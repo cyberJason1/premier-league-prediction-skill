@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>英超预测引擎 · 2026-27</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        :root{
+            --bg:#0a0e1a;--panel:#141a2e;--panel2:#1c2340;--border:#2a3352;
+            --text:#e6ebf5;--muted:#8892b0;--accent:#7c5cff;--accent2:#3ddc97;--danger:#ff6b6b;
+        }
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+            background:radial-gradient(1200px 600px at 20% -10%,#1a1340 0%,transparent 60%),var(--bg);
+            color:var(--text);min-height:100vh;padding:20px;line-height:1.5}
+        header{max-width:1200px;margin:0 auto 20px}
+        h1{font-size:24px;font-weight:700;letter-spacing:.5px}
+        h1 span{color:var(--accent)}
+        .sub{color:var(--muted);font-size:13px;margin-top:4px}
+        .layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:400px 1fr;gap:20px}
+        @media(max-width:900px){.layout{grid-template-columns:1fr}}
+        .panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:18px}
+        .panel h2{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
+        label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+        input,textarea,select{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
+            border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;outline:none;transition:border .15s}
+        input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+        textarea{resize:vertical;min-height:120px;line-height:1.5}
+        .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+        .row3{display:grid;grid-template-columns:1fr 1fr .8fr;gap:8px}
+        button{width:100%;margin-top:16px;background:linear-gradient(135deg,#7c5cff,#5c3dff);color:#fff;border:0;
+            border-radius:10px;padding:12px;font-size:15px;font-weight:600;cursor:pointer;transition:transform .1s,opacity .2s}
+        button:hover:not(:disabled){transform:translateY(-1px)}
+        button:disabled{opacity:.5;cursor:not-allowed}
+        .status{margin-top:12px;font-size:12px;color:var(--muted);min-height:16px}
+        .status.loading{color:var(--accent)}
+        .status.done{color:var(--accent2)}
+        .status.error{color:var(--danger)}
+        .empty{color:var(--muted);font-size:13px;text-align:center;padding:60px 20px}
+        .match-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;margin-bottom:6px}
+        .team{font-size:17px;font-weight:600;text-align:center}
+        .team.home{text-align:right}
+        .team.away{text-align:left}
+        .score{font-size:28px;font-weight:700;color:var(--accent2);background:var(--panel2);padding:6px 16px;border-radius:10px;letter-spacing:1px}
+        .meta{text-align:center;color:var(--muted);font-size:12px;margin-bottom:18px}
+        .prob-bar{display:flex;height:36px;border-radius:10px;overflow:hidden;margin-bottom:8px;border:1px solid var(--border)}
+        .seg{display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;transition:width .4s;min-width:0;overflow:hidden}
+        .seg.home{background:linear-gradient(135deg,#7c5cff,#5c3dff)}
+        .seg.draw{background:linear-gradient(135deg,#3d5cff,#2a3fd0)}
+        .seg.away{background:linear-gradient(135deg,#ff5c7c,#d03d5c)}
+        .prob-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:18px}
+        .section{margin-top:16px}
+        .section h3{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600}
+        .section p,.section ul{font-size:14px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+        .section ul{list-style:none}
+        .section li{padding:3px 0;position:relative;padding-left:14px}
+        .section li::before{content:"›";position:absolute;left:0;color:var(--accent)}
+        .section li.muted{color:var(--muted)}
+        .section li.muted::before{color:var(--muted)}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        @media(max-width:600px){.grid-2{grid-template-columns:1fr}}
+        details.raw{margin-top:18px;font-size:12px}
+        details.raw summary{cursor:pointer;color:var(--muted);padding:6px 0}
+        details.raw pre{background:#080b14;border:1px solid var(--border);border-radius:8px;padding:12px;
+            overflow:auto;font-size:12px;color:#a8b2d1;max-height:280px;margin-top:6px}
+        .error-box{background:#2a1520;border:1px solid var(--danger);color:#ffb0b0;border-radius:8px;padding:14px;
+            font-size:13px;white-space:pre-wrap;word-break:break-word}
+        .hint{font-size:11px;color:var(--muted);margin-top:6px}
+    </style>
+</head>
+<body>
+<header>
+    <h1>英超预测引擎 <span>2026-27</span></h1>
+    <div class="sub">基于 skill.md 提示词工程 · 静态规则 + 动态情报</div>
+</header>
+
+<div class="layout">
+    <section class="panel">
+        <h2>比赛输入</h2>
+
+        <label>主队 / 客队 / 轮次</label>
+        <div class="row3">
+            <input id="home" placeholder="阿森纳">
+            <input id="away" placeholder="考文垂城">
+            <input id="round" placeholder="第8轮">
+        </div>
+
+        <label>今日情报（可留空）</label>
+        <textarea id="intel" placeholder="例：
+- 阿森纳：萨利巴背伤，赛前评估
+- 考文垂城：主力中场停赛
+- 天气：主场小雨"></textarea>
+
+        <label>DeepSeek API Key</label>
+        <input id="apiKey" type="password" placeholder="sk-...">
+        <div class="hint">只保存在你的浏览器，不会上传到任何服务器</div>
+
+        <label>模型</label>
+        <select id="model">
+            <option value="deepseek-chat">deepseek-chat（V3，快）</option>
+            <option value="deepseek-reasoner">deepseek-reasoner（R1，慢但更稳）</option>
+        </select>
+
+        <button id="predictBtn">开始预测</button>
+        <div id="status" class="status"></div>
+    </section>
+
+    <section class="panel">
+        <h2>预测结果</h2>
+        <div id="result"><div class="empty">填写左侧信息后，点击「开始预测」</div></div>
+    </section>
+</div>
+
+<script>
+    const els = {
+        home: document.getElementById('home'),
+        away: document.getElementById('away'),
+        round: document.getElementById('round'),
+        intel: document.getElementById('intel'),
+        apiKey: document.getElementById('apiKey'),
+        model: document.getElementById('model'),
+        predictBtn: document.getElementById('predictBtn'),
+        status: document.getElementById('status'),
+        result: document.getElementById('result'),
+    };
+
+    const keys = { home:'home', away:'away', round:'round', intel:'intel', apiKey:'ds_key', model:'model' };
+
+    // 恢复本地缓存
+    Object.entries(keys).forEach(([el, k]) => {
+        const v = localStorage.getItem(k);
+        if (v) els[el].value = v;
+    });
+    if (!els.round.value) els.round.value = '第8轮';
+
+    // 自动保存
+    Object.entries(keys).forEach(([el, k]) => {
+        els[el].addEventListener('change', () => localStorage.setItem(k, els[el].value));
+    });
+
+    let skillCache = null;
+    async function loadSkill() {
+        if (skillCache) return skillCache;
+        const res = await fetch('./skill.md', { cache: 'no-cache' });
+        if (!res.ok) throw new Error('无法加载 skill.md（HTTP ' + res.status + '）');
+        skillCache = await res.text();
+        return skillCache;
+    }
+
+    els.predictBtn.addEventListener('click', async () => {
+        const home = els.home.value.trim();
+        const away = els.away.value.trim();
+        const round = els.round.value.trim() || '第X轮';
+        const intel = els.intel.value.trim();
+        const apiKey = els.apiKey.value.trim();
+        const model = els.model.value;
+
+        if (!home || !away) return alert('请填写主队和客队');
+        if (!apiKey) return alert('请填写 DeepSeek API Key');
+
+        els.predictBtn.disabled = true;
+        els.status.className = 'status loading';
+        els.status.textContent = '加载 skill.md…';
+        els.result.innerHTML = '<div class="empty">推理中，请稍候…</div>';
+
+        try {
+            const skill = await loadSkill();
+            els.status.textContent = '调用模型推理中…';
+
+            const userMsg =
+                `【今日情报】
+${intel || '（今日无新增情报）'}
+
+【预测指令】
+请预测：${home} vs ${away}，英超 2026-27 ${round}。
+严格遵守 skill.md，只输出纯 json 对象，不要任何额外文字。`;
+
+            const res = await fetch('https://api.deepseek.com/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + apiKey,
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        { role: 'system', content: skill },
+                        { role: 'user', content: userMsg },
+                    ],
+                    temperature: 0.7,
+                    response_format: { type: 'json_object' },
+                }),
+            });
+
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error('API 错误 ' + res.status + '\n' + t);
+            }
+
+            const data = await res.json();
+            const content = data.choices?.[0]?.message?.content || '';
+            let parsed;
+            try {
+                parsed = JSON.parse(content);
+            } catch (e) {
+                throw new Error('模型未返回合法 JSON：\n' + content);
+            }
+
+            render(parsed);
+            els.status.className = 'status done';
+            els.status.textContent = '完成 · ' + new Date().toLocaleTimeString();
+        } catch (e) {
+            els.status.className = 'status error';
+            els.status.textContent = '出错';
+            els.result.innerHTML = '<div class="error-box">' + escapeHtml(e.message) + '</div>';
+        } finally {
+            els.predictBtn.disabled = false;
+        }
+    });
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function render(d) {
+        const p = d.probabilities || {};
+        const hw = Number(p.homeWin) || 0;
+        const dr = Number(p.draw) || 0;
+        const aw = Number(p.awayWin) || 0;
+
+        const list = (arr) => {
+            if (!arr || !arr.length) return '<li class="muted">无</li>';
+            return arr.map(x => '<li>' + escapeHtml(x) + '</li>').join('');
+        };
+
+        els.result.innerHTML = `
+    <div class="match-head">
+      <div class="team home">${escapeHtml(d.match?.home || '')}</div>
+      <div class="score">${escapeHtml(d.predictedScore || '')}</div>
+      <div class="team away">${escapeHtml(d.match?.away || '')}</div>
+    </div>
+    <div class="meta">${escapeHtml(d.match?.competition || '')} · ${escapeHtml(d.match?.season || '')} · ${escapeHtml(d.match?.round || '')}</div>
+
+    <div class="prob-bar">
+      <div class="seg home" style="width:${hw}%">${hw >= 12 ? hw + '%' : ''}</div>
+      <div class="seg draw" style="width:${dr}%">${dr >= 12 ? dr + '%' : ''}</div>
+      <div class="seg away" style="width:${aw}%">${aw >= 12 ? aw + '%' : ''}</div>
+    </div>
+    <div class="prob-labels">
+      <span>主胜 ${hw}%</span><span>平 ${dr}%</span><span>客胜 ${aw}%</span>
+    </div>
+
+    <div class="section"><h3>关键因素</h3><ul>${list(d.keyFactors)}</ul></div>
+    <div class="section"><h3>分析</h3><p>${escapeHtml(d.analysis || '')}</p></div>
+
+    <div class="grid-2">
+      <div class="section"><h3>置信度</h3><p>${escapeHtml(d.confidence || '')}</p></div>
+      <div class="section"><h3>时间模式</h3><p>${escapeHtml(d.timeMode || '')}</p></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="section"><h3>缺失信息</h3><ul>${list(d.missingInfo)}</ul></div>
+      <div class="section"><h3>估算项</h3><ul>${list(d.estimates)}</ul></div>
+    </div>
+
+    <details class="raw">
+      <summary>原始 JSON</summary>
+      <pre>${escapeHtml(JSON.stringify(d, null, 2))}</pre>
+    </details>
+  `;
+    }
+</script>
+</body>
+</html>
