@@ -79,10 +79,11 @@
         .sb-live .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 1.5s infinite}
         .sb-main{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:16px;position:relative;z-index:1}
         .sb-team{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:0}
-        .crest{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;box-shadow:0 10px 24px -6px rgba(0,0,0,.6),inset 0 2px 4px rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.1);transition:transform .3s}
+        .crest{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;box-shadow:0 10px 24px -6px rgba(0,0,0,.6),inset 0 2px 4px rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.1);transition:transform .3s;overflow:hidden;background:#0d1a30}
         .crest:hover{transform:scale(1.08) rotate(-3deg)}
         .crest.home{background:linear-gradient(135deg,#8b5cf6,#5b21b6)}
         .crest.away{background:linear-gradient(135deg,#f43f5e,#9f1239)}
+        .crest img{width:78%;height:78%;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
         .sb-name{font-size:15px;font-weight:800;letter-spacing:-.2px;text-align:center;line-height:1.2;max-width:130px;word-break:break-word}
         .sb-score{display:flex;align-items:center;gap:10px;padding:8px 20px;background:linear-gradient(180deg,#050b14,#0a1524);border:1px solid rgba(0,255,136,.25);border-radius:16px;box-shadow:0 0 40px rgba(0,255,136,.15),inset 0 1px 0 rgba(255,255,255,.08);animation:scorePop .6s cubic-bezier(.34,1.56,.64,1)}
         @keyframes scorePop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
@@ -116,7 +117,6 @@
         .section li.muted{color:#4a5878}
         .section li.muted::before{background:#2a3352;box-shadow:none}
 
-        /* H2H 区块 */
         .h2h-wrap{background:linear-gradient(180deg,#0d1a30,#0a1524);border:1px solid rgba(139,92,246,.25);border-radius:16px;padding:18px 20px;margin-top:18px;box-shadow:0 12px 40px -20px rgba(139,92,246,.4),inset 0 1px 0 rgba(255,255,255,.04)}
         .h2h-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
         .h2h-head .t{font-size:11px;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:1.5px;display:flex;align-items:center;gap:8px}
@@ -154,6 +154,116 @@
         .error-box{background:linear-gradient(180deg,rgba(244,63,94,.12),rgba(244,63,94,.05));border:1px solid rgba(244,63,94,.4);color:#fecdd3;border-radius:14px;padding:18px;font-size:13px;white-space:pre-wrap;word-break:break-word;line-height:1.7}
         .hint{font-size:11px;color:#4a5878;margin-top:8px;line-height:1.5;display:flex;align-items:center;gap:6px}
         .divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:20px 0 4px}
+
+        /* ========== 积分榜 ========== */
+        .standings-panel{margin-top:22px;background:linear-gradient(180deg,rgba(13,21,36,.95),rgba(19,29,51,.9));border:1px solid var(--border);border-radius:20px;padding:22px;position:relative;overflow:hidden}
+        .standings-panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent-2),transparent);opacity:.6}
+        .standings-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+        .standings-head h2{font-size:14px;font-weight:800;color:var(--text);letter-spacing:1px;display:flex;align-items:center;gap:10px}
+        .standings-head h2 .bar{width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--accent),var(--accent-2));box-shadow:0 0 10px rgba(0,255,136,.5)}
+        .standings-head .meta{font-size:11px;color:var(--text-dim);font-weight:600;letter-spacing:.5px}
+        .standings-legend{display:flex;gap:14px;font-size:10.5px;color:var(--text-dim);flex-wrap:wrap;margin-bottom:12px;font-weight:600}
+        .standings-legend span{display:inline-flex;align-items:center;gap:6px}
+        .standings-legend .sw{width:10px;height:10px;border-radius:3px}
+        .standings-legend .sw.ucl{background:#00ff88}
+        .standings-legend .sw.uel{background:#00d4ff}
+        .standings-legend .sw.uecl{background:#8b5cf6}
+        .standings-legend .sw.rel{background:#f43f5e}
+        .standings-scroll{overflow-x:auto;border-radius:12px}
+        .standings-table{width:100%;border-collapse:collapse;font-size:13px;min-width:660px}
+        .standings-table thead th{background:rgba(0,255,136,.06);color:var(--accent);font-weight:700;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;padding:11px 8px;text-align:center;border-bottom:1px solid var(--border)}
+        .standings-table thead th:nth-child(2){text-align:left}
+        .standings-table tbody td{padding:9px 8px;text-align:center;border-bottom:1px solid rgba(34,48,79,.35);color:#cdd5ec;font-variant-numeric:tabular-nums}
+        .standings-table tbody td:nth-child(2){text-align:left}
+        .standings-table tbody tr{transition:background .15s}
+        .standings-table tbody tr:hover{background:rgba(0,255,136,.05)}
+        .standings-table tbody tr.r-ucl{border-left:3px solid var(--accent)}
+        .standings-table tbody tr.r-uel{border-left:3px solid var(--accent-2)}
+        .standings-table tbody tr.r-uecl{border-left:3px solid var(--purple)}
+        .standings-table tbody tr.r-rel{border-left:3px solid var(--red)}
+        .standings-table .rank{font-weight:800;color:#e6eefc}
+        .standings-table .team-cell{display:flex;align-items:center;gap:9px}
+        .standings-table .team-cell img{width:22px;height:22px;object-fit:contain;flex-shrink:0}
+        .standings-table .team-cell .fb{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#2a3b5e,#1a2642);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:900;color:#b8c2de;flex-shrink:0}
+        .standings-table .pts{font-weight:900;color:var(--accent)}
+
+        /* ========== 配置同步 ========== */
+        .sync-bar{display:flex;gap:8px;margin-top:10px}
+        .sync-bar button{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text-dim);padding:9px 12px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;letter-spacing:.3px}
+        .sync-bar button:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,255,136,.06)}
+        .sync-panel{display:none;margin-top:10px;padding:12px;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:12px}
+        .sync-panel.open{display:block}
+        .sync-panel textarea{width:100%;min-height:76px;font-size:11px;font-family:"SF Mono",Menlo,Consolas,monospace;background:#03060c;border:1px solid var(--border);border-radius:8px;color:#8ba3c4;padding:10px;resize:vertical;word-break:break-all;line-height:1.5}
+        .sync-panel .row-btns{display:flex;gap:8px;margin-top:8px}
+        .sync-panel .row-btns button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text-dim);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+        .sync-panel .row-btns button.primary{background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,212,255,.15));border-color:rgba(0,255,136,.4);color:var(--accent)}
+        .sync-panel .row-btns button:hover{border-color:var(--accent);color:var(--accent)}
+        .sync-tip{font-size:10.5px;color:#4a5878;margin-top:8px;line-height:1.5}
+        .sync-tip.warn{color:var(--gold)}
+
+        /* ========== 历史记录 ========== */
+        .pl-history-fab{position:fixed;right:24px;bottom:24px;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#00d4ff);color:#050810;border:none;font-size:24px;cursor:pointer;box-shadow:0 8px 32px rgba(0,255,136,.35);z-index:9998;display:flex;align-items:center;justify-content:center;transition:transform .25s,box-shadow .25s}
+        .pl-history-fab:hover{transform:scale(1.08) rotate(-5deg);box-shadow:0 12px 40px rgba(0,255,136,.5)}
+        .pl-history-fab .badge{position:absolute;top:-4px;right:-4px;background:#f43f5e;color:#fff;border-radius:10px;padding:2px 7px;font-size:11px;font-weight:700;min-width:18px;text-align:center;box-shadow:0 2px 8px rgba(244,63,94,.5)}
+        .pl-history-overlay{position:fixed;inset:0;background:rgba(5,8,16,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:9999;display:none;padding:24px;overflow-y:auto}
+        .pl-history-overlay.open{display:block;animation:pl-fade-in .22s ease}
+        @keyframes pl-fade-in{from{opacity:0}to{opacity:1}}
+        .pl-history-panel{max-width:980px;margin:0 auto;background:linear-gradient(160deg,rgba(20,28,44,.96),rgba(10,16,28,.96));border:1px solid rgba(0,255,136,.18);border-radius:20px;padding:28px;color:#e6eefc;box-shadow:0 30px 80px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.06);animation:pl-slide-up .3s cubic-bezier(.2,.9,.3,1)}
+        @keyframes pl-slide-up{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+        .pl-history-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+        .pl-history-header h2{margin:0;font-size:22px;letter-spacing:.5px;background:linear-gradient(90deg,#00ff88,#00d4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+        .pl-history-close{background:rgba(255,255,255,.06);color:#e6eefc;border:1px solid rgba(255,255,255,.1);width:36px;height:36px;border-radius:10px;font-size:18px;cursor:pointer;transition:all .2s}
+        .pl-history-close:hover{background:rgba(244,63,94,.2);border-color:#f43f5e}
+        .pl-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
+        .pl-stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+        .pl-stat::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(0,255,136,.08),transparent 60%);pointer-events:none}
+        .pl-stat-label{font-size:11px;color:#8b9ab5;letter-spacing:1.2px;text-transform:uppercase}
+        .pl-stat-value{font-size:26px;font-weight:700;margin-top:6px;color:#00ff88}
+        .pl-stat-value.blue{color:#00d4ff}
+        .pl-stat-value.purple{color:#8b5cf6}
+        .pl-stat-value.red{color:#f43f5e}
+        .pl-filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+        .pl-filter{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#b8c4d8;padding:7px 14px;border-radius:999px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+        .pl-filter:hover{border-color:rgba(0,255,136,.4);color:#e6eefc}
+        .pl-filter.active{background:linear-gradient(135deg,rgba(0,255,136,.2),rgba(0,212,255,.2));border-color:#00ff88;color:#00ff88;font-weight:600}
+        .pl-records{display:flex;flex-direction:column;gap:12px}
+        .pl-record{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);border-left:3px solid #00d4ff;border-radius:14px;padding:16px 18px;transition:all .2s}
+        .pl-record:hover{background:rgba(255,255,255,.045);transform:translateX(2px)}
+        .pl-record.hit{border-left-color:#00ff88}
+        .pl-record.miss{border-left-color:#f43f5e}
+        .pl-record.pending{border-left-color:#8b9ab5}
+        .pl-record-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+        .pl-record-match{font-size:16px;font-weight:700;color:#e6eefc}
+        .pl-record-match .vs{color:#8b9ab5;font-weight:400;margin:0 6px}
+        .pl-record-meta{font-size:11px;color:#8b9ab5;margin-top:4px;letter-spacing:.4px}
+        .pl-record-score{font-family:'SF Mono',Menlo,monospace;font-size:20px;font-weight:700;color:#00ff88;letter-spacing:2px;text-shadow:0 0 20px rgba(0,255,136,.4)}
+        .pl-probs{display:flex;gap:8px;margin:10px 0;font-size:11px;flex-wrap:wrap}
+        .pl-prob-chip{padding:3px 10px;border-radius:6px;background:rgba(255,255,255,.05);color:#b8c4d8}
+        .pl-prob-chip.home{color:#00ff88}
+        .pl-prob-chip.draw{color:#8b9ab5}
+        .pl-prob-chip.away{color:#00d4ff}
+        .pl-actual-row{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.08);flex-wrap:wrap}
+        .pl-actual-row label{font-size:11px;color:#8b9ab5;letter-spacing:1px;text-transform:uppercase;margin:0}
+        .pl-actual-input{width:48px;height:32px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:#e6eefc;text-align:center;font-size:15px;font-weight:700;font-family:inherit;outline:none;transition:all .2s;padding:0}
+        .pl-actual-input:focus{border-color:#00ff88;box-shadow:0 0 0 3px rgba(0,255,136,.15)}
+        .pl-btn-mini{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#b8c4d8;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s;font-family:inherit}
+        .pl-btn-mini:hover{border-color:#00ff88;color:#00ff88}
+        .pl-btn-mini.danger:hover{border-color:#f43f5e;color:#f43f5e}
+        .pl-btn-mini.primary{background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,212,255,.15));border-color:rgba(0,255,136,.4);color:#00ff88;font-weight:600}
+        .pl-verdict{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.5px}
+        .pl-verdict.exact{background:rgba(0,255,136,.15);color:#00ff88;border:1px solid rgba(0,255,136,.4)}
+        .pl-verdict.outcome{background:rgba(0,212,255,.15);color:#00d4ff;border:1px solid rgba(0,212,255,.4)}
+        .pl-verdict.miss{background:rgba(244,63,94,.12);color:#f43f5e;border:1px solid rgba(244,63,94,.35)}
+        .pl-verdict.pending{background:rgba(139,154,181,.12);color:#8b9ab5;border:1px solid rgba(139,154,181,.3)}
+        .pl-empty{text-align:center;padding:60px 20px;color:#8b9ab5}
+        .pl-empty .icon{font-size:48px;opacity:.4;margin-bottom:12px}
+        .pl-empty .msg{font-size:14px}
+        .pl-footer-bar{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);flex-wrap:wrap}
+        @media (max-width:640px){
+            .pl-history-fab{right:16px;bottom:16px;width:52px;height:52px;font-size:22px}
+            .pl-history-panel{padding:18px}
+            .pl-stat-value{font-size:22px}
+        }
     </style>
 </head>
 <body>
@@ -203,6 +313,20 @@
 
             <button id="predictBtn" class="btn">开始预测</button>
             <div id="status" class="status"></div>
+
+            <div class="sync-bar">
+                <button id="syncExportBtn" type="button">📤 导出配置</button>
+                <button id="syncImportBtn" type="button">📥 导入配置</button>
+            </div>
+            <div class="sync-panel" id="syncPanel">
+                <textarea id="syncText" placeholder="点击「导出配置」生成文本，或粘贴其他设备的配置文本后点「应用」"></textarea>
+                <div class="row-btns">
+                    <button id="syncCopyBtn" type="button">复制</button>
+                    <button id="syncApplyBtn" type="button" class="primary">应用并刷新</button>
+                    <button id="syncCloseBtn" type="button">关闭</button>
+                </div>
+                <div class="sync-tip warn">⚠️ 这段文本包含你的 API Key，请勿分享给他人，也不要粘贴到公开的地方。</div>
+            </div>
         </section>
 
         <section class="panel">
@@ -214,6 +338,64 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <div class="standings-panel">
+        <div class="standings-head">
+            <h2><span class="bar"></span>英超积分榜</h2>
+            <div class="meta" id="standingsMeta">截至第 6 轮</div>
+        </div>
+        <div class="standings-legend">
+            <span><span class="sw ucl"></span>欧冠</span>
+            <span><span class="sw uel"></span>欧联</span>
+            <span><span class="sw uecl"></span>欧协联</span>
+            <span><span class="sw rel"></span>降级区</span>
+        </div>
+        <div class="standings-scroll">
+            <table class="standings-table">
+                <thead>
+                <tr>
+                    <th style="width:44px">#</th>
+                    <th>球队</th>
+                    <th>场</th>
+                    <th>胜</th>
+                    <th>平</th>
+                    <th>负</th>
+                    <th>进</th>
+                    <th>失</th>
+                    <th>净</th>
+                    <th>积分</th>
+                </tr>
+                </thead>
+                <tbody id="standingsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<button class="pl-history-fab" id="plHistoryFab" title="预测历史">
+    📊<span class="badge" id="plHistoryBadge" style="display:none">0</span>
+</button>
+<div class="pl-history-overlay" id="plHistoryOverlay">
+    <div class="pl-history-panel">
+        <div class="pl-history-header">
+            <h2>📊 预测历史 & 命中率</h2>
+            <button class="pl-history-close" id="plHistoryClose">✕</button>
+        </div>
+        <div class="pl-stats" id="plStats"></div>
+        <div class="pl-filters" id="plFilters">
+            <button class="pl-filter active" data-filter="all">全部</button>
+            <button class="pl-filter" data-filter="pending">待录入赛果</button>
+            <button class="pl-filter" data-filter="hit">已命中</button>
+            <button class="pl-filter" data-filter="miss">未命中</button>
+        </div>
+        <div class="pl-records" id="plRecords"></div>
+        <div class="pl-footer-bar">
+            <button class="pl-btn-mini" id="plExport">⬇ 导出 JSON</button>
+            <button class="pl-btn-mini" id="plImport">⬆ 导入 JSON</button>
+            <button class="pl-btn-mini danger" id="plClear">🗑 清空全部</button>
+            <input type="file" id="plImportFile" accept=".json" style="display:none">
+        </div>
     </div>
 </div>
 
@@ -261,6 +443,36 @@
     ];
 
     const ABBR = {'阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','阿斯顿维拉':'AVL','纽卡斯尔联':'NEW','曼联':'MUN','布莱顿':'BHA','水晶宫':'CRY','埃弗顿':'EVE','富勒姆':'FUL','布伦特福德':'BRE','诺丁汉森林':'NFO','伯恩茅斯':'BOU','利兹联':'LEE','桑德兰':'SUN','考文垂城':'COV','赫尔城':'HUL','伊普斯维奇镇':'IPS'};
+
+    const ESPN_IDS = {
+        '阿森纳':359,'曼城':382,'利物浦':364,'切尔西':363,'热刺':367,'曼联':360,
+        '纽卡斯尔联':361,'阿斯顿维拉':362,'布莱顿':331,'埃弗顿':368,'富勒姆':370,
+        '水晶宫':384,'布伦特福德':337,'伯恩茅斯':349,'诺丁汉森林':393,'利兹联':357,
+        '桑德兰':366,'伊普斯维奇镇':373,'考文垂城':385,'赫尔城':336
+    };
+
+    const STATIC_STANDINGS = [
+        {rank:1, team:'曼城', played:6, won:6, drawn:0, lost:0, gf:16, ga:5, gd:11, points:18},
+        {rank:2, team:'阿森纳', played:6, won:5, drawn:0, lost:1, gf:10, ga:5, gd:5, points:15},
+        {rank:3, team:'布莱顿', played:6, won:4, drawn:1, lost:1, gf:18, ga:5, gd:13, points:13},
+        {rank:4, team:'布伦特福德', played:6, won:2, drawn:4, lost:0, gf:12, ga:6, gd:6, points:10},
+        {rank:5, team:'埃弗顿', played:6, won:2, drawn:4, lost:0, gf:6, ga:3, gd:3, points:10},
+        {rank:6, team:'切尔西', played:6, won:3, drawn:1, lost:2, gf:15, ga:13, gd:2, points:10},
+        {rank:7, team:'利兹联', played:6, won:2, drawn:3, lost:1, gf:8, ga:5, gd:3, points:9},
+        {rank:8, team:'赫尔城', played:5, won:2, drawn:2, lost:1, gf:6, ga:4, gd:2, points:8},
+        {rank:9, team:'利物浦', played:6, won:2, drawn:3, lost:1, gf:7, ga:7, gd:0, points:9},
+        {rank:10, team:'伊普斯维奇镇', played:6, won:3, drawn:0, lost:3, gf:9, ga:12, gd:-3, points:9},
+        {rank:11, team:'纽卡斯尔联', played:5, won:2, drawn:2, lost:1, gf:9, ga:9, gd:0, points:8},
+        {rank:12, team:'水晶宫', played:6, won:2, drawn:1, lost:3, gf:8, ga:11, gd:-3, points:7},
+        {rank:13, team:'曼联', played:6, won:1, drawn:3, lost:2, gf:9, ga:9, gd:0, points:6},
+        {rank:14, team:'考文垂城', played:6, won:2, drawn:0, lost:4, gf:5, ga:11, gd:-6, points:6},
+        {rank:15, team:'诺丁汉森林', played:5, won:1, drawn:2, lost:2, gf:4, ga:5, gd:-1, points:5},
+        {rank:16, team:'阿斯顿维拉', played:6, won:1, drawn:2, lost:3, gf:6, ga:11, gd:-5, points:5},
+        {rank:17, team:'桑德兰', played:6, won:1, drawn:1, lost:4, gf:6, ga:12, gd:-6, points:4},
+        {rank:18, team:'伯恩茅斯', played:6, won:0, drawn:3, lost:3, gf:7, ga:13, gd:-6, points:3},
+        {rank:19, team:'热刺', played:6, won:0, drawn:3, lost:3, gf:3, ga:9, gd:-6, points:3},
+        {rank:20, team:'富勒姆', played:6, won:0, drawn:2, lost:4, gf:6, ga:10, gd:-4, points:2}
+    ];
 
     const els = {
         home: document.getElementById('home'), away: document.getElementById('away'),
@@ -390,6 +602,16 @@
     function confClass(c) { const m = { '高':'high', '中高':'midhigh', '中':'mid', '低':'low' }; return m[c] || 'low'; }
     function getAbbr(name) { return ABBR[name] || (name ? name.slice(0,3).toUpperCase() : '??'); }
 
+    function crestHTML(name, side) {
+        const abbr = getAbbr(name);
+        const id = ESPN_IDS[name];
+        if (id) {
+            const url = 'https://a.espncdn.com/i/teamlogos/soccer/500/' + id + '.png';
+            return `<div class="crest ${side}"><img src="${url}" alt="${esc(name)}" onerror="this.parentNode.textContent='${esc(abbr)}'"></div>`;
+        }
+        return `<div class="crest ${side}">${esc(abbr)}</div>`;
+    }
+
     function renderH2H(h) {
         if (!h) return '';
         const note = h.note || '估算';
@@ -416,10 +638,8 @@
         const dr = Number(p.draw) || 0;
         const aw = Number(p.awayWin) || 0;
 
-        const homeName = d.match?.home || '';
-        const awayName = d.match?.away || '';
-        const homeAbbr = getAbbr(homeName);
-        const awayAbbr = getAbbr(awayName);
+        const homeName = d.match?.home || els.home.value.trim();
+        const awayName = d.match?.away || els.away.value.trim();
 
         const sp = String(d.predictedScore || '0-0').split('-');
         const homeGoals = (sp[0] || '0').trim();
@@ -436,7 +656,7 @@
         </div>
         <div class="sb-main">
           <div class="sb-team home">
-            <div class="crest home">${esc(homeAbbr)}</div>
+            ${crestHTML(homeName, 'home')}
             <div class="sb-name">${esc(homeName)}</div>
           </div>
           <div class="sb-score">
@@ -445,13 +665,13 @@
             <span class="num">${esc(awayGoals)}</span>
           </div>
           <div class="sb-team away">
-            <div class="crest away">${esc(awayAbbr)}</div>
+            ${crestHTML(awayName, 'away')}
             <div class="sb-name">${esc(awayName)}</div>
           </div>
         </div>
       </div>
 
-      <div class="section-title" style="margin-top:0">胜平负概率 · ${esc(d.match?.round || '')}</div>
+      <div class="section-title" style="margin-top:0">胜平负概率 · ${esc(d.match?.round || els.round.value)}</div>
       <div class="prob-bar">
         <div class="seg home" style="width:${hw}%">${hw >= 12 ? hw + '%' : ''}</div>
         <div class="seg draw" style="width:${dr}%">${dr >= 12 ? dr + '%' : ''}</div>
@@ -503,7 +723,397 @@
       </details>
     </div>
   `;
+
+        try {
+            window.PLHistory?.add({
+                round: d.match?.round || els.round.value,
+                homeTeam: homeName,
+                awayTeam: awayName,
+                predictedHome: Number(homeGoals),
+                predictedAway: Number(awayGoals),
+                probability: { home: hw, draw: dr, away: aw },
+                confidence: d.confidence || '',
+                analysis: d.analysis || ''
+            });
+        } catch (e) { console.warn('[History] add failed', e); }
     }
+
+    (function renderStandings() {
+        const tbody = document.getElementById('standingsBody');
+        if (!tbody) return;
+        const total = STATIC_STANDINGS.length;
+        tbody.innerHTML = STATIC_STANDINGS.map(r => {
+            let cls = '';
+            if (r.rank <= 4) cls = 'r-ucl';
+            else if (r.rank <= 6) cls = 'r-uel';
+            else if (r.rank === 7) cls = 'r-uecl';
+            else if (r.rank > total - 3) cls = 'r-rel';
+            const id = ESPN_IDS[r.team];
+            const abbr = ABBR[r.team] || r.team.slice(0,3).toUpperCase();
+            const badge = id
+                ? `<img src="https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png" alt="${esc(r.team)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="fb" style="display:none">${esc(abbr)}</div>`
+                : `<div class="fb">${esc(abbr)}</div>`;
+            const gd = r.gd > 0 ? '+' + r.gd : r.gd;
+            return `<tr class="${cls}">
+                <td class="rank">${r.rank}</td>
+                <td><div class="team-cell">${badge}<span>${esc(r.team)}</span></div></td>
+                <td>${r.played}</td>
+                <td>${r.won}</td>
+                <td>${r.drawn}</td>
+                <td>${r.lost}</td>
+                <td>${r.gf}</td>
+                <td>${r.ga}</td>
+                <td>${gd}</td>
+                <td class="pts">${r.points}</td>
+            </tr>`;
+        }).join('');
+    })();
+</script>
+
+<script>
+    (function() {
+        'use strict';
+        const KEY = 'pl_prediction_history_v1';
+        const MAX_RECORDS = 2000;
+
+        const Store = {
+            all() {
+                try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : []; }
+                catch (e) { console.warn('[History] parse failed', e); return []; }
+            },
+            save(list) {
+                try {
+                    if (list.length > MAX_RECORDS) list = list.slice(0, MAX_RECORDS);
+                    localStorage.setItem(KEY, JSON.stringify(list));
+                } catch (e) { console.warn('[History] save failed', e); }
+            },
+            add(rec) {
+                const list = this.all();
+                const entry = Object.assign({
+                    id: 'p_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                    createdAt: Date.now(), actualHome: null, actualAway: null
+                }, rec);
+                list.unshift(entry); this.save(list); return entry;
+            },
+            update(id, patch) {
+                const list = this.all();
+                const i = list.findIndex(x => x.id === id);
+                if (i >= 0) { list[i] = Object.assign({}, list[i], patch); this.save(list); }
+            },
+            remove(id) { this.save(this.all().filter(x => x.id !== id)); },
+            clear() { this.save([]); }
+        };
+
+        function sign(h, a) { return h > a ? 1 : (h < a ? -1 : 0); }
+
+        function evaluate(rec) {
+            if (rec.actualHome == null || rec.actualAway == null) return { status: 'pending' };
+            const pH = Number(rec.predictedHome), pA = Number(rec.predictedAway);
+            const aH = Number(rec.actualHome),    aA = Number(rec.actualAway);
+            if ([pH, pA, aH, aA].some(n => isNaN(n))) return { status: 'pending' };
+            if (pH === aH && pA === aA) return { status: 'hit', kind: 'exact' };
+            if (sign(pH, pA) === sign(aH, aA)) return { status: 'hit', kind: 'outcome' };
+            return { status: 'miss', kind: 'miss' };
+        }
+
+        function stats(list) {
+            let total = list.length, settled = 0, exact = 0, outcome = 0, miss = 0;
+            for (const r of list) {
+                const e = evaluate(r);
+                if (e.status === 'pending') continue;
+                settled++;
+                if (e.kind === 'exact') exact++;
+                else if (e.kind === 'outcome') outcome++;
+                else miss++;
+            }
+            return {
+                total, settled, exact, outcome, miss,
+                hitRateAny: settled ? (exact + outcome) / settled * 100 : 0,
+                hitRateExact: settled ? exact / settled * 100 : 0
+            };
+        }
+
+        let currentFilter = 'all';
+        const esc = s => String(s == null ? '' : s)
+            .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+        function fmtTime(ts) {
+            const d = new Date(ts), pad = n => String(n).padStart(2, '0');
+            return `${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function renderStats() {
+            const s = stats(Store.all());
+            document.getElementById('plStats').innerHTML = `
+      <div class="pl-stat"><div class="pl-stat-label">总预测</div><div class="pl-stat-value blue">${s.total}</div></div>
+      <div class="pl-stat"><div class="pl-stat-label">已录入赛果</div><div class="pl-stat-value purple">${s.settled}</div></div>
+      <div class="pl-stat"><div class="pl-stat-label">胜平负命中率</div><div class="pl-stat-value">${s.settled ? s.hitRateAny.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pl-stat"><div class="pl-stat-label">精确比分命中率</div><div class="pl-stat-value">${s.settled ? s.hitRateExact.toFixed(1)+'%' : '—'}</div></div>
+      <div class="pl-stat"><div class="pl-stat-label">精确 / 胜平负 / 未中</div><div class="pl-stat-value red" style="font-size:16px">${s.exact} / ${s.outcome} / ${s.miss}</div></div>
+    `;
+        }
+
+        function renderRecords() {
+            const list = Store.all();
+            const el = document.getElementById('plRecords');
+            const filtered = list.filter(r => {
+                const e = evaluate(r);
+                if (currentFilter === 'all') return true;
+                if (currentFilter === 'pending') return e.status === 'pending';
+                if (currentFilter === 'hit') return e.status === 'hit';
+                if (currentFilter === 'miss') return e.status === 'miss';
+                return true;
+            });
+
+            if (!filtered.length) {
+                el.innerHTML = `<div class="pl-empty"><div class="icon">📭</div><div class="msg">${list.length ? '当前筛选下没有记录' : '还没有预测记录，去预测一场吧'}</div></div>`;
+                return;
+            }
+
+            el.innerHTML = filtered.map(r => {
+                const e = evaluate(r);
+                const cls = e.status === 'pending' ? 'pending' : (e.status === 'hit' ? 'hit' : 'miss');
+                const prob = r.probability || {};
+                const homeName = esc(r.homeTeam || '主队');
+                const awayName = esc(r.awayTeam || '客队');
+                const rnd = r.round != null ? esc(r.round) : '';
+
+                let verdict;
+                if (e.status === 'pending') verdict = `<span class="pl-verdict pending">待录入</span>`;
+                else if (e.kind === 'exact') verdict = `<span class="pl-verdict exact">✓ 精确命中</span>`;
+                else if (e.kind === 'outcome') verdict = `<span class="pl-verdict outcome">◐ 胜平负命中</span>`;
+                else verdict = `<span class="pl-verdict miss">✗ 未命中</span>`;
+
+                return `
+      <div class="pl-record ${cls}" data-id="${esc(r.id)}">
+        <div class="pl-record-top">
+          <div>
+            <div class="pl-record-match">${homeName}<span class="vs">VS</span>${awayName}</div>
+            <div class="pl-record-meta">${rnd} · ${fmtTime(r.createdAt)}${r.confidence ? ' · 置信度 ' + esc(r.confidence) : ''}</div>
+          </div>
+          <div style="text-align:right">
+            <div class="pl-record-score">${r.predictedHome ?? '?'} - ${r.predictedAway ?? '?'}</div>
+            <div style="margin-top:6px">${verdict}</div>
+          </div>
+        </div>
+        ${prob.home != null ? `<div class="pl-probs">
+          <span class="pl-prob-chip home">主胜 ${prob.home}%</span>
+          <span class="pl-prob-chip draw">平 ${prob.draw}%</span>
+          <span class="pl-prob-chip away">客胜 ${prob.away}%</span>
+        </div>` : ''}
+        <div class="pl-actual-row">
+          <label>实际赛果</label>
+          <input class="pl-actual-input" data-act="home" type="number" min="0" max="20" value="${r.actualHome ?? ''}" placeholder="?">
+          <span style="color:#8b9ab5">-</span>
+          <input class="pl-actual-input" data-act="away" type="number" min="0" max="20" value="${r.actualAway ?? ''}" placeholder="?">
+          <button class="pl-btn-mini primary" data-action="save-actual">保存赛果</button>
+          <button class="pl-btn-mini" data-action="clear-actual">清除</button>
+          <button class="pl-btn-mini danger" data-action="delete" style="margin-left:auto">删除</button>
+        </div>
+      </div>`;
+            }).join('');
+        }
+
+        function updateBadge() {
+            const list = Store.all();
+            const n = list.filter(r => evaluate(r).status === 'pending').length;
+            const b = document.getElementById('plHistoryBadge');
+            if (n > 0) { b.textContent = n > 99 ? '99+' : n; b.style.display = ''; }
+            else b.style.display = 'none';
+        }
+
+        function renderAll() { renderStats(); renderRecords(); updateBadge(); }
+
+        function openPanel() {
+            document.getElementById('plHistoryOverlay').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            renderAll();
+        }
+        function closePanel() {
+            document.getElementById('plHistoryOverlay').classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        function bindEvents() {
+            document.getElementById('plHistoryFab').addEventListener('click', openPanel);
+            document.getElementById('plHistoryClose').addEventListener('click', closePanel);
+            document.getElementById('plHistoryOverlay').addEventListener('click', e => {
+                if (e.target.id === 'plHistoryOverlay') closePanel();
+            });
+            document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+            document.getElementById('plFilters').addEventListener('click', e => {
+                const btn = e.target.closest('.pl-filter'); if (!btn) return;
+                document.querySelectorAll('.pl-filter').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderRecords();
+            });
+
+            document.getElementById('plRecords').addEventListener('click', e => {
+                const btn = e.target.closest('button[data-action]'); if (!btn) return;
+                const card = btn.closest('.pl-record'); const id = card.dataset.id;
+                if (btn.dataset.action === 'save-actual') {
+                    const h = card.querySelector('input[data-act="home"]').value;
+                    const a = card.querySelector('input[data-act="away"]').value;
+                    if (h === '' || a === '') { alert('请填写两个比分'); return; }
+                    Store.update(id, { actualHome: Number(h), actualAway: Number(a) });
+                    renderAll();
+                } else if (btn.dataset.action === 'clear-actual') {
+                    Store.update(id, { actualHome: null, actualAway: null }); renderAll();
+                } else if (btn.dataset.action === 'delete') {
+                    if (confirm('删除这条预测记录？')) { Store.remove(id); renderAll(); }
+                }
+            });
+
+            document.getElementById('plExport').addEventListener('click', () => {
+                const blob = new Blob([JSON.stringify(Store.all(), null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'pl-history-' + new Date().toISOString().slice(0,10) + '.json';
+                a.click(); URL.revokeObjectURL(url);
+            });
+
+            const fileInput = document.getElementById('plImportFile');
+            document.getElementById('plImport').addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', e => {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const imported = JSON.parse(reader.result);
+                        if (!Array.isArray(imported)) throw new Error('不是数组');
+                        const existing = Store.all();
+                        const ids = new Set(existing.map(x => x.id));
+                        const merged = imported.filter(x => x && x.id && !ids.has(x.id))
+                            .concat(existing).sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
+                        Store.save(merged); renderAll();
+                        alert(`成功导入 ${imported.length} 条（新增 ${merged.length - existing.length} 条）`);
+                    } catch (err) { alert('导入失败：' + err.message); }
+                    fileInput.value = '';
+                };
+                reader.readAsText(file);
+            });
+
+            document.getElementById('plClear').addEventListener('click', () => {
+                if (!Store.all().length) return;
+                if (confirm('确定清空全部预测历史？此操作不可恢复。')) { Store.clear(); renderAll(); }
+            });
+        }
+
+        window.PLHistory = {
+            add(rec) {
+                const entry = Store.add(rec);
+                updateBadge();
+                if (document.getElementById('plHistoryOverlay').classList.contains('open')) renderAll();
+                return entry;
+            },
+            all: () => Store.all(),
+            clear: () => { Store.clear(); renderAll(); },
+            stats: () => stats(Store.all()),
+            open: openPanel
+        };
+
+        function init() { bindEvents(); updateBadge(); }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+        else init();
+    })();
+</script>
+
+<script>
+    (function(){
+        'use strict';
+        const SYNC_PREFIX = 'EPL1:';
+        const SYNC_KEYS = ['epl_home','epl_away','epl_round','epl_intel','epl_provider','epl_apikey','epl_roundSel','epl_matchSel'];
+        const $ = id => document.getElementById(id);
+
+        function exportConfig(){
+            const data = {};
+            SYNC_KEYS.forEach(k => {
+                const v = localStorage.getItem(k);
+                if (v !== null) data[k] = v;
+            });
+            const json = JSON.stringify(data);
+            const b64 = btoa(unescape(encodeURIComponent(json)));
+            return SYNC_PREFIX + b64;
+        }
+
+        function importConfig(text){
+            text = String(text || '').trim().replace(/\s+/g, '');
+            if (!text) throw new Error('内容为空');
+            if (!text.startsWith(SYNC_PREFIX)) throw new Error('格式不正确（缺少前缀 ' + SYNC_PREFIX + '）');
+            const b64 = text.slice(SYNC_PREFIX.length);
+            let json;
+            try { json = decodeURIComponent(escape(atob(b64))); }
+            catch(e){ throw new Error('解码失败，可能复制不完整'); }
+            let data;
+            try { data = JSON.parse(json); }
+            catch(e){ throw new Error('JSON 解析失败'); }
+            if (typeof data !== 'object' || data === null) throw new Error('数据结构异常');
+            let n = 0;
+            Object.entries(data).forEach(([k, v]) => {
+                if (SYNC_KEYS.includes(k) && typeof v === 'string') {
+                    localStorage.setItem(k, v); n++;
+                }
+            });
+            return n;
+        }
+
+        function bind(){
+            const panel = $('syncPanel');
+            const text = $('syncText');
+            if (!panel || !text) return;
+
+            $('syncExportBtn').addEventListener('click', () => {
+                try {
+                    text.value = exportConfig();
+                    panel.classList.add('open');
+                    text.select();
+                    text.setSelectionRange(0, 99999);
+                    try { document.execCommand('copy'); } catch(e){}
+                } catch(e) { alert('导出失败：' + e.message); }
+            });
+
+            $('syncImportBtn').addEventListener('click', () => {
+                text.value = '';
+                panel.classList.add('open');
+                text.focus();
+            });
+
+            $('syncCopyBtn').addEventListener('click', async () => {
+                if (!text.value) return alert('没有内容可复制');
+                try {
+                    await navigator.clipboard.writeText(text.value);
+                    $('syncCopyBtn').textContent = '✓ 已复制';
+                    setTimeout(() => { $('syncCopyBtn').textContent = '复制'; }, 1500);
+                } catch(e) {
+                    text.select();
+                    document.execCommand('copy');
+                }
+            });
+
+            $('syncApplyBtn').addEventListener('click', () => {
+                const v = text.value.trim();
+                if (!v) return alert('请先粘贴配置文本');
+                try {
+                    const n = importConfig(v);
+                    alert('✓ 已导入 ' + n + ' 项配置，页面即将刷新');
+                    location.reload();
+                } catch(e) {
+                    alert('导入失败：' + e.message);
+                }
+            });
+
+            $('syncCloseBtn').addEventListener('click', () => {
+                panel.classList.remove('open');
+            });
+        }
+
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+        else bind();
+    })();
 </script>
 </body>
 </html>
