@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
-    <title>英超预测引擎 v7.1</title>
+    <title>英超预测引擎 v8.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,7 +19,7 @@
             --rose:#ef4444;--rose-soft:rgba(239,68,68,.14);
             --violet:#a78bfa;--violet-soft:rgba(167,139,250,.14);
             --gold:#fbbf24;
-            --text:#f1f5f9;--text-2:#94a3b8;--text-3:#64748b;--text-4:#475569;
+            --text:#f1f5f9;--text-2:#a8b5c7;--text-3:#7d8a9c;--text-4:#5a6675;
             --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-full:999px;
             --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;
             --font-sans:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -101,18 +101,21 @@
             50%{transform:scale(1.15);opacity:.6}
         }
         body::after{
-            content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+            content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+            opacity:.08;
             background-image:
-                    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
-                    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-            background-size:64px 64px;
-            mask-image:radial-gradient(ellipse at center,black 30%,transparent 80%);
-            -webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 80%);
+                    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>"),
+                    linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+                    linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);
+            background-size:200px 200px, 64px 64px, 64px 64px;
+            mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);
+            -webkit-mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);
+            mix-blend-mode:overlay;
         }
 
         @media(prefers-reduced-motion:reduce){
             *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-            .fade-in{opacity:1!important;transform:none!important}
+            .fade-in,.reveal{opacity:1!important;transform:none!important}
             #ambientCursor,#particleLayer{display:none!important}
             body::before{animation:none!important}
         }
@@ -125,6 +128,13 @@
         @keyframes fadeUp{to{opacity:1;transform:none}}
         .d1{animation-delay:.05s}.d2{animation-delay:.12s}.d3{animation-delay:.19s}
         .d4{animation-delay:.26s}.d5{animation-delay:.33s}.d6{animation-delay:.40s}
+
+        .reveal{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+        .reveal.visible{opacity:1;transform:none}
+        .reveal.delay-1{transition-delay:.06s}
+        .reveal.delay-2{transition-delay:.12s}
+        .reveal.delay-3{transition-delay:.18s}
+        .reveal.delay-4{transition-delay:.24s}
 
         .skeleton{
             background:linear-gradient(90deg,rgba(255,255,255,.03) 25%,rgba(255,255,255,.06) 50%,rgba(255,255,255,.03) 75%);
@@ -193,6 +203,12 @@
             padding:3px 6px;border-radius:5px;
             background:var(--surface);border:1px solid var(--border-hi);color:var(--text-2);
         }
+        .hero .live-clock{
+            display:inline-flex;align-items:center;gap:6px;
+            font-family:var(--font-mono);font-size:11px;color:var(--text-3);
+            padding:3px 8px;border-radius:var(--r-full);
+            background:var(--surface);border:1px solid var(--border);
+        }
 
         /* 氛围开关 */
         .ambient-toggle{
@@ -221,19 +237,20 @@
         }
         .cell::before{
             content:"";position:absolute;inset:0;
-            background:linear-gradient(180deg,rgba(255,255,255,.03),transparent 40%);
+            background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 40%);
             pointer-events:none;
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
         }
         .cell::after{
             content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;
-            background:radial-gradient(circle,rgba(255,159,67,.20) 0%,transparent 40%);
+            background:radial-gradient(circle,rgba(255,159,67,.22) 0%,transparent 40%);
             opacity:0;transition:opacity .5s var(--ease);
             pointer-events:none;
             transform:translate(var(--mx,-50%),var(--my,-50%));
         }
         .cell:hover{
             border-color:var(--border-hi);transform:translateY(-3px);
-            box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 16px 40px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.08);
+            box-shadow:0 1px 0 rgba(255,255,255,.06) inset,0 16px 40px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.1);
         }
         .cell:hover::after{opacity:1}
         .cell .lbl{
@@ -257,10 +274,13 @@
             border-radius:var(--r-xl);padding:var(--sp-6);
             backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
             transition:border-color .3s var(--ease),transform .5s var(--ease),box-shadow .5s var(--ease);
-            box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 16px 40px -16px rgba(0,0,0,.5);
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 16px 40px -16px rgba(0,0,0,.5);
             transform-style:preserve-3d;will-change:transform;
         }
-        .card:hover{border-color:var(--border-hi);box-shadow:0 1px 0 rgba(255,255,255,.05) inset,0 24px 60px -20px rgba(0,0,0,.6)}
+        .card:hover{
+            border-color:var(--border-hi);
+            box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 60px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.08);
+        }
         .card h3{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-4)}
 
         .field{margin-bottom:var(--sp-4)}
@@ -272,7 +292,7 @@
             -webkit-appearance:none;appearance:none;
         }
         select{
-            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2394a3b8' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23a8b5c7' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
             background-repeat:no-repeat;background-position:right 14px center;padding-right:36px;cursor:pointer;
         }
         select:focus,input:focus,textarea:focus{
@@ -318,6 +338,16 @@
         .btn.ghost:hover{color:var(--amber);border-color:var(--border-focus);background:var(--amber-soft)}
         .btn.ghost::before{display:none}
         .btn.small{padding:8px 14px;font-size:12px;width:auto;border-radius:var(--r-sm)}
+
+        /* 涟漪 */
+        .ripple{
+            position:absolute;border-radius:50%;
+            background:rgba(255,255,255,.35);
+            transform:scale(0);opacity:.6;
+            animation:ripple .6s cubic-bezier(.16,1,.3,1) forwards;
+            pointer-events:none;
+        }
+        @keyframes ripple{to{transform:scale(4);opacity:0}}
 
         .empty{color:var(--text-3);text-align:center;padding:60px var(--sp-4);font-size:14px;line-height:1.7}
         .empty .empty-ball{
@@ -372,6 +402,13 @@
             100%{transform:scale(1)}
         }
 
+        /* 结果操作栏 */
+        .result-actions{
+            display:flex;gap:var(--sp-2);justify-content:center;
+            margin-top:var(--sp-4);flex-wrap:wrap;
+        }
+        .result-actions .btn{width:auto}
+
         /* ══════════════ RINGS ══════════════ */
         .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin-bottom:var(--sp-3)}
         @media(max-width:480px){.rings{gap:var(--sp-2)}}
@@ -388,6 +425,18 @@
         }
         .ring:hover{border-color:var(--border-hi);transform:translateY(-3px);box-shadow:0 16px 40px -12px rgba(0,0,0,.5)}
         .ring:hover::before{opacity:1}
+        .ring.pulse-glow::after{
+            content:"";position:absolute;inset:0;border-radius:inherit;
+            box-shadow:0 0 40px -8px var(--amber-glow),inset 0 0 40px -16px var(--amber-glow);
+            opacity:0;animation:ringPulse 1.2s ease-out;
+            pointer-events:none;
+        }
+        .ring.d.pulse-glow::after{box-shadow:0 0 40px -8px rgba(148,163,184,.5),inset 0 0 40px -16px rgba(148,163,184,.4)}
+        .ring.a.pulse-glow::after{box-shadow:0 0 40px -8px var(--cyan),inset 0 0 40px -16px var(--cyan)}
+        @keyframes ringPulse{
+            0%{opacity:1}
+            100%{opacity:0}
+        }
         .ring svg{width:100%;max-width:104px;aspect-ratio:1;transform:rotate(-90deg);display:block;margin:0 auto;position:relative;z-index:1}
         .ring circle{fill:none;stroke-width:7;stroke-linecap:round}
         .ring .track{stroke:rgba(255,255,255,.06)}
@@ -548,7 +597,7 @@
             background:linear-gradient(180deg,#0f1219,#0a0d13);
             border:1px solid var(--border-hi);border-radius:var(--r-xl);max-width:780px;width:100%;
             padding:var(--sp-6);
-            box-shadow:0 40px 80px -20px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.05) inset,0 0 0 1px rgba(255,159,67,.05);
+            box-shadow:0 40px 80px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05),0 0 0 1px rgba(255,159,67,.05);
             animation:modalIn .4s var(--ease-spring);outline:none;position:relative;
         }
         @keyframes modalIn{from{opacity:0;transform:translateY(-24px) scale(.94)}to{opacity:1;transform:none}}
@@ -625,6 +674,86 @@
         .progress.show{display:block}
         .progress .bar{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);width:0;transition:width .4s var(--ease);box-shadow:0 0 12px var(--amber-glow)}
 
+        /* ══════════════ COMMAND PALETTE ══════════════ */
+        .cmd-mask{
+            position:fixed;inset:0;background:rgba(4,5,8,.75);
+            backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+            z-index:90;display:none;align-items:flex-start;justify-content:center;
+            padding:14vh var(--sp-4) var(--sp-4);
+        }
+        .cmd-mask.show{display:flex;animation:fadeIn .15s var(--ease)}
+        .cmd-panel{
+            background:linear-gradient(180deg,#0f1219,#0a0d13);
+            border:1px solid var(--border-hi);border-radius:var(--r-lg);
+            max-width:560px;width:100%;
+            box-shadow:0 40px 80px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06),0 0 0 1px rgba(255,159,67,.08);
+            animation:cmdIn .25s var(--ease-spring);overflow:hidden;
+        }
+        @keyframes cmdIn{from{opacity:0;transform:scale(.96) translateY(-8px)}to{opacity:1;transform:none}}
+        .cmd-input{
+            width:100%;padding:16px 20px;border:0;background:transparent;color:var(--text);
+            font-family:var(--font-sans);font-size:15px;font-weight:500;outline:none;
+            border-bottom:1px solid var(--border);
+        }
+        .cmd-input::placeholder{color:var(--text-4)}
+        .cmd-list{max-height:360px;overflow-y:auto;padding:var(--sp-2)}
+        .cmd-item{
+            display:flex;align-items:center;gap:var(--sp-3);
+            padding:10px 14px;border-radius:var(--r-sm);
+            cursor:pointer;transition:background .15s var(--ease);
+            font-size:13px;
+        }
+        .cmd-item:hover,.cmd-item.on{background:var(--amber-soft);color:var(--amber)}
+        .cmd-item .icon{font-size:16px;width:22px;text-align:center;flex-shrink:0}
+        .cmd-item .label{flex:1;font-weight:500}
+        .cmd-item .kbd{font-family:var(--font-mono);font-size:10px;color:var(--text-3);padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
+        .cmd-item:hover .kbd,.cmd-item.on .kbd{color:var(--amber);border-color:var(--border-focus)}
+
+        /* ══════════════ SHORTCUT OVERLAY ══════════════ */
+        .shortcut-mask{
+            position:fixed;inset:0;background:rgba(4,5,8,.85);
+            backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+            z-index:85;display:none;align-items:center;justify-content:center;
+            padding:var(--sp-4);
+        }
+        .shortcut-mask.show{display:flex;animation:fadeIn .2s var(--ease)}
+        .shortcut-panel{
+            background:linear-gradient(180deg,#0f1219,#0a0d13);
+            border:1px solid var(--border-hi);border-radius:var(--r-xl);
+            max-width:520px;width:100%;padding:var(--sp-6);
+            box-shadow:0 40px 80px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05);
+            animation:modalIn .35s var(--ease-spring);
+        }
+        .shortcut-panel h2{font-family:var(--font-serif);font-weight:500;font-size:24px;margin-bottom:var(--sp-4)}
+        .shortcut-row{
+            display:flex;justify-content:space-between;align-items:center;
+            padding:10px 0;border-bottom:1px solid var(--border);
+            font-size:13px;
+        }
+        .shortcut-row:last-child{border-bottom:0}
+        .shortcut-row .desc{color:var(--text-2)}
+        .shortcut-row .keys{display:flex;gap:4px}
+        .shortcut-row kbd{
+            font-family:var(--font-mono);font-size:11px;font-weight:600;
+            padding:4px 8px;border-radius:5px;
+            background:var(--surface);border:1px solid var(--border-hi);color:var(--text);
+        }
+
+        /* ══════════════ TOOLTIP ══════════════ */
+        [data-tip]{position:relative}
+        [data-tip]::after{
+            content:attr(data-tip);
+            position:absolute;left:50%;top:calc(100% + 8px);
+            transform:translateX(-50%) translateY(-4px);
+            background:#0f1219;border:1px solid var(--border-hi);color:var(--text);
+            font-size:11px;font-weight:500;letter-spacing:.01em;
+            padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;
+            box-shadow:0 8px 20px -6px rgba(0,0,0,.6);
+            opacity:0;pointer-events:none;z-index:100;
+            transition:opacity .2s var(--ease),transform .2s var(--ease);
+        }
+        [data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
         /* ══════════════ TOAST ══════════════ */
         .toast-wrap{
             position:fixed;top:var(--sp-6);left:50%;transform:translateX(-50%);
@@ -688,24 +817,24 @@
             <span>Premier League 2026/27</span>
         </div>
         <h1 id="heroTitle">英超 <em>预测</em> 引擎</h1>
-        <div class="sub">规则工程 · 前端工程 · 自动化 · v7.1</div>
+        <div class="sub">规则工程 · 前端工程 · 自动化 · v8.0</div>
         <div class="tag-line">
             <a href="about.html" style="color:var(--amber);text-decoration:none;font-weight:500">关于 →</a>
             <span style="color:var(--text-4)">·</span>
             <span id="matchdayLine">加载中…</span>
+            <span class="live-clock" id="liveClock" data-tip="当前时间">--:--</span>
             <span class="kbd-hint">
-        <kbd>Ctrl</kbd><kbd>↵</kbd> 预测
-        <kbd>Ctrl</kbd><kbd>H</kbd> 历史
-        <kbd>Ctrl</kbd><kbd>B</kbd> 批量
+        <kbd>Ctrl</kbd><kbd>K</kbd> 命令
+        <kbd>?</kbd> 快捷键
       </span>
         </div>
     </div>
 
     <div class="dash fade-in d2">
-        <div class="cell" data-count="dashRound"><div class="lbl">🏆 当前轮次</div><div class="val orange" id="dashRound">—</div></div>
-        <div class="cell" data-count="dashPlayed"><div class="lbl">⚽ 已完赛</div><div class="val" id="dashPlayed">—</div></div>
-        <div class="cell" data-count="dashPending"><div class="lbl">🎯 待预测</div><div class="val blue" id="dashPending">—</div></div>
-        <div class="cell" data-count="dashRecord"><div class="lbl">📝 待录入</div><div class="val" id="dashRecord">—</div></div>
+        <div class="cell"><div class="lbl">🏆 当前轮次</div><div class="val orange" id="dashRound">—</div></div>
+        <div class="cell"><div class="lbl">⚽ 已完赛</div><div class="val" id="dashPlayed">—</div></div>
+        <div class="cell"><div class="lbl">🎯 待预测</div><div class="val blue" id="dashPending">—</div></div>
+        <div class="cell"><div class="lbl">📝 待录入</div><div class="val" id="dashRecord">—</div></div>
     </div>
 
     <div class="grid">
@@ -729,19 +858,19 @@
             <h3 style="margin-top:var(--sp-6)">今日情报（可选）</h3>
             <div class="field"><textarea id="intel" placeholder="例：萨利巴背伤缺席；利物浦无锋阵；福登停赛..."></textarea></div>
 
-            <button class="btn" id="predictBtn" onclick="startPredict()">开始预测</button>
+            <button class="btn" id="predictBtn" onclick="startPredict()" data-tip="Ctrl + Enter">开始预测</button>
         </div>
 
         <div class="card fade-in d4" id="resultCard" aria-live="polite">
             <div class="empty">
                 <div class="empty-ball"></div>
                 <div>选择比赛 → 填写情报 → 开始预测</div>
-                <div class="hint">提示：点积分榜任意一行，自动跳到该队的比赛</div>
+                <div class="hint">按 <kbd style="font-family:var(--font-mono);font-size:11px;padding:2px 6px;border-radius:4px;background:var(--surface);border:1px solid var(--border-hi)">Ctrl</kbd> + <kbd style="font-family:var(--font-mono);font-size:11px;padding:2px 6px;border-radius:4px;background:var(--surface);border:1px solid var(--border-hi)">K</kbd> 打开命令面板 · 点积分榜任意行跳到该队比赛</div>
             </div>
         </div>
     </div>
 
-    <div class="card fade-in d5" style="margin-top:var(--sp-6)">
+    <div class="card fade-in d5 reveal" style="margin-top:var(--sp-6)">
         <h3>积分榜</h3>
         <div class="standings" id="standings">
             <div class="skeleton sk-row"></div>
@@ -753,10 +882,11 @@
     </div>
 </div>
 
-<button class="fab hist" onclick="openHistory()" aria-label="历史记录">📊<span class="badge-n" id="histBadge" style="display:none">0</span></button>
-<button class="fab batch" onclick="openBatch()" aria-label="批量预测">⚡</button>
+<button class="fab hist" onclick="openHistory()" aria-label="历史记录" data-tip="Ctrl + H">📊<span class="badge-n" id="histBadge" style="display:none">0</span></button>
+<button class="fab batch" onclick="openBatch()" aria-label="批量预测" data-tip="Ctrl + B">⚡</button>
 <button class="fab top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="返回顶部">↑</button>
 
+<!-- 历史弹窗 -->
 <div class="mask" id="histMask" role="dialog" aria-modal="true" aria-labelledby="histTitle">
     <div class="modal" tabindex="-1">
         <button class="close" onclick="closeHistory()" aria-label="关闭">✕</button>
@@ -784,6 +914,7 @@
     </div>
 </div>
 
+<!-- 批量弹窗 -->
 <div class="mask" id="batchMask" role="dialog" aria-modal="true" aria-labelledby="batchTitle">
     <div class="modal" tabindex="-1">
         <button class="close" onclick="closeBatch()" aria-label="关闭">✕</button>
@@ -800,14 +931,37 @@
     </div>
 </div>
 
+<!-- 命令面板 -->
+<div class="cmd-mask" id="cmdMask">
+    <div class="cmd-panel" role="dialog" aria-modal="true">
+        <input type="text" class="cmd-input" id="cmdInput" placeholder="输入命令或搜索…" autocomplete="off">
+        <div class="cmd-list" id="cmdList"></div>
+    </div>
+</div>
+
+<!-- 快捷键浮层 -->
+<div class="shortcut-mask" id="shortcutMask">
+    <div class="shortcut-panel" role="dialog" aria-modal="true">
+        <button class="close" onclick="closeShortcuts()" aria-label="关闭" style="position:absolute;top:16px;right:16px;background:transparent;border:0;color:var(--text-3);font-size:22px;cursor:pointer;padding:6px 10px;border-radius:var(--r-sm)">✕</button>
+        <h2>键盘快捷键</h2>
+        <div class="shortcut-row"><span class="desc">命令面板</span><span class="keys"><kbd>Ctrl</kbd><kbd>K</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">开始预测</span><span class="keys"><kbd>Ctrl</kbd><kbd>↵</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">打开历史记录</span><span class="keys"><kbd>Ctrl</kbd><kbd>H</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">打开批量预测</span><span class="keys"><kbd>Ctrl</kbd><kbd>B</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">显示/隐藏快捷键</span><span class="keys"><kbd>?</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">关闭所有弹窗</span><span class="keys"><kbd>Esc</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">切换氛围开关</span><span class="keys"><kbd>Ctrl</kbd><kbd>.</kbd></span></div>
+    </div>
+</div>
+
 <div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 
 <script>
     /* ═══════════════════════════════════════════
-       氛围引擎（默认开启，不记忆）
+       氛围引擎
     ═══════════════════════════════════════════ */
     const Ambient = (() => {
-        let enabled = true;  // ⚡ 修复 #2：不再从 localStorage 读取，默认每次开启
+        let enabled = true;
         let mouseX = -1000, mouseY = -1000;
         let rafId = null;
         let particles = [];
@@ -845,7 +999,6 @@
             const layer = document.getElementById('particleLayer');
             if (!layer) return;
             clearParticles();
-            // ⚡ 修复 #3：增加粒子数量到 30，让效果更明显
             for (let i = 0; i < 30; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle' + (Math.random() > .5 ? ' cyan' : '');
@@ -872,9 +1025,7 @@
                     const py = (e.clientY - r.top) / r.height - .5;
                     card.style.transform = `perspective(1000px) rotateX(${-py * 4}deg) rotateY(${px * 4}deg) translateY(-2px)`;
                 });
-                card.addEventListener('pointerleave', () => {
-                    card.style.transform = '';
-                });
+                card.addEventListener('pointerleave', () => { card.style.transform = ''; });
             });
         }
 
@@ -914,10 +1065,7 @@
                     const text = child.textContent;
                     const frag = document.createDocumentFragment();
                     [...text].forEach(ch => {
-                        if (ch === ' ' || ch === '\n') {
-                            frag.appendChild(document.createTextNode(ch));
-                            return;
-                        }
+                        if (ch === ' ' || ch === '\n') { frag.appendChild(document.createTextNode(ch)); return; }
                         const span = document.createElement('span');
                         span.className = 'char';
                         span.textContent = ch;
@@ -926,21 +1074,40 @@
                         frag.appendChild(span);
                     });
                     node.replaceChild(frag, child);
-                } else if (child.nodeType === 1) {
-                    walk(child);
-                }
+                } else if (child.nodeType === 1) { walk(child); }
             });
         };
         walk(h1);
     }
 
     /* ═══════════════════════════════════════════
+       滚动进入视口
+    ═══════════════════════════════════════════ */
+    function setupReveal(){
+        if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
+            document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+            return;
+        }
+        if (!('IntersectionObserver' in window)) {
+            document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible'));
+            return;
+        }
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    io.unobserve(e.target);
+                }
+            });
+        }, { threshold: .12, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    }
+
+    /* ═══════════════════════════════════════════
        加载进度条
     ═══════════════════════════════════════════ */
     const LoadingBar = {
-        el: null,
-        progress: 0,
-        timer: null,
+        el: null, progress: 0, timer: null,
         start(){
             this.el = document.getElementById('loadingBar');
             if (!this.el) return;
@@ -967,28 +1134,64 @@
     };
 
     /* ═══════════════════════════════════════════
+       实时时钟
+    ═══════════════════════════════════════════ */
+    function startClock(){
+        const el = document.getElementById('liveClock');
+        if (!el) return;
+        const tick = () => {
+            const d = new Date();
+            const hh = String(d.getHours()).padStart(2,'0');
+            const mm = String(d.getMinutes()).padStart(2,'0');
+            el.textContent = `${hh}:${mm}`;
+        };
+        tick();
+        setInterval(tick, 30000);
+    }
+
+    /* ═══════════════════════════════════════════
        数字滚动
     ═══════════════════════════════════════════ */
     function animateDashNumber(el, target, dur = 1200){
         if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) {
-            el.textContent = target;
-            return;
+            el.textContent = target; return;
         }
         const start = performance.now();
-        const from = 0;
         function tick(now){
             const t = Math.min(1, (now - start) / dur);
             const eased = 1 - Math.pow(1 - t, 3);
-            el.textContent = Math.round(from + (target - from) * eased);
+            el.textContent = Math.round(target * eased);
             if (t < 1) requestAnimationFrame(tick);
         }
         requestAnimationFrame(tick);
     }
 
     /* ═══════════════════════════════════════════
-       概率环完成粒子释放
+       涟漪
+    ═══════════════════════════════════════════ */
+    function attachRipple(){
+        document.addEventListener('pointerdown', e => {
+            const btn = e.target.closest('.btn, .fab, .filter-btn, .batch-opts button');
+            if (!btn) return;
+            if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+            const r = btn.getBoundingClientRect();
+            const size = Math.max(r.width, r.height);
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = (e.clientX - r.left - size/2) + 'px';
+            ripple.style.top = (e.clientY - r.top - size/2) + 'px';
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 600);
+        });
+    }
+
+    /* ═══════════════════════════════════════════
+       环完成光晕
     ═══════════════════════════════════════════ */
     function releaseRingParticles(ringEl){
+        ringEl.classList.add('pulse-glow');
+        setTimeout(() => ringEl.classList.remove('pulse-glow'), 1300);
         if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
         const rect = ringEl.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
@@ -1042,7 +1245,6 @@
         '布莱顿','埃弗顿','富勒姆','水晶宫','布伦特福德','伯恩茅斯','诺丁汉森林',
         '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
 
-    /* 数据 */
     const FIXTURES = [];
     const RESULTS = {};
     let STATIC_STANDINGS = [];
@@ -1069,7 +1271,6 @@
     })();
     STATIC_STANDINGS = TEAMS.map(t => ({ team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 }));
 
-    /* 校验 */
     function validateAndNormalizePrediction(raw) {
         const errors = [], warnings = [];
         const data = JSON.parse(JSON.stringify(raw));
@@ -1098,7 +1299,6 @@
         return { ok:true, errors, warnings, data };
     }
 
-    /* Toast */
     const _toastKeys = new Set();
     function toast(msg, kind='ok', dur=3500) {
         const key = kind + ':' + msg;
@@ -1134,7 +1334,6 @@
         }
     }
 
-    /* API Key */
     function toggleKeyVisibility(){
         const inp = document.getElementById('apiKey');
         inp.type = inp.type === 'password' ? 'text' : 'password';
@@ -1143,7 +1342,6 @@
     function clearKey(){ localStorage.removeItem('groq_key'); document.getElementById('apiKey').value=''; toast('已清除','warn'); }
     function getKey(){ return localStorage.getItem('groq_key') || ''; }
 
-    /* skill.md */
     let _skillCache = null;
     let _verBarShown = false;
     async function loadSkill(){
@@ -1182,7 +1380,6 @@
         return text;
     }
 
-    /* Groq */
     async function callGroq(systemPrompt, userPrompt, maxRetry=3){
         const key = getKey();
         if (!key) throw new Error('未设置 API Key');
@@ -1219,7 +1416,6 @@
         throw new Error('Groq 重试耗尽');
     }
 
-    /* 选择器 */
     function initSelectors(){
         const rs = document.getElementById('roundSel');
         const oldVal = rs.value;
@@ -1268,7 +1464,6 @@
         toast(`未找到 ${team} 的比赛`, 'warn');
     }
 
-    /* 预测 */
     async function startPredict(){
         const btn = document.getElementById('predictBtn');
         const { round, home, away } = currentMatch();
@@ -1316,7 +1511,6 @@
         }
     }
 
-    /* 渲染 */
     function espnUrl(name){ const id = ESPN_IDS[name]; return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null; }
     function badgeHtml(name){
         const url = espnUrl(name);
@@ -1353,7 +1547,11 @@
         }
         requestAnimationFrame(tick);
     }
+
+    let _lastResult = null;
+
     function renderResult(d, ctx){
+        _lastResult = { d, ctx };
         const { home, away } = ctx;
         const card = document.getElementById('resultCard');
         const h = d.homeWin, dr = d.draw, a = d.awayWin;
@@ -1397,6 +1595,10 @@
         <div class="team">${badgeHtml(away)}<div class="nm">${away}</div></div>
       </div>
       <div style="margin-top:16px"><span class="conf ${confClass(d.confidence)}">置信度 ${d.confidence}</span></div>
+      <div class="result-actions">
+        <button class="btn ghost small" onclick="copyResult()" data-tip="复制预测文本">📋 复制</button>
+        <button class="btn ghost small" onclick="startPredict()" data-tip="再预测一次">🔄 重跑</button>
+      </div>
     </div>
 
     <div class="rings">${ring(h,'h')}${ring(dr,'d')}${ring(a,'a')}</div>
@@ -1433,7 +1635,22 @@
         }));
     }
 
-    /* 积分榜 */
+    function copyResult(){
+        if (!_lastResult) return;
+        const { d, ctx } = _lastResult;
+        const text = `【第${ctx.round+1}轮预测】${ctx.home} vs ${ctx.away}\n比分：${d.score}\n概率：主胜 ${d.homeWin}% / 平局 ${d.draw}% / 客胜 ${d.awayWin}%\n置信度：${d.confidence}\n关键因素：${(d.keyFactors||[]).join('、')}\n分析：${d.analysis}\n${d.headToHead?.summary ? '交锋：' + d.headToHead.summary + '\n' : ''}—— 英超预测引擎`;
+        navigator.clipboard.writeText(text).then(() => {
+            toast('预测已复制到剪贴板');
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); toast('预测已复制'); } catch(e) { toast('复制失败','err'); }
+            ta.remove();
+        });
+    }
+
     function buildLast5Cache(){
         _last5Cache = {};
         if (!RESULTS || typeof RESULTS !== 'object') return;
@@ -1457,7 +1674,6 @@
             }
         }
         for (const k of Object.keys(_last5Cache)) _last5Cache[k] = _last5Cache[k].slice(-5);
-        console.log('✅ last5 缓存已构建', Object.fromEntries(Object.entries(_last5Cache).map(([k,v])=>[k, v.join('')])));
     }
     function getLast5(team){
         if (!_last5Cache) buildLast5Cache();
@@ -1499,20 +1715,10 @@
     </table>`;
     }
 
-    /* 仪表盘 */
     function refreshDashboard(){
         const r = +document.getElementById('roundSel').value || 0;
         const roundEl = document.getElementById('dashRound');
-        if (roundEl && roundEl.dataset.lastVal !== String(r+1)) {
-            roundEl.dataset.lastVal = String(r+1);
-            roundEl.textContent = '第 ' + (r+1) + ' 轮';
-            if (roundEl.animate) {
-                roundEl.animate(
-                    [{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }],
-                    { duration: 400, easing: 'cubic-bezier(.2,1.6,.4,1)' }
-                );
-            }
-        } else if (roundEl) {
+        if (roundEl) {
             roundEl.textContent = '第 ' + (r+1) + ' 轮';
         }
 
@@ -1565,7 +1771,6 @@
         }
     }
 
-    /* 历史 */
     const HIST_KEY = 'pl_history_v2';
     let histFilter = 'all';
     function getHistory(){
@@ -1658,14 +1863,13 @@
         inp.click();
     }
 
-    /* 模态框 */
     let _focusBefore = null;
     function openModal(id){
         _focusBefore = document.activeElement;
         const mask = document.getElementById(id);
         mask.classList.add('show');
         document.body.classList.add('no-scroll');
-        setTimeout(() => mask.querySelector('.modal')?.focus(), 50);
+        setTimeout(() => mask.querySelector('.modal, .cmd-panel, .shortcut-panel')?.focus(), 50);
     }
     function closeModal(id){
         const mask = document.getElementById(id);
@@ -1677,6 +1881,7 @@
     function closeHistory(){ closeModal('histMask'); }
     function openBatch(){ openModal('batchMask'); updateQuota(); }
     function closeBatch(){ closeModal('batchMask'); }
+
     document.querySelectorAll('.mask').forEach(m => {
         m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
     });
@@ -1692,7 +1897,6 @@
         }
     });
 
-    /* 批量 */
     let batchN = 1;
     function updateQuota(){
         const calls = 10 * batchN;
@@ -1788,19 +1992,130 @@
         }
     }
 
-    /* 快捷键 */
+    /* ═══════════════════════════════════════════
+       命令面板
+    ═══════════════════════════════════════════ */
+    const CommandPalette = (() => {
+        let items = [];
+        let selected = 0;
+
+        const commands = [
+            { icon:'⚡', label:'开始预测', shortcut:'Ctrl+↵', action: () => { closeCmd(); startPredict(); } },
+            { icon:'📊', label:'历史记录与命中率', shortcut:'Ctrl+H', action: () => { closeCmd(); openHistory(); } },
+            { icon:'🚀', label:'批量预测当前轮', shortcut:'Ctrl+B', action: () => { closeCmd(); openBatch(); } },
+            { icon:'🎨', label:'切换氛围开关', action: () => { toggleAmbient(); closeCmd(); toast('氛围已' + (Ambient.isEnabled() ? '开启' : '关闭')); } },
+            { icon:'📋', label:'复制当前预测', action: () => { copyResult(); closeCmd(); } },
+            { icon:'🔑', label:'保存 API Key', action: () => { saveKey(); closeCmd(); } },
+            { icon:'🗑️', label:'清除 API Key', action: () => { clearKey(); closeCmd(); } },
+            { icon:'📤', label:'导出历史记录', action: () => { exportHistory(); closeCmd(); } },
+            { icon:'📥', label:'导入历史记录', action: () => { importHistory(); closeCmd(); } },
+            { icon:'❓', label:'查看键盘快捷键', shortcut:'?', action: () => { closeCmd(); openShortcuts(); } },
+            { icon:'🏠', label:'回到顶部', action: () => { window.scrollTo({top:0,behavior:'smooth'}); closeCmd(); } },
+            { icon:'ℹ️', label:'关于此项目', action: () => { location.href = 'about.html'; } },
+        ];
+
+        function render(filter=''){
+            const q = filter.trim().toLowerCase();
+            items = q ? commands.filter(c => c.label.toLowerCase().includes(q)) : commands;
+            selected = 0;
+            const list = document.getElementById('cmdList');
+            if (!items.length) { list.innerHTML = '<div class="cmd-item"><span class="label" style="color:var(--text-3)">无匹配命令</span></div>'; return; }
+            list.innerHTML = items.map((c, i) => `
+      <div class="cmd-item${i===0?' on':''}" data-idx="${i}">
+        <span class="icon">${c.icon}</span>
+        <span class="label">${c.label}</span>
+        ${c.shortcut ? `<span class="kbd">${c.shortcut}</span>` : ''}
+      </div>
+    `).join('');
+            list.querySelectorAll('.cmd-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const idx = +el.dataset.idx;
+                    items[idx]?.action();
+                });
+                el.addEventListener('mouseenter', () => {
+                    list.querySelectorAll('.cmd-item').forEach(x => x.classList.remove('on'));
+                    el.classList.add('on');
+                    selected = +el.dataset.idx;
+                });
+            });
+        }
+
+        function open(){
+            document.getElementById('cmdMask').classList.add('show');
+            document.getElementById('cmdInput').value = '';
+            render();
+            setTimeout(() => document.getElementById('cmdInput').focus(), 30);
+        }
+        function close(){
+            document.getElementById('cmdMask').classList.remove('show');
+        }
+
+        function bind(){
+            document.getElementById('cmdInput').addEventListener('input', e => render(e.target.value));
+            document.getElementById('cmdInput').addEventListener('keydown', e => {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    selected = Math.min(selected + 1, items.length - 1);
+                    updateSel();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    selected = Math.max(selected - 1, 0);
+                    updateSel();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    items[selected]?.action();
+                } else if (e.key === 'Escape') {
+                    close();
+                }
+            });
+            document.getElementById('cmdMask').addEventListener('click', e => {
+                if (e.target.id === 'cmdMask') close();
+            });
+        }
+        function updateSel(){
+            const list = document.getElementById('cmdList');
+            list.querySelectorAll('.cmd-item').forEach((el, i) => el.classList.toggle('on', i === selected));
+            const cur = list.querySelectorAll('.cmd-item')[selected];
+            if (cur) cur.scrollIntoView({ block:'nearest' });
+        }
+
+        return { open, close, bind };
+    })();
+
+    function openCmd(){ CommandPalette.open(); }
+    function closeCmd(){ CommandPalette.close(); }
+
+    /* ═══════════════════════════════════════════
+       快捷键浮层
+    ═══════════════════════════════════════════ */
+    function openShortcuts(){ openModal('shortcutMask'); }
+    function closeShortcuts(){ closeModal('shortcutMask'); }
+
+    /* ═══════════════════════════════════════════
+       快捷键
+    ═══════════════════════════════════════════ */
     window.addEventListener('keydown', e => {
         const ctrl = e.ctrlKey || e.metaKey;
-        if (ctrl && e.key === 'Enter') { e.preventDefault(); if (!document.getElementById('predictBtn').disabled) startPredict(); }
-        if (ctrl && e.key.toLowerCase() === 'h') { e.preventDefault(); openHistory(); }
-        if (ctrl && e.key.toLowerCase() === 'b') { e.preventDefault(); openBatch(); }
-        if (e.key === 'Escape') { closeHistory(); closeBatch(); }
+        const inInput = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName);
+
+        if (ctrl && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmd(); return; }
+        if (ctrl && e.key === 'Enter') { e.preventDefault(); if (!document.getElementById('predictBtn').disabled) startPredict(); return; }
+        if (ctrl && e.key.toLowerCase() === 'h') { e.preventDefault(); openHistory(); return; }
+        if (ctrl && e.key.toLowerCase() === 'b') { e.preventDefault(); openBatch(); return; }
+        if (ctrl && e.key === '.') { e.preventDefault(); toggleAmbient(); toast('氛围已' + (Ambient.isEnabled() ? '开启' : '关闭')); return; }
+        if (e.key === '?' && !inInput) { e.preventDefault(); openShortcuts(); return; }
+        if (e.key === 'Escape') {
+            closeHistory(); closeBatch(); closeShortcuts(); closeCmd();
+        }
     });
+
     window.addEventListener('scroll', () => {
         document.getElementById('topBtn').classList.toggle('show', window.scrollY > 400);
     });
 
-    /* 加载 data.json */
+    /* ═══════════════════════════════════════════
+       加载 data.json
+    ═══════════════════════════════════════════ */
     async function loadExternalData(){
         try {
             const res = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
@@ -1836,17 +2151,20 @@
         }
     }
 
-    /* 启动 */
+    /* ═══════════════════════════════════════════
+       启动
+    ═══════════════════════════════════════════ */
     (async function boot(){
-        // ⚡ 启动氛围引擎（默认开启）
         Ambient.init();
         LoadingBar.start();
-        setTimeout(() => LoadingBar.done(), 1500);  // 兜底
+        setTimeout(() => LoadingBar.done(), 1800);
 
-        // Hero 标题逐字入场
         splitHeroTitle();
+        startClock();
+        setupReveal();
+        attachRipple();
+        CommandPalette.bind();
 
-        // 恢复 API Key
         const saved = localStorage.getItem('groq_key');
         if (saved) document.getElementById('apiKey').value = saved;
 
@@ -1873,7 +2191,6 @@
 
         LoadingBar.done();
 
-        // 队徽预加载
         const preload = () => {
             Object.values(ESPN_IDS).forEach(id => {
                 const img = new Image();
