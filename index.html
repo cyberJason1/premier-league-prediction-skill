@@ -7,7 +7,7 @@
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
         :root{
-            --bg:#0a0a0a;--surface:#141414;--surface-2:#1a1a1a;--surface-3:#232323;
+            --bg:#06070a;--surface:#141414;--surface-2:#1a1a1a;--surface-3:#232323;
             --border:#242424;--border-2:#333;
             --text:#f5f3ef;--text-2:#9a9691;--text-3:#6b6862;--text-4:#48453f;
             --accent:#ff6b35;--accent-2:#ff8b5c;--accent-soft:rgba(255,107,53,.10);
@@ -22,22 +22,26 @@
         button{font-family:inherit}
         input,textarea,select{font-family:inherit}
 
+        /* ===== 球场夜色背景 ===== */
+        body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse 90% 55% at 50% -10%,rgba(255,107,53,.09),transparent 60%),radial-gradient(ellipse 70% 45% at 85% 105%,rgba(96,165,250,.06),transparent 60%),#06070a}
+        body::after{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,#000,transparent 92%);-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,#000,transparent 92%);pointer-events:none}
+
         .app{position:relative;max-width:1280px;margin:0 auto;padding:0 32px 120px}
         @media (max-width:640px){.app{padding:0 20px 80px}}
 
-        .nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 0;background:rgba(10,10,10,.72);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);margin:0 -32px;padding-left:32px;padding-right:32px;border-bottom:1px solid rgba(255,255,255,.04)}
-        @media (max-width:640px){.nav{margin:0 -20px;padding-left:20px;padding-right:20px}}
+        .nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:rgba(6,7,10,.72);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);margin:0 -32px;border-bottom:1px solid rgba(255,255,255,.04)}
+        @media (max-width:640px){.nav{margin:0 -20px;padding:16px 20px}}
         .nav-brand{display:flex;align-items:center;gap:14px}
         .nav-logo{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0a0a0a;letter-spacing:-.5px}
         .nav-title{font-size:14px;font-weight:500;color:var(--text);letter-spacing:-.01em}
         .nav-title span{color:var(--text-3);font-weight:400}
         .nav-right{display:flex;align-items:center;gap:12px}
-        .nav-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:12.5px;font-weight:500;padding:8px 14px;border-radius:99px;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:-.01em;display:flex;align-items:center;gap:6px}
+        .nav-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:12.5px;font-weight:500;padding:8px 14px;border-radius:99px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
         .nav-btn:hover{border-color:var(--border-2);color:var(--text);background:rgba(255,255,255,.02)}
         .nav-btn .badge{background:var(--accent);color:#0a0a0a;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:16px;text-align:center}
 
-        .hero{padding:80px 0 64px;max-width:900px}
-        @media (max-width:640px){.hero{padding:48px 0 40px}}
+        .hero{padding:80px 0 32px;max-width:900px}
+        @media (max-width:640px){.hero{padding:48px 0 24px}}
         .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:32px}
         .hero-eyebrow::before{content:"";width:24px;height:1px;background:var(--accent)}
         .hero h1{font-size:clamp(40px,6.5vw,76px);font-weight:400;line-height:1.05;letter-spacing:-.035em;color:var(--text);margin-bottom:28px}
@@ -50,7 +54,17 @@
         .hero-stat .v{font-size:32px;font-weight:500;color:var(--text);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
         .hero-stat .l{font-size:11px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:500}
 
-        .main-grid{display:grid;grid-template-columns:minmax(340px,420px) 1fr;gap:32px;align-items:start}
+        /* ===== 比赛日仪表盘 ===== */
+        .matchday-dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:36px}
+        .matchday-dash .dash-item{background:linear-gradient(180deg,var(--surface) 0%,#0c0c0c 100%);padding:22px 20px;position:relative}
+        .matchday-dash .dash-item .l{font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;font-weight:500;margin-bottom:12px}
+        .matchday-dash .dash-item .v{font-family:Georgia,serif;font-size:28px;color:var(--text);letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
+        .matchday-dash .dash-item .v.accent{color:var(--accent)}
+        .matchday-dash .dash-item .v.live{display:inline-flex;align-items:center;gap:10px}
+        .matchday-dash .dash-item .v.live::after{content:"";width:7px;height:7px;background:var(--success);border-radius:50%;box-shadow:0 0 12px var(--success);animation:dashPulse 1.8s ease-in-out infinite}
+        @keyframes dashPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+
+        .main-grid{display:grid;grid-template-columns:minmax(340px,420px) 1fr;gap:32px;align-items:start;margin-top:48px}
         @media (max-width:1024px){.main-grid{grid-template-columns:1fr;gap:24px}}
 
         .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;position:relative}
@@ -64,11 +78,11 @@
         .field-row-2{display:grid;grid-template-columns:1fr 1.6fr;gap:10px}
         .field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
 
-        input,textarea,select{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:14px;padding:12px 14px;border-radius:12px;outline:none;transition:all .2s;letter-spacing:-.005em}
+        input,textarea,select{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-size:14px;padding:12px 14px;border-radius:12px;outline:none;transition:all .2s;letter-spacing:-.005em}
         input::placeholder,textarea::placeholder{color:var(--text-4)}
         input:hover,textarea:hover,select:hover{border-color:var(--border-2)}
         input:focus,textarea:focus,select:focus{border-color:var(--accent);background:rgba(255,107,53,.03);box-shadow:0 0 0 4px var(--accent-soft)}
-        textarea{resize:vertical;min-height:96px;line-height:1.6;font-family:inherit}
+        textarea{resize:vertical;min-height:96px;line-height:1.6}
         select{cursor:pointer;appearance:none;padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6862' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
         select option{background:var(--surface-2);color:var(--text)}
 
@@ -78,7 +92,7 @@
         .key-toggle:hover{color:var(--text);background:rgba(255,255,255,.04)}
         .field-hint{font-size:11px;color:var(--text-4);margin-top:8px;letter-spacing:-.005em;display:flex;align-items:center;gap:6px}
 
-        .btn{width:100%;padding:14px 20px;background:var(--accent);color:#0a0a0a;border:0;border-radius:12px;font-family:inherit;font-size:14px;font-weight:600;letter-spacing:-.005em;cursor:pointer;transition:all .2s;margin-top:8px;position:relative;overflow:hidden}
+        .btn{width:100%;padding:14px 20px;background:var(--accent);color:#0a0a0a;border:0;border-radius:12px;font-size:14px;font-weight:600;letter-spacing:-.005em;cursor:pointer;transition:all .2s;margin-top:8px;position:relative;overflow:hidden}
         .btn::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:translateX(-100%);transition:transform .8s}
         .btn:hover:not(:disabled){background:var(--accent-2);transform:translateY(-1px);box-shadow:0 12px 32px rgba(255,107,53,.25)}
         .btn:hover:not(:disabled)::after{transform:translateX(100%)}
@@ -105,30 +119,50 @@
         .score-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase}
         .score-head .status-tag{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;border:1px solid var(--border);font-size:10px;letter-spacing:.1em}
         .score-head .status-tag .dot{width:5px;height:5px;border-radius:50%;background:var(--text-3)}
-        .score-head .status-tag.live .dot{background:var(--success);box-shadow:0 0 8px var(--success)}
+        .score-head .status-tag.live .dot{background:var(--success);box-shadow:0 0 8px var(--success);animation:dashPulse 1.8s infinite}
         .score-head .status-tag.finished .dot{background:var(--info)}
 
         .teams-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;margin-bottom:40px}
         .team{display:flex;flex-direction:column;align-items:center;gap:16px;min-width:0}
-        .team-crest{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;transition:transform .4s}
+        .team-crest{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;transition:transform .4s;position:relative;box-shadow:0 0 0 1px rgba(255,255,255,.02),0 12px 40px rgba(0,0,0,.4)}
         .team-crest:hover{transform:scale(1.06)}
-        .team-crest img{width:72%;height:72%;object-fit:contain}
-        .team-crest .fb{font-size:22px;font-weight:600;color:var(--text-2);letter-spacing:-.02em}
+        .team-crest img{width:72%;height:72%;object-fit:contain;position:relative;z-index:1}
+        .team-crest .fb{font-size:22px;font-weight:600;color:var(--text-2);letter-spacing:-.02em;position:relative;z-index:1}
+        .team:first-child .team-crest::after{content:"";position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(255,107,53,.4),transparent 40%);animation:ringSpin 6s linear infinite;z-index:0;opacity:.7;filter:blur(6px)}
+        .team:last-child .team-crest::after{content:"";position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(from 180deg,transparent,rgba(96,165,250,.4),transparent 40%);animation:ringSpin 6s linear infinite;z-index:0;opacity:.7;filter:blur(6px)}
+        @keyframes ringSpin{to{transform:rotate(360deg)}}
         .team-name{font-size:15px;font-weight:500;color:var(--text);text-align:center;letter-spacing:-.01em;line-height:1.3;max-width:140px;word-break:break-word}
         .score-block{display:flex;align-items:center;gap:18px;padding:8px 0;position:relative}
         .score-block .label{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;letter-spacing:.15em;color:var(--text-3);text-transform:uppercase;white-space:nowrap}
-        .score-num{font-family:Georgia,"Times New Roman",serif;font-size:72px;font-weight:400;color:var(--text);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;text-align:center;min-width:60px}
+        .score-num{font-family:Georgia,"Times New Roman",serif;font-size:72px;font-weight:400;color:var(--text);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;text-align:center;min-width:60px;text-shadow:0 0 60px rgba(255,107,53,.18),0 0 20px rgba(255,107,53,.08)}
+        .score-card.finished .score-num{text-shadow:0 0 40px rgba(255,255,255,.12)}
         .score-dash{font-family:Georgia,serif;font-size:40px;color:var(--text-4);font-weight:300}
+        .score-block::before{content:"";position:absolute;top:50%;left:50%;width:140%;height:140%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(255,107,53,.06),transparent 60%);pointer-events:none}
 
-        .prob-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:14px;overflow:hidden;margin-bottom:32px;border:1px solid var(--border)}
-        .prob-cell{background:var(--surface-2);padding:20px 16px;text-align:center;transition:background .2s}
-        .prob-cell:hover{background:var(--surface-3)}
-        .prob-cell .lbl{font-size:10px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
-        .prob-cell .val{font-family:Georgia,"Times New Roman",serif;font-size:32px;font-weight:400;color:var(--text);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
-        .prob-cell .val .pct{font-size:16px;color:var(--text-3);margin-left:2px}
-        .prob-cell.home .val{color:var(--purple)}
-        .prob-cell.draw .val{color:var(--text-2)}
-        .prob-cell.away .val{color:var(--info)}
+        /* ===== 环形概率 ===== */
+        .prob-ring-wrap{display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:center;margin-bottom:32px;padding:28px;background:linear-gradient(180deg,var(--surface-2),#0e0e0e);border:1px solid var(--border);border-radius:18px}
+        @media (max-width:640px){.prob-ring-wrap{grid-template-columns:1fr;gap:20px}}
+        .prob-ring{position:relative;width:180px;height:180px;margin:0 auto}
+        .prob-ring svg{transform:rotate(-90deg);display:block}
+        .prob-ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+        .prob-ring .center .score{font-family:Georgia,serif;font-size:38px;color:var(--text);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+        .prob-ring .center .label{font-size:9.5px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;margin-top:8px;font-weight:500}
+        .prob-legend{display:flex;flex-direction:column;gap:16px}
+        .prob-legend .row{display:flex;align-items:center;gap:14px}
+        .prob-legend .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+        .prob-legend .dot.home{background:var(--accent);box-shadow:0 0 12px rgba(255,107,53,.5)}
+        .prob-legend .dot.draw{background:var(--text-3)}
+        .prob-legend .dot.away{background:var(--info);box-shadow:0 0 12px rgba(96,165,250,.5)}
+        .prob-legend .name{flex:1;font-size:13px;color:var(--text-2);letter-spacing:-.005em}
+        .prob-legend .pct{font-family:Georgia,serif;font-size:24px;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+
+        /* ===== 足球加载动画 ===== */
+        .soccer-loader{width:44px;height:44px;position:relative;margin:0 auto}
+        .soccer-loader .ball{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e0e0e0 60%,#c8c8c8);position:relative;animation:bounceRoll 1.5s cubic-bezier(.5,0,.5,1) infinite;box-shadow:inset -4px -6px 12px rgba(0,0,0,.15),0 8px 20px rgba(255,107,53,.2)}
+        .soccer-loader .ball::before{content:"";position:absolute;inset:0;border-radius:50%;background-image:radial-gradient(circle at 50% 25%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 25% 70%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 75% 70%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 50% 50%,#0a0a0a 0,#0a0a0a 2.5px,transparent 3.5px)}
+        .soccer-loader .ball::after{content:"";position:absolute;bottom:-12px;left:5%;right:5%;height:6px;background:radial-gradient(ellipse,rgba(255,107,53,.35),transparent 70%);border-radius:50%;animation:shadowPulse 1.5s cubic-bezier(.5,0,.5,1) infinite}
+        @keyframes bounceRoll{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-24px) rotate(180deg)}}
+        @keyframes shadowPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.5);opacity:.3}}
 
         .compare{margin-top:32px;padding-top:32px;border-top:1px solid var(--border)}
         .compare-label{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
@@ -172,20 +206,26 @@
         .h2h-list .txt{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px}
         .h2h-empty{text-align:center;padding:20px;color:var(--text-4);font-size:13px;font-style:italic}
 
+        /* ===== FIFA 球员卡 ===== */
         .kp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
         @media (max-width:640px){.kp-grid{grid-template-columns:1fr}}
         .kp-side{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
         .kp-side-title{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
         .kp-side-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-        .kp-player{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
-        .kp-player:last-child{border-bottom:0;padding-bottom:0}
-        .kp-player:first-of-type{padding-top:0}
-        .kp-rating{min-width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:Georgia,"Times New Roman",serif;font-size:19px;font-weight:400;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-variant-numeric:tabular-nums;flex-shrink:0;transition:all .3s}
-        .kp-player:hover .kp-rating{background:var(--accent-soft);border-color:rgba(255,107,53,.3);color:var(--accent)}
-        .kp-info{flex:1;min-width:0}
+        .kp-player{display:flex;align-items:center;gap:14px;padding:14px;margin-bottom:10px;border-radius:14px;position:relative;overflow:hidden;transition:all .3s cubic-bezier(.16,1,.3,1);background:linear-gradient(135deg,rgba(255,107,53,.05),rgba(255,107,53,.01));border:1px solid rgba(255,107,53,.12)}
+        .kp-player:last-child{margin-bottom:0}
+        .kp-player.away-side{background:linear-gradient(135deg,rgba(96,165,250,.05),rgba(96,165,250,.01));border-color:rgba(96,165,250,.12)}
+        .kp-player::before{content:"";position:absolute;top:-60%;right:-60%;width:120%;height:120%;background:radial-gradient(circle,rgba(255,107,53,.1),transparent 60%);pointer-events:none}
+        .kp-player.away-side::before{background:radial-gradient(circle,rgba(96,165,250,.1),transparent 60%)}
+        .kp-player:hover{transform:translateY(-2px);border-color:rgba(255,107,53,.3);box-shadow:0 12px 32px rgba(255,107,53,.15)}
+        .kp-player.away-side:hover{border-color:rgba(96,165,250,.3);box-shadow:0 12px 32px rgba(96,165,250,.15)}
+        .kp-rating{min-width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:19px;font-weight:600;background:linear-gradient(135deg,var(--accent),#ff8b5c);color:#0a0a0a;box-shadow:0 6px 20px rgba(255,107,53,.3);flex-shrink:0;transition:transform .3s;font-variant-numeric:tabular-nums;position:relative;z-index:1}
+        .kp-player.away-side .kp-rating{background:linear-gradient(135deg,#3b82f6,#60a5fa);box-shadow:0 6px 20px rgba(96,165,250,.3)}
+        .kp-player:hover .kp-rating{transform:scale(1.08) rotate(-2deg)}
+        .kp-info{flex:1;min-width:0;position:relative;z-index:1}
         .kp-name{font-size:14px;font-weight:500;color:var(--text);letter-spacing:-.01em}
         .kp-meta{font-size:11.5px;color:var(--text-3);margin-top:3px}
-        .kp-note{font-size:10px;color:#fbbf24;padding:3px 8px;border-radius:6px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);font-weight:500;flex-shrink:0}
+        .kp-note{font-size:10px;color:#fbbf24;padding:3px 8px;border-radius:6px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);font-weight:500;flex-shrink:0;position:relative;z-index:1}
         .kp-empty{color:var(--text-4);font-size:13px;text-align:center;padding:16px;font-style:italic}
 
         .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px}
@@ -205,7 +245,7 @@
         details.raw summary::before{content:"›";font-size:16px;transition:transform .25s;display:inline-block;color:var(--accent)}
         details.raw[open] summary::before{transform:rotate(90deg)}
         details.raw pre{background:#050505;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto;font-size:11.5px;color:var(--text-3);max-height:340px;margin-top:10px;line-height:1.8;font-family:ui-monospace,"SF Mono",Menlo,monospace}
-        .copy-json-btn{position:absolute;top:44px;right:14px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-2);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;z-index:2;font-family:inherit}
+        .copy-json-btn{position:absolute;top:44px;right:14px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-2);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;z-index:2}
         .copy-json-btn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
         .copy-json-btn.copied{background:var(--success-soft);color:var(--success);border-color:rgba(34,197,94,.3)}
 
@@ -223,7 +263,6 @@
         .legend .sw.uel{background:#60a5fa}
         .legend .sw.uecl{background:#34d399}
         .legend .sw.rel{background:#f87171}
-
         .standings-scroll{overflow-x:auto;border-radius:12px;margin:0 -8px}
         .standings-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:700px}
         .standings-table thead th{background:transparent;color:var(--text-3);font-weight:500;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:14px 10px;text-align:center;border-bottom:1px solid var(--border)}
@@ -244,26 +283,31 @@
         .standings-table .pts{color:var(--text);font-weight:500;font-family:Georgia,serif;font-size:15px}
 
         .sync-bar{display:flex;gap:8px;margin-top:12px}
-        .sync-bar button{flex:1;background:transparent;border:1px solid var(--border);color:var(--text-3);padding:10px 12px;border-radius:10px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+        .sync-bar button{flex:1;background:transparent;border:1px solid var(--border);color:var(--text-3);padding:10px 12px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
         .sync-bar button:hover{border-color:var(--border-2);color:var(--text)}
         .sync-panel{display:none;margin-top:12px;padding:16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px}
         .sync-panel.open{display:block}
         .sync-panel textarea{width:100%;min-height:80px;font-size:11px;font-family:ui-monospace,"SF Mono",Menlo,monospace;background:#050505;border:1px solid var(--border);border-radius:8px;color:var(--text-3);padding:12px;resize:vertical;word-break:break-all;line-height:1.5}
         .sync-panel .row-btns{display:flex;gap:8px;margin-top:12px}
-        .sync-panel .row-btns button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+        .sync-panel .row-btns button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
         .sync-panel .row-btns button.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
         .sync-panel .row-btns button:hover{border-color:var(--border-2);color:var(--text)}
         .sync-panel .row-btns button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#0a0a0a}
         .sync-tip{font-size:11px;color:var(--text-4);margin-top:12px;line-height:1.6}
         .sync-tip.warn{color:#fbbf24}
 
+        /* 悬浮按钮 */
         .tool-btn{position:fixed;right:24px;bottom:24px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#0a0a0a;border:0;font-size:20px;cursor:pointer;box-shadow:0 12px 32px rgba(255,107,53,.35);z-index:9000;display:flex;align-items:center;justify-content:center;transition:all .3s}
         .tool-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(255,107,53,.5)}
         .tool-btn .badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:99px;padding:2px 7px;font-size:10px;font-weight:600;min-width:18px;text-align:center;border:2px solid var(--bg)}
-        .back-top{position:fixed;right:24px;bottom:88px;width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:16px;z-index:8999;backdrop-filter:blur(12px);transition:all .2s}
+        .batch-btn{position:fixed;right:24px;bottom:88px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#3b82f6);color:#fff;border:0;font-size:20px;cursor:pointer;box-shadow:0 12px 32px rgba(96,165,250,.4);z-index:9000;display:flex;align-items:center;justify-content:center;transition:all .3s}
+        .batch-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(96,165,250,.55)}
+        .back-top{position:fixed;right:24px;bottom:152px;width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:16px;z-index:8999;backdrop-filter:blur(12px);transition:all .2s}
         .back-top.show{display:flex}
         .back-top:hover{border-color:var(--border-2);color:var(--text);transform:translateY(-2px)}
+        @media (max-width:640px){.tool-btn,.batch-btn{width:48px;height:48px;right:16px}.tool-btn{bottom:16px}.batch-btn{bottom:72px}.back-top{right:16px;bottom:128px}}
 
+        /* 历史 + 批量 overlay */
         .overlay{position:fixed;inset:0;background:rgba(5,5,5,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:9100;display:none;padding:24px;overflow-y:auto}
         .overlay.open{display:block;animation:fadeIn .25s}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -278,15 +322,15 @@
         .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px;border:1px solid var(--border)}
         .stat{background:var(--surface);padding:20px}
         .stat-label{font-size:10.5px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:10px}
-        .stat-value{font-family:Georgia,"Times New Roman",serif;font-size:28px;font-weight:400;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+        .stat-value{font-family:Georgia,serif;font-size:28px;font-weight:400;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
         .stat-value.success{color:var(--success)}
         .stat-value.danger{color:var(--danger)}
 
-        .hist-search{width:100%;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:inherit;font-size:14px;outline:none;transition:all .2s;margin-bottom:14px}
+        .hist-search{width:100%;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:all .2s;margin-bottom:14px}
         .hist-search:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
 
         .filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-        .filter{background:transparent;border:1px solid var(--border);color:var(--text-3);padding:8px 16px;border-radius:99px;font-family:inherit;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s}
+        .filter{background:transparent;border:1px solid var(--border);color:var(--text-3);padding:8px 16px;border-radius:99px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s}
         .filter:hover{color:var(--text);border-color:var(--border-2)}
         .filter.active{background:var(--text);color:var(--bg);border-color:var(--text)}
 
@@ -307,7 +351,7 @@
         .rec-input{width:48px;height:36px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);text-align:center;font-family:Georgia,serif;font-size:16px;font-weight:400;outline:none;padding:0;transition:all .2s;font-variant-numeric:tabular-nums}
         .rec-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
-        .btn-sm{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:7px 14px;border-radius:8px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
+        .btn-sm{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
         .btn-sm:hover{border-color:var(--border-2);color:var(--text);background:var(--surface-3)}
         .btn-sm.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
         .btn-sm.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#0a0a0a}
@@ -323,23 +367,26 @@
         .hist-empty .icon{font-size:40px;opacity:.25;margin-bottom:16px}
         .hist-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
 
-        .sk{background:linear-gradient(90deg,var(--surface-2) 0%,var(--surface-3) 50%,var(--surface-2) 100%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:14px}
-        @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-        .sk-hero{height:240px;margin-bottom:20px}
-        .sk-line{height:14px;margin-bottom:14px}
-        .sk-line.w-60{width:60%}
-        .sk-line.w-80{width:80%}
-
-        @media (max-width:640px){
-            .team-crest{width:64px;height:64px}
-            .score-num{font-size:52px;min-width:44px}
-            .score-dash{font-size:28px}
-            .prob-cell .val{font-size:24px}
-            .prob-cell .val .pct{font-size:13px}
-            .tool-btn{right:16px;bottom:16px;width:48px;height:48px}
-            .back-top{right:16px;bottom:76px}
-            .nav-title{display:none}
-        }
+        /* 批量预测弹窗 */
+        .batch-modal{max-width:720px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;animation:slideUp .35s cubic-bezier(.16,1,.3,1);box-shadow:0 40px 100px rgba(0,0,0,.8)}
+        .batch-modal h2{font-size:22px;font-weight:500;letter-spacing:-.02em;color:var(--text);margin-bottom:8px}
+        .batch-modal .sub{font-size:13px;color:var(--text-3);margin-bottom:24px}
+        .batch-progress{background:var(--surface-2);border-radius:8px;height:8px;overflow:hidden;margin-bottom:20px}
+        .batch-progress-bar{height:100%;background:linear-gradient(90deg,#00d4ff,#3b82f6);width:0%;transition:width .3s ease}
+        .batch-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding-right:4px;margin-bottom:20px}
+        .batch-item{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--text-2);transition:all .2s}
+        .batch-item.pending{opacity:.55}
+        .batch-item.running{border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.04)}
+        .batch-item.done{border-color:rgba(34,197,94,.3);background:var(--success-soft)}
+        .batch-item.fail{border-color:rgba(239,68,68,.3);background:var(--danger-soft)}
+        .batch-item .score{font-family:Georgia,serif;font-size:17px;color:var(--text);font-variant-numeric:tabular-nums}
+        .batch-item .probs{font-size:11px;color:var(--text-3);margin-left:10px}
+        .batch-footer{display:flex;gap:10px;justify-content:flex-end;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
+        .batch-footer button{padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
+        .batch-footer button:hover{border-color:var(--border-2);color:var(--text)}
+        .batch-footer button.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
+        .batch-footer button.primary:hover{background:var(--accent-2);border-color:var(--accent-2)}
+        .batch-footer button.primary:disabled{opacity:.4;cursor:not-allowed}
     </style>
 </head>
 <body>
@@ -351,9 +398,7 @@
             <div class="nav-title">英超预测引擎 <span>· 2026-27</span></div>
         </div>
         <div class="nav-right">
-            <button class="nav-btn" id="navHistory">
-                📊 历史 <span class="badge" id="navHistoryBadge" style="display:none">0</span>
-            </button>
+            <button class="nav-btn" id="navHistory">📊 历史 <span class="badge" id="navHistoryBadge" style="display:none">0</span></button>
         </div>
     </nav>
 
@@ -367,14 +412,17 @@
             <div class="hero-stat"><div class="v">380</div><div class="l">比赛</div></div>
             <div class="hero-stat"><div class="v" id="heroHitRate">—</div><div class="l">命中率</div></div>
         </div>
+        <div class="matchday-dash">
+            <div class="dash-item"><div class="l">当前轮次</div><div class="v accent" id="dashRound">—</div></div>
+            <div class="dash-item"><div class="l">本轮已完赛</div><div class="v" id="dashFinished">—</div></div>
+            <div class="dash-item"><div class="l">本轮待预测</div><div class="v live" id="dashPending">—</div></div>
+            <div class="dash-item"><div class="l">待录入赛果</div><div class="v" id="dashSettle">—</div></div>
+        </div>
     </section>
 
     <div class="main-grid">
         <aside class="card">
-            <div class="card-head">
-                <div class="card-label">比赛输入</div>
-            </div>
-
+            <div class="card-head"><div class="card-label">比赛输入</div></div>
             <div class="field">
                 <label class="field-label">快速选择</label>
                 <div class="field-row-2">
@@ -382,7 +430,6 @@
                     <select id="matchSelect"></select>
                 </div>
             </div>
-
             <div class="field">
                 <label class="field-label">当前选中</label>
                 <div class="field-row-3">
@@ -391,12 +438,10 @@
                     <input id="round" placeholder="轮次">
                 </div>
             </div>
-
             <div class="field">
                 <label class="field-label">今日情报</label>
                 <textarea id="intel" placeholder="例如：&#10;- 阿森纳：萨利巴背伤&#10;- 利物浦：锋线轮换"></textarea>
             </div>
-
             <div class="field">
                 <label class="field-label">API 提供商</label>
                 <select id="provider">
@@ -404,7 +449,6 @@
                     <option value="openrouter">OpenRouter · 每日 50 次免费</option>
                 </select>
             </div>
-
             <div class="field">
                 <label class="field-label">API Key</label>
                 <div class="key-wrap">
@@ -413,10 +457,8 @@
                 </div>
                 <div class="field-hint">🔒 只保存在浏览器本地</div>
             </div>
-
             <button id="predictBtn" class="btn">开始预测</button>
             <div id="status" class="status"></div>
-
             <div class="sync-bar">
                 <button id="syncExportBtn" type="button">导出配置</button>
                 <button id="syncImportBtn" type="button">导入配置</button>
@@ -433,9 +475,7 @@
         </aside>
 
         <main class="card">
-            <div class="card-head">
-                <div class="card-label">预测结果</div>
-            </div>
+            <div class="card-head"><div class="card-label">预测结果</div></div>
             <div id="result">
                 <div class="empty">
                     <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
@@ -462,12 +502,7 @@
         </div>
         <div class="standings-scroll">
             <table class="standings-table">
-                <thead>
-                <tr>
-                    <th style="width:44px">#</th><th>球队</th><th>场</th><th>胜</th><th>平</th><th>负</th>
-                    <th>进</th><th>失</th><th>净</th><th>积分</th>
-                </tr>
-                </thead>
+                <thead><tr><th style="width:44px">#</th><th>球队</th><th>场</th><th>胜</th><th>平</th><th>负</th><th>进</th><th>失</th><th>净</th><th>积分</th></tr></thead>
                 <tbody id="standingsBody"></tbody>
             </table>
         </div>
@@ -475,6 +510,7 @@
 </div>
 
 <button class="back-top" id="backTop" title="返回顶部">↑</button>
+<button class="batch-btn" id="plBatchFab" title="批量预测本轮">⚡</button>
 <button class="tool-btn" id="plHistoryFab" title="预测历史">📊<span class="badge" id="plHistoryBadge" style="display:none">0</span></button>
 
 <div class="overlay" id="plHistoryOverlay">
@@ -501,85 +537,99 @@
     </div>
 </div>
 
+<div class="overlay" id="plBatchOverlay">
+    <div class="batch-modal">
+        <div class="hist-head">
+            <h2>批量预测本轮</h2>
+            <button class="hist-close" id="plBatchClose">✕</button>
+        </div>
+        <div class="sub">轮次：<span id="plBatchRound">—</span> · 共 <span id="plBatchTotal">0</span> 场 · 每场间隔 1.5 秒自动限速</div>
+        <div class="batch-progress"><div class="batch-progress-bar" id="plBatchBar"></div></div>
+        <div class="batch-list" id="plBatchList"></div>
+        <div class="batch-footer">
+            <button id="plBatchCancel">关闭</button>
+            <button class="primary" id="plBatchRun">开始批量预测</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    /* ============ 数据（会由 update.js 自动覆盖） ============ */
+    /* ============ 数据（由 update.js 自动覆盖） ============ */
     const FIXTURES = [
-  [{home:'阿森纳',away:'考文垂城'},{home:'赫尔城',away:'曼联'},{home:'伊普斯维奇镇',away:'桑德兰'},{home:'诺丁汉森林',away:'利兹联'},{home:'埃弗顿',away:'水晶宫'},{home:'布伦特福德',away:'热刺'},{home:'曼城',away:'伯恩茅斯'},{home:'布莱顿',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'利物浦'},{home:'富勒姆',away:'切尔西'}],
-  [{home:'水晶宫',away:'曼城'},{home:'利物浦',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'埃弗顿'},{home:'考文垂城',away:'赫尔城'},{home:'热刺',away:'纽卡斯尔联'},{home:'桑德兰',away:'富勒姆'},{home:'切尔西',away:'布莱顿'},{home:'利兹联',away:'布伦特福德'},{home:'曼联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'阿森纳'}],
-  [{home:'伊普斯维奇镇',away:'利物浦'},{home:'纽卡斯尔联',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'热刺'},{home:'曼城',away:'考文垂城'},{home:'布莱顿',away:'利兹联'},{home:'布伦特福德',away:'桑德兰'},{home:'富勒姆',away:'水晶宫'},{home:'赫尔城',away:'阿斯顿维拉'},{home:'埃弗顿',away:'曼联'},{home:'阿森纳',away:'切尔西'}],
-  [{home:'水晶宫',away:'伊普斯维奇镇'},{home:'利物浦',away:'富勒姆'},{home:'阿斯顿维拉',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'布伦特福德'},{home:'切尔西',away:'赫尔城'},{home:'热刺',away:'埃弗顿'},{home:'桑德兰',away:'阿森纳'},{home:'考文垂城',away:'布莱顿'},{home:'曼联',away:'曼城'},{home:'利兹联',away:'纽卡斯尔联'}],
-  [{home:'布伦特福德',away:'切尔西'},{home:'热刺',away:'阿斯顿维拉'},{home:'埃弗顿',away:'伊普斯维奇镇'},{home:'布莱顿',away:'阿森纳'},{home:'纽卡斯尔联',away:'赫尔城'},{home:'诺丁汉森林',away:'考文垂城'},{home:'伯恩茅斯',away:'利物浦'},{home:'利兹联',away:'水晶宫'},{home:'曼城',away:'桑德兰'},{home:'富勒姆',away:'曼联'}],
-  [{home:'阿森纳',away:'利兹联'},{home:'桑德兰',away:'布莱顿'},{home:'切尔西',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'富勒姆'},{home:'阿斯顿维拉',away:'布伦特福德'},{home:'曼联',away:'热刺'},{home:'赫尔城',away:'埃弗顿'},{home:'水晶宫',away:'诺丁汉森林'},{home:'利物浦',away:'曼城'},{home:'考文垂城',away:'纽卡斯尔联'}],
-  [{home:'埃弗顿',away:'切尔西'},{home:'富勒姆',away:'赫尔城'},{home:'曼城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'利物浦'},{home:'纽卡斯尔联',away:'阿斯顿维拉'},{home:'伯恩茅斯',away:'桑德兰'},{home:'利兹联',away:'曼联'},{home:'布莱顿',away:'水晶宫'},{home:'诺丁汉森林',away:'阿森纳'},{home:'热刺',away:'考文垂城'}],
-  [{home:'伊普斯维奇镇',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'曼城'},{home:'阿森纳',away:'埃弗顿'},{home:'考文垂城',away:'富勒姆'},{home:'切尔西',away:'热刺'},{home:'利物浦',away:'布莱顿'},{home:'水晶宫',away:'纽卡斯尔联'},{home:'曼联',away:'伯恩茅斯'},{home:'赫尔城',away:'布伦特福德'},{home:'桑德兰',away:'利兹联'}],
-  [{home:'切尔西',away:'曼联'},{home:'曼城',away:'布莱顿'},{home:'伯恩茅斯',away:'利兹联'},{home:'考文垂城',away:'桑德兰'},{home:'赫尔城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'诺丁汉森林'},{home:'热刺',away:'水晶宫'},{home:'阿斯顿维拉',away:'富勒姆'},{home:'利物浦',away:'阿森纳'},{home:'纽卡斯尔联',away:'埃弗顿'}],
-  [{home:'埃弗顿',away:'考文垂城'},{home:'利兹联',away:'热刺'},{home:'阿森纳',away:'赫尔城'},{home:'富勒姆',away:'纽卡斯尔联'},{home:'诺丁汉森林',away:'曼城'},{home:'水晶宫',away:'利物浦'},{home:'桑德兰',away:'切尔西'},{home:'伊普斯维奇镇',away:'伯恩茅斯'},{home:'布莱顿',away:'布伦特福德'},{home:'曼联',away:'阿斯顿维拉'}],
-  [{home:'曼城',away:'富勒姆'},{home:'切尔西',away:'利兹联'},{home:'阿斯顿维拉',away:'桑德兰'},{home:'伯恩茅斯',away:'诺丁汉森林'},{home:'热刺',away:'伊普斯维奇镇'},{home:'考文垂城',away:'水晶宫'},{home:'纽卡斯尔联',away:'阿森纳'},{home:'赫尔城',away:'布莱顿'},{home:'利物浦',away:'曼联'},{home:'布伦特福德',away:'埃弗顿'}],
-  [{home:'诺丁汉森林',away:'切尔西'},{home:'利兹联',away:'考文垂城'},{home:'曼联',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'阿斯顿维拉'},{home:'埃弗顿',away:'利物浦'},{home:'富勒姆',away:'伯恩茅斯'},{home:'布莱顿',away:'纽卡斯尔联'},{home:'桑德兰',away:'热刺'},{home:'水晶宫',away:'赫尔城'},{home:'阿森纳',away:'曼城'}],
-  [{home:'热刺',away:'富勒姆'},{home:'利物浦',away:'桑德兰'},{home:'赫尔城',away:'诺丁汉森林'},{home:'切尔西',away:'水晶宫'},{home:'阿斯顿维拉',away:'埃弗顿'},{home:'布伦特福德',away:'阿森纳'},{home:'考文垂城',away:'伊普斯维奇镇'},{home:'曼城',away:'利兹联'},{home:'纽卡斯尔联',away:'曼联'},{home:'伯恩茅斯',away:'布莱顿'}],
-  [{home:'热刺',away:'阿森纳'},{home:'曼联',away:'考文垂城'},{home:'利兹联',away:'伊普斯维奇镇'},{home:'纽卡斯尔联',away:'桑德兰'},{home:'切尔西',away:'利物浦'},{home:'布伦特福德',away:'曼城'},{home:'伯恩茅斯',away:'赫尔城'},{home:'阿斯顿维拉',away:'水晶宫'},{home:'诺丁汉森林',away:'布莱顿'},{home:'埃弗顿',away:'富勒姆'}],
-  [{home:'桑德兰',away:'诺丁汉森林'},{home:'水晶宫',away:'曼联'},{home:'赫尔城',away:'热刺'},{home:'布莱顿',away:'埃弗顿'},{home:'伊普斯维奇镇',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿斯顿维拉'},{home:'阿森纳',away:'伯恩茅斯'},{home:'曼城',away:'切尔西'},{home:'利物浦',away:'利兹联'},{home:'富勒姆',away:'布伦特福德'}],
-  [{home:'利兹联',away:'富勒姆'},{home:'布莱顿',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'埃弗顿'},{home:'布伦特福德',away:'纽卡斯尔联'},{home:'曼城',away:'赫尔城'},{home:'桑德兰',away:'水晶宫'},{home:'伯恩茅斯',away:'考文垂城'},{home:'阿森纳',away:'曼联'},{home:'利物浦',away:'热刺'},{home:'切尔西',away:'阿斯顿维拉'}],
-  [{home:'阿斯顿维拉',away:'利兹联'},{home:'埃弗顿',away:'桑德兰'},{home:'富勒姆',away:'布莱顿'},{home:'热刺',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'布伦特福德'},{home:'赫尔城',away:'利物浦'},{home:'纽卡斯尔联',away:'曼城'},{home:'考文垂城',away:'切尔西'},{home:'曼联',away:'诺丁汉森林'},{home:'水晶宫',away:'阿森纳'}],
-  [{home:'赫尔城',away:'利兹联'},{home:'热刺',away:'布莱顿'},{home:'埃弗顿',away:'曼城'},{home:'富勒姆',away:'阿森纳'},{home:'考文垂城',away:'布伦特福德'},{home:'纽卡斯尔联',away:'诺丁汉森林'},{home:'曼联',away:'桑德兰'},{home:'水晶宫',away:'伯恩茅斯'},{home:'阿斯顿维拉',away:'利物浦'},{home:'伊普斯维奇镇',away:'切尔西'}],
-  [{home:'利兹联',away:'埃弗顿'},{home:'布莱顿',away:'曼联'},{home:'布伦特福德',away:'水晶宫'},{home:'阿森纳',away:'伊普斯维奇镇'},{home:'桑德兰',away:'赫尔城'},{home:'利物浦',away:'考文垂城'},{home:'诺丁汉森林',away:'富勒姆'},{home:'伯恩茅斯',away:'阿斯顿维拉'},{home:'切尔西',away:'纽卡斯尔联'},{home:'曼城',away:'热刺'}],
-  [{home:'阿森纳',away:'布伦特福德'},{home:'布莱顿',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'赫尔城'},{home:'埃弗顿',away:'阿斯顿维拉'},{home:'桑德兰',away:'利物浦'},{home:'富勒姆',away:'热刺'},{home:'水晶宫',away:'切尔西'},{home:'伊普斯维奇镇',away:'考文垂城'},{home:'利兹联',away:'曼城'},{home:'曼联',away:'纽卡斯尔联'}],
-  [{home:'伯恩茅斯',away:'伊普斯维奇镇'},{home:'曼城',away:'诺丁汉森林'},{home:'切尔西',away:'桑德兰'},{home:'布伦特福德',away:'布莱顿'},{home:'阿斯顿维拉',away:'曼联'},{home:'热刺',away:'利兹联'},{home:'考文垂城',away:'埃弗顿'},{home:'利物浦',away:'水晶宫'},{home:'赫尔城',away:'阿森纳'},{home:'纽卡斯尔联',away:'富勒姆'}],
-  [{home:'伊普斯维奇镇',away:'赫尔城'},{home:'埃弗顿',away:'布伦特福德'},{home:'桑德兰',away:'考文垂城'},{home:'诺丁汉森林',away:'伯恩茅斯'},{home:'阿森纳',away:'纽卡斯尔联'},{home:'利兹联',away:'切尔西'},{home:'富勒姆',away:'阿斯顿维拉'},{home:'曼联',away:'利物浦'},{home:'布莱顿',away:'曼城'},{home:'水晶宫',away:'热刺'}],
-  [{home:'热刺',away:'桑德兰'},{home:'布伦特福德',away:'曼联'},{home:'纽卡斯尔联',away:'布莱顿'},{home:'赫尔城',away:'水晶宫'},{home:'考文垂城',away:'利兹联'},{home:'伯恩茅斯',away:'富勒姆'},{home:'切尔西',away:'诺丁汉森林'},{home:'利物浦',away:'埃弗顿'},{home:'曼城',away:'阿森纳'},{home:'阿斯顿维拉',away:'伊普斯维奇镇'}],
-  [{home:'阿森纳',away:'利物浦'},{home:'布莱顿',away:'赫尔城'},{home:'桑德兰',away:'阿斯顿维拉'},{home:'水晶宫',away:'考文垂城'},{home:'伊普斯维奇镇',away:'热刺'},{home:'埃弗顿',away:'纽卡斯尔联'},{home:'富勒姆',away:'曼城'},{home:'利兹联',away:'伯恩茅斯'},{home:'曼联',away:'切尔西'},{home:'诺丁汉森林',away:'布伦特福德'}],
-  [{home:'埃弗顿',away:'利兹联'},{home:'考文垂城',away:'利物浦'},{home:'赫尔城',away:'桑德兰'},{home:'阿斯顿维拉',away:'伯恩茅斯'},{home:'水晶宫',away:'布伦特福德'},{home:'纽卡斯尔联',away:'切尔西'},{home:'富勒姆',away:'诺丁汉森林'},{home:'热刺',away:'曼城'},{home:'曼联',away:'布莱顿'},{home:'伊普斯维奇镇',away:'阿森纳'}],
-  [{home:'曼城',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'水晶宫'},{home:'布伦特福德',away:'考文垂城'},{home:'切尔西',away:'伊普斯维奇镇'},{home:'利物浦',away:'赫尔城'},{home:'阿森纳',away:'富勒姆'},{home:'诺丁汉森林',away:'曼联'},{home:'布莱顿',away:'热刺'},{home:'桑德兰',away:'埃弗顿'},{home:'利兹联',away:'阿斯顿维拉'}],
-  [{home:'水晶宫',away:'桑德兰'},{home:'曼联',away:'阿森纳'},{home:'伊普斯维奇镇',away:'布莱顿'},{home:'考文垂城',away:'伯恩茅斯'},{home:'埃弗顿',away:'诺丁汉森林'},{home:'富勒姆',away:'利兹联'},{home:'阿斯顿维拉',away:'切尔西'},{home:'热刺',away:'利物浦'},{home:'纽卡斯尔联',away:'布伦特福德'},{home:'赫尔城',away:'曼城'}],
-  [{home:'诺丁汉森林',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'热刺'},{home:'曼城',away:'埃弗顿'},{home:'阿森纳',away:'水晶宫'},{home:'利兹联',away:'赫尔城'},{home:'桑德兰',away:'曼联'},{home:'利物浦',away:'阿斯顿维拉'},{home:'布莱顿',away:'富勒姆'},{home:'布伦特福德',away:'伊普斯维奇镇'},{home:'切尔西',away:'考文垂城'}],
-  [{home:'利兹联',away:'布莱顿'},{home:'热刺',away:'诺丁汉森林'},{home:'水晶宫',away:'富勒姆'},{home:'利物浦',away:'伊普斯维奇镇'},{home:'考文垂城',away:'曼城'},{home:'伯恩茅斯',away:'纽卡斯尔联'},{home:'切尔西',away:'阿森纳'},{home:'阿斯顿维拉',away:'赫尔城'},{home:'曼联',away:'埃弗顿'},{home:'桑德兰',away:'布伦特福德'}],
-  [{home:'布伦特福德',away:'伯恩茅斯'},{home:'布莱顿',away:'考文垂城'},{home:'曼城',away:'曼联'},{home:'伊普斯维奇镇',away:'水晶宫'},{home:'阿森纳',away:'桑德兰'},{home:'富勒姆',away:'利物浦'},{home:'赫尔城',away:'切尔西'},{home:'诺丁汉森林',away:'阿斯顿维拉'},{home:'埃弗顿',away:'热刺'},{home:'纽卡斯尔联',away:'利兹联'}],
-  [{home:'桑德兰',away:'伊普斯维奇镇'},{home:'利兹联',away:'诺丁汉森林'},{home:'曼联',away:'赫尔城'},{home:'切尔西',away:'富勒姆'},{home:'利物浦',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿森纳'},{home:'伯恩茅斯',away:'曼城'},{home:'水晶宫',away:'埃弗顿'},{home:'热刺',away:'布伦特福德'},{home:'阿斯顿维拉',away:'布莱顿'}],
-  [{home:'布莱顿',away:'切尔西'},{home:'富勒姆',away:'桑德兰'},{home:'布伦特福德',away:'利兹联'},{home:'诺丁汉森林',away:'利物浦'},{home:'赫尔城',away:'考文垂城'},{home:'阿森纳',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'曼联'},{home:'曼城',away:'水晶宫'},{home:'纽卡斯尔联',away:'热刺'},{home:'埃弗顿',away:'伯恩茅斯'}],
-  [{home:'切尔西',away:'曼城'},{home:'伯恩茅斯',away:'阿森纳'},{home:'热刺',away:'赫尔城'},{home:'曼联',away:'水晶宫'},{home:'埃弗顿',away:'布莱顿'},{home:'诺丁汉森林',away:'桑德兰'},{home:'纽卡斯尔联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'考文垂城'},{home:'布伦特福德',away:'富勒姆'},{home:'利兹联',away:'利物浦'}],
-  [{home:'桑德兰',away:'纽卡斯尔联'},{home:'布莱顿',away:'诺丁汉森林'},{home:'考文垂城',away:'曼联'},{home:'赫尔城',away:'伯恩茅斯'},{home:'曼城',away:'布伦特福德'},{home:'富勒姆',away:'埃弗顿'},{home:'利物浦',away:'切尔西'},{home:'阿森纳',away:'热刺'},{home:'水晶宫',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'利兹联'}],
-  [{home:'曼城',away:'利物浦'},{home:'利兹联',away:'阿森纳'},{home:'富勒姆',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'水晶宫'},{home:'布伦特福德',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'考文垂城'},{home:'布莱顿',away:'桑德兰'},{home:'热刺',away:'切尔西'},{home:'埃弗顿',away:'赫尔城'},{home:'伯恩茅斯',away:'曼联'}],
-  [{home:'赫尔城',away:'富勒姆'},{home:'曼联',away:'利兹联'},{home:'水晶宫',away:'布莱顿'},{home:'阿斯顿维拉',away:'纽卡斯尔联'},{home:'切尔西',away:'埃弗顿'},{home:'考文垂城',away:'热刺'},{home:'桑德兰',away:'伯恩茅斯'},{home:'利物浦',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'曼城'},{home:'阿森纳',away:'诺丁汉森林'}],
-  [{home:'布伦特福德',away:'赫尔城'},{home:'纽卡斯尔联',away:'水晶宫'},{home:'热刺',away:'曼联'},{home:'利兹联',away:'桑德兰'},{home:'布莱顿',away:'利物浦'},{home:'诺丁汉森林',away:'伊普斯维奇镇'},{home:'伯恩茅斯',away:'切尔西'},{home:'富勒姆',away:'考文垂城'},{home:'埃弗顿',away:'阿森纳'},{home:'曼城',away:'阿斯顿维拉'}],
-  [{home:'伊普斯维奇镇',away:'埃弗顿'},{home:'阿森纳',away:'布莱顿'},{home:'利物浦',away:'伯恩茅斯'},{home:'考文垂城',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'热刺'},{home:'赫尔城',away:'纽卡斯尔联'},{home:'曼联',away:'富勒姆'},{home:'桑德兰',away:'曼城'},{home:'切尔西',away:'布伦特福德'},{home:'水晶宫',away:'利兹联'}]
-];
+        [{home:'阿森纳',away:'考文垂城'},{home:'赫尔城',away:'曼联'},{home:'伊普斯维奇镇',away:'桑德兰'},{home:'诺丁汉森林',away:'利兹联'},{home:'埃弗顿',away:'水晶宫'},{home:'布伦特福德',away:'热刺'},{home:'曼城',away:'伯恩茅斯'},{home:'布莱顿',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'利物浦'},{home:'富勒姆',away:'切尔西'}],
+        [{home:'水晶宫',away:'曼城'},{home:'利物浦',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'埃弗顿'},{home:'考文垂城',away:'赫尔城'},{home:'热刺',away:'纽卡斯尔联'},{home:'桑德兰',away:'富勒姆'},{home:'切尔西',away:'布莱顿'},{home:'利兹联',away:'布伦特福德'},{home:'曼联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'阿森纳'}],
+        [{home:'伊普斯维奇镇',away:'利物浦'},{home:'纽卡斯尔联',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'热刺'},{home:'曼城',away:'考文垂城'},{home:'布莱顿',away:'利兹联'},{home:'布伦特福德',away:'桑德兰'},{home:'富勒姆',away:'水晶宫'},{home:'赫尔城',away:'阿斯顿维拉'},{home:'埃弗顿',away:'曼联'},{home:'阿森纳',away:'切尔西'}],
+        [{home:'水晶宫',away:'伊普斯维奇镇'},{home:'利物浦',away:'富勒姆'},{home:'阿斯顿维拉',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'布伦特福德'},{home:'切尔西',away:'赫尔城'},{home:'热刺',away:'埃弗顿'},{home:'桑德兰',away:'阿森纳'},{home:'考文垂城',away:'布莱顿'},{home:'曼联',away:'曼城'},{home:'利兹联',away:'纽卡斯尔联'}],
+        [{home:'布伦特福德',away:'切尔西'},{home:'热刺',away:'阿斯顿维拉'},{home:'埃弗顿',away:'伊普斯维奇镇'},{home:'布莱顿',away:'阿森纳'},{home:'纽卡斯尔联',away:'赫尔城'},{home:'诺丁汉森林',away:'考文垂城'},{home:'伯恩茅斯',away:'利物浦'},{home:'利兹联',away:'水晶宫'},{home:'曼城',away:'桑德兰'},{home:'富勒姆',away:'曼联'}],
+        [{home:'阿森纳',away:'利兹联'},{home:'桑德兰',away:'布莱顿'},{home:'切尔西',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'富勒姆'},{home:'阿斯顿维拉',away:'布伦特福德'},{home:'曼联',away:'热刺'},{home:'赫尔城',away:'埃弗顿'},{home:'水晶宫',away:'诺丁汉森林'},{home:'利物浦',away:'曼城'},{home:'考文垂城',away:'纽卡斯尔联'}],
+        [{home:'埃弗顿',away:'切尔西'},{home:'富勒姆',away:'赫尔城'},{home:'曼城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'利物浦'},{home:'纽卡斯尔联',away:'阿斯顿维拉'},{home:'伯恩茅斯',away:'桑德兰'},{home:'利兹联',away:'曼联'},{home:'布莱顿',away:'水晶宫'},{home:'诺丁汉森林',away:'阿森纳'},{home:'热刺',away:'考文垂城'}],
+        [{home:'伊普斯维奇镇',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'曼城'},{home:'阿森纳',away:'埃弗顿'},{home:'考文垂城',away:'富勒姆'},{home:'切尔西',away:'热刺'},{home:'利物浦',away:'布莱顿'},{home:'水晶宫',away:'纽卡斯尔联'},{home:'曼联',away:'伯恩茅斯'},{home:'赫尔城',away:'布伦特福德'},{home:'桑德兰',away:'利兹联'}],
+        [{home:'切尔西',away:'曼联'},{home:'曼城',away:'布莱顿'},{home:'伯恩茅斯',away:'利兹联'},{home:'考文垂城',away:'桑德兰'},{home:'赫尔城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'诺丁汉森林'},{home:'热刺',away:'水晶宫'},{home:'阿斯顿维拉',away:'富勒姆'},{home:'利物浦',away:'阿森纳'},{home:'纽卡斯尔联',away:'埃弗顿'}],
+        [{home:'埃弗顿',away:'考文垂城'},{home:'利兹联',away:'热刺'},{home:'阿森纳',away:'赫尔城'},{home:'富勒姆',away:'纽卡斯尔联'},{home:'诺丁汉森林',away:'曼城'},{home:'水晶宫',away:'利物浦'},{home:'桑德兰',away:'切尔西'},{home:'伊普斯维奇镇',away:'伯恩茅斯'},{home:'布莱顿',away:'布伦特福德'},{home:'曼联',away:'阿斯顿维拉'}],
+        [{home:'曼城',away:'富勒姆'},{home:'切尔西',away:'利兹联'},{home:'阿斯顿维拉',away:'桑德兰'},{home:'伯恩茅斯',away:'诺丁汉森林'},{home:'热刺',away:'伊普斯维奇镇'},{home:'考文垂城',away:'水晶宫'},{home:'纽卡斯尔联',away:'阿森纳'},{home:'赫尔城',away:'布莱顿'},{home:'利物浦',away:'曼联'},{home:'布伦特福德',away:'埃弗顿'}],
+        [{home:'诺丁汉森林',away:'切尔西'},{home:'利兹联',away:'考文垂城'},{home:'曼联',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'阿斯顿维拉'},{home:'埃弗顿',away:'利物浦'},{home:'富勒姆',away:'伯恩茅斯'},{home:'布莱顿',away:'纽卡斯尔联'},{home:'桑德兰',away:'热刺'},{home:'水晶宫',away:'赫尔城'},{home:'阿森纳',away:'曼城'}],
+        [{home:'热刺',away:'富勒姆'},{home:'利物浦',away:'桑德兰'},{home:'赫尔城',away:'诺丁汉森林'},{home:'切尔西',away:'水晶宫'},{home:'阿斯顿维拉',away:'埃弗顿'},{home:'布伦特福德',away:'阿森纳'},{home:'考文垂城',away:'伊普斯维奇镇'},{home:'曼城',away:'利兹联'},{home:'纽卡斯尔联',away:'曼联'},{home:'伯恩茅斯',away:'布莱顿'}],
+        [{home:'热刺',away:'阿森纳'},{home:'曼联',away:'考文垂城'},{home:'利兹联',away:'伊普斯维奇镇'},{home:'纽卡斯尔联',away:'桑德兰'},{home:'切尔西',away:'利物浦'},{home:'布伦特福德',away:'曼城'},{home:'伯恩茅斯',away:'赫尔城'},{home:'阿斯顿维拉',away:'水晶宫'},{home:'诺丁汉森林',away:'布莱顿'},{home:'埃弗顿',away:'富勒姆'}],
+        [{home:'桑德兰',away:'诺丁汉森林'},{home:'水晶宫',away:'曼联'},{home:'赫尔城',away:'热刺'},{home:'布莱顿',away:'埃弗顿'},{home:'伊普斯维奇镇',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿斯顿维拉'},{home:'阿森纳',away:'伯恩茅斯'},{home:'曼城',away:'切尔西'},{home:'利物浦',away:'利兹联'},{home:'富勒姆',away:'布伦特福德'}],
+        [{home:'利兹联',away:'富勒姆'},{home:'布莱顿',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'埃弗顿'},{home:'布伦特福德',away:'纽卡斯尔联'},{home:'曼城',away:'赫尔城'},{home:'桑德兰',away:'水晶宫'},{home:'伯恩茅斯',away:'考文垂城'},{home:'阿森纳',away:'曼联'},{home:'利物浦',away:'热刺'},{home:'切尔西',away:'阿斯顿维拉'}],
+        [{home:'阿斯顿维拉',away:'利兹联'},{home:'埃弗顿',away:'桑德兰'},{home:'富勒姆',away:'布莱顿'},{home:'热刺',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'布伦特福德'},{home:'赫尔城',away:'利物浦'},{home:'纽卡斯尔联',away:'曼城'},{home:'考文垂城',away:'切尔西'},{home:'曼联',away:'诺丁汉森林'},{home:'水晶宫',away:'阿森纳'}],
+        [{home:'赫尔城',away:'利兹联'},{home:'热刺',away:'布莱顿'},{home:'埃弗顿',away:'曼城'},{home:'富勒姆',away:'阿森纳'},{home:'考文垂城',away:'布伦特福德'},{home:'纽卡斯尔联',away:'诺丁汉森林'},{home:'曼联',away:'桑德兰'},{home:'水晶宫',away:'伯恩茅斯'},{home:'阿斯顿维拉',away:'利物浦'},{home:'伊普斯维奇镇',away:'切尔西'}],
+        [{home:'利兹联',away:'埃弗顿'},{home:'布莱顿',away:'曼联'},{home:'布伦特福德',away:'水晶宫'},{home:'阿森纳',away:'伊普斯维奇镇'},{home:'桑德兰',away:'赫尔城'},{home:'利物浦',away:'考文垂城'},{home:'诺丁汉森林',away:'富勒姆'},{home:'伯恩茅斯',away:'阿斯顿维拉'},{home:'切尔西',away:'纽卡斯尔联'},{home:'曼城',away:'热刺'}],
+        [{home:'阿森纳',away:'布伦特福德'},{home:'布莱顿',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'赫尔城'},{home:'埃弗顿',away:'阿斯顿维拉'},{home:'桑德兰',away:'利物浦'},{home:'富勒姆',away:'热刺'},{home:'水晶宫',away:'切尔西'},{home:'伊普斯维奇镇',away:'考文垂城'},{home:'利兹联',away:'曼城'},{home:'曼联',away:'纽卡斯尔联'}],
+        [{home:'伯恩茅斯',away:'伊普斯维奇镇'},{home:'曼城',away:'诺丁汉森林'},{home:'切尔西',away:'桑德兰'},{home:'布伦特福德',away:'布莱顿'},{home:'阿斯顿维拉',away:'曼联'},{home:'热刺',away:'利兹联'},{home:'考文垂城',away:'埃弗顿'},{home:'利物浦',away:'水晶宫'},{home:'赫尔城',away:'阿森纳'},{home:'纽卡斯尔联',away:'富勒姆'}],
+        [{home:'伊普斯维奇镇',away:'赫尔城'},{home:'埃弗顿',away:'布伦特福德'},{home:'桑德兰',away:'考文垂城'},{home:'诺丁汉森林',away:'伯恩茅斯'},{home:'阿森纳',away:'纽卡斯尔联'},{home:'利兹联',away:'切尔西'},{home:'富勒姆',away:'阿斯顿维拉'},{home:'曼联',away:'利物浦'},{home:'布莱顿',away:'曼城'},{home:'水晶宫',away:'热刺'}],
+        [{home:'热刺',away:'桑德兰'},{home:'布伦特福德',away:'曼联'},{home:'纽卡斯尔联',away:'布莱顿'},{home:'赫尔城',away:'水晶宫'},{home:'考文垂城',away:'利兹联'},{home:'伯恩茅斯',away:'富勒姆'},{home:'切尔西',away:'诺丁汉森林'},{home:'利物浦',away:'埃弗顿'},{home:'曼城',away:'阿森纳'},{home:'阿斯顿维拉',away:'伊普斯维奇镇'}],
+        [{home:'阿森纳',away:'利物浦'},{home:'布莱顿',away:'赫尔城'},{home:'桑德兰',away:'阿斯顿维拉'},{home:'水晶宫',away:'考文垂城'},{home:'伊普斯维奇镇',away:'热刺'},{home:'埃弗顿',away:'纽卡斯尔联'},{home:'富勒姆',away:'曼城'},{home:'利兹联',away:'伯恩茅斯'},{home:'曼联',away:'切尔西'},{home:'诺丁汉森林',away:'布伦特福德'}],
+        [{home:'埃弗顿',away:'利兹联'},{home:'考文垂城',away:'利物浦'},{home:'赫尔城',away:'桑德兰'},{home:'阿斯顿维拉',away:'伯恩茅斯'},{home:'水晶宫',away:'布伦特福德'},{home:'纽卡斯尔联',away:'切尔西'},{home:'富勒姆',away:'诺丁汉森林'},{home:'热刺',away:'曼城'},{home:'曼联',away:'布莱顿'},{home:'伊普斯维奇镇',away:'阿森纳'}],
+        [{home:'曼城',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'水晶宫'},{home:'布伦特福德',away:'考文垂城'},{home:'切尔西',away:'伊普斯维奇镇'},{home:'利物浦',away:'赫尔城'},{home:'阿森纳',away:'富勒姆'},{home:'诺丁汉森林',away:'曼联'},{home:'布莱顿',away:'热刺'},{home:'桑德兰',away:'埃弗顿'},{home:'利兹联',away:'阿斯顿维拉'}],
+        [{home:'水晶宫',away:'桑德兰'},{home:'曼联',away:'阿森纳'},{home:'伊普斯维奇镇',away:'布莱顿'},{home:'考文垂城',away:'伯恩茅斯'},{home:'埃弗顿',away:'诺丁汉森林'},{home:'富勒姆',away:'利兹联'},{home:'阿斯顿维拉',away:'切尔西'},{home:'热刺',away:'利物浦'},{home:'纽卡斯尔联',away:'布伦特福德'},{home:'赫尔城',away:'曼城'}],
+        [{home:'诺丁汉森林',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'热刺'},{home:'曼城',away:'埃弗顿'},{home:'阿森纳',away:'水晶宫'},{home:'利兹联',away:'赫尔城'},{home:'桑德兰',away:'曼联'},{home:'利物浦',away:'阿斯顿维拉'},{home:'布莱顿',away:'富勒姆'},{home:'布伦特福德',away:'伊普斯维奇镇'},{home:'切尔西',away:'考文垂城'}],
+        [{home:'利兹联',away:'布莱顿'},{home:'热刺',away:'诺丁汉森林'},{home:'水晶宫',away:'富勒姆'},{home:'利物浦',away:'伊普斯维奇镇'},{home:'考文垂城',away:'曼城'},{home:'伯恩茅斯',away:'纽卡斯尔联'},{home:'切尔西',away:'阿森纳'},{home:'阿斯顿维拉',away:'赫尔城'},{home:'曼联',away:'埃弗顿'},{home:'桑德兰',away:'布伦特福德'}],
+        [{home:'布伦特福德',away:'伯恩茅斯'},{home:'布莱顿',away:'考文垂城'},{home:'曼城',away:'曼联'},{home:'伊普斯维奇镇',away:'水晶宫'},{home:'阿森纳',away:'桑德兰'},{home:'富勒姆',away:'利物浦'},{home:'赫尔城',away:'切尔西'},{home:'诺丁汉森林',away:'阿斯顿维拉'},{home:'埃弗顿',away:'热刺'},{home:'纽卡斯尔联',away:'利兹联'}],
+        [{home:'桑德兰',away:'伊普斯维奇镇'},{home:'利兹联',away:'诺丁汉森林'},{home:'曼联',away:'赫尔城'},{home:'切尔西',away:'富勒姆'},{home:'利物浦',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿森纳'},{home:'伯恩茅斯',away:'曼城'},{home:'水晶宫',away:'埃弗顿'},{home:'热刺',away:'布伦特福德'},{home:'阿斯顿维拉',away:'布莱顿'}],
+        [{home:'布莱顿',away:'切尔西'},{home:'富勒姆',away:'桑德兰'},{home:'布伦特福德',away:'利兹联'},{home:'诺丁汉森林',away:'利物浦'},{home:'赫尔城',away:'考文垂城'},{home:'阿森纳',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'曼联'},{home:'曼城',away:'水晶宫'},{home:'纽卡斯尔联',away:'热刺'},{home:'埃弗顿',away:'伯恩茅斯'}],
+        [{home:'切尔西',away:'曼城'},{home:'伯恩茅斯',away:'阿森纳'},{home:'热刺',away:'赫尔城'},{home:'曼联',away:'水晶宫'},{home:'埃弗顿',away:'布莱顿'},{home:'诺丁汉森林',away:'桑德兰'},{home:'纽卡斯尔联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'考文垂城'},{home:'布伦特福德',away:'富勒姆'},{home:'利兹联',away:'利物浦'}],
+        [{home:'桑德兰',away:'纽卡斯尔联'},{home:'布莱顿',away:'诺丁汉森林'},{home:'考文垂城',away:'曼联'},{home:'赫尔城',away:'伯恩茅斯'},{home:'曼城',away:'布伦特福德'},{home:'富勒姆',away:'埃弗顿'},{home:'利物浦',away:'切尔西'},{home:'阿森纳',away:'热刺'},{home:'水晶宫',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'利兹联'}],
+        [{home:'曼城',away:'利物浦'},{home:'利兹联',away:'阿森纳'},{home:'富勒姆',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'水晶宫'},{home:'布伦特福德',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'考文垂城'},{home:'布莱顿',away:'桑德兰'},{home:'热刺',away:'切尔西'},{home:'埃弗顿',away:'赫尔城'},{home:'伯恩茅斯',away:'曼联'}],
+        [{home:'赫尔城',away:'富勒姆'},{home:'曼联',away:'利兹联'},{home:'水晶宫',away:'布莱顿'},{home:'阿斯顿维拉',away:'纽卡斯尔联'},{home:'切尔西',away:'埃弗顿'},{home:'考文垂城',away:'热刺'},{home:'桑德兰',away:'伯恩茅斯'},{home:'利物浦',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'曼城'},{home:'阿森纳',away:'诺丁汉森林'}],
+        [{home:'布伦特福德',away:'赫尔城'},{home:'纽卡斯尔联',away:'水晶宫'},{home:'热刺',away:'曼联'},{home:'利兹联',away:'桑德兰'},{home:'布莱顿',away:'利物浦'},{home:'诺丁汉森林',away:'伊普斯维奇镇'},{home:'伯恩茅斯',away:'切尔西'},{home:'富勒姆',away:'考文垂城'},{home:'埃弗顿',away:'阿森纳'},{home:'曼城',away:'阿斯顿维拉'}],
+        [{home:'伊普斯维奇镇',away:'埃弗顿'},{home:'阿森纳',away:'布莱顿'},{home:'利物浦',away:'伯恩茅斯'},{home:'考文垂城',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'热刺'},{home:'赫尔城',away:'纽卡斯尔联'},{home:'曼联',away:'富勒姆'},{home:'桑德兰',away:'曼城'},{home:'切尔西',away:'布伦特福德'},{home:'水晶宫',away:'利兹联'}]
+    ];
 
-    /* update.js 会自动填充这里 */
     const RESULTS = {
-  '1':{'阿森纳|考文垂城':[3,0],'赫尔城|曼联':[2,0],'伊普斯维奇镇|桑德兰':[2,1],'诺丁汉森林|利兹联':[0,1],'埃弗顿|水晶宫':[2,0],'布伦特福德|热刺':[3,0],'曼城|伯恩茅斯':[2,1],'布莱顿|阿斯顿维拉':[4,0],'纽卡斯尔联|利物浦':[2,2],'富勒姆|切尔西':[2,3]},
-  '2':{'水晶宫|曼城':[1,4],'利物浦|诺丁汉森林':[2,2],'伯恩茅斯|埃弗顿':[1,1],'考文垂城|赫尔城':[0,1],'热刺|纽卡斯尔联':[0,2],'桑德兰|富勒姆':[1,0],'切尔西|布莱顿':[4,3],'利兹联|布伦特福德':[1,1],'曼联|伊普斯维奇镇':[5,2],'阿斯顿维拉|阿森纳':[0,1]},
-  '3':{'伊普斯维奇镇|利物浦':[0,2],'纽卡斯尔联|伯恩茅斯':[2,2],'诺丁汉森林|热刺':[0,0],'曼城|考文垂城':[1,0],'布莱顿|利兹联':[1,1],'布伦特福德|桑德兰':[1,1],'富勒姆|水晶宫':[2,3],'赫尔城|阿斯顿维拉':[0,0],'埃弗顿|曼联':[2,2],'阿森纳|切尔西':[2,1]},
-  '4':{'水晶宫|伊普斯维奇镇':[2,3],'利物浦|富勒姆':[0,0],'阿斯顿维拉|诺丁汉森林':[1,2],'伯恩茅斯|布伦特福德':[2,2],'切尔西|赫尔城':[2,2],'热刺|埃弗顿':[0,0],'桑德兰|阿森纳':[0,2],'考文垂城|布莱顿':[0,5],'曼联|曼城':[0,1],'利兹联|纽卡斯尔联':[4,1]},
-  '5':{'布伦特福德|切尔西':[3,0],'热刺|阿斯顿维拉':[2,3],'埃弗顿|伊普斯维奇镇':[1,0],'布莱顿|阿森纳':[3,0],'纽卡斯尔联|赫尔城':[2,1],'诺丁汉森林|考文垂城':[0,1],'伯恩茅斯|利物浦':[0,1],'利兹联|水晶宫':[0,0],'曼城|桑德兰':[5,3],'富勒姆|曼联':[1,1]},
-  '6':{'阿森纳|利兹联':[2,1],'桑德兰|布莱顿':[0,2],'切尔西|伯恩茅斯':[5,1],'伊普斯维奇镇|富勒姆':[2,1],'阿斯顿维拉|布伦特福德':[2,2],'曼联|热刺':[1,1],'赫尔城|埃弗顿':[2,2],'水晶宫|诺丁汉森林':[3,1],'利物浦|曼城':[0,3],'考文垂城|纽卡斯尔联':[4,1]}
-};
+        '1':{'阿森纳|考文垂城':[3,0],'赫尔城|曼联':[2,0],'伊普斯维奇镇|桑德兰':[2,1],'诺丁汉森林|利兹联':[0,1],'埃弗顿|水晶宫':[2,0],'布伦特福德|热刺':[3,0],'曼城|伯恩茅斯':[2,1],'布莱顿|阿斯顿维拉':[4,0],'纽卡斯尔联|利物浦':[2,2],'富勒姆|切尔西':[2,3]},
+        '2':{'水晶宫|曼城':[1,4],'利物浦|诺丁汉森林':[2,2],'伯恩茅斯|埃弗顿':[1,1],'考文垂城|赫尔城':[0,1],'热刺|纽卡斯尔联':[0,2],'桑德兰|富勒姆':[1,0],'切尔西|布莱顿':[4,3],'利兹联|布伦特福德':[1,1],'曼联|伊普斯维奇镇':[5,2],'阿斯顿维拉|阿森纳':[0,1]},
+        '3':{'伊普斯维奇镇|利物浦':[0,2],'纽卡斯尔联|伯恩茅斯':[2,2],'诺丁汉森林|热刺':[0,0],'曼城|考文垂城':[1,0],'布莱顿|利兹联':[1,1],'布伦特福德|桑德兰':[1,1],'富勒姆|水晶宫':[2,3],'赫尔城|阿斯顿维拉':[0,0],'埃弗顿|曼联':[2,2],'阿森纳|切尔西':[2,1]},
+        '4':{'水晶宫|伊普斯维奇镇':[2,3],'利物浦|富勒姆':[0,0],'阿斯顿维拉|诺丁汉森林':[1,2],'伯恩茅斯|布伦特福德':[2,2],'切尔西|赫尔城':[2,2],'热刺|埃弗顿':[0,0],'桑德兰|阿森纳':[0,2],'考文垂城|布莱顿':[0,5],'曼联|曼城':[0,1],'利兹联|纽卡斯尔联':[4,1]},
+        '5':{'布伦特福德|切尔西':[3,0],'热刺|阿斯顿维拉':[2,3],'埃弗顿|伊普斯维奇镇':[1,0],'布莱顿|阿森纳':[3,0],'纽卡斯尔联|赫尔城':[2,1],'诺丁汉森林|考文垂城':[0,1],'伯恩茅斯|利物浦':[0,1],'利兹联|水晶宫':[0,0],'曼城|桑德兰':[5,3],'富勒姆|曼联':[1,1]},
+        '6':{'阿森纳|利兹联':[2,1],'桑德兰|布莱顿':[0,2],'切尔西|伯恩茅斯':[5,1],'伊普斯维奇镇|富勒姆':[2,1],'阿斯顿维拉|布伦特福德':[2,2],'曼联|热刺':[1,1],'赫尔城|埃弗顿':[2,2],'水晶宫|诺丁汉森林':[3,1],'利物浦|曼城':[0,3],'考文垂城|纽卡斯尔联':[4,1]}
+    };
 
-    /* update.js 会自动填充这里 */
     const STATIC_STANDINGS=[
-  {rank:1,team:'曼城',played:6,won:6,drawn:0,lost:0,gf:16,ga:5,gd:11,points:18},
-  {rank:2,team:'阿森纳',played:6,won:5,drawn:0,lost:1,gf:10,ga:5,gd:5,points:15},
-  {rank:3,team:'布莱顿',played:6,won:4,drawn:1,lost:1,gf:18,ga:5,gd:13,points:13},
-  {rank:4,team:'布伦特福德',played:6,won:2,drawn:4,lost:0,gf:12,ga:6,gd:6,points:10},
-  {rank:5,team:'埃弗顿',played:6,won:2,drawn:4,lost:0,gf:8,ga:5,gd:3,points:10},
-  {rank:6,team:'切尔西',played:6,won:3,drawn:1,lost:2,gf:15,ga:13,gd:2,points:10},
-  {rank:7,team:'利兹联',played:6,won:2,drawn:3,lost:1,gf:8,ga:5,gd:3,points:9},
-  {rank:8,team:'赫尔城',played:6,won:2,drawn:3,lost:1,gf:8,ga:6,gd:2,points:9},
-  {rank:9,team:'利物浦',played:6,won:2,drawn:3,lost:1,gf:7,ga:7,gd:0,points:9},
-  {rank:10,team:'伊普斯维奇镇',played:6,won:3,drawn:0,lost:3,gf:9,ga:12,gd:-3,points:9},
-  {rank:11,team:'纽卡斯尔联',played:6,won:2,drawn:2,lost:2,gf:10,ga:13,gd:-3,points:8},
-  {rank:12,team:'水晶宫',played:6,won:2,drawn:1,lost:3,gf:9,ga:12,gd:-3,points:7},
-  {rank:13,team:'曼联',played:6,won:1,drawn:3,lost:2,gf:9,ga:9,gd:0,points:6},
-  {rank:14,team:'考文垂城',played:6,won:2,drawn:0,lost:4,gf:5,ga:11,gd:-6,points:6},
-  {rank:15,team:'诺丁汉森林',played:6,won:1,drawn:2,lost:3,gf:5,ga:8,gd:-3,points:5},
-  {rank:16,team:'阿斯顿维拉',played:6,won:1,drawn:2,lost:3,gf:6,ga:11,gd:-5,points:5},
-  {rank:17,team:'桑德兰',played:6,won:1,drawn:1,lost:4,gf:6,ga:12,gd:-6,points:4},
-  {rank:18,team:'伯恩茅斯',played:6,won:0,drawn:3,lost:3,gf:7,ga:13,gd:-6,points:3},
-  {rank:19,team:'热刺',played:6,won:0,drawn:3,lost:3,gf:3,ga:9,gd:-6,points:3},
-  {rank:20,team:'富勒姆',played:6,won:0,drawn:2,lost:4,gf:6,ga:10,gd:-4,points:2}
-];
+        {rank:1,team:'曼城',played:6,won:6,drawn:0,lost:0,gf:16,ga:5,gd:11,points:18},
+        {rank:2,team:'阿森纳',played:6,won:5,drawn:0,lost:1,gf:10,ga:5,gd:5,points:15},
+        {rank:3,team:'布莱顿',played:6,won:4,drawn:1,lost:1,gf:18,ga:5,gd:13,points:13},
+        {rank:4,team:'布伦特福德',played:6,won:2,drawn:4,lost:0,gf:12,ga:6,gd:6,points:10},
+        {rank:5,team:'埃弗顿',played:6,won:2,drawn:4,lost:0,gf:8,ga:5,gd:3,points:10},
+        {rank:6,team:'切尔西',played:6,won:3,drawn:1,lost:2,gf:15,ga:13,gd:2,points:10},
+        {rank:7,team:'利兹联',played:6,won:2,drawn:3,lost:1,gf:8,ga:5,gd:3,points:9},
+        {rank:8,team:'赫尔城',played:6,won:2,drawn:3,lost:1,gf:8,ga:6,gd:2,points:9},
+        {rank:9,team:'利物浦',played:6,won:2,drawn:3,lost:1,gf:7,ga:7,gd:0,points:9},
+        {rank:10,team:'伊普斯维奇镇',played:6,won:3,drawn:0,lost:3,gf:9,ga:12,gd:-3,points:9},
+        {rank:11,team:'纽卡斯尔联',played:6,won:2,drawn:2,lost:2,gf:10,ga:13,gd:-3,points:8},
+        {rank:12,team:'水晶宫',played:6,won:2,drawn:1,lost:3,gf:9,ga:12,gd:-3,points:7},
+        {rank:13,team:'曼联',played:6,won:1,drawn:3,lost:2,gf:9,ga:9,gd:0,points:6},
+        {rank:14,team:'考文垂城',played:6,won:2,drawn:0,lost:4,gf:5,ga:11,gd:-6,points:6},
+        {rank:15,team:'诺丁汉森林',played:6,won:1,drawn:2,lost:3,gf:5,ga:8,gd:-3,points:5},
+        {rank:16,team:'阿斯顿维拉',played:6,won:1,drawn:2,lost:3,gf:6,ga:11,gd:-5,points:5},
+        {rank:17,team:'桑德兰',played:6,won:1,drawn:1,lost:4,gf:6,ga:12,gd:-6,points:4},
+        {rank:18,team:'伯恩茅斯',played:6,won:0,drawn:3,lost:3,gf:7,ga:13,gd:-6,points:3},
+        {rank:19,team:'热刺',played:6,won:0,drawn:3,lost:3,gf:3,ga:9,gd:-6,points:3},
+        {rank:20,team:'富勒姆',played:6,won:0,drawn:2,lost:4,gf:6,ga:10,gd:-4,points:2}
+    ];
 
-    const ABBR = {'阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','阿斯顿维拉':'AVL','纽卡斯尔联':'NEW','曼联':'MUN','布莱顿':'BHA','水晶宫':'CRY','埃弗顿':'EVE','富勒姆':'FUL','布伦特福德':'BRE','诺丁汉森林':'NFO','伯恩茅斯':'BOU','利兹联':'LEE','桑德兰':'SUN','西汉姆联':'WHU','狼队':'WOL','伯恩利':'BUR'};
-    const ESPN_IDS = {'阿森纳':359,'曼城':382,'利物浦':364,'切尔西':363,'热刺':367,'曼联':360,'纽卡斯尔联':361,'阿斯顿维拉':362,'布莱顿':331,'埃弗顿':368,'富勒姆':370,'水晶宫':384,'布伦特福德':337,'伯恩茅斯':349,'诺丁汉森林':393,'利兹联':357,'桑德兰':366,'西汉姆联':371,'狼队':380,'伯恩利':379};
+    const ABBR={'阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','阿斯顿维拉':'AVL','纽卡斯尔联':'NEW','曼联':'MUN','布莱顿':'BHA','水晶宫':'CRY','埃弗顿':'EVE','富勒姆':'FUL','布伦特福德':'BRE','诺丁汉森林':'NFO','伯恩茅斯':'BOU','利兹联':'LEE','桑德兰':'SUN','考文垂城':'COV','赫尔城':'HUL','伊普斯维奇镇':'IPS'};
+    const ESPN_IDS={'阿森纳':359,'曼城':382,'利物浦':364,'切尔西':363,'热刺':367,'曼联':360,'纽卡斯尔联':361,'阿斯顿维拉':362,'布莱顿':331,'埃弗顿':368,'富勒姆':370,'水晶宫':384,'布伦特福德':337,'伯恩茅斯':349,'诺丁汉森林':393,'利兹联':357,'桑德兰':366,'考文垂城':385,'赫尔城':389,'伊普斯维奇镇':373};
 
     /* ============ 工具 ============ */
     function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -590,6 +640,7 @@
     function getResult(roundIdx,home,away){const r=RESULTS[String(roundIdx+1)];if(!r)return null;const val=r[home+'|'+away];if(!val)return null;return{home:val[0],away:val[1]};}
     function outcomeSign(h,a){return h>a?'H':(h<a?'A':'D');}
     function judgePrediction(pH,pA,aH,aA){if(pH===aH&&pA===aA)return'exact';if(outcomeSign(pH,pA)===outcomeSign(aH,aA))return'outcome';return'miss';}
+    function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
 
     /* ============ DOM ============ */
     const els={home:document.getElementById('home'),away:document.getElementById('away'),round:document.getElementById('round'),intel:document.getElementById('intel'),provider:document.getElementById('provider'),apiKey:document.getElementById('apiKey'),predictBtn:document.getElementById('predictBtn'),status:document.getElementById('status'),result:document.getElementById('result'),roundSelect:document.getElementById('roundSelect'),matchSelect:document.getElementById('matchSelect')};
@@ -599,10 +650,10 @@
 
     function updateMatchList(){
         const r=Number(els.roundSelect.value);els.matchSelect.innerHTML='';
-        const round = FIXTURES[r]||[];
+        const round=FIXTURES[r]||[];
         round.forEach((m,i)=>{
             const o=document.createElement('option');o.value=i;
-            const hasResult=RESULTS[String(r+1)] && RESULTS[String(r+1)][m.home+'|'+m.away];
+            const hasResult=RESULTS[String(r+1)]&&RESULTS[String(r+1)][m.home+'|'+m.away];
             o.textContent=m.home+'  vs  '+m.away+(hasResult?'  ·  已完赛':'');
             els.matchSelect.appendChild(o);
         });
@@ -610,8 +661,7 @@
     }
     function applySelection(){
         const r=Number(els.roundSelect.value);const m=Number(els.matchSelect.value);
-        const round = FIXTURES[r]||[];
-        const match=round[m];if(!match)return;
+        const round=FIXTURES[r]||[];const match=round[m];if(!match)return;
         els.home.value=match.home;els.away.value=match.away;els.round.value='第'+(r+1)+'轮';
         Object.entries({[SK.home]:els.home.value,[SK.away]:els.away.value,[SK.round]:els.round.value,[SK.roundSel]:els.roundSelect.value,[SK.matchSel]:els.matchSelect.value}).forEach(([k,v])=>localStorage.setItem(k,v));
     }
@@ -634,9 +684,9 @@
     const backTop=document.getElementById('backTop');
     window.addEventListener('scroll',()=>{if(window.scrollY>400)backTop.classList.add('show');else backTop.classList.remove('show');},{passive:true});
     backTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-
     document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();els.predictBtn.click();}});
 
+    /* ============ skill.md 加载 ============ */
     let skillCache=null;
     async function loadSkill(){
         if(skillCache)return skillCache;
@@ -654,63 +704,49 @@
         }
     }
 
+    /* ============ API 配置 ============ */
     const apiConfig={
         groq:{endpoint:'https://api.groq.com/openai/v1/chat/completions',model:'openai/gpt-oss-120b',name:'Groq'},
         openrouter:{endpoint:'https://openrouter.ai/api/v1/chat/completions',model:'meta-llama/llama-3.3-70b-instruct:free',name:'OpenRouter'}
     };
 
-    function showSkeleton(){
-        els.result.innerHTML=`<div><div class="sk sk-hero"></div><div class="sk sk-line w-60"></div><div class="sk sk-line w-80"></div><div class="sk sk-line w-60"></div></div>`;
+    /* ============ 核心：runPrediction ============ */
+    async function runPrediction(home,away,roundStr,intel,apiKey,provider){
+        const cfg=apiConfig[provider];
+        if(!cfg)throw new Error('未知 API 提供商');
+        const skill=await loadSkill();
+        const userMsg=`【今日情报】\n${intel||'（今日无新增情报）'}\n\n【预测指令】\n请预测：${home} vs ${away}，英超 2026-27 ${roundStr}。\n严格遵守 skill.md，只输出纯 json 对象，不要任何额外文字。`;
+        let attempt=0;const maxAttempts=3;let res=null;const fallbackWait=[3,6];
+        while(attempt<maxAttempts){
+            res=await fetch(cfg.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:cfg.model,messages:[{role:'system',content:skill},{role:'user',content:userMsg}],temperature:0.7,response_format:{type:'json_object'}})});
+            if(res.status===429&&attempt<maxAttempts-1){
+                const retryAfter=res.headers.get('retry-after');
+                let wait=retryAfter?parseFloat(retryAfter):fallbackWait[attempt];
+                if(!isFinite(wait)||wait<=0)wait=fallbackWait[attempt]||6;
+                wait=Math.min(Math.max(wait,2),15);
+                await sleep(wait*1000);
+                attempt++;
+                continue;
+            }
+            break;
+        }
+        if(!res.ok)throw new Error(cfg.name+' API 错误 '+res.status+'\n'+await res.text());
+        const data=await res.json();
+        const content=data.choices?.[0]?.message?.content||'';
+        try{return JSON.parse(content);}catch(e){throw new Error('模型未返回合法 JSON：\n'+content);}
     }
 
-    let isPredicting=false;
-    els.predictBtn.addEventListener('click',async()=>{
-        if(isPredicting)return;
-        const home=els.home.value.trim();const away=els.away.value.trim();
-        const roundStr=els.round.value.trim()||'第X轮';
-        const roundIdx=Number(els.roundSelect.value);
-        const intel=els.intel.value.trim();const apiKey=els.apiKey.value.trim();
-        const cfg=apiConfig[els.provider.value];
-        if(!home||!away)return alert('请选择或填写主队和客队');
-        if(!apiKey)return alert('请填写 '+cfg.name+' API Key');
-        isPredicting=true;els.predictBtn.disabled=true;
-        els.status.className='status loading';els.status.innerHTML='<span class="spinner"></span>加载 skill.md…';
-        showSkeleton();
-        try{
-            const skill=await loadSkill();
-            els.status.innerHTML='<span class="spinner"></span>调用 '+cfg.name+' 推理中…';
-            const userMsg=`【今日情报】\n${intel||'（今日无新增情报）'}\n\n【预测指令】\n请预测：${home} vs ${away}，英超 2026-27 ${roundStr}。\n严格遵守 skill.md，只输出纯 json 对象，不要任何额外文字。`;
-            let attempt=0;const maxAttempts=3;let res=null;const fallbackWait=[3,6];
-            while(attempt<maxAttempts){
-                res=await fetch(cfg.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:cfg.model,messages:[{role:'system',content:skill},{role:'user',content:userMsg}],temperature:0.7,response_format:{type:'json_object'}})});
-                if(res.status===429&&attempt<maxAttempts-1){
-                    const retryAfter=res.headers.get('retry-after');
-                    let wait=retryAfter?parseFloat(retryAfter):fallbackWait[attempt];
-                    if(!isFinite(wait)||wait<=0)wait=fallbackWait[attempt]||6;
-                    wait=Math.min(Math.max(wait,2),15);
-                    els.status.innerHTML='<span class="spinner"></span>触发限流，'+wait+' 秒后自动重试…';
-                    await new Promise(r=>setTimeout(r,wait*1000));
-                    attempt++;
-                    els.status.innerHTML='<span class="spinner"></span>重试中（第 '+(attempt+1)+' 次）…';
-                    continue;
-                }
-                break;
-            }
-            if(!res.ok)throw new Error(cfg.name+' API 错误 '+res.status+'\n'+await res.text());
-            const data=await res.json();
-            const content=data.choices?.[0]?.message?.content||'';
-            let parsed;
-            try{parsed=JSON.parse(content);}catch(e){throw new Error('模型未返回合法 JSON：\n'+content);}
-            render(parsed,roundIdx,home,away);
-            els.status.className='status done';
-            els.status.textContent='预测完成 · '+new Date().toLocaleTimeString();
-            if(window.innerWidth<1024){document.querySelector('.main-grid > main')?.scrollIntoView({behavior:'smooth',block:'start'});}
-        }catch(e){
-            els.status.className='status error';els.status.textContent='出错';
-            els.result.innerHTML='<div class="error-box">'+esc(e.message)+'</div>';
-        }finally{isPredicting=false;els.predictBtn.disabled=false;}
-    });
+    /* ============ 加载动画 ============ */
+    function showSkeleton(){
+        els.result.innerHTML=`
+    <div style="padding:80px 20px;text-align:center">
+      <div class="soccer-loader"><div class="ball"></div></div>
+      <div style="margin-top:32px;font-size:13px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase">Analyzing Match</div>
+      <div style="margin-top:10px;font-size:11.5px;color:var(--text-4);font-family:Georgia,serif;font-style:italic">正在读取资料库与今日情报…</div>
+    </div>`;
+    }
 
+    /* ============ 渲染子模块 ============ */
     function crestHTML(name){
         const abbr=getAbbr(name);const id=ESPN_IDS[name];
         if(id){const url='https://a.espncdn.com/i/teamlogos/soccer/500/'+id+'.png';return `<div class="team-crest"><img src="${url}" alt="${esc(name)}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=fb>${esc(abbr)}</span>'"></div>`;}
@@ -721,7 +757,7 @@
         if(!h)return'';
         const note=h.note||'估算';
         const noteClass=['估算','资料库','今日情报'].includes(note)?note:'估算';
-        const rawSummary=(h.summary && h.summary.trim()!=='资料库无记录')?h.summary:'';
+        const rawSummary=(h.summary&&h.summary.trim()!=='资料库无记录')?h.summary:'';
         const summaryText=rawSummary.slice(0,80);
         const summary=summaryText?`<div class="h2h-summary">${esc(summaryText)}</div>`:'';
         const hasMatches=h.lastMatches&&h.lastMatches.length>0;
@@ -731,12 +767,17 @@
     }
 
     function renderKeyPlayers(kp){
-        if(!kp||(!kp.home?.length && !kp.away?.length))return'';
-        const renderSide=(players,label)=>{
+        if(!kp||(!kp.home?.length&&!kp.away?.length))return'';
+        const renderSide=(players,label,sideClass)=>{
             if(!players||!players.length)return `<div class="kp-side"><div class="kp-side-title">${label}</div><div class="kp-empty">资料库无球员记录</div></div>`;
-            return `<div class="kp-side"><div class="kp-side-title">${label}</div>${players.slice(0,3).map(p=>`<div class="kp-player"><div class="kp-rating">${esc(String(p.rating||'—'))}</div><div class="kp-info"><div class="kp-name">${esc(p.name||'')}</div><div class="kp-meta">${esc(p.position||'')}</div></div>${p.note?`<div class="kp-note">${esc(p.note).slice(0,12)}</div>`:''}</div>`).join('')}</div>`;
+            return `<div class="kp-side"><div class="kp-side-title">${label}</div>${players.slice(0,3).map(p=>`
+      <div class="kp-player ${sideClass}">
+        <div class="kp-rating">${esc(String(p.rating||'—'))}</div>
+        <div class="kp-info"><div class="kp-name">${esc(p.name||'')}</div><div class="kp-meta">${esc(p.position||'')}</div></div>
+        ${p.note?`<div class="kp-note">${esc(p.note).slice(0,12)}</div>`:''}
+      </div>`).join('')}</div>`;
         };
-        return `<div class="section"><div class="section-label">本场焦点球员</div><div class="kp-grid">${renderSide(kp.home,'主队')}${renderSide(kp.away,'客队')}</div></div>`;
+        return `<div class="section"><div class="section-label">本场焦点球员</div><div class="kp-grid">${renderSide(kp.home,'主队','home-side')}${renderSide(kp.away,'客队','away-side')}</div></div>`;
     }
 
     function render(d,roundIdx,homeInput,awayInput){
@@ -756,12 +797,41 @@
         const rawJson=JSON.stringify(d,null,2);
         const cardCls=actual?'score-card finished':'score-card';
 
+        // 环形概率
+        const C=2*Math.PI*70;
+        const seg1=(hw/100)*C;const seg2=(dr/100)*C;const seg3=(aw/100)*C;
+        const probRing=`
+    <div class="prob-ring-wrap">
+      <div class="prob-ring">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#1a1a1a" stroke-width="14"/>
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#ff6b35" stroke-width="14" stroke-dasharray="${seg1} ${C-seg1}" stroke-dashoffset="0" stroke-linecap="butt">
+            <animate attributeName="stroke-dasharray" from="0 ${C}" to="${seg1} ${C-seg1}" dur="0.9s" fill="freeze"/>
+          </circle>
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#5a5a5a" stroke-width="14" stroke-dasharray="${seg2} ${C-seg2}" stroke-dashoffset="${-seg1}" stroke-linecap="butt">
+            <animate attributeName="stroke-dasharray" from="0 ${C}" to="${seg2} ${C-seg2}" dur="0.9s" begin="0.1s" fill="freeze"/>
+          </circle>
+          <circle cx="90" cy="90" r="70" fill="none" stroke="#60a5fa" stroke-width="14" stroke-dasharray="${seg3} ${C-seg3}" stroke-dashoffset="${-(seg1+seg2)}" stroke-linecap="butt">
+            <animate attributeName="stroke-dasharray" from="0 ${C}" to="${seg3} ${C-seg3}" dur="0.9s" begin="0.2s" fill="freeze"/>
+          </circle>
+        </svg>
+        <div class="center">
+          <div class="score">${esc(predHome)}–${esc(predAway)}</div>
+          <div class="label">AI 预测</div>
+        </div>
+      </div>
+      <div class="prob-legend">
+        <div class="row"><span class="dot home"></span><span class="name">${esc(homeName)} 胜</span><span class="pct">${hw}<span style="font-size:13px;color:var(--text-3)">%</span></span></div>
+        <div class="row"><span class="dot draw"></span><span class="name">平局</span><span class="pct">${dr}<span style="font-size:13px;color:var(--text-3)">%</span></span></div>
+        <div class="row"><span class="dot away"></span><span class="name">${esc(awayName)} 胜</span><span class="pct">${aw}<span style="font-size:13px;color:var(--text-3)">%</span></span></div>
+      </div>
+    </div>`;
+
         let verdictBlock='';
         if(actual){
             const vb=verdictKind==='exact'?'exact':(verdictKind==='outcome'?'outcome':'miss');
             verdictBlock=`<div class="compare"><div class="compare-label">预测 vs 实际</div><div class="compare-grid"><div class="compare-box"><div class="l">AI 预测</div><div class="s">${esc(predHome)} – ${esc(predAway)}</div><div class="sub">${Number(predHome)>Number(predAway)?'主胜':(Number(predHome)<Number(predAway)?'客胜':'平局')}</div></div><div class="v-badge ${vb}"><div class="icon">${verdictIcon}</div><div class="text">${verdictLabel}</div></div><div class="compare-box actual"><div class="l">实际结果</div><div class="s">${actual.home} – ${actual.away}</div><div class="sub">${actual.home>actual.away?'主胜':(actual.home<actual.away?'客胜':'平局')}</div></div></div></div>`;
         }
-
         const headerTag=actual?`<span class="status-tag finished"><span class="dot"></span>已完赛</span>`:`<span class="status-tag live"><span class="dot"></span>PRE-MATCH</span>`;
 
         els.result.innerHTML=`
@@ -781,30 +851,21 @@
         </div>
         <div class="team">${crestHTML(awayName)}<div class="team-name">${esc(awayName)}</div></div>
       </div>
-      <div class="prob-row">
-        <div class="prob-cell home"><div class="lbl">主胜</div><div class="val">${hw}<span class="pct">%</span></div></div>
-        <div class="prob-cell draw"><div class="lbl">平局</div><div class="val">${dr}<span class="pct">%</span></div></div>
-        <div class="prob-cell away"><div class="lbl">客胜</div><div class="val">${aw}<span class="pct">%</span></div></div>
-      </div>
+      ${probRing}
       ${verdictBlock}
     </div>
-
     <div class="section"><div class="section-label">关键因素</div><div class="section-body"><ul>${list(d.keyFactors)}</ul></div></div>
     <div class="section"><div class="section-label">分析</div><div class="section-body">${esc(d.analysis||'')}</div></div>
-
     <div class="meta-grid">
       <div><div class="section-label">置信度</div><div class="section-body"><span class="pill ${confClass(d.confidence)}">${esc(d.confidence||'')}</span></div></div>
       <div><div class="section-label">时间模式</div><div class="section-body"><span class="pill neutral">${esc(d.timeMode||'')}</span></div></div>
     </div>
-
     ${renderKeyPlayers(d.keyPlayers)}
     ${renderH2H(d.headToHead)}
-
     <div class="meta-grid">
       <div><div class="section-label">缺失信息</div><div class="section-body"><ul>${list(d.missingInfo)}</ul></div></div>
       <div><div class="section-label">估算项</div><div class="section-body"><ul>${list(d.estimates)}</ul></div></div>
     </div>
-
     <details class="raw">
       <summary>查看原始 JSON</summary>
       <button class="copy-json-btn" type="button" data-copy='${esc(rawJson)}'>复制</button>
@@ -829,7 +890,35 @@
         }catch(e){console.warn(e);}
     }
 
-    /* 积分榜 */
+    /* ============ 单场预测按钮 ============ */
+    let isPredicting=false;
+    els.predictBtn.addEventListener('click',async()=>{
+        if(isPredicting)return;
+        const home=els.home.value.trim();const away=els.away.value.trim();
+        const roundStr=els.round.value.trim()||'第X轮';
+        const roundIdx=Number(els.roundSelect.value);
+        const intel=els.intel.value.trim();const apiKey=els.apiKey.value.trim();
+        const provider=els.provider.value;const cfg=apiConfig[provider];
+        if(!home||!away)return alert('请选择或填写主队和客队');
+        if(!apiKey)return alert('请填写 '+cfg.name+' API Key');
+        isPredicting=true;els.predictBtn.disabled=true;
+        els.status.className='status loading';els.status.innerHTML='<span class="spinner"></span>加载 skill.md…';
+        showSkeleton();
+        try{
+            await loadSkill();
+            els.status.innerHTML='<span class="spinner"></span>调用 '+cfg.name+' 推理中…';
+            const parsed=await runPrediction(home,away,roundStr,intel,apiKey,provider);
+            render(parsed,roundIdx,home,away);
+            els.status.className='status done';
+            els.status.textContent='预测完成 · '+new Date().toLocaleTimeString();
+            if(window.innerWidth<1024){document.querySelector('.main-grid > main')?.scrollIntoView({behavior:'smooth',block:'start'});}
+        }catch(e){
+            els.status.className='status error';els.status.textContent='出错';
+            els.result.innerHTML='<div class="error-box">'+esc(e.message)+'</div>';
+        }finally{isPredicting=false;els.predictBtn.disabled=false;}
+    });
+
+    /* ============ 积分榜 ============ */
     (function renderStandings(){
         const tbody=document.getElementById('standingsBody');if(!tbody)return;
         const total=STATIC_STANDINGS.length;
@@ -846,13 +935,37 @@
             return `<tr class="${cls}"><td class="rank">${r.rank}</td><td><div class="team-cell">${badge}<span>${esc(r.team)}</span></div></td><td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td><td>${r.gf}</td><td>${r.ga}</td><td>${gd}</td><td class="pts">${r.points}</td></tr>`;
         }).join('');
     })();
+
+    /* ============ 比赛日仪表盘 ============ */
+    (function renderDashboard(){
+        const roundSel=document.getElementById('roundSelect');
+        if(!roundSel)return;
+        function refresh(){
+            const r=Number(roundSel.value);
+            const roundFixtures=FIXTURES[r]||[];
+            const results=RESULTS[String(r+1)]||{};
+            const finished=roundFixtures.filter(m=>results[m.home+'|'+m.away]).length;
+            document.getElementById('dashRound').textContent='第 '+(r+1)+' 轮';
+            document.getElementById('dashFinished').textContent=finished+' / '+roundFixtures.length;
+            document.getElementById('dashPending').textContent=(roundFixtures.length-finished)+' 场';
+            try{
+                const hist=JSON.parse(localStorage.getItem('pl_prediction_history_v1')||'[]');
+                const pending=hist.filter(x=>x.actualHome==null||x.actualAway==null).length;
+                document.getElementById('dashSettle').textContent=pending;
+            }catch(e){document.getElementById('dashSettle').textContent='—';}
+        }
+        roundSel.addEventListener('change',refresh);
+        refresh();
+        setInterval(refresh,3000);
+    })();
 </script>
 
 <script>
-    /* 历史记录 */
+    /* ============ 历史记录 ============ */
     (function(){
         'use strict';
         const KEY='pl_prediction_history_v1';const MAX_RECORDS=2000;
+        function toValidGoal(v){const n=Number(v);if(!isFinite(n)||n<0)return 0;return Math.min(Math.floor(n),20);}
         const Store={
             all(){try{const raw=localStorage.getItem(KEY);return raw?JSON.parse(raw):[];}catch(e){return[];}},
             save(list){try{if(list.length>MAX_RECORDS)list=list.slice(0,MAX_RECORDS);localStorage.setItem(KEY,JSON.stringify(list));}catch(e){}},
@@ -1021,7 +1134,7 @@
 </script>
 
 <script>
-    /* 配置同步 */
+    /* ============ 配置同步 ============ */
     (function(){
         'use strict';
         const SYNC_PREFIX='EPL1:';
@@ -1050,6 +1163,128 @@
         }
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);
         else bind();
+    })();
+</script>
+
+<script>
+    /* ============ 批量预测 ============ */
+    (function(){
+        'use strict';
+        let running=false;let aborted=false;
+        const $=id=>document.getElementById(id);
+
+        function getRoundMatches(roundNum){
+            if(typeof FIXTURES==='undefined')throw new Error('未找到 FIXTURES 数组');
+            return FIXTURES[Number(roundNum)]||[];
+        }
+
+        function renderList(matches){
+            const list=$('plBatchList');list.innerHTML='';
+            matches.forEach((m,i)=>{
+                const el=document.createElement('div');
+                el.className='batch-item pending';
+                el.dataset.idx=i;
+                el.innerHTML=`<span>${m.home} vs ${m.away}</span><span class="score" data-role="result">待预测</span>`;
+                list.appendChild(el);
+            });
+        }
+        function updateItem(idx,cls,resultText){
+            const el=document.querySelector(`.batch-item[data-idx="${idx}"]`);
+            if(!el)return;
+            el.className='batch-item '+cls;
+            el.querySelector('[data-role="result"]').innerHTML=resultText;
+        }
+        function setProgress(cur,total){
+            const pct=total===0?0:Math.round(cur/total*100);
+            $('plBatchBar').style.width=pct+'%';
+        }
+
+        async function run(roundNum,intel,apiKey,provider){
+            if(running)return;
+            running=true;aborted=false;
+            $('plBatchRun').disabled=true;
+            $('plBatchRun').textContent='进行中…';
+
+            const matches=getRoundMatches(roundNum);
+            $('plBatchRound').textContent='第'+(Number(roundNum)+1)+'轮';
+            $('plBatchTotal').textContent=matches.length;
+            renderList(matches);
+            setProgress(0,matches.length);
+
+            let ok=0,fail=0;
+            for(let i=0;i<matches.length;i++){
+                if(aborted)break;
+                const m=matches[i];
+                updateItem(i,'running','预测中…');
+                try{
+                    const data=await runPrediction(m.home,m.away,'第'+(Number(roundNum)+1)+'轮',intel,apiKey,provider);
+                    const score=data?.predictedScore||'—';
+                    const probs=data?.probabilities;
+                    const probText=probs?` <span class="probs">${probs.homeWin}/${probs.draw}/${probs.awayWin}</span>`:'';
+                    updateItem(i,'done',`${esc(score)}${probText}`);
+                    ok++;
+                    // 自动入库（不重复渲染）
+                    try{
+                        window.PLHistory?.add({
+                            round:'第'+(Number(roundNum)+1)+'轮',
+                            homeTeam:m.home,awayTeam:m.away,
+                            predictedHome:Number(parseScore(score).home),
+                            predictedAway:Number(parseScore(score).away),
+                            probability:probs?{home:probs.homeWin,draw:probs.draw,away:probs.awayWin}:{},
+                            confidence:data.confidence||'',analysis:data.analysis||'',
+                            actualHome:null,actualAway:null
+                        });
+                    }catch(e){}
+                }catch(err){
+                    updateItem(i,'fail','失败：'+esc((err.message||'未知错误').slice(0,40)));
+                    fail++;
+                }
+                setProgress(i+1,matches.length);
+                if(i<matches.length-1&&!aborted)await sleep(1500);
+            }
+
+            running=false;
+            $('plBatchRun').disabled=false;
+            $('plBatchRun').textContent=`完成（成功 ${ok} / 失败 ${fail}）`;
+            setTimeout(()=>{$('plBatchRun').textContent='再次批量预测';},2500);
+        }
+
+        function open(){
+            const roundSel=document.getElementById('roundSelect');
+            if(!roundSel){alert('未找到轮次选择器');return;}
+            $('plBatchRound').textContent='第'+(Number(roundSel.value)+1)+'轮';
+            $('plBatchOverlay').classList.add('open');
+            document.body.style.overflow='hidden';
+            // 预渲染列表
+            const matches=getRoundMatches(roundSel.value);
+            $('plBatchTotal').textContent=matches.length;
+            renderList(matches);
+            $('plBatchBar').style.width='0%';
+            $('plBatchRun').textContent='开始批量预测';
+            $('plBatchRun').disabled=false;
+        }
+        function close(){
+            if(running){
+                if(!confirm('批量预测正在进行，确定要中断吗？'))return;
+                aborted=true;
+            }
+            $('plBatchOverlay').classList.remove('open');
+            document.body.style.overflow='';
+        }
+
+        document.getElementById('plBatchFab').addEventListener('click',open);
+        document.getElementById('plBatchClose').addEventListener('click',close);
+        document.getElementById('plBatchCancel').addEventListener('click',close);
+        document.getElementById('plBatchOverlay').addEventListener('click',e=>{if(e.target.id==='plBatchOverlay')close();});
+        document.getElementById('plBatchRun').addEventListener('click',()=>{
+            const roundSel=document.getElementById('roundSelect');
+            const roundNum=roundSel.value;
+            const intel=document.getElementById('intel').value.trim();
+            const apiKey=document.getElementById('apiKey').value.trim();
+            const provider=document.getElementById('provider').value;
+            if(!apiKey){alert('请先填写 API Key');return;}
+            run(roundNum,intel,apiKey,provider);
+        });
     })();
 </script>
 </body>
