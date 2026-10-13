@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 /**
  * 英超预测引擎 - 真实数据自动更新
+ * 数据写入独立的 data.json，不再碰 index.html
  * 用法：FD_TOKEN=你的密钥 node update.js
- * Windows：set FD_TOKEN=你的密钥 && node update.js
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const INDEX_FILE = path.join(__dirname, 'index.html');
-const BACKUP_FILE = path.join(__dirname, 'index.html.bak');
+const DATA_FILE = path.join(__dirname, 'data.json');
 
 const TEAM_MAP = {
     'Arsenal':'阿森纳','Manchester City':'曼城','Liverpool':'利物浦','Chelsea':'切尔西',
@@ -54,58 +53,28 @@ async function fetchFromApi(token){
     if(!mRes.ok) throw new Error(`Matches API ${mRes.status}：${await mRes.text()}`);
     const mData = await mRes.json();
 
+    // fixtures: 数组，index 0 = 第 1 轮
+    const fixtures = [];
+    for (let i = 0; i < 38; i++) fixtures.push([]);
+
+    // results: 对象 { "1": { "阿森纳|利兹联": [3,0] }, ... }
     const results = {};
-    const fixtures = {};
 
     mData.matches.forEach(m => {
         const h = toChinese(m.homeTeam.name);
         const a = toChinese(m.awayTeam.name);
         if(!h || !a) return;
-        const rk = String(m.matchday);
-        if(!fixtures[rk]) fixtures[rk] = [];
-        fixtures[rk].push({ home: h, away: a });
+        const md = m.matchday;
+        if (md >= 1 && md <= 38) {
+            fixtures[md - 1].push({ home: h, away: a });
+        }
         if(m.status === 'FINISHED' && m.score?.fullTime){
-            if(!results[rk]) results[rk] = {};
-            results[rk][`${h}|${a}`] = [m.score.fullTime.home, m.score.fullTime.away];
+            if (!results[md]) results[md] = {};
+            results[md][`${h}|${a}`] = [m.score.fullTime.home, m.score.fullTime.away];
         }
     });
 
     return { standings, results, fixtures };
-}
-
-function buildFixtures(fixtures){
-    const lines = ['const FIXTURES = ['];
-    const rounds = Object.keys(fixtures).sort((a,b)=>Number(a)-Number(b));
-    rounds.forEach((r, i) => {
-        const ms = fixtures[r].map(m => `{home:'${m.home}',away:'${m.away}'}`);
-        lines.push(`  [${ms.join(',')}]${i < rounds.length-1 ? ',' : ''}`);
-    });
-    lines.push('];');
-    return lines.join('\n');
-}
-
-function buildResults(results){
-    const lines = ['const RESULTS = {'];
-    const rounds = Object.keys(results).sort((a,b)=>Number(a)-Number(b));
-    if(rounds.length === 0){
-        lines.push('};');
-        return lines.join('\n');
-    }
-    rounds.forEach((r, i) => {
-        const entries = Object.entries(results[r]).map(([k,s]) => `'${k}':[${s[0]},${s[1]}]`);
-        lines.push(`  '${r}':{${entries.join(',')}}${i < rounds.length-1 ? ',' : ''}`);
-    });
-    lines.push('};');
-    return lines.join('\n');
-}
-
-function buildStandings(standings){
-    const lines = ['const STATIC_STANDINGS=['];
-    standings.forEach((r, i) => {
-        lines.push(`  {rank:${r.rank},team:'${r.team}',played:${r.played},won:${r.won},drawn:${r.drawn},lost:${r.lost},gf:${r.gf},ga:${r.ga},gd:${r.gd},points:${r.points}}${i < standings.length-1 ? ',' : ''}`);
-    });
-    lines.push('];');
-    return lines.join('\n');
 }
 
 async function main(){
@@ -113,42 +82,29 @@ async function main(){
     if(!token){
         console.error('❌ 请设置 FD_TOKEN 环境变量');
         console.error('   Windows: set FD_TOKEN=你的密钥 && node update.js');
-        console.error('   Mac/Linux: FD_TOKEN=你的密钥 node update.js');
         process.exit(1);
     }
 
     console.log('📡 从 football-data.org 拉取…');
     const { standings, results, fixtures } = await fetchFromApi(token);
     console.log(`✅ 积分榜：${standings.length} 队`);
-    console.log(`✅ 赛程：${Object.keys(fixtures).length} 轮`);
+    console.log(`✅ 赛程：${fixtures.filter(f => f.length).length} 轮`);
     console.log(`✅ 已完赛：${Object.keys(results).length} 轮`);
 
-    const original = fs.readFileSync(INDEX_FILE, 'utf8');
-    fs.writeFileSync(BACKUP_FILE, original, 'utf8');
-    console.log('💾 已备份 index.html.bak');
+    const payload = {
+        updatedAt: new Date().toISOString(),
+        fixtures,
+        results,
+        standings
+    };
 
-    let html = original;
-
-    const r1 = html.match(/const FIXTURES\s*=\s*\[[\s\S]*?\];/);
-    if(!r1) throw new Error('未找到 FIXTURES 块');
-    html = html.replace(r1[0], buildFixtures(fixtures));
-
-    const r2 = html.match(/const RESULTS\s*=\s*\{[\s\S]*?\};/);
-    if(!r2) throw new Error('未找到 RESULTS 块');
-    html = html.replace(r2[0], buildResults(results));
-
-    const r3 = html.match(/const STATIC_STANDINGS\s*=\s*\[[\s\S]*?\];/);
-    if(!r3) throw new Error('未找到 STATIC_STANDINGS 块');
-    html = html.replace(r3[0], buildStandings(standings));
-
-    fs.writeFileSync(INDEX_FILE, html, 'utf8');
+    fs.writeFileSync(DATA_FILE, JSON.stringify(payload, null, 2), 'utf8');
     console.log('');
-    console.log('🎉 完成！下一步：');
-    console.log('  git add .');
+    console.log('🎉 已写入 data.json');
+    console.log('下一步：');
+    console.log('  git add data.json');
     console.log('  git commit -m "Update PL data"');
     console.log('  git push origin main');
-    console.log('');
-    console.log('回滚：cp index.html.bak index.html');
 }
 
 main().catch(e => { console.error('❌', e.message); process.exit(1); });

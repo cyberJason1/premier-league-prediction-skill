@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>英超预测引擎 v4.0</title>
+    <title>英超预测引擎 v4.1</title>
     <style>
         :root{
             --bg:#050810; --bg2:#0a1220;
@@ -16,8 +16,6 @@
         }
         *{box-sizing:border-box;margin:0;padding:0}
         html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
-
-        /* 背景：光晕 + 微妙球场线纹理 */
         body::before{
             content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
             background:
@@ -26,21 +24,16 @@
                     repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0 1px,transparent 1px 80px),
                     repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 80px);
         }
-        /* 极淡球场 SVG 线条 */
         body::after{
             content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.03;
             background-image:
                     radial-gradient(circle at 50% 50%,transparent 68%,#fff 68.5%,transparent 69%),
                     linear-gradient(90deg,transparent 49.8%,#fff 49.8%,#fff 50.2%,transparent 50.2%);
         }
-
         .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:32px 22px 120px}
-
-        /* 页面依次淡入 */
         .fade-in{opacity:0;transform:translateY(14px);animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) forwards}
         @keyframes fadeUp{to{opacity:1;transform:none}}
         .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}.d6{animation-delay:.55s}
-
         .hero{padding:28px 8px 22px;border-bottom:1px solid var(--line)}
         .hero .kick{font-size:12px;letter-spacing:.28em;color:var(--orange);text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:10px}
         .hero .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.6s infinite}
@@ -49,19 +42,14 @@
         .hero h1 em{font-style:italic;color:var(--orange)}
         .hero p{color:var(--txt2);font-size:14px;margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
         .hero .tag-line{font-size:12px;color:var(--txt3);margin-top:10px}
-
-        /* 仪表盘 */
         .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 26px}
         .cell{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;backdrop-filter:blur(12px);transition:border-color .2s,transform .2s}
         .cell:hover{border-color:var(--line2);transform:translateY(-2px)}
         .cell .lbl{font-size:11px;letter-spacing:.2em;color:var(--txt3);text-transform:uppercase;display:flex;align-items:center;gap:6px}
         .cell .val{font-family:Georgia,serif;font-size:34px;color:var(--txt);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums}
         .cell .val.orange{color:var(--orange)} .cell .val.blue{color:var(--blue)}
-
-        /* 网格 */
         .grid{display:grid;grid-template-columns:400px 1fr;gap:22px}
         @media(max-width:920px){.grid{grid-template-columns:1fr}.hero h1{font-size:38px}.dash{grid-template-columns:repeat(2,1fr)}}
-
         .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;backdrop-filter:blur(12px);transition:border-color .25s}
         .card:hover{border-color:var(--line2)}
         .card h3{font-size:12px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:14px}
@@ -70,8 +58,6 @@
         select,input,textarea{width:100%;background:#0a0f1a;border:1px solid var(--line2);color:var(--txt);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
         select:focus,input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,93,58,.15)}
         textarea{resize:vertical;min-height:88px;line-height:1.5}
-
-        /* 按钮 + 加载进度条 */
         .btn{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08;font-weight:800;font-size:15px;letter-spacing:.06em;cursor:pointer;transition:transform .15s,filter .15s;position:relative;overflow:hidden}
         .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
         .btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
@@ -80,7 +66,6 @@
         .btn.loading::before{content:"";position:absolute;left:0;top:0;bottom:0;background:rgba(0,0,0,.15);width:100%}
         .btn.ghost{background:transparent;color:var(--txt2);border:1px solid var(--line2)}
         .btn.ghost:hover{color:var(--orange);border-color:var(--orange)}
-
         .empty{color:var(--txt3);text-align:center;padding:60px 10px;font-size:14px}
         .empty .empty-ball{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;background:
                 radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
@@ -88,8 +73,6 @@
             box-shadow:0 0 0 2px rgba(255,255,255,.06);
             animation:spinSlow 8s linear infinite}
         @keyframes spinSlow{to{transform:rotate(360deg)}}
-
-        /* 比分板 */
         .scoreboard{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px;animation:fadeUp .55s cubic-bezier(.2,.8,.2,1)}
         .teams{display:flex;align-items:center;justify-content:center;gap:22px}
         .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -102,8 +85,6 @@
         .score{font-family:Georgia,serif;font-size:60px;color:var(--green);text-shadow:0 0 24px rgba(74,222,128,.35);letter-spacing:.02em;white-space:nowrap}
         .score.pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1)}
         @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-
-        /* 概率环 + 对比条 */
         .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
         .ring{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;transition:border-color .2s}
         .ring:hover{border-color:var(--line2)}
@@ -114,15 +95,11 @@
         .ring .lbl2{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;margin-top:8px}
         .ring .num{font-family:Georgia,serif;font-size:26px;margin-top:2px;font-variant-numeric:tabular-nums}
         .ring.h .num{color:var(--orange)} .ring.d .num{color:var(--txt2)} .ring.a .num{color:var(--blue)}
-
-        /* 概率对比条 */
         .compare{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;display:flex;border:1px solid var(--line);margin-bottom:20px}
         .compare .seg{height:100%;transition:width 1s cubic-bezier(.4,0,.2,1)}
         .compare .seg.h{background:linear-gradient(90deg,var(--orange),var(--orange2))}
         .compare .seg.d{background:#5a6779}
         .compare .seg.a{background:linear-gradient(90deg,#0098cc,var(--blue))}
-
-        /* 段落 */
         .sect{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
         .sect .ttl{font-size:11px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:10px}
         .kv{color:var(--txt);font-size:14px;line-height:1.75}
@@ -134,8 +111,6 @@
         .conf.中高{background:rgba(0,212,255,.14);color:var(--blue);border:1px solid rgba(0,212,255,.3)}
         .conf.中{background:rgba(255,182,72,.14);color:var(--gold);border:1px solid rgba(255,182,72,.3)}
         .conf.低{background:rgba(244,63,94,.14);color:var(--red);border:1px solid rgba(244,63,94,.3)}
-
-        /* H2H */
         .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:14px;padding:14px 16px;position:relative}
         .h2h .tag{position:absolute;top:-9px;right:12px;font-size:10px;padding:3px 8px;border-radius:6px;letter-spacing:.1em;font-weight:700}
         .h2h .tag.估算{background:rgba(255,182,72,.18);color:var(--gold);border:1px solid rgba(255,182,72,.4)}
@@ -145,8 +120,6 @@
         .h2h ul{list-style:none;font-size:13px;color:var(--txt2)}
         .h2h li{padding:3px 0}
         .h2h li::before{content:"›";color:var(--purple);margin-right:8px;font-weight:700}
-
-        /* 球员卡 */
         .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
         .pcard{background:linear-gradient(160deg,rgba(232,93,58,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:14px;padding:12px;transition:transform .2s,box-shadow .2s}
         .pcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
@@ -156,8 +129,6 @@
         .pcard .rt{margin-top:8px;display:flex;align-items:center;gap:8px}
         .pcard .rating{font-family:Georgia,serif;font-size:24px;color:var(--orange);font-weight:700}
         .pcard .note{font-size:11px;color:var(--txt2);line-height:1.5;margin-top:6px}
-
-        /* 积分榜 */
         .standings{font-size:13px}
         .standings table{width:100%;border-collapse:collapse}
         .standings th{color:var(--txt3);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
@@ -172,14 +143,11 @@
         .mini-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:Georgia,serif;color:var(--txt3);background:rgba(255,255,255,.05);border-radius:4px}
         .mini-badge.loaded ~ .mini-fallback{display:none}
         .standings .team-name{vertical-align:middle}
-        /* 最近 5 场 */
         .last5{display:inline-flex;gap:3px}
         .last5 span{width:14px;height:14px;border-radius:3px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
         .last5 span.W{background:rgba(74,222,128,.7)}
         .last5 span.D{background:rgba(139,152,171,.5)}
         .last5 span.L{background:rgba(244,63,94,.6)}
-
-        /* 加载动画 */
         .loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:50px 0}
         .ball{width:48px;height:48px;border-radius:50%;background:
                 radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
@@ -189,8 +157,6 @@
         @keyframes bounce{to{transform:translateY(-22px)}}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loader .msg{font-size:13px;color:var(--txt2);letter-spacing:.05em}
-
-        /* FAB */
         .fab{position:fixed;right:24px;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .2s,filter .2s;z-index:60}
         .fab:hover{transform:translateY(-2px) scale(1.05);filter:brightness(1.1)}
         .fab.hist{bottom:24px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08}
@@ -198,8 +164,6 @@
         .fab.top{bottom:152px;background:rgba(255,255,255,.12);border:1px solid var(--line2);opacity:0;pointer-events:none;transition:opacity .25s}
         .fab.top.show{opacity:1;pointer-events:auto}
         .fab .badge-n{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
-
-        /* 弹窗 */
         .mask{position:fixed;inset:0;background:rgba(3,5,10,.78);backdrop-filter:blur(6px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
         .mask.show{display:flex;animation:fadeIn .2s}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -232,8 +196,6 @@
         .hitem input{padding:7px 10px;font-size:13px;text-align:center}
         .hitem button{padding:7px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .15s}
         .hitem button:hover{border-color:var(--orange);color:var(--orange)}
-
-        /* 批量 */
         .batch-opts{display:flex;gap:8px;margin:12px 0}
         .batch-opts button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700;transition:all .2s}
         .batch-opts button:hover{border-color:var(--orange);color:var(--orange)}
@@ -242,23 +204,15 @@
         .quota.ok{background:rgba(74,222,128,.1);color:var(--green)}
         .quota.warn{background:rgba(255,182,72,.12);color:var(--gold)}
         .quota.bad{background:rgba(244,63,94,.12);color:var(--red)}
-
-        /* Toast */
         .toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
         .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:14px;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease}
         .toast.ok{border-color:rgba(74,222,128,.5)} .toast.ok::before{content:"✅ ";margin-right:4px}
         .toast.warn{border-color:rgba(255,182,72,.5)} .toast.warn::before{content:"⚠️ ";margin-right:4px}
         .toast.err{border-color:rgba(244,63,94,.5)} .toast.err::before{content:"❌ ";margin-right:4px}
         @keyframes slidein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
-
-        /* 版本警告 */
         .verbar{position:fixed;top:0;left:0;right:0;z-index:300;background:#ffb648;color:#000;padding:8px 16px;font-size:13px;text-align:center;font-weight:600}
-
-        /* 彩带 */
         .confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:150;pointer-events:none;animation:fall linear forwards}
         @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-
-        /* 连胜成就 */
         .streak{display:inline-block;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(232,93,58,.2),rgba(255,182,72,.2));border:1px solid rgba(255,182,72,.4);color:var(--gold);font-size:11px;font-weight:700;margin-left:8px}
     </style>
 </head>
@@ -268,7 +222,7 @@
     <div class="hero fade-in d1">
         <div class="kick"><span id="liveDot" class="live-dot" style="display:none"></span><span>Premier League 2026/27</span></div>
         <h1>英超 <em>预测</em> 引擎</h1>
-        <p><span>规则工程 + 前端工程 + 自动化</span><span>· v4.0</span></p>
+        <p><span>规则工程 + 前端工程 + 自动化</span><span>· v4.1</span></p>
         <div class="tag-line" id="matchdayLine">加载中…</div>
     </div>
 
@@ -287,14 +241,11 @@
                 <button class="btn ghost" style="flex:1" onclick="saveKey()">保存</button>
                 <button class="btn ghost" style="flex:1" onclick="clearKey()">清除</button>
             </div>
-
             <h3>比赛选择</h3>
             <div class="field"><label>轮次</label><select id="roundSel"></select></div>
             <div class="field"><label>对阵</label><select id="matchSel"></select></div>
-
             <h3 style="margin-top:18px">今日情报（可选）</h3>
             <div class="field"><textarea id="intel" placeholder="例：萨利巴背伤缺席；利物浦无锋阵；福登停赛..."></textarea></div>
-
             <button class="btn" id="predictBtn" onclick="startPredict()">开始预测</button>
             <div style="margin-top:10px;font-size:11px;color:var(--txt3);text-align:center">Ctrl/⌘ + Enter 快速预测</div>
         </div>
@@ -388,9 +339,13 @@
         '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
 
     /* ============================================================
-       1. 赛程 / 结果 / 积分榜（update.js 覆盖）
+       1. 数据容器（从 data.json 加载）
     ============================================================ */
     const FIXTURES = [];
+    const RESULTS = {};
+    let STATIC_STANDINGS = [];
+
+    // 回退：如果 data.json 加载失败，用算法生成占位赛程，避免页面空白
     (function fillFallbackFixtures(){
         if (FIXTURES.length) return;
         const out = [];
@@ -411,30 +366,10 @@
         FIXTURES.push(...out, ...second);
     })();
 
-    const RESULTS = {};
-
-    const STATIC_STANDINGS = [
-        { team: '阿森纳',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '曼城',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '利物浦',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '切尔西',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '热刺',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '曼联',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '纽卡斯尔联',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '阿斯顿维拉',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '布莱顿',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '埃弗顿',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '富勒姆',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '水晶宫',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '布伦特福德',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '伯恩茅斯',    played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '诺丁汉森林',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '利兹联',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '桑德兰',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '考文垂城',    played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '赫尔城',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
-        { team: '伊普斯维奇镇',played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 }
-    ];
+    // 回退积分榜（data.json 加载成功后会覆盖）
+    STATIC_STANDINGS = TEAMS.map(t => ({
+        team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0
+    }));
 
     /* ============================================================
        2. 校验 + 归一化
@@ -508,7 +443,7 @@
     function getKey(){ return localStorage.getItem('groq_key') || ''; }
 
     /* ============================================================
-       5. skill.md 加载（带 localStorage 缓存）
+       5. skill.md 加载
     ============================================================ */
     let _skillCache = null;
     let _verBarShown = false;
@@ -521,7 +456,6 @@
                 return _skillCache;
             }
         } catch(e){}
-
         const res = await fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' });
         if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
         let text = await res.text();
@@ -530,7 +464,6 @@
         const vm = text.match(/v(\d+\.\d+\.\d+)/);
         const actualVersion = vm ? vm[1] : null;
         if (actualVersion !== EXPECTED_SKILL_VERSION && !_verBarShown) {
-            console.warn(`⚠️ skill.md 版本不符：期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}`);
             const bar = document.createElement('div');
             bar.className = 'verbar';
             bar.textContent = `⚠️ skill.md 版本不符（期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}）`;
@@ -576,20 +509,15 @@
     ============================================================ */
     function initSelectors(){
         const rs = document.getElementById('roundSel');
+        const oldVal = rs.value;
         if (!FIXTURES.length) {
             rs.innerHTML = '<option>无赛程</option>';
             document.getElementById('matchSel').innerHTML = '<option>—</option>';
             return;
         }
         rs.innerHTML = FIXTURES.map((_,i) => `<option value="${i}">第 ${i+1} 轮</option>`).join('');
-        const saved = localStorage.getItem('last_round');
+        const saved = oldVal || localStorage.getItem('last_round');
         if (saved !== null && FIXTURES[+saved]) rs.value = saved;
-        rs.addEventListener('change', () => { localStorage.setItem('last_round', rs.value); fillMatches(); refreshDashboard(); });
-        document.getElementById('matchSel').addEventListener('change', () => {
-            const r = +rs.value || 0;
-            localStorage.setItem('last_match_'+r, document.getElementById('matchSel').value);
-            refreshDashboard();
-        });
         fillMatches();
     }
     function fillMatches(){
@@ -682,8 +610,6 @@
     <div class="rt"><div class="rating">${rating}</div>${note?`<div class="note">${note}</div>`:''}</div>
   </div>`;
     }
-
-    /* 数字滚动 */
     function animateNumber(el, target, dur=900, suffix='%'){
         const start = performance.now();
         const from = 0;
@@ -696,7 +622,6 @@
         }
         requestAnimationFrame(tick);
     }
-
     function renderResult(d, ctx){
         const { home, away } = ctx;
         const card = document.getElementById('resultCard');
@@ -764,7 +689,6 @@
     ${playersHtml}
   `;
 
-        // 触发动画
         requestAnimationFrame(() => requestAnimationFrame(() => {
             card.querySelectorAll('.ring .bar').forEach((el,i) => {
                 const pct = [h,dr,a][i];
@@ -785,19 +709,23 @@
     ============================================================ */
     function getLast5(team){
         const arr = [];
-        for (const key in RESULTS) {
-            const [h,a] = key.split('|');
-            if (h !== team && a !== team) continue;
-            const sc = RESULTS[key];
-            const [hg,ag] = sc.split('-').map(Number);
-            let r;
-            if (h === team) r = hg>ag ? 'W' : hg<ag ? 'L' : 'D';
-            else r = ag>hg ? 'W' : ag<hg ? 'L' : 'D';
-            arr.push({ r, t: key });
+        for (const roundKey in RESULTS) {
+            const roundObj = RESULTS[roundKey];
+            for (const key in roundObj) {
+                const [h,a] = key.split('|');
+                if (h !== team && a !== team) continue;
+                const sc = roundObj[key];
+                let hg, ag;
+                if (Array.isArray(sc)) { hg = sc[0]; ag = sc[1]; }
+                else { const parts = String(sc).split('-'); hg = +parts[0]; ag = +parts[1]; }
+                let r;
+                if (h === team) r = hg>ag ? 'W' : hg<ag ? 'L' : 'D';
+                else r = ag>hg ? 'W' : ag<hg ? 'L' : 'D';
+                arr.push({ r });
+            }
         }
         return arr.slice(-5);
     }
-
     function renderStandings(list){
         if (!list || !list.length) { document.getElementById('standings').innerHTML = '<div class="empty">暂无数据</div>'; return; }
         const rows = list.map((s,i) => {
@@ -835,7 +763,7 @@
     }
 
     /* ============================================================
-       11. 仪表盘 + 比赛日气氛 + 连胜
+       11. 仪表盘 + 比赛日 + 连胜
     ============================================================ */
     function refreshDashboard(){
         const r = +document.getElementById('roundSel').value || 0;
@@ -851,7 +779,6 @@
         if (toRecord > 0) { badge.style.display = 'flex'; badge.textContent = toRecord; }
         else badge.style.display = 'none';
 
-        // 连胜
         const done = hist.filter(h => h.actual);
         let streak = 0;
         for (let i = done.length - 1; i >= 0; i--) {
@@ -866,19 +793,15 @@
             sub.textContent = '录入实际赛果，自动判定命中';
         }
     }
-
-    /* 比赛日气氛：简单规则 */
     function updateMatchdayLine(){
         const el = document.getElementById('matchdayLine');
         const dot = document.getElementById('liveDot');
-        // 用浏览器日期判断（周六/周日视为比赛日）
         const d = new Date();
         const day = d.getDay();
         if (day === 0 || day === 6) {
             el.textContent = '🔴 比赛日 —— 记得录入上一轮实际赛果';
             dot.style.display = 'inline-block';
         } else {
-            // 计算距离下个周六的天数
             const daysToSat = (6 - day + 7) % 7 || 7;
             el.textContent = `距下个比赛日还有 ${daysToSat} 天`;
             dot.style.display = 'none';
@@ -886,18 +809,16 @@
     }
 
     /* ============================================================
-       12. 历史记录（压缩存储 + 筛选）
+       12. 历史记录
     ============================================================ */
     const HIST_KEY = 'pl_history_v2';
     let histFilter = 'all';
-
     function getHistory(){
         try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
         catch { return []; }
     }
     function setHistory(list){
         if (list.length > 500) toast('记录超过 500 条，建议导出后清空','warn');
-        // 压缩存储：去掉 keyFactors / analysis / *_players
         const slim = list.slice(-800).map(h => {
             const o = { round:h.round, home:h.home, away:h.away, homeWin:h.homeWin, draw:h.draw, awayWin:h.awayWin, score:h.score, confidence:h.confidence, ts:h.ts };
             if (h.actual) o.actual = h.actual;
@@ -994,7 +915,7 @@
     });
 
     /* ============================================================
-       13. 批量预测（并发 3）
+       13. 批量预测
     ============================================================ */
     let batchN = 1;
     function openBatch(){ document.getElementById('batchMask').classList.add('show'); updateQuota(); }
@@ -1011,7 +932,6 @@
         document.querySelectorAll('#batchOpts button').forEach(x => x.classList.toggle('on', x === b));
         updateQuota();
     });
-
     function mode(arr){
         const m = new Map();
         arr.forEach(x => m.set(x, (m.get(x)||0)+1));
@@ -1019,7 +939,6 @@
         for (const [k,v] of m) if (v > bestN) { best = k; bestN = v; }
         return best;
     }
-
     async function predictOne(skill, r, home, away, intel){
         const runs = [];
         for (let k = 0; k < batchN; k++) {
@@ -1046,7 +965,6 @@
             _multi: batchN
         };
     }
-
     async function runBatch(){
         const btn = document.getElementById('batchBtn');
         if (!getKey()) return toast('请先填 Groq API Key','warn');
@@ -1064,7 +982,6 @@
 
         try {
             const skill = await loadSkill();
-            // 并发池：同时最多 3 场
             const CONCURRENCY = 3;
             let cursor = 0;
             async function worker(){
@@ -1090,7 +1007,7 @@
     }
 
     /* ============================================================
-       14. 键盘快捷键
+       14. 键盘快捷键 + 滚动
     ============================================================ */
     window.addEventListener('keydown', e => {
         const ctrl = e.ctrlKey || e.metaKey;
@@ -1099,25 +1016,69 @@
         if (ctrl && e.key.toLowerCase() === 'b') { e.preventDefault(); openBatch(); }
         if (e.key === 'Escape') { closeHistory(); closeBatch(); }
     });
-
-    /* 返回顶部 */
     window.addEventListener('scroll', () => {
         document.getElementById('topBtn').classList.toggle('show', window.scrollY > 400);
     });
 
     /* ============================================================
-       15. 启动
+       15. 加载 data.json + 启动
     ============================================================ */
-    (function boot(){
+    async function loadExternalData(){
+        try {
+            const res = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) { console.warn('⚠️ data.json 未找到，使用内置回退数据'); return; }
+            const data = await res.json();
+
+            if (Array.isArray(data.fixtures) && data.fixtures.length) {
+                FIXTURES.length = 0;
+                FIXTURES.push(...data.fixtures);
+            }
+            if (data.results && typeof data.results === 'object') {
+                Object.keys(RESULTS).forEach(k => delete RESULTS[k]);
+                Object.assign(RESULTS, data.results);
+            }
+            if (Array.isArray(data.standings) && data.standings.length) {
+                STATIC_STANDINGS = data.standings;
+            }
+
+            initSelectors();
+            renderStandings(STATIC_STANDINGS);
+            refreshDashboard();
+
+            if (data.updatedAt && data.updatedAt !== '1970-01-01T00:00:00Z') {
+                const t = new Date(data.updatedAt).toLocaleString('zh-CN');
+                console.log(`✅ data.json 已加载（更新时间：${t}）`);
+            } else {
+                console.log('⚠️ data.json 是空壳，请跑一次 update.bat');
+            }
+        } catch(e){
+            console.warn('⚠️ data.json 加载失败，使用内置回退数据', e);
+        }
+    }
+
+    (async function boot(){
         const saved = localStorage.getItem('groq_key');
         if (saved) document.getElementById('apiKey').value = saved;
 
+        // 事件监听（只绑一次）
+        const rs = document.getElementById('roundSel');
+        rs.addEventListener('change', () => { localStorage.setItem('last_round', rs.value); fillMatches(); refreshDashboard(); });
+        document.getElementById('matchSel').addEventListener('change', () => {
+            const r = +rs.value || 0;
+            localStorage.setItem('last_match_'+r, document.getElementById('matchSel').value);
+            refreshDashboard();
+        });
+
+        // 先用回退数据渲染，避免空白
         initSelectors();
         renderStandings(STATIC_STANDINGS);
         refreshDashboard();
         updateMatchdayLine();
 
-        // 空闲时预加载队徽
+        // 异步加载真实数据
+        await loadExternalData();
+
+        // 预加载队徽
         const preload = () => {
             Object.values(ESPN_IDS).forEach(id => {
                 const img = new Image();
@@ -1129,13 +1090,13 @@
         if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2000 });
         else setTimeout(preload, 1200);
     })();
+
     /* ============================================================
-   16. Service Worker 注册 + 更新提示
-============================================================ */
+       16. Service Worker 注册
+    ============================================================ */
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js').then(reg => {
-                // 检测新版本
                 reg.addEventListener('updatefound', () => {
                     const newSW = reg.installing;
                     if (!newSW) return;
@@ -1145,28 +1106,12 @@
                         }
                     });
                 });
-            }).catch(err => {
-                console.warn('Service Worker 注册失败：', err);
-            });
+            }).catch(err => console.warn('Service Worker 注册失败：', err));
         });
-
-        // SW 主动要求刷新时
         navigator.serviceWorker.addEventListener('message', e => {
             if (e.data && e.data.type === 'REFRESH') location.reload();
         });
-
-        // 首次获得控制权时刷新（让新 SW 立即生效）
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) return;
-            refreshing = true;
-            // 如果之前已有 controller（说明是更新），才刷新
-            if (navigator.serviceWorker.controller) {
-                // 这里不做自动刷新，避免打断用户
-            }
-        });
     }
-
     function showUpdateToast(reg){
         const el = document.createElement('div');
         el.className = 'toast ok';
@@ -1174,13 +1119,10 @@
         el.style.cursor = 'pointer';
         el.innerHTML = '🎉 新版本已就绪，<b>点击刷新</b>';
         el.onclick = () => {
-            if (reg.waiting) {
-                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            }
+            if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
             setTimeout(() => location.reload(), 200);
         };
         document.getElementById('toastWrap').appendChild(el);
-        // 8 秒后自动消失
         setTimeout(() => el.remove(), 8000);
     }
 </script>
