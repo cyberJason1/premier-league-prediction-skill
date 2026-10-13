@@ -3,1379 +3,933 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>英超预测引擎 · 2026-27</title>
+    <title>英超预测引擎 v3.1</title>
     <style>
-        *{box-sizing:border-box;margin:0;padding:0}
         :root{
-            --bg:#06070a;--surface:#141414;--surface-2:#1a1a1a;--surface-3:#232323;
-            --border:#242424;--border-2:#333;
-            --text:#f5f3ef;--text-2:#9a9691;--text-3:#6b6862;--text-4:#48453f;
-            --accent:#ff6b35;--accent-2:#ff8b5c;--accent-soft:rgba(255,107,53,.10);
-            --success:#22c55e;--success-soft:rgba(34,197,94,.12);
-            --danger:#ef4444;--danger-soft:rgba(239,68,68,.12);
-            --info:#60a5fa;--info-soft:rgba(96,165,250,.12);
-            --purple:#a78bfa;
+            --bg:#050810; --bg2:#0a1220; --panel:rgba(16,22,36,.72);
+            --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+            --orange:#ff6b35; --blue:#00d4ff; --green:#00ff88;
+            --gold:#ffb648; --red:#f43f5e; --purple:#8b5cf6;
+            --txt:#e8eef7; --txt2:#8b98ab; --txt3:#5a6779;
         }
-        html{scroll-behavior:smooth}
-        html,body{height:100%}
-        body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;min-height:100vh}
-        button{font-family:inherit}
-        input,textarea,select{font-family:inherit}
-
-        body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse 90% 55% at 50% -10%,rgba(255,107,53,.09),transparent 60%),radial-gradient(ellipse 70% 45% at 85% 105%,rgba(96,165,250,.06),transparent 60%),#06070a}
-        body::after{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,#000,transparent 92%);-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,#000,transparent 92%);pointer-events:none}
-
-        .app{position:relative;max-width:1280px;margin:0 auto;padding:0 32px 120px}
-        @media (max-width:640px){.app{padding:0 20px 80px}}
-
-        .nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 32px;background:rgba(6,7,10,.72);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);margin:0 -32px;border-bottom:1px solid rgba(255,255,255,.04)}
-        @media (max-width:640px){.nav{margin:0 -20px;padding:16px 20px}}
-        .nav-brand{display:flex;align-items:center;gap:14px}
-        .nav-logo{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#0a0a0a;letter-spacing:-.5px}
-        .nav-title{font-size:14px;font-weight:500;color:var(--text);letter-spacing:-.01em}
-        .nav-title span{color:var(--text-3);font-weight:400}
-        .nav-right{display:flex;align-items:center;gap:12px}
-        .nav-btn{background:transparent;border:1px solid var(--border);color:var(--text-2);font-size:12.5px;font-weight:500;padding:8px 14px;border-radius:99px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
-        .nav-btn:hover{border-color:var(--border-2);color:var(--text);background:rgba(255,255,255,.02)}
-        .nav-btn .badge{background:var(--accent);color:#0a0a0a;font-size:10px;font-weight:700;padding:1px 6px;border-radius:99px;min-width:16px;text-align:center}
-
-        .hero{padding:80px 0 32px;max-width:900px}
-        @media (max-width:640px){.hero{padding:48px 0 24px}}
-        .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.15em;text-transform:uppercase;margin-bottom:32px}
-        .hero-eyebrow::before{content:"";width:24px;height:1px;background:var(--accent)}
-        .hero h1{font-size:clamp(40px,6.5vw,76px);font-weight:400;line-height:1.05;letter-spacing:-.035em;color:var(--text);margin-bottom:28px}
-        .hero h1 .dim{color:var(--text-3);font-style:italic;font-family:Georgia,"Times New Roman",serif}
-        .hero h1 .accent{color:var(--accent);font-style:italic;font-family:Georgia,"Times New Roman",serif}
-        .hero-desc{font-size:16px;color:var(--text-2);line-height:1.7;max-width:560px;letter-spacing:-.005em;margin-bottom:48px}
-        .hero-stats{display:flex;gap:56px;flex-wrap:wrap;padding-top:36px;border-top:1px solid var(--border)}
-        @media (max-width:640px){.hero-stats{gap:32px}}
-        .hero-stat{display:flex;flex-direction:column;gap:4px}
-        .hero-stat .v{font-size:32px;font-weight:500;color:var(--text);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
-        .hero-stat .l{font-size:11px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:500}
-
-        .matchday-dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:36px}
-        .matchday-dash .dash-item{background:linear-gradient(180deg,var(--surface) 0%,#0c0c0c 100%);padding:22px 20px;position:relative}
-        .matchday-dash .dash-item .l{font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;font-weight:500;margin-bottom:12px}
-        .matchday-dash .dash-item .v{font-family:Georgia,serif;font-size:28px;color:var(--text);letter-spacing:-.025em;line-height:1;font-variant-numeric:tabular-nums}
-        .matchday-dash .dash-item .v.accent{color:var(--accent)}
-        .matchday-dash .dash-item .v.live{display:inline-flex;align-items:center;gap:10px}
-        .matchday-dash .dash-item .v.live::after{content:"";width:7px;height:7px;background:var(--success);border-radius:50%;box-shadow:0 0 12px var(--success);animation:dashPulse 1.8s ease-in-out infinite}
-        @keyframes dashPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
-
-        .main-grid{display:grid;grid-template-columns:minmax(340px,420px) 1fr;gap:32px;align-items:start;margin-top:48px}
-        @media (max-width:1024px){.main-grid{grid-template-columns:1fr;gap:24px}}
-
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px;position:relative}
-        .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-        .card-label{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
-        .card-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-
-        .field{margin-bottom:20px}
-        .field:last-child{margin-bottom:0}
-        .field-label{display:block;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
-        .field-row-2{display:grid;grid-template-columns:1fr 1.6fr;gap:10px}
-        .field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-
-        input,textarea,select{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);font-size:14px;padding:12px 14px;border-radius:12px;outline:none;transition:all .2s;letter-spacing:-.005em}
-        input::placeholder,textarea::placeholder{color:var(--text-4)}
-        input:hover,textarea:hover,select:hover{border-color:var(--border-2)}
-        input:focus,textarea:focus,select:focus{border-color:var(--accent);background:rgba(255,107,53,.03);box-shadow:0 0 0 4px var(--accent-soft)}
-        textarea{resize:vertical;min-height:96px;line-height:1.6}
-        select{cursor:pointer;appearance:none;padding-right:38px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6862' stroke-width='2' stroke-linecap='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
-        select option{background:var(--surface-2);color:var(--text)}
-
-        .key-wrap{position:relative}
-        .key-wrap input{padding-right:44px}
-        .key-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--text-3);cursor:pointer;padding:8px 10px;border-radius:8px;font-size:13px;transition:all .2s}
-        .key-toggle:hover{color:var(--text);background:rgba(255,255,255,.04)}
-        .field-hint{font-size:11px;color:var(--text-4);margin-top:8px;letter-spacing:-.005em;display:flex;align-items:center;gap:6px}
-
-        .btn{width:100%;padding:14px 20px;background:var(--accent);color:#0a0a0a;border:0;border-radius:12px;font-size:14px;font-weight:600;letter-spacing:-.005em;cursor:pointer;transition:all .2s;margin-top:8px;position:relative;overflow:hidden}
-        .btn::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent);transform:translateX(-100%);transition:transform .8s}
-        .btn:hover:not(:disabled){background:var(--accent-2);transform:translateY(-1px);box-shadow:0 12px 32px rgba(255,107,53,.25)}
-        .btn:hover:not(:disabled)::after{transform:translateX(100%)}
-        .btn:active:not(:disabled){transform:translateY(0)}
-        .btn:disabled{opacity:.4;cursor:not-allowed}
-
-        .status{margin-top:16px;font-size:13px;color:var(--text-3);min-height:20px;display:flex;align-items:center;gap:10px;letter-spacing:-.005em}
-        .status.loading{color:var(--text-2)}
-        .status .spinner{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--border-2);border-top-color:var(--accent);animation:spin .7s linear infinite;flex-shrink:0}
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+        body::before{
+            content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+            background:
+                    radial-gradient(1200px 600px at 50% -10%,rgba(255,107,53,.18),transparent 60%),
+                    radial-gradient(1000px 500px at 50% 110%,rgba(0,212,255,.12),transparent 60%),
+                    repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 1px,transparent 1px 60px),
+                    repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 60px);
+        }
+        .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:32px 22px 120px}
+        /* HERO */
+        .hero{padding:28px 8px 22px;border-bottom:1px solid var(--line)}
+        .hero .kick{font-size:12px;letter-spacing:.28em;color:var(--orange);text-transform:uppercase;font-weight:700}
+        .hero h1{font-family:Georgia,"Times New Roman",serif;font-size:52px;line-height:1.05;font-weight:400;margin:10px 0 6px;letter-spacing:-.02em}
+        .hero h1 em{font-style:italic;color:var(--orange)}
+        .hero p{color:var(--txt2);font-size:14px;margin-top:6px}
+        /* DASHBOARD */
+        .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 26px}
+        .cell{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;backdrop-filter:blur(12px)}
+        .cell .lbl{font-size:11px;letter-spacing:.2em;color:var(--txt3);text-transform:uppercase}
+        .cell .val{font-family:Georgia,serif;font-size:32px;color:var(--txt);margin-top:6px;line-height:1}
+        .cell .val.orange{color:var(--orange)} .cell .val.blue{color:var(--blue)}
+        /* GRID */
+        .grid{display:grid;grid-template-columns:400px 1fr;gap:22px}
+        @media(max-width:920px){.grid{grid-template-columns:1fr}.hero h1{font-size:38px}.dash{grid-template-columns:repeat(2,1fr)}}
+        .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;backdrop-filter:blur(12px)}
+        .card h3{font-size:12px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:14px}
+        .field{margin-bottom:14px}
+        .field label{display:block;font-size:12px;color:var(--txt2);margin-bottom:6px}
+        select,input,textarea{width:100%;background:#0a0f1a;border:1px solid var(--line2);color:var(--txt);border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+        select:focus,input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,107,53,.18)}
+        textarea{resize:vertical;min-height:88px;line-height:1.5}
+        .btn{width:100%;padding:14px;border:0;border-radius:12px;background:linear-gradient(135deg,#ff6b35,#ff8b5a);color:#1a0f08;font-weight:800;font-size:15px;letter-spacing:.06em;cursor:pointer;transition:transform .15s,filter .15s;position:relative;overflow:hidden}
+        .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
+        .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+        .btn.ghost{background:transparent;color:var(--txt2);border:1px solid var(--line2)}
+        /* RESULT */
+        .empty{color:var(--txt3);text-align:center;padding:60px 10px;font-size:14px}
+        .scoreboard{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px}
+        .teams{display:flex;align-items:center;justify-content:center;gap:22px}
+        .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px}
+        .badge{width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5));transition:transform .25s;position:relative}
+        .badge:hover{transform:scale(1.08)}
+        .team .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:var(--txt2);letter-spacing:.05em}
+        .team .nm{font-size:14px;font-weight:600}
+        .score{font-family:Georgia,serif;font-size:56px;color:var(--green);text-shadow:0 0 24px rgba(0,255,136,.35);letter-spacing:.02em;white-space:nowrap}
+        .score.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+        @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+        /* RINGS */
+        .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+        .ring{background:rgba(10,15,26,.6);border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
+        .ring svg{width:96px;height:96px;transform:rotate(-90deg)}
+        .ring circle{fill:none;stroke-width:8;stroke-linecap:round}
+        .ring .track{stroke:rgba(255,255,255,.08)}
+        .ring .bar{transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
+        .ring .lbl2{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;margin-top:8px}
+        .ring .num{font-family:Georgia,serif;font-size:24px;margin-top:2px}
+        .ring.h .num{color:var(--orange)} .ring.d .num{color:var(--txt2)} .ring.a .num{color:var(--blue)}
+        /* SECTIONS */
+        .sect{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+        .sect .ttl{font-size:11px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:10px}
+        .kv{color:var(--txt);font-size:14px;line-height:1.7}
+        .factors{display:flex;flex-wrap:wrap;gap:8px}
+        .chip{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.28);color:#ffb59a;font-size:12px;padding:5px 10px;border-radius:999px}
+        .conf{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
+        .conf.高{background:rgba(0,255,136,.14);color:var(--green);border:1px solid rgba(0,255,136,.3)}
+        .conf.中高{background:rgba(0,212,255,.14);color:var(--blue);border:1px solid rgba(0,212,255,.3)}
+        .conf.中{background:rgba(255,182,72,.14);color:var(--gold);border:1px solid rgba(255,182,72,.3)}
+        .conf.低{background:rgba(244,63,94,.14);color:var(--red);border:1px solid rgba(244,63,94,.3)}
+        /* H2H */
+        .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:12px;padding:14px 16px;position:relative}
+        .h2h .tag{position:absolute;top:-9px;right:12px;font-size:10px;padding:3px 8px;border-radius:6px;letter-spacing:.1em;font-weight:700}
+        .h2h .tag.估算{background:rgba(255,182,72,.18);color:var(--gold);border:1px solid rgba(255,182,72,.4)}
+        .h2h .tag.资料库{background:rgba(0,255,136,.18);color:var(--green);border:1px solid rgba(0,255,136,.4)}
+        .h2h .tag.今日情报{background:rgba(0,212,255,.18);color:var(--blue);border:1px solid rgba(0,212,255,.4)}
+        .h2h .sum{font-size:14px;margin-bottom:8px}
+        .h2h ul{list-style:none;font-size:13px;color:var(--txt2)}
+        .h2h li{padding:3px 0}
+        .h2h li::before{content:"›";color:var(--purple);margin-right:8px;font-weight:700}
+        /* PLAYERS */
+        .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+        .pcard{background:linear-gradient(160deg,rgba(255,107,53,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:12px;padding:12px;transition:transform .2s,box-shadow .2s}
+        .pcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
+        .pcard .row{display:flex;justify-content:space-between;align-items:center}
+        .pcard .nm{font-size:13px;font-weight:700}
+        .pcard .pos{font-size:10px;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
+        .pcard .rt{margin-top:8px;display:flex;align-items:center;gap:8px}
+        .pcard .rating{font-family:Georgia,serif;font-size:22px;color:var(--orange);font-weight:700}
+        .pcard .note{font-size:11px;color:var(--txt2);line-height:1.5;margin-top:6px}
+        /* STANDINGS */
+        .standings{font-size:13px}
+        .standings table{width:100%;border-collapse:collapse}
+        .standings th{color:var(--txt3);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
+        .standings td{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04)}
+        .standings td:first-child{font-family:Georgia,serif;color:var(--txt2);width:26px}
+        .standings tr.ucl td:first-child{color:var(--green)}
+        .standings tr.rel td:first-child{color:var(--red)}
+        /* LOADER */
+        .loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:50px 0}
+        .ball{width:46px;height:46px;border-radius:50%;background:
+                radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
+                conic-gradient(from 0deg,#fff 0 25%,#111 25% 50%,#fff 50% 75%,#111 75% 100%);
+            box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.06);
+            animation:bounce .7s cubic-bezier(.2,.6,.4,1) infinite alternate,spin 1.4s linear infinite}
+        @keyframes bounce{to{transform:translateY(-22px)}}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .status.done{color:var(--success)}
-        .status.error{color:var(--danger)}
-
-        .empty{text-align:center;padding:100px 24px;color:var(--text-3);display:flex;flex-direction:column;align-items:center;gap:20px;font-size:14px}
-        .empty svg{opacity:.2}
-
-        .result{animation:enter .5s cubic-bezier(.16,1,.3,1)}
-        @keyframes enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-        .score-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:36px 32px;position:relative;overflow:hidden}
-        .score-card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,107,53,.4),transparent)}
-        .score-card.finished{background:linear-gradient(180deg,var(--surface) 0%,#0f0f0f 100%)}
-
-        .score-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:36px;font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase}
-        .score-head .status-tag{display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;border:1px solid var(--border);font-size:10px;letter-spacing:.1em}
-        .score-head .status-tag .dot{width:5px;height:5px;border-radius:50%;background:var(--text-3)}
-        .score-head .status-tag.live .dot{background:var(--success);box-shadow:0 0 8px var(--success);animation:dashPulse 1.8s infinite}
-        .score-head .status-tag.finished .dot{background:var(--info)}
-
-        .teams-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;margin-bottom:40px}
-        .team{display:flex;flex-direction:column;align-items:center;gap:16px;min-width:0}
-        .team-crest{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;transition:transform .4s;position:relative;box-shadow:0 0 0 1px rgba(255,255,255,.02),0 12px 40px rgba(0,0,0,.4)}
-        .team-crest:hover{transform:scale(1.06)}
-        .team-crest img{width:72%;height:72%;object-fit:contain;position:relative;z-index:1}
-        .team-crest .fb{font-size:22px;font-weight:600;color:var(--text-2);letter-spacing:-.02em;position:relative;z-index:1}
-        .team:first-child .team-crest::after{content:"";position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(from 0deg,transparent,rgba(255,107,53,.4),transparent 40%);animation:ringSpin 6s linear infinite;z-index:0;opacity:.7;filter:blur(6px)}
-        .team:last-child .team-crest::after{content:"";position:absolute;inset:-8px;border-radius:50%;background:conic-gradient(from 180deg,transparent,rgba(96,165,250,.4),transparent 40%);animation:ringSpin 6s linear infinite;z-index:0;opacity:.7;filter:blur(6px)}
-        @keyframes ringSpin{to{transform:rotate(360deg)}}
-        .team-name{font-size:15px;font-weight:500;color:var(--text);text-align:center;letter-spacing:-.01em;line-height:1.3;max-width:140px;word-break:break-word}
-        .score-block{display:flex;align-items:center;gap:18px;padding:8px 0;position:relative}
-        .score-block .label{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;letter-spacing:.15em;color:var(--text-3);text-transform:uppercase;white-space:nowrap}
-        .score-num{font-family:Georgia,"Times New Roman",serif;font-size:72px;font-weight:400;color:var(--text);line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums;text-align:center;min-width:60px;text-shadow:0 0 60px rgba(255,107,53,.18),0 0 20px rgba(255,107,53,.08)}
-        .score-card.finished .score-num{text-shadow:0 0 40px rgba(255,255,255,.12)}
-        .score-dash{font-family:Georgia,serif;font-size:40px;color:var(--text-4);font-weight:300}
-        .score-block::before{content:"";position:absolute;top:50%;left:50%;width:140%;height:140%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(255,107,53,.06),transparent 60%);pointer-events:none}
-
-        .prob-ring-wrap{display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:center;margin-bottom:32px;padding:28px;background:linear-gradient(180deg,var(--surface-2),#0e0e0e);border:1px solid var(--border);border-radius:18px}
-        @media (max-width:640px){.prob-ring-wrap{grid-template-columns:1fr;gap:20px}}
-        .prob-ring{position:relative;width:180px;height:180px;margin:0 auto}
-        .prob-ring svg{transform:rotate(-90deg);display:block}
-        .prob-ring .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-        .prob-ring .center .score{font-family:Georgia,serif;font-size:38px;color:var(--text);letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
-        .prob-ring .center .label{font-size:9.5px;color:var(--text-3);letter-spacing:.14em;text-transform:uppercase;margin-top:8px;font-weight:500}
-        .prob-legend{display:flex;flex-direction:column;gap:16px}
-        .prob-legend .row{display:flex;align-items:center;gap:14px}
-        .prob-legend .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-        .prob-legend .dot.home{background:var(--accent);box-shadow:0 0 12px rgba(255,107,53,.5)}
-        .prob-legend .dot.draw{background:var(--text-3)}
-        .prob-legend .dot.away{background:var(--info);box-shadow:0 0 12px rgba(96,165,250,.5)}
-        .prob-legend .name{flex:1;font-size:13px;color:var(--text-2);letter-spacing:-.005em}
-        .prob-legend .pct{font-family:Georgia,serif;font-size:24px;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-
-        .soccer-loader{width:44px;height:44px;position:relative;margin:0 auto}
-        .soccer-loader .ball{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e0e0e0 60%,#c8c8c8);position:relative;animation:bounceRoll 1.5s cubic-bezier(.5,0,.5,1) infinite;box-shadow:inset -4px -6px 12px rgba(0,0,0,.15),0 8px 20px rgba(255,107,53,.2)}
-        .soccer-loader .ball::before{content:"";position:absolute;inset:0;border-radius:50%;background-image:radial-gradient(circle at 50% 25%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 25% 70%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 75% 70%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 50% 50%,#0a0a0a 0,#0a0a0a 2.5px,transparent 3.5px)}
-        .soccer-loader .ball::after{content:"";position:absolute;bottom:-12px;left:5%;right:5%;height:6px;background:radial-gradient(ellipse,rgba(255,107,53,.35),transparent 70%);border-radius:50%;animation:shadowPulse 1.5s cubic-bezier(.5,0,.5,1) infinite}
-        @keyframes bounceRoll{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-24px) rotate(180deg)}}
-        @keyframes shadowPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.5);opacity:.3}}
-
-        .compare{margin-top:32px;padding-top:32px;border-top:1px solid var(--border)}
-        .compare-label{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px}
-        .compare-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
-        @media (max-width:640px){.compare-grid{grid-template-columns:1fr;gap:14px}}
-        .compare-box{padding:24px;border-radius:16px;background:var(--surface-2);border:1px solid var(--border);text-align:center}
-        .compare-box .l{font-size:10px;font-weight:500;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
-        .compare-box .s{font-family:Georgia,serif;font-size:32px;font-weight:400;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
-        .compare-box .sub{font-size:12px;color:var(--text-3);margin-top:10px}
-        .compare-box.actual{border-color:var(--border-2)}
-
-        .v-badge{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px;border-radius:16px;min-width:130px;border:1px solid}
-        .v-badge .icon{font-size:32px;line-height:1;font-weight:400;font-family:Georgia,serif}
-        .v-badge .text{font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
-        .v-badge.exact{color:var(--success);background:var(--success-soft);border-color:rgba(34,197,94,.25)}
-        .v-badge.outcome{color:var(--info);background:var(--info-soft);border-color:rgba(96,165,250,.25)}
-        .v-badge.miss{color:var(--danger);background:var(--danger-soft);border-color:rgba(239,68,68,.25)}
-
-        .section{margin-top:32px}
-        .section-label{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}
-        .section-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-        .section-body{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;color:var(--text-2);font-size:14px;line-height:1.75}
-        .section-body ul{list-style:none;display:flex;flex-direction:column;gap:12px}
-        .section-body li{padding-left:16px;position:relative}
-        .section-body li::before{content:"";position:absolute;left:0;top:9px;width:4px;height:4px;border-radius:50%;background:var(--accent);opacity:.6}
-        .section-body li.muted{color:var(--text-4)}
-        .section-body li.muted::before{background:var(--text-4);opacity:.4}
-
-        .h2h{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px}
-        .h2h-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
-        .h2h-head .t{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase}
-        .h2h-tag{font-size:10px;font-weight:500;padding:4px 10px;border-radius:99px;border:1px solid;letter-spacing:.03em}
-        .h2h-tag.估算{color:#fbbf24;background:rgba(251,191,36,.06);border-color:rgba(251,191,36,.2)}
-        .h2h-tag.资料库{color:var(--success);background:var(--success-soft);border-color:rgba(34,197,94,.2)}
-        .h2h-tag.今日情报{color:var(--info);background:var(--info-soft);border-color:rgba(96,165,250,.2)}
-        .h2h-summary{font-size:14px;color:var(--text-2);margin-bottom:14px;padding:14px 16px;background:var(--surface-2);border-left:2px solid var(--accent);border-radius:6px}
-        .h2h-list{list-style:none;display:flex;flex-direction:column;gap:8px}
-        .h2h-list li{display:flex;align-items:center;gap:12px;padding:11px 14px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--text-2);transition:all .2s}
-        .h2h-list li:hover{border-color:var(--border-2);background:var(--surface-3)}
-        .h2h-list .idx{width:22px;height:22px;border-radius:6px;background:var(--surface-3);color:var(--text-3);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-variant-numeric:tabular-nums}
-        .h2h-list .txt{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px}
-        .h2h-empty{text-align:center;padding:20px;color:var(--text-4);font-size:13px;font-style:italic}
-
-        .kp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-        @media (max-width:640px){.kp-grid{grid-template-columns:1fr}}
-        .kp-side{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
-        .kp-side-title{font-size:11px;font-weight:500;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-        .kp-side-title::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
-        .kp-player{display:flex;align-items:center;gap:14px;padding:14px;margin-bottom:10px;border-radius:14px;position:relative;overflow:hidden;transition:all .3s cubic-bezier(.16,1,.3,1);background:linear-gradient(135deg,rgba(255,107,53,.05),rgba(255,107,53,.01));border:1px solid rgba(255,107,53,.12)}
-        .kp-player:last-child{margin-bottom:0}
-        .kp-player.away-side{background:linear-gradient(135deg,rgba(96,165,250,.05),rgba(96,165,250,.01));border-color:rgba(96,165,250,.12)}
-        .kp-player::before{content:"";position:absolute;top:-60%;right:-60%;width:120%;height:120%;background:radial-gradient(circle,rgba(255,107,53,.1),transparent 60%);pointer-events:none}
-        .kp-player.away-side::before{background:radial-gradient(circle,rgba(96,165,250,.1),transparent 60%)}
-        .kp-player:hover{transform:translateY(-2px);border-color:rgba(255,107,53,.3);box-shadow:0 12px 32px rgba(255,107,53,.15)}
-        .kp-player.away-side:hover{border-color:rgba(96,165,250,.3);box-shadow:0 12px 32px rgba(96,165,250,.15)}
-        .kp-rating{min-width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:19px;font-weight:600;background:linear-gradient(135deg,var(--accent),#ff8b5c);color:#0a0a0a;box-shadow:0 6px 20px rgba(255,107,53,.3);flex-shrink:0;transition:transform .3s;font-variant-numeric:tabular-nums;position:relative;z-index:1}
-        .kp-player.away-side .kp-rating{background:linear-gradient(135deg,#3b82f6,#60a5fa);box-shadow:0 6px 20px rgba(96,165,250,.3)}
-        .kp-player:hover .kp-rating{transform:scale(1.08) rotate(-2deg)}
-        .kp-info{flex:1;min-width:0;position:relative;z-index:1}
-        .kp-name{font-size:14px;font-weight:500;color:var(--text);letter-spacing:-.01em}
-        .kp-meta{font-size:11.5px;color:var(--text-3);margin-top:3px}
-        .kp-note{font-size:10px;color:#fbbf24;padding:3px 8px;border-radius:6px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);font-weight:500;flex-shrink:0;position:relative;z-index:1}
-        .kp-empty{color:var(--text-4);font-size:13px;text-align:center;padding:16px;font-style:italic}
-
-        .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:32px}
-        @media (max-width:640px){.meta-grid{grid-template-columns:1fr}}
-        .pill{display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:99px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--surface);color:var(--text-2)}
-        .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.8}
-        .pill.high{color:var(--success);border-color:rgba(34,197,94,.25);background:var(--success-soft)}
-        .pill.midhigh{color:#a5b4fc;border-color:rgba(165,180,252,.25);background:rgba(165,180,252,.08)}
-        .pill.mid{color:var(--info);border-color:rgba(96,165,250,.25);background:var(--info-soft)}
-        .pill.low{color:var(--text-3)}
-        .pill.neutral{color:var(--text-2)}
-
-        details.raw{margin-top:32px;position:relative}
-        details.raw summary{cursor:pointer;color:var(--text-3);padding:12px 0;list-style:none;user-select:none;font-size:12px;font-weight:500;display:flex;align-items:center;gap:8px;transition:color .2s}
-        details.raw summary:hover{color:var(--text)}
-        details.raw summary::-webkit-details-marker{display:none}
-        details.raw summary::before{content:"›";font-size:16px;transition:transform .25s;display:inline-block;color:var(--accent)}
-        details.raw[open] summary::before{transform:rotate(90deg)}
-        details.raw pre{background:#050505;border:1px solid var(--border);border-radius:12px;padding:20px;overflow:auto;font-size:11.5px;color:var(--text-3);max-height:340px;margin-top:10px;line-height:1.8;font-family:ui-monospace,"SF Mono",Menlo,monospace}
-        .copy-json-btn{position:absolute;top:44px;right:14px;background:var(--surface-3);border:1px solid var(--border);color:var(--text-2);padding:6px 14px;border-radius:8px;font-size:11px;font-weight:500;cursor:pointer;transition:all .2s;z-index:2}
-        .copy-json-btn:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2)}
-        .copy-json-btn.copied{background:var(--success-soft);color:var(--success);border-color:rgba(34,197,94,.3)}
-
-        .error-box{background:var(--danger-soft);border:1px solid rgba(239,68,68,.2);color:#fca5a5;border-radius:14px;padding:20px;font-size:13px;white-space:pre-wrap;word-break:break-word;line-height:1.7;font-family:ui-monospace,"SF Mono",Menlo,monospace}
-
-        .standings{margin-top:80px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px}
-        @media (max-width:640px){.standings{padding:20px;margin-top:56px}}
-        .standings-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px;flex-wrap:wrap;gap:12px}
-        .standings-head h2{font-size:20px;font-weight:500;letter-spacing:-.02em;color:var(--text)}
-        .standings-head .meta{font-size:12px;color:var(--text-3);letter-spacing:.02em}
-        .legend{display:flex;gap:20px;font-size:11.5px;color:var(--text-3);flex-wrap:wrap;margin-bottom:20px}
-        .legend span{display:inline-flex;align-items:center;gap:8px}
-        .legend .sw{width:10px;height:2px;border-radius:1px}
-        .legend .sw.ucl{background:#a78bfa}
-        .legend .sw.uel{background:#60a5fa}
-        .legend .sw.uecl{background:#34d399}
-        .legend .sw.rel{background:#f87171}
-        .standings-scroll{overflow-x:auto;border-radius:12px;margin:0 -8px}
-        .standings-table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:700px}
-        .standings-table thead th{background:transparent;color:var(--text-3);font-weight:500;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:14px 10px;text-align:center;border-bottom:1px solid var(--border)}
-        .standings-table thead th:nth-child(2){text-align:left}
-        .standings-table tbody td{padding:14px 10px;text-align:center;border-bottom:1px solid var(--border);color:var(--text-2);font-variant-numeric:tabular-nums;transition:all .15s}
-        .standings-table tbody td:nth-child(2){text-align:left}
-        .standings-table tbody tr:last-child td{border-bottom:0}
-        .standings-table tbody tr:hover td{background:var(--surface-2);color:var(--text)}
-        .standings-table tbody tr.r-ucl td:first-child{position:relative}
-        .standings-table tbody tr.r-ucl td:first-child::before{content:"";position:absolute;left:0;top:24%;bottom:24%;width:2px;background:#a78bfa;border-radius:2px}
-        .standings-table tbody tr.r-uel td:first-child::before{content:"";position:absolute;left:0;top:24%;bottom:24%;width:2px;background:#60a5fa;border-radius:2px}
-        .standings-table tbody tr.r-uecl td:first-child::before{content:"";position:absolute;left:0;top:24%;bottom:24%;width:2px;background:#34d399;border-radius:2px}
-        .standings-table tbody tr.r-rel td:first-child::before{content:"";position:absolute;left:0;top:24%;bottom:24%;width:2px;background:#f87171;border-radius:2px}
-        .standings-table .rank{color:var(--text-3);font-size:12px}
-        .standings-table .team-cell{display:flex;align-items:center;gap:12px}
-        .standings-table .team-cell img{width:22px;height:22px;object-fit:contain}
-        .standings-table .team-cell .fb{width:22px;height:22px;border-radius:50%;background:var(--surface-3);color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
-        .standings-table .pts{color:var(--text);font-weight:500;font-family:Georgia,serif;font-size:15px}
-
-        .sync-bar{display:flex;gap:8px;margin-top:12px}
-        .sync-bar button{flex:1;background:transparent;border:1px solid var(--border);color:var(--text-3);padding:10px 12px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
-        .sync-bar button:hover{border-color:var(--border-2);color:var(--text)}
-        .sync-panel{display:none;margin-top:12px;padding:16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px}
-        .sync-panel.open{display:block}
-        .sync-panel textarea{width:100%;min-height:80px;font-size:11px;font-family:ui-monospace,"SF Mono",Menlo,monospace;background:#050505;border:1px solid var(--border);border-radius:8px;color:var(--text-3);padding:12px;resize:vertical;word-break:break-all;line-height:1.5}
-        .sync-panel .row-btns{display:flex;gap:8px;margin-top:12px}
-        .sync-panel .row-btns button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
-        .sync-panel .row-btns button.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
-        .sync-panel .row-btns button:hover{border-color:var(--border-2);color:var(--text)}
-        .sync-panel .row-btns button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#0a0a0a}
-        .sync-tip{font-size:11px;color:var(--text-4);margin-top:12px;line-height:1.6}
-        .sync-tip.warn{color:#fbbf24}
-
-        .tool-btn{position:fixed;right:24px;bottom:24px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#0a0a0a;border:0;font-size:20px;cursor:pointer;box-shadow:0 12px 32px rgba(255,107,53,.35);z-index:9000;display:flex;align-items:center;justify-content:center;transition:all .3s}
-        .tool-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(255,107,53,.5)}
-        .tool-btn .badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:99px;padding:2px 7px;font-size:10px;font-weight:600;min-width:18px;text-align:center;border:2px solid var(--bg)}
-        .batch-btn{position:fixed;right:24px;bottom:88px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#00d4ff,#3b82f6);color:#fff;border:0;font-size:20px;cursor:pointer;box-shadow:0 12px 32px rgba(96,165,250,.4);z-index:9000;display:flex;align-items:center;justify-content:center;transition:all .3s}
-        .batch-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(96,165,250,.55)}
-        .back-top{position:fixed;right:24px;bottom:152px;width:40px;height:40px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);cursor:pointer;display:none;align-items:center;justify-content:center;font-size:16px;z-index:8999;backdrop-filter:blur(12px);transition:all .2s}
-        .back-top.show{display:flex}
-        .back-top:hover{border-color:var(--border-2);color:var(--text);transform:translateY(-2px)}
-        @media (max-width:640px){.tool-btn,.batch-btn{width:48px;height:48px;right:16px}.tool-btn{bottom:16px}.batch-btn{bottom:72px}.back-top{right:16px;bottom:128px}}
-
-        .overlay{position:fixed;inset:0;background:rgba(5,5,5,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:9100;display:none;padding:24px;overflow-y:auto}
-        .overlay.open{display:block;animation:fadeIn .25s}
-        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .hist{max-width:960px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:36px;animation:slideUp .35s cubic-bezier(.16,1,.3,1);box-shadow:0 40px 100px rgba(0,0,0,.8)}
-        @media (max-width:640px){.hist{padding:24px;margin:16px auto}}
-        @keyframes slideUp{from{transform:translateY(16px);opacity:0}to{transform:none;opacity:1}}
-        .hist-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
-        .hist-head h2{font-size:22px;font-weight:500;letter-spacing:-.02em;color:var(--text)}
-        .hist-close{background:transparent;color:var(--text-3);border:1px solid var(--border);width:36px;height:36px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-        .hist-close:hover{background:var(--surface-2);color:var(--text);border-color:var(--border-2);transform:rotate(90deg)}
-
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border-radius:14px;overflow:hidden;margin-bottom:28px;border:1px solid var(--border)}
-        .stat{background:var(--surface);padding:20px}
-        .stat-label{font-size:10.5px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:10px}
-        .stat-value{font-family:Georgia,serif;font-size:28px;font-weight:400;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
-        .stat-value.success{color:var(--success)}
-        .stat-value.danger{color:var(--danger)}
-
-        .hist-search{width:100%;padding:12px 16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:all .2s;margin-bottom:14px}
-        .hist-search:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
-
-        .filters{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-        .filter{background:transparent;border:1px solid var(--border);color:var(--text-3);padding:8px 16px;border-radius:99px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .2s}
-        .filter:hover{color:var(--text);border-color:var(--border-2)}
-        .filter.active{background:var(--text);color:var(--bg);border-color:var(--text)}
-
-        .records{display:flex;flex-direction:column;gap:12px;max-height:56vh;overflow-y:auto;padding-right:4px}
-        .records::-webkit-scrollbar{width:6px}
-        .records::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:3px}
-        .rec{background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:20px;transition:all .2s}
-        .rec:hover{border-color:var(--border-2);background:var(--surface-3)}
-        .rec-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px;flex-wrap:wrap}
-        .rec-match{font-size:15px;font-weight:500;color:var(--text);letter-spacing:-.01em}
-        .rec-match .vs{color:var(--text-4);font-weight:400;margin:0 8px;font-style:italic;font-family:Georgia,serif}
-        .rec-meta{font-size:11.5px;color:var(--text-3);margin-top:5px}
-        .rec-score{font-family:Georgia,serif;font-size:22px;font-weight:400;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-        .rec-probs{display:flex;gap:8px;margin:12px 0;font-size:11.5px;flex-wrap:wrap}
-        .rec-chip{padding:4px 10px;border-radius:6px;background:var(--surface-3);color:var(--text-2);font-weight:500}
-        .rec-actions{display:flex;align-items:center;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);flex-wrap:wrap}
-        .rec-actions label{font-size:10.5px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:500}
-        .rec-input{width:48px;height:36px;background:var(--surface-3);border:1px solid var(--border);border-radius:8px;color:var(--text);text-align:center;font-family:Georgia,serif;font-size:16px;font-weight:400;outline:none;padding:0;transition:all .2s;font-variant-numeric:tabular-nums}
-        .rec-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-
-        .btn-sm{background:transparent;border:1px solid var(--border);color:var(--text-2);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}
-        .btn-sm:hover{border-color:var(--border-2);color:var(--text);background:var(--surface-3)}
-        .btn-sm.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
-        .btn-sm.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:#0a0a0a}
-        .btn-sm.danger:hover{border-color:rgba(239,68,68,.4);color:var(--danger)}
-
-        .verdict-tag{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;font-size:11px;font-weight:500;border:1px solid}
-        .verdict-tag.exact{color:var(--success);background:var(--success-soft);border-color:rgba(34,197,94,.2)}
-        .verdict-tag.outcome{color:var(--info);background:var(--info-soft);border-color:rgba(96,165,250,.2)}
-        .verdict-tag.miss{color:var(--danger);background:var(--danger-soft);border-color:rgba(239,68,68,.2)}
-        .verdict-tag.pending{color:var(--text-3);background:var(--surface-3);border-color:var(--border)}
-
-        .hist-empty{text-align:center;padding:64px 20px;color:var(--text-3);font-size:14px}
-        .hist-empty .icon{font-size:40px;opacity:.25;margin-bottom:16px}
-        .hist-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
-
-        .batch-modal{max-width:720px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;animation:slideUp .35s cubic-bezier(.16,1,.3,1);box-shadow:0 40px 100px rgba(0,0,0,.8)}
-        .batch-modal h2{font-size:22px;font-weight:500;letter-spacing:-.02em;color:var(--text);margin-bottom:8px}
-        .batch-modal .sub{font-size:13px;color:var(--text-3);margin-bottom:20px}
-        .batch-options{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;flex-wrap:wrap}
-        .batch-opt{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-2)}
-        .batch-opt select{width:auto;padding:8px 32px 8px 12px;font-size:13px}
-        .batch-warn{font-size:12px;color:#fbbf24;font-weight:500;letter-spacing:-.005em}
-        .batch-progress{background:var(--surface-2);border-radius:8px;height:8px;overflow:hidden;margin-bottom:20px}
-        .batch-progress-bar{height:100%;background:linear-gradient(90deg,#00d4ff,#3b82f6);width:0%;transition:width .3s ease}
-        .batch-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding-right:4px;margin-bottom:20px}
-        .batch-item{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:13.5px;color:var(--text-2);transition:all .2s}
-        .batch-item.pending{opacity:.55}
-        .batch-item.running{border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.04)}
-        .batch-item.done{border-color:rgba(34,197,94,.3);background:var(--success-soft)}
-        .batch-item.done.multi{background:linear-gradient(180deg,var(--success-soft),rgba(96,165,250,.05))}
-        .batch-item.fail{border-color:rgba(239,68,68,.3);background:var(--danger-soft)}
-        .batch-item .score{font-family:Georgia,serif;font-size:17px;color:var(--text);font-variant-numeric:tabular-nums}
-        .batch-item .probs{font-size:11px;color:var(--text-3);margin-left:10px}
-        .batch-item .runs{font-size:11px;color:var(--text-3);margin-left:8px;font-weight:400}
-        .batch-footer{display:flex;gap:10px;justify-content:flex-end;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
-        .batch-footer button{padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
-        .batch-footer button:hover{border-color:var(--border-2);color:var(--text)}
-        .batch-footer button.primary{background:var(--accent);color:#0a0a0a;border-color:var(--accent);font-weight:600}
-        .batch-footer button.primary:hover{background:var(--accent-2);border-color:var(--accent-2)}
-        .batch-footer button.primary:disabled{opacity:.4;cursor:not-allowed}
+        .loader .msg{font-size:13px;color:var(--txt2);letter-spacing:.05em}
+        /* FLOAT BTNS */
+        .fab{position:fixed;right:24px;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .2s,filter .2s;z-index:60}
+        .fab:hover{transform:translateY(-2px) scale(1.05);filter:brightness(1.1)}
+        .fab.hist{bottom:24px;background:linear-gradient(135deg,#ff6b35,#ff8b5a);color:#1a0f08}
+        .fab.batch{bottom:88px;background:linear-gradient(135deg,#00d4ff,#5cc8ff);color:#02131c}
+        .fab.top{bottom:152px;background:rgba(255,255,255,.12);border:1px solid var(--line2);opacity:0;pointer-events:none;transition:opacity .25s}
+        .fab.top.show{opacity:1;pointer-events:auto}
+        .fab .badge-n{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+        /* MODAL */
+        .mask{position:fixed;inset:0;background:rgba(3,5,10,.78);backdrop-filter:blur(6px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
+        .mask.show{display:flex}
+        .modal{background:#0b1220;border:1px solid var(--line2);border-radius:18px;max-width:760px;width:100%;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+        .modal h2{font-family:Georgia,serif;font-size:26px;font-weight:400;margin-bottom:6px}
+        .modal .sub{color:var(--txt2);font-size:13px;margin-bottom:18px}
+        .modal .close{float:right;background:transparent;border:0;color:var(--txt3);font-size:22px;cursor:pointer;line-height:1}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+        .stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+        .stat .n{font-family:Georgia,serif;font-size:26px;color:var(--orange)}
+        .stat .l{font-size:10px;letter-spacing:.15em;color:var(--txt3);text-transform:uppercase;margin-top:4px}
+        .hlist{max-height:460px;overflow-y:auto;margin-top:6px}
+        .hitem{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+        .hitem .top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+        .hitem .teams2{font-weight:700}
+        .hitem .res-badge{font-size:10px;padding:3px 9px;border-radius:999px;letter-spacing:.08em;font-weight:700}
+        .res-badge.exact{background:rgba(0,255,136,.16);color:var(--green);border:1px solid rgba(0,255,136,.35)}
+        .res-badge.wdl{background:rgba(255,182,72,.16);color:var(--gold);border:1px solid rgba(255,182,72,.35)}
+        .res-badge.miss{background:rgba(244,63,94,.16);color:var(--red);border:1px solid rgba(244,63,94,.35)}
+        .res-badge.pending{background:rgba(139,92,246,.16);color:var(--purple);border:1px solid rgba(139,92,246,.35)}
+        .hitem .meta{font-size:11px;color:var(--txt3);margin-top:6px}
+        .hitem .row2{display:flex;gap:8px;align-items:center;margin-top:8px}
+        .hitem input{padding:7px 10px;font-size:13px;text-align:center}
+        .hitem button{padding:7px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer}
+        .hitem button:hover{border-color:var(--orange);color:var(--orange)}
+        /* BATCH */
+        .batch-opts{display:flex;gap:8px;margin:12px 0}
+        .batch-opts button{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700}
+        .batch-opts button.on{border-color:var(--orange);background:rgba(255,107,53,.14);color:var(--orange)}
+        .quota{font-size:12px;padding:8px 12px;border-radius:8px;margin-top:10px;text-align:center}
+        .quota.ok{background:rgba(0,255,136,.1);color:var(--green)}
+        .quota.warn{background:rgba(255,182,72,.12);color:var(--gold)}
+        .quota.bad{background:rgba(244,63,94,.12);color:var(--red)}
+        /* TOAST */
+        .toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+        .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease}
+        .toast.ok{border-color:rgba(0,255,136,.5)} .toast.ok::before{content:"✅ ";margin-right:4px}
+        .toast.warn{border-color:rgba(255,182,72,.5)} .toast.warn::before{content:"⚠️ ";margin-right:4px}
+        .toast.err{border-color:rgba(244,63,94,.5)} .toast.err::before{content:"❌ ";margin-right:4px}
+        @keyframes slidein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+        /* VERSION BAR */
+        .verbar{position:fixed;top:0;left:0;right:0;z-index:300;background:#ffb648;color:#000;padding:8px 16px;font-size:13px;text-align:center;font-weight:600}
     </style>
 </head>
 <body>
 
-<div class="app">
-    <nav class="nav">
-        <div class="nav-brand">
-            <div class="nav-logo">PL</div>
-            <div class="nav-title">英超预测引擎 <span>· 2026-27</span></div>
-        </div>
-        <div class="nav-right">
-            <button class="nav-btn" id="navHistory">📊 历史 <span class="badge" id="navHistoryBadge" style="display:none">0</span></button>
-        </div>
-    </nav>
-
-    <section class="hero">
-        <div class="hero-eyebrow">AI Prediction Engine</div>
-        <h1>让数据告诉你，<br><span class="dim">下一场英超</span><span class="accent">会发生什么。</span></h1>
-        <p class="hero-desc">基于近期状态、硬实力、历史交锋、情境因素四维推理。每次预测输出结构化 JSON，可追踪、可对比、可复盘。</p>
-        <div class="hero-stats">
-            <div class="hero-stat"><div class="v">20</div><div class="l">球队</div></div>
-            <div class="hero-stat"><div class="v">38</div><div class="l">轮次</div></div>
-            <div class="hero-stat"><div class="v">380</div><div class="l">比赛</div></div>
-            <div class="hero-stat"><div class="v" id="heroHitRate">—</div><div class="l">命中率</div></div>
-        </div>
-        <div class="matchday-dash">
-            <div class="dash-item"><div class="l">当前轮次</div><div class="v accent" id="dashRound">—</div></div>
-            <div class="dash-item"><div class="l">本轮已完赛</div><div class="v" id="dashFinished">—</div></div>
-            <div class="dash-item"><div class="l">本轮待预测</div><div class="v live" id="dashPending">—</div></div>
-            <div class="dash-item"><div class="l">待录入赛果</div><div class="v" id="dashSettle">—</div></div>
-        </div>
-    </section>
-
-    <div class="main-grid">
-        <aside class="card">
-            <div class="card-head"><div class="card-label">比赛输入</div></div>
-            <div class="field">
-                <label class="field-label">快速选择</label>
-                <div class="field-row-2">
-                    <select id="roundSelect"></select>
-                    <select id="matchSelect"></select>
-                </div>
-            </div>
-            <div class="field">
-                <label class="field-label">当前选中</label>
-                <div class="field-row-3">
-                    <input id="home" placeholder="主队">
-                    <input id="away" placeholder="客队">
-                    <input id="round" placeholder="轮次">
-                </div>
-            </div>
-            <div class="field">
-                <label class="field-label">今日情报</label>
-                <textarea id="intel" placeholder="例如：&#10;- 阿森纳：萨利巴背伤&#10;- 利物浦：锋线轮换"></textarea>
-            </div>
-            <div class="field">
-                <label class="field-label">API 提供商</label>
-                <select id="provider">
-                    <option value="groq">Groq · 每日 1000 次免费</option>
-                    <option value="openrouter">OpenRouter · 每日 50 次免费</option>
-                </select>
-            </div>
-            <div class="field">
-                <label class="field-label">API Key</label>
-                <div class="key-wrap">
-                    <input id="apiKey" type="password" placeholder="gsk_... 或 sk-or-v1-...">
-                    <button class="key-toggle" id="keyToggle" type="button">👁</button>
-                </div>
-                <div class="field-hint">🔒 只保存在浏览器本地</div>
-            </div>
-            <button id="predictBtn" class="btn">开始预测</button>
-            <div id="status" class="status"></div>
-            <div class="sync-bar">
-                <button id="syncExportBtn" type="button">导出配置</button>
-                <button id="syncImportBtn" type="button">导入配置</button>
-            </div>
-            <div class="sync-panel" id="syncPanel">
-                <textarea id="syncText" placeholder="点击「导出配置」生成文本，或粘贴其他设备的配置文本"></textarea>
-                <div class="row-btns">
-                    <button id="syncCopyBtn" type="button">复制</button>
-                    <button id="syncApplyBtn" type="button" class="primary">应用并刷新</button>
-                    <button id="syncCloseBtn" type="button">关闭</button>
-                </div>
-                <div class="sync-tip warn">⚠️ 这段文本包含你的 API Key，请勿分享给他人。</div>
-            </div>
-        </aside>
-
-        <main class="card">
-            <div class="card-head"><div class="card-label">预测结果</div></div>
-            <div id="result">
-                <div class="empty">
-                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                        <path d="M2 12h20"/>
-                    </svg>
-                    <div>选择一场比赛，点击「开始预测」</div>
-                </div>
-            </div>
-        </main>
+<div class="wrap">
+    <div class="hero">
+        <div class="kick">Premier League 2026/27</div>
+        <h1>英超 <em>预测</em> 引擎</h1>
+        <p>规则工程 + 前端工程 + 自动化 · v3.1</p>
     </div>
 
-    <section class="standings">
-        <div class="standings-head">
-            <h2>积分榜</h2>
-            <div class="meta">来自 football-data.org · 自动更新</div>
-        </div>
-        <div class="legend">
-            <span><span class="sw ucl"></span>欧冠</span>
-            <span><span class="sw uel"></span>欧联</span>
-            <span><span class="sw uecl"></span>欧协联</span>
-            <span><span class="sw rel"></span>降级区</span>
-        </div>
-        <div class="standings-scroll">
-            <table class="standings-table">
-                <thead><tr><th style="width:44px">#</th><th>球队</th><th>场</th><th>胜</th><th>平</th><th>负</th><th>进</th><th>失</th><th>净</th><th>积分</th></tr></thead>
-                <tbody id="standingsBody"></tbody>
-            </table>
-        </div>
-    </section>
-</div>
+    <div class="dash">
+        <div class="cell"><div class="lbl">当前轮次</div><div class="val orange" id="dashRound">—</div></div>
+        <div class="cell"><div class="lbl">已完赛</div><div class="val" id="dashPlayed">—</div></div>
+        <div class="cell"><div class="lbl">待预测</div><div class="val blue" id="dashPending">—</div></div>
+        <div class="cell"><div class="lbl">待录入</div><div class="val" id="dashRecord">—</div></div>
+    </div>
 
-<button class="back-top" id="backTop" title="返回顶部">↑</button>
-<button class="batch-btn" id="plBatchFab" title="批量预测本轮">⚡</button>
-<button class="tool-btn" id="plHistoryFab" title="预测历史">📊<span class="badge" id="plHistoryBadge" style="display:none">0</span></button>
+    <div class="grid">
+        <!-- LEFT -->
+        <div class="card">
+            <h3>Groq API Key</h3>
+            <div class="field">
+                <input type="password" id="apiKey" placeholder="gsk_... 只存本地浏览器">
+            </div>
+            <div style="display:flex;gap:8px;margin-bottom:18px">
+                <button class="btn ghost" style="flex:1" onclick="saveKey()">保存</button>
+                <button class="btn ghost" style="flex:1" onclick="clearKey()">清除</button>
+            </div>
 
-<div class="overlay" id="plHistoryOverlay">
-    <div class="hist">
-        <div class="hist-head">
-            <h2>预测历史</h2>
-            <button class="hist-close" id="plHistoryClose">✕</button>
+            <h3>比赛选择</h3>
+            <div class="field">
+                <label>轮次</label>
+                <select id="roundSel"></select>
+            </div>
+            <div class="field">
+                <label>对阵</label>
+                <select id="matchSel"></select>
+            </div>
+
+            <h3 style="margin-top:18px">今日情报（可选）</h3>
+            <div class="field">
+                <textarea id="intel" placeholder="例：萨利巴背伤缺席；利物浦无锋阵；福登停赛..."></textarea>
+            </div>
+
+            <button class="btn" id="predictBtn" onclick="startPredict()">开始预测</button>
         </div>
-        <div class="stats-grid" id="plStats"></div>
-        <input type="text" class="hist-search" id="plSearch" placeholder="🔍 搜索球队名、轮次…">
-        <div class="filters" id="plFilters">
-            <button class="filter active" data-filter="all">全部</button>
-            <button class="filter" data-filter="pending">待录入</button>
-            <button class="filter" data-filter="hit">已命中</button>
-            <button class="filter" data-filter="miss">未命中</button>
+
+        <!-- RIGHT -->
+        <div class="card" id="resultCard">
+            <div class="empty">选择比赛 → 填写情报 → 开始预测</div>
         </div>
-        <div class="records" id="plRecords"></div>
-        <div class="hist-footer">
-            <button class="btn-sm" id="plExport">导出 JSON</button>
-            <button class="btn-sm" id="plImport">导入 JSON</button>
-            <button class="btn-sm danger" id="plClear">清空全部</button>
-            <input type="file" id="plImportFile" accept=".json" style="display:none">
-        </div>
+    </div>
+
+    <!-- STANDINGS -->
+    <div class="card" style="margin-top:22px">
+        <h3>积分榜</h3>
+        <div class="standings" id="standings"><div class="empty">加载中…</div></div>
     </div>
 </div>
 
-<div class="overlay" id="plBatchOverlay">
-    <div class="batch-modal">
-        <div class="hist-head">
-            <h2>批量预测本轮</h2>
-            <button class="hist-close" id="plBatchClose">✕</button>
+<!-- FABS -->
+<button class="fab hist" onclick="openHistory()">📊<span class="badge-n" id="histBadge" style="display:none">0</span></button>
+<button class="fab batch" onclick="openBatch()">⚡</button>
+<button class="fab top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<!-- HISTORY MODAL -->
+<div class="mask" id="histMask">
+    <div class="modal">
+        <button class="close" onclick="closeHistory()">✕</button>
+        <h2>历史记录与命中率</h2>
+        <div class="sub">录入实际赛果，自动判定命中</div>
+        <div class="stats">
+            <div class="stat"><div class="n" id="sTotal">0</div><div class="l">总预测</div></div>
+            <div class="stat"><div class="n" id="sDone">0</div><div class="l">已录入</div></div>
+            <div class="stat"><div class="n" id="sWdl">0%</div><div class="l">胜平负</div></div>
+            <div class="stat"><div class="n" id="sExact">0%</div><div class="l">精确比分</div></div>
         </div>
-        <div class="sub">
-            轮次：<span id="plBatchRound">—</span> · 共 <span id="plBatchTotal">0</span> 场
+        <div style="display:flex;gap:8px;margin-bottom:14px">
+            <button class="btn ghost" onclick="exportHistory()">导出 JSON</button>
+            <button class="btn ghost" onclick="importHistory()">导入 JSON</button>
+            <button class="btn ghost" onclick="clearHistory()">清空</button>
         </div>
-        <div class="batch-options">
-            <label class="batch-opt">
-                <span>每场跑几次</span>
-                <select id="plBatchTimes">
-                    <option value="1">1 次（最快）</option>
-                    <option value="3">3 次（取平均，更稳）</option>
-                    <option value="5">5 次（最稳，耗额度）</option>
-                </select>
-            </label>
-            <div class="batch-warn" id="plBatchWarn">预计消耗 10 次 API 调用</div>
-        </div>
-        <div class="batch-progress"><div class="batch-progress-bar" id="plBatchBar"></div></div>
-        <div class="batch-list" id="plBatchList"></div>
-        <div class="batch-footer">
-            <button id="plBatchCancel">关闭</button>
-            <button class="primary" id="plBatchRun">开始批量预测</button>
-        </div>
+        <div class="hlist" id="histList"></div>
     </div>
 </div>
+
+<!-- BATCH MODAL -->
+<div class="mask" id="batchMask">
+    <div class="modal">
+        <button class="close" onclick="closeBatch()">✕</button>
+        <h2>批量预测</h2>
+        <div class="sub">对当前轮次全部 10 场进行预测</div>
+        <div class="batch-opts" id="batchOpts">
+            <button data-n="1" class="on">每场 1 次</button>
+            <button data-n="3">每场 3 次</button>
+            <button data-n="5">每场 5 次</button>
+        </div>
+        <div class="quota ok" id="batchQuota">预计消耗 10 次调用</div>
+        <button class="btn" id="batchBtn" onclick="runBatch()">开始批量预测</button>
+    </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-    /* ============ 数据（由 update.js 自动覆盖） ============ */
-    const FIXTURES = [
-  [{home:'阿森纳',away:'考文垂城'},{home:'赫尔城',away:'曼联'},{home:'伊普斯维奇镇',away:'桑德兰'},{home:'诺丁汉森林',away:'利兹联'},{home:'埃弗顿',away:'水晶宫'},{home:'布伦特福德',away:'热刺'},{home:'曼城',away:'伯恩茅斯'},{home:'布莱顿',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'利物浦'},{home:'富勒姆',away:'切尔西'}],
-  [{home:'水晶宫',away:'曼城'},{home:'利物浦',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'埃弗顿'},{home:'考文垂城',away:'赫尔城'},{home:'热刺',away:'纽卡斯尔联'},{home:'桑德兰',away:'富勒姆'},{home:'切尔西',away:'布莱顿'},{home:'利兹联',away:'布伦特福德'},{home:'曼联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'阿森纳'}],
-  [{home:'伊普斯维奇镇',away:'利物浦'},{home:'纽卡斯尔联',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'热刺'},{home:'曼城',away:'考文垂城'},{home:'布莱顿',away:'利兹联'},{home:'布伦特福德',away:'桑德兰'},{home:'富勒姆',away:'水晶宫'},{home:'赫尔城',away:'阿斯顿维拉'},{home:'埃弗顿',away:'曼联'},{home:'阿森纳',away:'切尔西'}],
-  [{home:'水晶宫',away:'伊普斯维奇镇'},{home:'利物浦',away:'富勒姆'},{home:'阿斯顿维拉',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'布伦特福德'},{home:'切尔西',away:'赫尔城'},{home:'热刺',away:'埃弗顿'},{home:'桑德兰',away:'阿森纳'},{home:'考文垂城',away:'布莱顿'},{home:'曼联',away:'曼城'},{home:'利兹联',away:'纽卡斯尔联'}],
-  [{home:'布伦特福德',away:'切尔西'},{home:'热刺',away:'阿斯顿维拉'},{home:'埃弗顿',away:'伊普斯维奇镇'},{home:'布莱顿',away:'阿森纳'},{home:'纽卡斯尔联',away:'赫尔城'},{home:'诺丁汉森林',away:'考文垂城'},{home:'伯恩茅斯',away:'利物浦'},{home:'利兹联',away:'水晶宫'},{home:'曼城',away:'桑德兰'},{home:'富勒姆',away:'曼联'}],
-  [{home:'阿森纳',away:'利兹联'},{home:'桑德兰',away:'布莱顿'},{home:'切尔西',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'富勒姆'},{home:'阿斯顿维拉',away:'布伦特福德'},{home:'曼联',away:'热刺'},{home:'赫尔城',away:'埃弗顿'},{home:'水晶宫',away:'诺丁汉森林'},{home:'利物浦',away:'曼城'},{home:'考文垂城',away:'纽卡斯尔联'}],
-  [{home:'埃弗顿',away:'切尔西'},{home:'富勒姆',away:'赫尔城'},{home:'曼城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'利物浦'},{home:'纽卡斯尔联',away:'阿斯顿维拉'},{home:'伯恩茅斯',away:'桑德兰'},{home:'利兹联',away:'曼联'},{home:'布莱顿',away:'水晶宫'},{home:'诺丁汉森林',away:'阿森纳'},{home:'热刺',away:'考文垂城'}],
-  [{home:'伊普斯维奇镇',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'曼城'},{home:'阿森纳',away:'埃弗顿'},{home:'考文垂城',away:'富勒姆'},{home:'切尔西',away:'热刺'},{home:'利物浦',away:'布莱顿'},{home:'水晶宫',away:'纽卡斯尔联'},{home:'曼联',away:'伯恩茅斯'},{home:'赫尔城',away:'布伦特福德'},{home:'桑德兰',away:'利兹联'}],
-  [{home:'切尔西',away:'曼联'},{home:'曼城',away:'布莱顿'},{home:'伯恩茅斯',away:'利兹联'},{home:'考文垂城',away:'桑德兰'},{home:'赫尔城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'诺丁汉森林'},{home:'热刺',away:'水晶宫'},{home:'阿斯顿维拉',away:'富勒姆'},{home:'利物浦',away:'阿森纳'},{home:'纽卡斯尔联',away:'埃弗顿'}],
-  [{home:'埃弗顿',away:'考文垂城'},{home:'利兹联',away:'热刺'},{home:'阿森纳',away:'赫尔城'},{home:'富勒姆',away:'纽卡斯尔联'},{home:'诺丁汉森林',away:'曼城'},{home:'水晶宫',away:'利物浦'},{home:'桑德兰',away:'切尔西'},{home:'伊普斯维奇镇',away:'伯恩茅斯'},{home:'布莱顿',away:'布伦特福德'},{home:'曼联',away:'阿斯顿维拉'}],
-  [{home:'曼城',away:'富勒姆'},{home:'切尔西',away:'利兹联'},{home:'阿斯顿维拉',away:'桑德兰'},{home:'伯恩茅斯',away:'诺丁汉森林'},{home:'热刺',away:'伊普斯维奇镇'},{home:'考文垂城',away:'水晶宫'},{home:'纽卡斯尔联',away:'阿森纳'},{home:'赫尔城',away:'布莱顿'},{home:'利物浦',away:'曼联'},{home:'布伦特福德',away:'埃弗顿'}],
-  [{home:'诺丁汉森林',away:'切尔西'},{home:'利兹联',away:'考文垂城'},{home:'曼联',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'阿斯顿维拉'},{home:'埃弗顿',away:'利物浦'},{home:'富勒姆',away:'伯恩茅斯'},{home:'布莱顿',away:'纽卡斯尔联'},{home:'桑德兰',away:'热刺'},{home:'水晶宫',away:'赫尔城'},{home:'阿森纳',away:'曼城'}],
-  [{home:'热刺',away:'富勒姆'},{home:'利物浦',away:'桑德兰'},{home:'赫尔城',away:'诺丁汉森林'},{home:'切尔西',away:'水晶宫'},{home:'阿斯顿维拉',away:'埃弗顿'},{home:'布伦特福德',away:'阿森纳'},{home:'考文垂城',away:'伊普斯维奇镇'},{home:'曼城',away:'利兹联'},{home:'纽卡斯尔联',away:'曼联'},{home:'伯恩茅斯',away:'布莱顿'}],
-  [{home:'热刺',away:'阿森纳'},{home:'曼联',away:'考文垂城'},{home:'利兹联',away:'伊普斯维奇镇'},{home:'纽卡斯尔联',away:'桑德兰'},{home:'切尔西',away:'利物浦'},{home:'布伦特福德',away:'曼城'},{home:'伯恩茅斯',away:'赫尔城'},{home:'阿斯顿维拉',away:'水晶宫'},{home:'诺丁汉森林',away:'布莱顿'},{home:'埃弗顿',away:'富勒姆'}],
-  [{home:'桑德兰',away:'诺丁汉森林'},{home:'水晶宫',away:'曼联'},{home:'赫尔城',away:'热刺'},{home:'布莱顿',away:'埃弗顿'},{home:'伊普斯维奇镇',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿斯顿维拉'},{home:'阿森纳',away:'伯恩茅斯'},{home:'曼城',away:'切尔西'},{home:'利物浦',away:'利兹联'},{home:'富勒姆',away:'布伦特福德'}],
-  [{home:'利兹联',away:'富勒姆'},{home:'布莱顿',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'埃弗顿'},{home:'布伦特福德',away:'纽卡斯尔联'},{home:'曼城',away:'赫尔城'},{home:'桑德兰',away:'水晶宫'},{home:'伯恩茅斯',away:'考文垂城'},{home:'阿森纳',away:'曼联'},{home:'利物浦',away:'热刺'},{home:'切尔西',away:'阿斯顿维拉'}],
-  [{home:'阿斯顿维拉',away:'利兹联'},{home:'埃弗顿',away:'桑德兰'},{home:'富勒姆',away:'布莱顿'},{home:'热刺',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'布伦特福德'},{home:'赫尔城',away:'利物浦'},{home:'纽卡斯尔联',away:'曼城'},{home:'考文垂城',away:'切尔西'},{home:'曼联',away:'诺丁汉森林'},{home:'水晶宫',away:'阿森纳'}],
-  [{home:'赫尔城',away:'利兹联'},{home:'热刺',away:'布莱顿'},{home:'埃弗顿',away:'曼城'},{home:'富勒姆',away:'阿森纳'},{home:'考文垂城',away:'布伦特福德'},{home:'纽卡斯尔联',away:'诺丁汉森林'},{home:'曼联',away:'桑德兰'},{home:'水晶宫',away:'伯恩茅斯'},{home:'阿斯顿维拉',away:'利物浦'},{home:'伊普斯维奇镇',away:'切尔西'}],
-  [{home:'利兹联',away:'埃弗顿'},{home:'布莱顿',away:'曼联'},{home:'布伦特福德',away:'水晶宫'},{home:'阿森纳',away:'伊普斯维奇镇'},{home:'桑德兰',away:'赫尔城'},{home:'利物浦',away:'考文垂城'},{home:'诺丁汉森林',away:'富勒姆'},{home:'伯恩茅斯',away:'阿斯顿维拉'},{home:'切尔西',away:'纽卡斯尔联'},{home:'曼城',away:'热刺'}],
-  [{home:'阿森纳',away:'布伦特福德'},{home:'布莱顿',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'赫尔城'},{home:'埃弗顿',away:'阿斯顿维拉'},{home:'桑德兰',away:'利物浦'},{home:'富勒姆',away:'热刺'},{home:'水晶宫',away:'切尔西'},{home:'伊普斯维奇镇',away:'考文垂城'},{home:'利兹联',away:'曼城'},{home:'曼联',away:'纽卡斯尔联'}],
-  [{home:'伯恩茅斯',away:'伊普斯维奇镇'},{home:'曼城',away:'诺丁汉森林'},{home:'切尔西',away:'桑德兰'},{home:'布伦特福德',away:'布莱顿'},{home:'阿斯顿维拉',away:'曼联'},{home:'热刺',away:'利兹联'},{home:'考文垂城',away:'埃弗顿'},{home:'利物浦',away:'水晶宫'},{home:'赫尔城',away:'阿森纳'},{home:'纽卡斯尔联',away:'富勒姆'}],
-  [{home:'伊普斯维奇镇',away:'赫尔城'},{home:'埃弗顿',away:'布伦特福德'},{home:'桑德兰',away:'考文垂城'},{home:'诺丁汉森林',away:'伯恩茅斯'},{home:'阿森纳',away:'纽卡斯尔联'},{home:'利兹联',away:'切尔西'},{home:'富勒姆',away:'阿斯顿维拉'},{home:'曼联',away:'利物浦'},{home:'布莱顿',away:'曼城'},{home:'水晶宫',away:'热刺'}],
-  [{home:'热刺',away:'桑德兰'},{home:'布伦特福德',away:'曼联'},{home:'纽卡斯尔联',away:'布莱顿'},{home:'赫尔城',away:'水晶宫'},{home:'考文垂城',away:'利兹联'},{home:'伯恩茅斯',away:'富勒姆'},{home:'切尔西',away:'诺丁汉森林'},{home:'利物浦',away:'埃弗顿'},{home:'曼城',away:'阿森纳'},{home:'阿斯顿维拉',away:'伊普斯维奇镇'}],
-  [{home:'阿森纳',away:'利物浦'},{home:'布莱顿',away:'赫尔城'},{home:'桑德兰',away:'阿斯顿维拉'},{home:'水晶宫',away:'考文垂城'},{home:'伊普斯维奇镇',away:'热刺'},{home:'埃弗顿',away:'纽卡斯尔联'},{home:'富勒姆',away:'曼城'},{home:'利兹联',away:'伯恩茅斯'},{home:'曼联',away:'切尔西'},{home:'诺丁汉森林',away:'布伦特福德'}],
-  [{home:'埃弗顿',away:'利兹联'},{home:'考文垂城',away:'利物浦'},{home:'赫尔城',away:'桑德兰'},{home:'阿斯顿维拉',away:'伯恩茅斯'},{home:'水晶宫',away:'布伦特福德'},{home:'纽卡斯尔联',away:'切尔西'},{home:'富勒姆',away:'诺丁汉森林'},{home:'热刺',away:'曼城'},{home:'曼联',away:'布莱顿'},{home:'伊普斯维奇镇',away:'阿森纳'}],
-  [{home:'曼城',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'水晶宫'},{home:'布伦特福德',away:'考文垂城'},{home:'切尔西',away:'伊普斯维奇镇'},{home:'利物浦',away:'赫尔城'},{home:'阿森纳',away:'富勒姆'},{home:'诺丁汉森林',away:'曼联'},{home:'布莱顿',away:'热刺'},{home:'桑德兰',away:'埃弗顿'},{home:'利兹联',away:'阿斯顿维拉'}],
-  [{home:'水晶宫',away:'桑德兰'},{home:'曼联',away:'阿森纳'},{home:'伊普斯维奇镇',away:'布莱顿'},{home:'考文垂城',away:'伯恩茅斯'},{home:'埃弗顿',away:'诺丁汉森林'},{home:'富勒姆',away:'利兹联'},{home:'阿斯顿维拉',away:'切尔西'},{home:'热刺',away:'利物浦'},{home:'纽卡斯尔联',away:'布伦特福德'},{home:'赫尔城',away:'曼城'}],
-  [{home:'诺丁汉森林',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'热刺'},{home:'曼城',away:'埃弗顿'},{home:'阿森纳',away:'水晶宫'},{home:'利兹联',away:'赫尔城'},{home:'桑德兰',away:'曼联'},{home:'利物浦',away:'阿斯顿维拉'},{home:'布莱顿',away:'富勒姆'},{home:'布伦特福德',away:'伊普斯维奇镇'},{home:'切尔西',away:'考文垂城'}],
-  [{home:'利兹联',away:'布莱顿'},{home:'热刺',away:'诺丁汉森林'},{home:'水晶宫',away:'富勒姆'},{home:'利物浦',away:'伊普斯维奇镇'},{home:'考文垂城',away:'曼城'},{home:'伯恩茅斯',away:'纽卡斯尔联'},{home:'切尔西',away:'阿森纳'},{home:'阿斯顿维拉',away:'赫尔城'},{home:'曼联',away:'埃弗顿'},{home:'桑德兰',away:'布伦特福德'}],
-  [{home:'布伦特福德',away:'伯恩茅斯'},{home:'布莱顿',away:'考文垂城'},{home:'曼城',away:'曼联'},{home:'伊普斯维奇镇',away:'水晶宫'},{home:'阿森纳',away:'桑德兰'},{home:'富勒姆',away:'利物浦'},{home:'赫尔城',away:'切尔西'},{home:'诺丁汉森林',away:'阿斯顿维拉'},{home:'埃弗顿',away:'热刺'},{home:'纽卡斯尔联',away:'利兹联'}],
-  [{home:'桑德兰',away:'伊普斯维奇镇'},{home:'利兹联',away:'诺丁汉森林'},{home:'曼联',away:'赫尔城'},{home:'切尔西',away:'富勒姆'},{home:'利物浦',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿森纳'},{home:'伯恩茅斯',away:'曼城'},{home:'水晶宫',away:'埃弗顿'},{home:'热刺',away:'布伦特福德'},{home:'阿斯顿维拉',away:'布莱顿'}],
-  [{home:'布莱顿',away:'切尔西'},{home:'富勒姆',away:'桑德兰'},{home:'布伦特福德',away:'利兹联'},{home:'诺丁汉森林',away:'利物浦'},{home:'赫尔城',away:'考文垂城'},{home:'阿森纳',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'曼联'},{home:'曼城',away:'水晶宫'},{home:'纽卡斯尔联',away:'热刺'},{home:'埃弗顿',away:'伯恩茅斯'}],
-  [{home:'切尔西',away:'曼城'},{home:'伯恩茅斯',away:'阿森纳'},{home:'热刺',away:'赫尔城'},{home:'曼联',away:'水晶宫'},{home:'埃弗顿',away:'布莱顿'},{home:'诺丁汉森林',away:'桑德兰'},{home:'纽卡斯尔联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'考文垂城'},{home:'布伦特福德',away:'富勒姆'},{home:'利兹联',away:'利物浦'}],
-  [{home:'桑德兰',away:'纽卡斯尔联'},{home:'布莱顿',away:'诺丁汉森林'},{home:'考文垂城',away:'曼联'},{home:'赫尔城',away:'伯恩茅斯'},{home:'曼城',away:'布伦特福德'},{home:'富勒姆',away:'埃弗顿'},{home:'利物浦',away:'切尔西'},{home:'阿森纳',away:'热刺'},{home:'水晶宫',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'利兹联'}],
-  [{home:'曼城',away:'利物浦'},{home:'利兹联',away:'阿森纳'},{home:'富勒姆',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'水晶宫'},{home:'布伦特福德',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'考文垂城'},{home:'布莱顿',away:'桑德兰'},{home:'热刺',away:'切尔西'},{home:'埃弗顿',away:'赫尔城'},{home:'伯恩茅斯',away:'曼联'}],
-  [{home:'赫尔城',away:'富勒姆'},{home:'曼联',away:'利兹联'},{home:'水晶宫',away:'布莱顿'},{home:'阿斯顿维拉',away:'纽卡斯尔联'},{home:'切尔西',away:'埃弗顿'},{home:'考文垂城',away:'热刺'},{home:'桑德兰',away:'伯恩茅斯'},{home:'利物浦',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'曼城'},{home:'阿森纳',away:'诺丁汉森林'}],
-  [{home:'布伦特福德',away:'赫尔城'},{home:'纽卡斯尔联',away:'水晶宫'},{home:'热刺',away:'曼联'},{home:'利兹联',away:'桑德兰'},{home:'布莱顿',away:'利物浦'},{home:'诺丁汉森林',away:'伊普斯维奇镇'},{home:'伯恩茅斯',away:'切尔西'},{home:'富勒姆',away:'考文垂城'},{home:'埃弗顿',away:'阿森纳'},{home:'曼城',away:'阿斯顿维拉'}],
-  [{home:'伊普斯维奇镇',away:'埃弗顿'},{home:'阿森纳',away:'布莱顿'},{home:'利物浦',away:'伯恩茅斯'},{home:'考文垂城',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'热刺'},{home:'赫尔城',away:'纽卡斯尔联'},{home:'曼联',away:'富勒姆'},{home:'桑德兰',away:'曼城'},{home:'切尔西',away:'布伦特福德'},{home:'水晶宫',away:'利兹联'}]
-];
+    /* ========================================================
+       0. 常量
+    ======================================================== */
+    const EXPECTED_SKILL_VERSION = '2.1.0';
+    const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+    const GROQ_MODEL = 'openai/gpt-oss-120b';
 
-    const RESULTS = {
-  '1':{'阿森纳|考文垂城':[3,0],'赫尔城|曼联':[2,0],'伊普斯维奇镇|桑德兰':[2,1],'诺丁汉森林|利兹联':[0,1],'埃弗顿|水晶宫':[2,0],'布伦特福德|热刺':[3,0],'曼城|伯恩茅斯':[2,1],'布莱顿|阿斯顿维拉':[4,0],'纽卡斯尔联|利物浦':[2,2],'富勒姆|切尔西':[2,3]},
-  '2':{'水晶宫|曼城':[1,4],'利物浦|诺丁汉森林':[2,2],'伯恩茅斯|埃弗顿':[1,1],'考文垂城|赫尔城':[0,1],'热刺|纽卡斯尔联':[0,2],'桑德兰|富勒姆':[1,0],'切尔西|布莱顿':[4,3],'利兹联|布伦特福德':[1,1],'曼联|伊普斯维奇镇':[5,2],'阿斯顿维拉|阿森纳':[0,1]},
-  '3':{'伊普斯维奇镇|利物浦':[0,2],'纽卡斯尔联|伯恩茅斯':[2,2],'诺丁汉森林|热刺':[0,0],'曼城|考文垂城':[1,0],'布莱顿|利兹联':[1,1],'布伦特福德|桑德兰':[1,1],'富勒姆|水晶宫':[2,3],'赫尔城|阿斯顿维拉':[0,0],'埃弗顿|曼联':[2,2],'阿森纳|切尔西':[2,1]},
-  '4':{'水晶宫|伊普斯维奇镇':[2,3],'利物浦|富勒姆':[0,0],'阿斯顿维拉|诺丁汉森林':[1,2],'伯恩茅斯|布伦特福德':[2,2],'切尔西|赫尔城':[2,2],'热刺|埃弗顿':[0,0],'桑德兰|阿森纳':[0,2],'考文垂城|布莱顿':[0,5],'曼联|曼城':[0,1],'利兹联|纽卡斯尔联':[4,1]},
-  '5':{'布伦特福德|切尔西':[3,0],'热刺|阿斯顿维拉':[2,3],'埃弗顿|伊普斯维奇镇':[1,0],'布莱顿|阿森纳':[3,0],'纽卡斯尔联|赫尔城':[2,1],'诺丁汉森林|考文垂城':[0,1],'伯恩茅斯|利物浦':[0,1],'利兹联|水晶宫':[0,0],'曼城|桑德兰':[5,3],'富勒姆|曼联':[1,1]},
-  '6':{'阿森纳|利兹联':[2,1],'桑德兰|布莱顿':[0,2],'切尔西|伯恩茅斯':[5,1],'伊普斯维奇镇|富勒姆':[2,1],'阿斯顿维拉|布伦特福德':[2,2],'曼联|热刺':[1,1],'赫尔城|埃弗顿':[2,2],'水晶宫|诺丁汉森林':[3,1],'利物浦|曼城':[0,3],'考文垂城|纽卡斯尔联':[4,1]}
-};
-
-    const STATIC_STANDINGS=[
-  {rank:1,team:'曼城',played:6,won:6,drawn:0,lost:0,gf:16,ga:5,gd:11,points:18},
-  {rank:2,team:'阿森纳',played:6,won:5,drawn:0,lost:1,gf:10,ga:5,gd:5,points:15},
-  {rank:3,team:'布莱顿',played:6,won:4,drawn:1,lost:1,gf:18,ga:5,gd:13,points:13},
-  {rank:4,team:'布伦特福德',played:6,won:2,drawn:4,lost:0,gf:12,ga:6,gd:6,points:10},
-  {rank:5,team:'埃弗顿',played:6,won:2,drawn:4,lost:0,gf:8,ga:5,gd:3,points:10},
-  {rank:6,team:'切尔西',played:6,won:3,drawn:1,lost:2,gf:15,ga:13,gd:2,points:10},
-  {rank:7,team:'利兹联',played:6,won:2,drawn:3,lost:1,gf:8,ga:5,gd:3,points:9},
-  {rank:8,team:'赫尔城',played:6,won:2,drawn:3,lost:1,gf:8,ga:6,gd:2,points:9},
-  {rank:9,team:'利物浦',played:6,won:2,drawn:3,lost:1,gf:7,ga:7,gd:0,points:9},
-  {rank:10,team:'伊普斯维奇镇',played:6,won:3,drawn:0,lost:3,gf:9,ga:12,gd:-3,points:9},
-  {rank:11,team:'纽卡斯尔联',played:6,won:2,drawn:2,lost:2,gf:10,ga:13,gd:-3,points:8},
-  {rank:12,team:'水晶宫',played:6,won:2,drawn:1,lost:3,gf:9,ga:12,gd:-3,points:7},
-  {rank:13,team:'曼联',played:6,won:1,drawn:3,lost:2,gf:9,ga:9,gd:0,points:6},
-  {rank:14,team:'考文垂城',played:6,won:2,drawn:0,lost:4,gf:5,ga:11,gd:-6,points:6},
-  {rank:15,team:'诺丁汉森林',played:6,won:1,drawn:2,lost:3,gf:5,ga:8,gd:-3,points:5},
-  {rank:16,team:'阿斯顿维拉',played:6,won:1,drawn:2,lost:3,gf:6,ga:11,gd:-5,points:5},
-  {rank:17,team:'桑德兰',played:6,won:1,drawn:1,lost:4,gf:6,ga:12,gd:-6,points:4},
-  {rank:18,team:'伯恩茅斯',played:6,won:0,drawn:3,lost:3,gf:7,ga:13,gd:-6,points:3},
-  {rank:19,team:'热刺',played:6,won:0,drawn:3,lost:3,gf:3,ga:9,gd:-6,points:3},
-  {rank:20,team:'富勒姆',played:6,won:0,drawn:2,lost:4,gf:6,ga:10,gd:-4,points:2}
-];
-
-    const ABBR={'阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','阿斯顿维拉':'AVL','纽卡斯尔联':'NEW','曼联':'MUN','布莱顿':'BHA','水晶宫':'CRY','埃弗顿':'EVE','富勒姆':'FUL','布伦特福德':'BRE','诺丁汉森林':'NFO','伯恩茅斯':'BOU','利兹联':'LEE','桑德兰':'SUN','考文垂城':'COV','赫尔城':'HUL','伊普斯维奇镇':'IPS'};
-    const ESPN_IDS={'阿森纳':359,'曼城':382,'利物浦':364,'切尔西':363,'热刺':367,'曼联':360,'纽卡斯尔联':361,'阿斯顿维拉':362,'布莱顿':331,'埃弗顿':368,'富勒姆':370,'水晶宫':384,'布伦特福德':337,'伯恩茅斯':349,'诺丁汉森林':393,'利兹联':357,'桑德兰':366,'考文垂城':388,'赫尔城':306,'伊普斯维奇镇':373};
-
-    /* ============ 工具 ============ */
-    function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-    function getAbbr(name){return ABBR[name]||(name?name.slice(0,3).toUpperCase():'??');}
-    function confClass(c){const m={'高':'high','中高':'midhigh','中':'mid','低':'low'};return m[c]||'low';}
-    function parseScore(raw){const s=String(raw||'0-0').replace(/[–—:：]/g,'-').trim();const parts=s.split('-').map(x=>String(x).trim().replace(/[^\d]/g,''));return{home:parts[0]||'0',away:parts[1]||'0'};}
-    function toValidGoal(v){const n=Number(v);if(!isFinite(n)||n<0)return 0;return Math.min(Math.floor(n),20);}
-    function getResult(roundIdx,home,away){const r=RESULTS[String(roundIdx+1)];if(!r)return null;const val=r[home+'|'+away];if(!val)return null;return{home:val[0],away:val[1]};}
-    function outcomeSign(h,a){return h>a?'H':(h<a?'A':'D');}
-    function judgePrediction(pH,pA,aH,aA){if(pH===aH&&pA===aA)return'exact';if(outcomeSign(pH,pA)===outcomeSign(aH,aA))return'outcome';return'miss';}
-    function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-
-    /* ============ DOM ============ */
-    const els={home:document.getElementById('home'),away:document.getElementById('away'),round:document.getElementById('round'),intel:document.getElementById('intel'),provider:document.getElementById('provider'),apiKey:document.getElementById('apiKey'),predictBtn:document.getElementById('predictBtn'),status:document.getElementById('status'),result:document.getElementById('result'),roundSelect:document.getElementById('roundSelect'),matchSelect:document.getElementById('matchSelect')};
-    const SK={home:'epl_home',away:'epl_away',round:'epl_round',intel:'epl_intel',provider:'epl_provider',apiKey:'epl_apikey',roundSel:'epl_roundSel',matchSel:'epl_matchSel'};
-
-    FIXTURES.forEach((_,i)=>{const o=document.createElement('option');o.value=i;o.textContent='第 '+(i+1)+' 轮';els.roundSelect.appendChild(o);});
-
-    function updateMatchList(){
-        const r=Number(els.roundSelect.value);els.matchSelect.innerHTML='';
-        const round=FIXTURES[r]||[];
-        round.forEach((m,i)=>{
-            const o=document.createElement('option');o.value=i;
-            const hasResult=RESULTS[String(r+1)]&&RESULTS[String(r+1)][m.home+'|'+m.away];
-            o.textContent=m.home+'  vs  '+m.away+(hasResult?'  ·  已完赛':'');
-            els.matchSelect.appendChild(o);
-        });
-        applySelection();
-    }
-    function applySelection(){
-        const r=Number(els.roundSelect.value);const m=Number(els.matchSelect.value);
-        const round=FIXTURES[r]||[];const match=round[m];if(!match)return;
-        els.home.value=match.home;els.away.value=match.away;els.round.value='第'+(r+1)+'轮';
-        Object.entries({[SK.home]:els.home.value,[SK.away]:els.away.value,[SK.round]:els.round.value,[SK.roundSel]:els.roundSelect.value,[SK.matchSel]:els.matchSelect.value}).forEach(([k,v])=>localStorage.setItem(k,v));
-    }
-    els.roundSelect.addEventListener('change',()=>{updateMatchList();applySelection();});
-    els.matchSelect.addEventListener('change',applySelection);
-
-    ['home','away','round','intel','provider','apiKey'].forEach(k=>{const v=localStorage.getItem(SK[k]);if(v)els[k].value=v;});
-    const sr=localStorage.getItem(SK.roundSel);const sm=localStorage.getItem(SK.matchSel);
-    if(sr!==null)els.roundSelect.value=sr;else els.roundSelect.value=0;
-    updateMatchList();
-    if(sm!==null){els.matchSelect.value=sm;applySelection();}
-    ['home','away','round','intel','provider','apiKey'].forEach(k=>{els[k].addEventListener('change',()=>localStorage.setItem(SK[k],els[k].value));});
-
-    document.getElementById('keyToggle').addEventListener('click',()=>{
-        const isPwd=els.apiKey.type==='password';
-        els.apiKey.type=isPwd?'text':'password';
-        document.getElementById('keyToggle').textContent=isPwd?'🙈':'👁';
-    });
-
-    const backTop=document.getElementById('backTop');
-    window.addEventListener('scroll',()=>{if(window.scrollY>400)backTop.classList.add('show');else backTop.classList.remove('show');},{passive:true});
-    backTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-    document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();els.predictBtn.click();}});
-
-    /* ============ skill.md 加载 ============ */
-    let skillCache=null;
-    async function loadSkill(){
-        if(skillCache)return skillCache;
-        const controller=new AbortController();
-        const timeoutId=setTimeout(()=>controller.abort(),10000);
-        try{
-            const r=await fetch('./skill.md',{cache:'no-cache',signal:controller.signal});
-            clearTimeout(timeoutId);
-            if(!r.ok)throw new Error('无法加载 skill.md（HTTP '+r.status+'）。请确认文件在仓库根目录，并已添加 .nojekyll 文件。');
-            skillCache=await r.text();return skillCache;
-        }catch(e){
-            clearTimeout(timeoutId);
-            if(e.name==='AbortError')throw new Error('加载 skill.md 超时（10 秒）');
-            throw e;
-        }
-    }
-
-    /* ============ API 配置 ============ */
-    const apiConfig={
-        groq:{endpoint:'https://api.groq.com/openai/v1/chat/completions',model:'openai/gpt-oss-120b',name:'Groq'},
-        openrouter:{endpoint:'https://openrouter.ai/api/v1/chat/completions',model:'meta-llama/llama-3.3-70b-instruct:free',name:'OpenRouter'}
+    const ABBR = {
+        '阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','曼联':'MUN',
+        '纽卡斯尔联':'NEW','阿斯顿维拉':'AVL','布莱顿':'BHA','埃弗顿':'EVE','富勒姆':'FUL',
+        '水晶宫':'CRY','布伦特福德':'BRE','伯恩茅斯':'BOU','诺丁汉森林':'NFO','利兹联':'LEE',
+        '桑德兰':'SUN','考文垂城':'COV','赫尔城':'HUL','伊普斯维奇镇':'IPS'
+    };
+    const ESPN_IDS = {
+        '阿森纳':359,'曼城':382,'利物浦':364,'切尔西':363,'热刺':367,'曼联':360,
+        '纽卡斯尔联':361,'阿斯顿维拉':362,'布莱顿':331,'埃弗顿':368,'富勒姆':370,
+        '水晶宫':384,'布伦特福德':337,'伯恩茅斯':349,'诺丁汉森林':393,'利兹联':357,
+        '桑德兰':366,'考文垂城':388,'赫尔城':306,'伊普斯维奇镇':373
     };
 
-    /* ============ 核心：runPrediction ============ */
-    async function runPrediction(home,away,roundStr,intel,apiKey,provider){
-        const cfg=apiConfig[provider];
-        if(!cfg)throw new Error('未知 API 提供商');
-        const skill=await loadSkill();
-        const userMsg=`【今日情报】\n${intel||'（今日无新增情报）'}\n\n【预测指令】\n请预测：${home} vs ${away}，英超 2026-27 ${roundStr}。\n严格遵守 skill.md，只输出纯 json 对象，不要任何额外文字。`;
-        let attempt=0;const maxAttempts=3;let res=null;const fallbackWait=[3,6];
-        while(attempt<maxAttempts){
-            res=await fetch(cfg.endpoint,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model:cfg.model,messages:[{role:'system',content:skill},{role:'user',content:userMsg}],temperature:0.7,response_format:{type:'json_object'}})});
-            if(res.status===429&&attempt<maxAttempts-1){
-                const retryAfter=res.headers.get('retry-after');
-                let wait=retryAfter?parseFloat(retryAfter):fallbackWait[attempt];
-                if(!isFinite(wait)||wait<=0)wait=fallbackWait[attempt]||6;
-                wait=Math.min(Math.max(wait,2),15);
-                await sleep(wait*1000);
-                attempt++;
+    // 20 队真实 2026-27 英超（football-data.org 会覆盖）
+    const TEAMS = ['阿森纳','曼城','利物浦','切尔西','热刺','曼联','纽卡斯尔联','阿斯顿维拉',
+        '布莱顿','埃弗顿','富勒姆','水晶宫','布伦特福德','伯恩茅斯','诺丁汉森林',
+        '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
+
+    /* ========================================================
+       1. 赛程生成（38 轮 380 场）—— update.js / Actions 会替换
+          若使用云端自动更新，下面 FIXTURES 会被覆盖
+    ======================================================== */
+    const FIXTURES = (function(){
+        const out = [];
+        const n = TEAMS.length;
+        const idx = [...Array(n).keys()];
+        for (let r = 0; r < n - 1; r++) {
+            const round = [];
+            for (let i = 0; i < n / 2; i++) {
+                const home = idx[i], away = idx[n - 1 - i];
+                round.push(r % 2 === 0
+                    ? { home: TEAMS[home], away: TEAMS[away] }
+                    : { home: TEAMS[away], away: TEAMS[home] });
+            }
+            out.push(round);
+            idx.splice(1, 0, idx.pop());
+        }
+        const second = out.map(rd => rd.map(m => ({ home: m.away, away: m.home })));
+        return [...out, ...second];
+    })();
+
+    // RESULTS: { "阿森纳|考文垂城": "3-0", ... }
+    const RESULTS = {};
+
+    // 初始积分榜（会被 update.js 覆盖）
+    const STATIC_STANDINGS = TEAMS.map((t,i) => ({
+        team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0
+    }));
+
+    /* ========================================================
+       2. 补丁3：校验 + 归一化
+    ======================================================== */
+    function validateAndNormalizePrediction(raw) {
+        const errors = [], warnings = [];
+        const data = JSON.parse(JSON.stringify(raw));
+
+        const required = ['homeWin','draw','awayWin','score','confidence','keyFactors','analysis'];
+        for (const k of required) {
+            if (data[k] === undefined || data[k] === null) errors.push(`缺少字段：${k}`);
+        }
+        if (errors.length) return { ok:false, errors, warnings, data };
+
+        let h = Number(data.homeWin), d = Number(data.draw), a = Number(data.awayWin);
+        if (![h,d,a].every(Number.isFinite)) {
+            errors.push('概率字段不是数字');
+            return { ok:false, errors, warnings, data };
+        }
+
+        const sum = h + d + a;
+        const diff = Math.abs(sum - 100);
+
+        if (diff > 2) {
+            warnings.push(`概率总和 ${sum}，偏差 ${diff.toFixed(1)} > 2，判定为无效`);
+            return { ok:false, errors, warnings, data, hardFail:true };
+        }
+
+        if (diff > 0) {
+            const f = 100 / sum;
+            const r = [Math.round(h*f*100), Math.round(d*f*100), Math.round(a*f*100)];
+            const delta = 10000 - (r[0]+r[1]+r[2]);
+            r[0] += delta;
+            data.homeWin = r[0]/100; data.draw = r[1]/100; data.awayWin = r[2]/100;
+            warnings.push(`概率已归一化：原总和 ${sum}`);
+        }
+
+        if (!Array.isArray(data.keyFactors)) warnings.push('keyFactors 不是数组');
+        if (data.headToHead && typeof data.headToHead === 'object') {
+            const note = data.headToHead.note;
+            if (note && !['估算','资料库','今日情报'].includes(note)) {
+                warnings.push(`headToHead.note 非法值：${note}`);
+            }
+            if (!Array.isArray(data.headToHead.lastMatches)) warnings.push('headToHead.lastMatches 不是数组');
+        } else {
+            warnings.push('headToHead 缺失');
+        }
+
+        return { ok:true, errors, warnings, data };
+    }
+
+    /* ========================================================
+       3. Toast
+    ======================================================== */
+    function toast(msg, kind='ok') {
+        const el = document.createElement('div');
+        el.className = 'toast ' + kind;
+        el.textContent = msg;
+        document.getElementById('toastWrap').appendChild(el);
+        setTimeout(() => el.remove(), 3200);
+    }
+
+    /* ========================================================
+       4. API Key
+    ======================================================== */
+    function saveKey(){
+        const k = document.getElementById('apiKey').value.trim();
+        if (!k) return toast('请输入 API Key', 'warn');
+        localStorage.setItem('groq_key', k);
+        toast('已保存 API Key');
+    }
+    function clearKey(){
+        localStorage.removeItem('groq_key');
+        document.getElementById('apiKey').value = '';
+        toast('已清除 API Key', 'warn');
+    }
+    function getKey(){
+        return localStorage.getItem('groq_key') || '';
+    }
+
+    /* ========================================================
+       5. skill.md 加载（补丁2）
+    ======================================================== */
+    let _skillCache = null;
+    async function loadSkill(){
+        if (_skillCache) return _skillCache;
+        const res = await fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' });
+        if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
+        const text = await res.text();
+
+        const vm = text.match(/v(\d+\.\d+\.\d+)/);
+        const actualVersion = vm ? vm[1] : null;
+        if (actualVersion !== EXPECTED_SKILL_VERSION) {
+            console.warn(`⚠️ skill.md 版本不符\n期望：${EXPECTED_SKILL_VERSION}\n实际：${actualVersion ?? '未找到'}`);
+            const bar = document.createElement('div');
+            bar.className = 'verbar';
+            bar.textContent = `⚠️ skill.md 版本不符（期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}）`;
+            document.body.appendChild(bar);
+        }
+        _skillCache = text;
+        return text;
+    }
+
+    /* ========================================================
+       6. Groq 调用（带 429 重试）
+    ======================================================== */
+    async function callGroq(systemPrompt, userPrompt, maxRetry = 3) {
+        const key = getKey();
+        if (!key) throw new Error('未设置 API Key');
+
+        let delay = 1500;
+        for (let attempt = 0; attempt <= maxRetry; attempt++) {
+            const resp = await fetch(GROQ_URL, {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+                body: JSON.stringify({
+                    model: GROQ_MODEL,
+                    messages: [
+                        { role:'system', content: systemPrompt },
+                        { role:'user',   content: userPrompt }
+                    ],
+                    temperature: 0.2,
+                    response_format: { type: 'json_object' }
+                })
+            });
+            if (resp.status === 429 && attempt < maxRetry) {
+                await new Promise(r => setTimeout(r, delay));
+                delay *= 2;
                 continue;
             }
-            break;
+            if (!resp.ok) {
+                const txt = await resp.text();
+                throw new Error(`Groq ${resp.status}: ${txt.slice(0,180)}`);
+            }
+            const j = await resp.json();
+            return j.choices?.[0]?.message?.content || '';
         }
-        if(!res.ok)throw new Error(cfg.name+' API 错误 '+res.status+'\n'+await res.text());
-        const data=await res.json();
-        const content=data.choices?.[0]?.message?.content||'';
-        try{return JSON.parse(content);}catch(e){throw new Error('模型未返回合法 JSON：\n'+content);}
+        throw new Error('Groq 重试耗尽');
     }
 
-    /* ============ 加载动画 ============ */
-    function showSkeleton(){
-        els.result.innerHTML=`
-    <div style="padding:80px 20px;text-align:center">
-      <div class="soccer-loader"><div class="ball"></div></div>
-      <div style="margin-top:32px;font-size:13px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase">Analyzing Match</div>
-      <div style="margin-top:10px;font-size:11.5px;color:var(--text-4);font-family:Georgia,serif;font-style:italic">正在读取资料库与今日情报…</div>
-    </div>`;
+    /* ========================================================
+       7. 轮次 / 比赛选择器
+    ======================================================== */
+    function initSelectors(){
+        const rs = document.getElementById('roundSel');
+        rs.innerHTML = FIXTURES.map((_,i) => `<option value="${i}">第 ${i+1} 轮</option>`).join('');
+        const saved = localStorage.getItem('last_round');
+        if (saved !== null && FIXTURES[+saved]) rs.value = saved;
+        rs.addEventListener('change', () => {
+            localStorage.setItem('last_round', rs.value);
+            fillMatches();
+        });
+        fillMatches();
+    }
+    function fillMatches(){
+        const r = +document.getElementById('roundSel').value || 0;
+        const ms = document.getElementById('matchSel');
+        ms.innerHTML = FIXTURES[r].map((m,i) =>
+            `<option value="${i}">${m.home} vs ${m.away}</option>`).join('');
+        const saved = localStorage.getItem('last_match_'+r);
+        if (saved !== null && FIXTURES[r][+saved]) ms.value = saved;
+        ms.addEventListener('change', () => localStorage.setItem('last_match_'+r, ms.value), { once:true });
+    }
+    function currentMatch(){
+        const r = +document.getElementById('roundSel').value || 0;
+        const i = +document.getElementById('matchSel').value || 0;
+        return { round: r, ...FIXTURES[r][i] };
     }
 
-    /* ============ 渲染子模块 ============ */
-    function crestHTML(name){
-        const abbr=getAbbr(name);const id=ESPN_IDS[name];
-        if(id){const url='https://a.espncdn.com/i/teamlogos/soccer/500/'+id+'.png';return `<div class="team-crest"><img src="${url}" alt="${esc(name)}" loading="lazy" onerror="this.parentNode.innerHTML='<span class=fb>${esc(abbr)}</span>'"></div>`;}
-        return `<div class="team-crest"><span class="fb">${esc(abbr)}</span></div>`;
-    }
+    /* ========================================================
+       8. 预测流程
+    ======================================================== */
+    async function startPredict(){
+        const btn = document.getElementById('predictBtn');
+        const { round, home, away } = currentMatch();
+        const intel = document.getElementById('intel').value.trim();
 
-    function renderH2H(h){
-        if(!h)return'';
-        const note=h.note||'估算';
-        const noteClass=['估算','资料库','今日情报'].includes(note)?note:'估算';
-        const rawSummary=(h.summary&&h.summary.trim()!=='资料库无记录')?h.summary:'';
-        const summaryText=rawSummary.slice(0,80);
-        const summary=summaryText?`<div class="h2h-summary">${esc(summaryText)}</div>`:'';
-        const hasMatches=h.lastMatches&&h.lastMatches.length>0;
-        const list=hasMatches?`<ul class="h2h-list">${h.lastMatches.slice(0,3).map((m,i)=>`<li><span class="idx">${i+1}</span><span class="txt">${esc(m)}</span></li>`).join('')}</ul>`:'';
-        const content=(summary||list)?(summary+list):'<div class="h2h-empty">资料库无记录</div>';
-        return `<div class="section"><div class="section-label">历史交锋</div><div class="h2h"><div class="h2h-head"><div class="t">H2H Records</div><div class="h2h-tag ${noteClass}">${esc(note)}</div></div>${content}</div></div>`;
-    }
+        if (!getKey()) return toast('请先填 Groq API Key', 'warn');
 
-    function renderKeyPlayers(kp){
-        if(!kp||(!kp.home?.length&&!kp.away?.length))return'';
-        const renderSide=(players,label,sideClass)=>{
-            if(!players||!players.length)return `<div class="kp-side"><div class="kp-side-title">${label}</div><div class="kp-empty">资料库无球员记录</div></div>`;
-            return `<div class="kp-side"><div class="kp-side-title">${label}</div>${players.slice(0,3).map(p=>`
-      <div class="kp-player ${sideClass}">
-        <div class="kp-rating">${esc(String(p.rating||'—'))}</div>
-        <div class="kp-info"><div class="kp-name">${esc(p.name||'')}</div><div class="kp-meta">${esc(p.position||'')}</div></div>
-        ${p.note?`<div class="kp-note">${esc(p.note).slice(0,12)}</div>`:''}
-      </div>`).join('')}</div>`;
-        };
-        return `<div class="section"><div class="section-label">本场焦点球员</div><div class="kp-grid">${renderSide(kp.home,'主队','home-side')}${renderSide(kp.away,'客队','away-side')}</div></div>`;
-    }
-
-    function render(d,roundIdx,homeInput,awayInput){
-        const p=d.probabilities||{};
-        const hw=Number(p.homeWin)||0;const dr=Number(p.draw)||0;const aw=Number(p.awayWin)||0;
-        const homeName=d.match?.home||homeInput;const awayName=d.match?.away||awayInput;
-        const {home:predHome,away:predAway}=parseScore(d.predictedScore);
-        const actual=getResult(roundIdx,homeName,awayName);
-        let verdictKind=null,verdictLabel='',verdictIcon='';
-        if(actual){
-            verdictKind=judgePrediction(Number(predHome),Number(predAway),actual.home,actual.away);
-            if(verdictKind==='exact'){verdictLabel='精确命中';verdictIcon='✓';}
-            else if(verdictKind==='outcome'){verdictLabel='胜平负命中';verdictIcon='◐';}
-            else{verdictLabel='未命中';verdictIcon='✕';}
-        }
-        const list=(a)=>(!a||!a.length)?'<li class="muted">无</li>':a.map(x=>'<li>'+esc(x)+'</li>').join('');
-        const rawJson=JSON.stringify(d,null,2);
-        const cardCls=actual?'score-card finished':'score-card';
-
-        const C=2*Math.PI*70;
-        const seg1=(hw/100)*C;const seg2=(dr/100)*C;const seg3=(aw/100)*C;
-        const probRing=`
-    <div class="prob-ring-wrap">
-      <div class="prob-ring">
-        <svg width="180" height="180" viewBox="0 0 180 180">
-          <circle cx="90" cy="90" r="70" fill="none" stroke="#1a1a1a" stroke-width="14"/>
-          <circle cx="90" cy="90" r="70" fill="none" stroke="#ff6b35" stroke-width="14" stroke-dasharray="${seg1} ${C-seg1}" stroke-dashoffset="0" stroke-linecap="butt">
-            <animate attributeName="stroke-dasharray" from="0 ${C}" to="${seg1} ${C-seg1}" dur="0.9s" fill="freeze"/>
-          </circle>
-          <circle cx="90" cy="90" r="70" fill="none" stroke="#5a5a5a" stroke-width="14" stroke-dasharray="${seg2} ${C-seg2}" stroke-dashoffset="${-seg1}" stroke-linecap="butt">
-            <animate attributeName="stroke-dasharray" from="0 ${C}" to="${seg2} ${C-seg2}" dur="0.9s" begin="0.1s" fill="freeze"/>
-          </circle>
-          <circle cx="90" cy="90" r="70" fill="none" stroke="#60a5fa" stroke-width="14" stroke-dasharray="${seg3} ${C-seg3}" stroke-dashoffset="${-(seg1+seg2)}" stroke-linecap="butt">
-            <animate attributeName="stroke-dasharray" from="0 ${C}" to="${seg3} ${C-seg3}" dur="0.9s" begin="0.2s" fill="freeze"/>
-          </circle>
-        </svg>
-        <div class="center">
-          <div class="score">${esc(predHome)}–${esc(predAway)}</div>
-          <div class="label">AI 预测</div>
-        </div>
-      </div>
-      <div class="prob-legend">
-        <div class="row"><span class="dot home"></span><span class="name">${esc(homeName)} 胜</span><span class="pct">${hw}<span style="font-size:13px;color:var(--text-3)">%</span></span></div>
-        <div class="row"><span class="dot draw"></span><span class="name">平局</span><span class="pct">${dr}<span style="font-size:13px;color:var(--text-3)">%</span></span></div>
-        <div class="row"><span class="dot away"></span><span class="name">${esc(awayName)} 胜</span><span class="pct">${aw}<span style="font-size:13px;color:var(--text-3)">%</span></span></div>
-      </div>
+        btn.disabled = true;
+        const card = document.getElementById('resultCard');
+        card.innerHTML = `
+    <div class="loader">
+      <div class="ball"></div>
+      <div class="msg">模型推理中…（第一次约 10 秒）</div>
     </div>`;
 
-        let verdictBlock='';
-        if(actual){
-            const vb=verdictKind==='exact'?'exact':(verdictKind==='outcome'?'outcome':'miss');
-            verdictBlock=`<div class="compare"><div class="compare-label">预测 vs 实际</div><div class="compare-grid"><div class="compare-box"><div class="l">AI 预测</div><div class="s">${esc(predHome)} – ${esc(predAway)}</div><div class="sub">${Number(predHome)>Number(predAway)?'主胜':(Number(predHome)<Number(predAway)?'客胜':'平局')}</div></div><div class="v-badge ${vb}"><div class="icon">${verdictIcon}</div><div class="text">${verdictLabel}</div></div><div class="compare-box actual"><div class="l">实际结果</div><div class="s">${actual.home} – ${actual.away}</div><div class="sub">${actual.home>actual.away?'主胜':(actual.home<actual.away?'客胜':'平局')}</div></div></div></div>`;
-        }
-        const headerTag=actual?`<span class="status-tag finished"><span class="dot"></span>已完赛</span>`:`<span class="status-tag live"><span class="dot"></span>PRE-MATCH</span>`;
+        try {
+            const skill = await loadSkill();
+            const userPrompt =
+                (intel ? `【今日情报】\n${intel}\n\n` : '') +
+                `【预测指令】\n请预测：第 ${round+1} 轮  ${home} vs ${away}\n` +
+                `严格按 skill.md 输出契约返回 JSON。`;
 
-        els.result.innerHTML=`
-  <div class="result">
-    <div class="${cardCls}">
-      <div class="score-head">
-        <span>${esc(d.match?.competition||'英超')} · ${esc(d.match?.season||'')} · ${esc(d.match?.round||els.round.value)}</span>
-        ${headerTag}
-      </div>
-      <div class="teams-row">
-        <div class="team">${crestHTML(homeName)}<div class="team-name">${esc(homeName)}</div></div>
-        <div class="score-block">
-          <span class="label">AI 预测比分</span>
-          <span class="score-num">${esc(predHome)}</span>
-          <span class="score-dash">–</span>
-          <span class="score-num">${esc(predAway)}</span>
-        </div>
-        <div class="team">${crestHTML(awayName)}<div class="team-name">${esc(awayName)}</div></div>
-      </div>
-      ${probRing}
-      ${verdictBlock}
-    </div>
-    <div class="section"><div class="section-label">关键因素</div><div class="section-body"><ul>${list(d.keyFactors)}</ul></div></div>
-    <div class="section"><div class="section-label">分析</div><div class="section-body">${esc(d.analysis||'')}</div></div>
-    <div class="meta-grid">
-      <div><div class="section-label">置信度</div><div class="section-body"><span class="pill ${confClass(d.confidence)}">${esc(d.confidence||'')}</span></div></div>
-      <div><div class="section-label">时间模式</div><div class="section-body"><span class="pill neutral">${esc(d.timeMode||'')}</span></div></div>
-    </div>
-    ${renderKeyPlayers(d.keyPlayers)}
-    ${renderH2H(d.headToHead)}
-    <div class="meta-grid">
-      <div><div class="section-label">缺失信息</div><div class="section-body"><ul>${list(d.missingInfo)}</ul></div></div>
-      <div><div class="section-label">估算项</div><div class="section-body"><ul>${list(d.estimates)}</ul></div></div>
-    </div>
-    <details class="raw">
-      <summary>查看原始 JSON</summary>
-      <button class="copy-json-btn" type="button" data-copy='${esc(rawJson)}'>复制</button>
-      <pre>${esc(rawJson)}</pre>
-    </details>
+            const raw = await callGroq(skill, userPrompt);
+
+            let parsed;
+            try { parsed = JSON.parse(raw); }
+            catch(e){
+                card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<br><pre style="white-space:pre-wrap;font-size:12px;color:#888;margin-top:12px">${raw.slice(0,500)}</pre></div>`;
+                return toast('模型返回非 JSON，请重试', 'err');
+            }
+
+            const v = validateAndNormalizePrediction(parsed);
+            if (!v.ok) {
+                card.innerHTML = `<div class="empty">❌ 校验失败<br>${v.errors.join('<br>')}<br>${v.warnings.join('<br>')}</div>`;
+                return toast('预测校验失败', 'err');
+            }
+            if (v.warnings.length) console.warn('校验警告：', v.warnings);
+
+            renderResult(v.data, { round, home, away, intel });
+            addHistory({ round, home, away, ...v.data, ts: Date.now() });
+            toast('预测完成');
+        } catch(err) {
+            console.error(err);
+            card.innerHTML = `<div class="empty">❌ ${err.message}</div>`;
+            toast(err.message, 'err');
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    /* ========================================================
+       9. 渲染结果
+    ======================================================== */
+    function espnUrl(name){
+        const id = ESPN_IDS[name];
+        return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null;
+    }
+    function badgeHtml(name){
+        const url = espnUrl(name);
+        const abbr = ABBR[name] || name.slice(0,3);
+        if (!url) return `<div class="fallback">${abbr}</div>`;
+        return `<img class="badge" src="${url}" alt="${name}" onerror="this.outerHTML='<div class=\\'fallback\\'>${abbr}</div>'">`;
+    }
+    function confClass(c){
+        if (c === '高') return '高';
+        if (c === '中高') return '中高';
+        if (c === '中') return '中';
+        return '低';
+    }
+    function playerCard(p){
+        const name = p.name || p.球员 || '';
+        const pos = p.position || p.位置 || '';
+        const rating = p.rating || p.评分 || '';
+        const note = p.note || p.备注 || '';
+        return `<div class="pcard">
+    <div class="row"><div class="nm">${name}</div><div class="pos">${pos}</div></div>
+    <div class="rt"><div class="rating">${rating}</div>${note?`<div class="note">${note}</div>`:''}</div>
   </div>`;
+    }
+    function renderResult(d, ctx){
+        const { home, away } = ctx;
+        const card = document.getElementById('resultCard');
+        const h = d.homeWin, dr = d.draw, a = d.awayWin;
 
-        const copyBtn=els.result.querySelector('.copy-json-btn');
-        if(copyBtn){
-            copyBtn.addEventListener('click',async()=>{
-                const text=copyBtn.getAttribute('data-copy');
-                try{await navigator.clipboard.writeText(text);copyBtn.textContent='已复制';copyBtn.classList.add('copied');setTimeout(()=>{copyBtn.textContent='复制';copyBtn.classList.remove('copied');},1600);}catch(e){alert('复制失败');}
+        const ring = (pct, cls) => {
+            const R = 42, C = 2 * Math.PI * R;
+            const off = C * (1 - pct/100);
+            const color = cls === 'h' ? '#ff6b35' : cls === 'a' ? '#00d4ff' : '#8b98ab';
+            return `<div class="ring ${cls}">
+      <svg viewBox="0 0 96 96">
+        <circle class="track" cx="48" cy="48" r="${R}"></circle>
+        <circle class="bar" cx="48" cy="48" r="${R}" stroke="${color}"
+          stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle>
+      </svg>
+      <div class="lbl2">${cls==='h'?'主胜':cls==='d'?'平局':'客胜'}</div>
+      <div class="num">${pct}%</div>
+    </div>`;
+        };
+
+        const h2h = d.headToHead && d.headToHead.summary ? `
+    <div class="sect">
+      <div class="ttl">历史交锋</div>
+      <div class="h2h">
+        <div class="tag ${d.headToHead.note || '估算'}">${d.headToHead.note || '估算'}</div>
+        <div class="sum">${d.headToHead.summary}</div>
+        ${Array.isArray(d.headToHead.lastMatches) && d.headToHead.lastMatches.length
+            ? '<ul>' + d.headToHead.lastMatches.map(m=>`<li>${m}</li>`).join('') + '</ul>'
+            : ''}
+      </div>
+    </div>` : '';
+
+        const homePlayers = d.homeKeyPlayers || d.homePlayers || [];
+        const awayPlayers = d.awayKeyPlayers || d.awayPlayers || [];
+        const players = [...homePlayers.map(p=>({...p,_side:'home'})), ...awayPlayers.map(p=>({...p,_side:'away'}))];
+        const playersHtml = players.length ? `
+    <div class="sect">
+      <div class="ttl">本场焦点球员</div>
+      <div class="players">${players.map(playerCard).join('')}</div>
+    </div>` : '';
+
+        card.innerHTML = `
+    <div class="scoreboard">
+      <div class="teams">
+        <div class="team">
+          ${badgeHtml(home)}
+          <div class="nm">${home}</div>
+        </div>
+        <div class="score pop">${d.score}</div>
+        <div class="team">
+          ${badgeHtml(away)}
+          <div class="nm">${away}</div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <span class="conf ${confClass(d.confidence)}">置信度：${d.confidence}</span>
+      </div>
+    </div>
+
+    <div class="rings">
+      ${ring(h,'h')}${ring(dr,'d')}${ring(a,'a')}
+    </div>
+
+    ${h2h}
+
+    <div class="sect">
+      <div class="ttl">关键因素</div>
+      <div class="factors">${(d.keyFactors||[]).map(f=>`<span class="chip">${f}</span>`).join('')}</div>
+    </div>
+
+    <div class="sect">
+      <div class="ttl">分析</div>
+      <div class="kv">${d.analysis || ''}</div>
+    </div>
+
+    ${playersHtml}
+  `;
+
+        requestAnimationFrame(() => {
+            card.querySelectorAll('.ring .bar').forEach((el,i) => {
+                const pct = [h,dr,a][i];
+                const R = 42, C = 2*Math.PI*R;
+                el.style.strokeDashoffset = C * (1 - pct/100);
             });
-        }
-        try{
-            window.PLHistory?.add({
-                round:d.match?.round||els.round.value,homeTeam:homeName,awayTeam:awayName,
-                predictedHome:Number(predHome),predictedAway:Number(predAway),
-                probability:{home:hw,draw:dr,away:aw},confidence:d.confidence||'',analysis:d.analysis||'',
-                actualHome:actual?actual.home:null,actualAway:actual?actual.away:null
-            });
-        }catch(e){console.warn(e);}
+        });
     }
 
-    /* ============ 单场预测按钮 ============ */
-    let isPredicting=false;
-    els.predictBtn.addEventListener('click',async()=>{
-        if(isPredicting)return;
-        const home=els.home.value.trim();const away=els.away.value.trim();
-        const roundStr=els.round.value.trim()||'第X轮';
-        const roundIdx=Number(els.roundSelect.value);
-        const intel=els.intel.value.trim();const apiKey=els.apiKey.value.trim();
-        const provider=els.provider.value;const cfg=apiConfig[provider];
-        if(!home||!away)return alert('请选择或填写主队和客队');
-        if(!apiKey)return alert('请填写 '+cfg.name+' API Key');
-        isPredicting=true;els.predictBtn.disabled=true;
-        els.status.className='status loading';els.status.innerHTML='<span class="spinner"></span>加载 skill.md…';
-        showSkeleton();
-        try{
-            await loadSkill();
-            els.status.innerHTML='<span class="spinner"></span>调用 '+cfg.name+' 推理中…';
-            const parsed=await runPrediction(home,away,roundStr,intel,apiKey,provider);
-            render(parsed,roundIdx,home,away);
-            els.status.className='status done';
-            els.status.textContent='预测完成 · '+new Date().toLocaleTimeString();
-            if(window.innerWidth<1024){document.querySelector('.main-grid > main')?.scrollIntoView({behavior:'smooth',block:'start'});}
-        }catch(e){
-            els.status.className='status error';els.status.textContent='出错';
-            els.result.innerHTML='<div class="error-box">'+esc(e.message)+'</div>';
-        }finally{isPredicting=false;els.predictBtn.disabled=false;}
+    /* ========================================================
+       10. 积分榜
+    ======================================================== */
+    function renderStandings(list){
+        const rows = list.map((s,i) => {
+            const cls = i < 4 ? 'ucl' : i >= list.length - 3 ? 'rel' : '';
+            return `<tr class="${cls}">
+      <td>${i+1}</td>
+      <td>${s.team}</td>
+      <td>${s.played ?? 0}</td>
+      <td>${s.won ?? 0}</td>
+      <td>${s.drawn ?? 0}</td>
+      <td>${s.lost ?? 0}</td>
+      <td>${s.gf ?? 0}:${s.ga ?? 0}</td>
+      <td style="color:#ffb648;font-weight:700">${s.points ?? 0}</td>
+    </tr>`;
+        }).join('');
+        document.getElementById('standings').innerHTML = `
+    <table>
+      <thead><tr><th>#</th><th>球队</th><th>赛</th><th>胜</th><th>平</th><th>负</th><th>进:失</th><th>分</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+    }
+
+    /* ========================================================
+       11. 仪表盘
+    ======================================================== */
+    function refreshDashboard(){
+        const r = +document.getElementById('roundSel').value || 0;
+        document.getElementById('dashRound').textContent = '第 ' + (r+1) + ' 轮';
+
+        const totalPlayed = Object.keys(RESULTS).length;
+        document.getElementById('dashPlayed').textContent = totalPlayed;
+
+        const hist = getHistory();
+        const pending = hist.filter(h => !h.actual).length;
+        document.getElementById('dashPending').textContent = hist.length;
+        document.getElementById('dashRecord').textContent = pending;
+
+        const badge = document.getElementById('histBadge');
+        if (pending > 0) { badge.style.display = 'flex'; badge.textContent = pending; }
+        else { badge.style.display = 'none'; }
+    }
+
+    /* ========================================================
+       12. 历史记录
+    ======================================================== */
+    const HIST_KEY = 'pl_history_v1';
+    function getHistory(){
+        try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
+        catch { return []; }
+    }
+    function setHistory(list){
+        if (list.length > 500) {
+            toast('记录超过 500 条，建议导出后清空', 'warn');
+        }
+        localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(-800)));
+    }
+    function addHistory(rec){
+        const list = getHistory();
+        list.push(rec);
+        setHistory(list);
+        refreshDashboard();
+        if (document.getElementById('histMask').classList.contains('show')) renderHistory();
+    }
+    function judge(rec){
+        if (!rec.actual) return 'pending';
+        if (rec.actual === rec.score) return 'exact';
+        const wdl = s => {
+            const [a,b] = s.split('-').map(Number);
+            return a>b ? 'H' : a<b ? 'A' : 'D';
+        };
+        return wdl(rec.actual) === wdl(rec.score) ? 'wdl' : 'miss';
+    }
+    function renderHistory(){
+        const list = getHistory().slice().reverse();
+        const box = document.getElementById('histList');
+        if (!list.length) { box.innerHTML = '<div class="empty">暂无记录</div>'; return; }
+
+        box.innerHTML = list.map((h,idx) => {
+            const realIdx = getHistory().length - 1 - idx;
+            const j = judge(h);
+            const labels = { exact:'精确命中', wdl:'胜平负命中', miss:'未命中', pending:'待录入' };
+            return `<div class="hitem">
+      <div class="top">
+        <div class="teams2">${h.home} vs ${h.away}</div>
+        <div class="res-badge ${j}">${labels[j]}</div>
+      </div>
+      <div class="meta">预测 ${h.score} · ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
+      <div class="row2">
+        <input placeholder="实际比分 如 2-1" value="${h.actual || ''}"
+          onchange="setActual(${realIdx}, this.value)">
+        <button onclick="delHistory(${realIdx})">删除</button>
+      </div>
+    </div>`;
+        }).join('');
+
+        const total = getHistory().length;
+        const done = getHistory().filter(h=>h.actual).length;
+        const wdl = getHistory().filter(h=>['wdl','exact'].includes(judge(h))).length;
+        const exact = getHistory().filter(h=>judge(h)==='exact').length;
+        document.getElementById('sTotal').textContent = total;
+        document.getElementById('sDone').textContent = done;
+        document.getElementById('sWdl').textContent = done ? Math.round(wdl/done*100)+'%' : '0%';
+        document.getElementById('sExact').textContent = done ? Math.round(exact/done*100)+'%' : '0%';
+    }
+    function setActual(idx, val){
+        const list = getHistory();
+        if (!list[idx]) return;
+        val = val.trim();
+        if (val && !/^\d+-\d+$/.test(val)) return toast('格式应为 2-1', 'warn');
+        list[idx].actual = val || undefined;
+        setHistory(list);
+        renderHistory();
+        refreshDashboard();
+    }
+    function delHistory(idx){
+        const list = getHistory();
+        list.splice(idx,1);
+        setHistory(list);
+        renderHistory();
+        refreshDashboard();
+    }
+    function clearHistory(){
+        if (!confirm('确定清空全部历史记录？')) return;
+        localStorage.removeItem(HIST_KEY);
+        renderHistory();
+        refreshDashboard();
+    }
+    function exportHistory(){
+        const blob = new Blob([JSON.stringify(getHistory(), null, 2)], {type:'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `pl-history-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    }
+    function importHistory(){
+        const inp = document.createElement('input');
+        inp.type = 'file'; inp.accept = '.json';
+        inp.onchange = e => {
+            const f = e.target.files[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = () => {
+                try {
+                    const arr = JSON.parse(r.result);
+                    if (!Array.isArray(arr)) throw 0;
+                    setHistory(arr);
+                    renderHistory();
+                    refreshDashboard();
+                    toast('导入成功');
+                } catch { toast('导入失败：文件格式错误', 'err'); }
+            };
+            r.readAsText(f);
+        };
+        inp.click();
+    }
+    function openHistory(){ document.getElementById('histMask').classList.add('show'); renderHistory(); }
+    function closeHistory(){ document.getElementById('histMask').classList.remove('show'); }
+
+    /* ========================================================
+       13. 批量预测
+    ======================================================== */
+    let batchN = 1;
+    function openBatch(){ document.getElementById('batchMask').classList.add('show'); updateQuota(); }
+    function closeBatch(){ document.getElementById('batchMask').classList.remove('show'); }
+    function updateQuota(){
+        const calls = 10 * batchN;
+        const el = document.getElementById('batchQuota');
+        el.className = 'quota ' + (calls <= 20 ? 'ok' : calls <= 50 ? 'warn' : 'bad');
+        el.textContent = `预计消耗 ${calls} 次调用（Groq 每天 1000 次）`;
+    }
+    document.getElementById('batchOpts').addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b) return;
+        batchN = +b.dataset.n;
+        document.querySelectorAll('#batchOpts button').forEach(x => x.classList.toggle('on', x === b));
+        updateQuota();
     });
 
-    /* ============ 积分榜 ============ */
-    (function renderStandings(){
-        const tbody=document.getElementById('standingsBody');if(!tbody)return;
-        const total=STATIC_STANDINGS.length;
-        if(total===0){
-            tbody.innerHTML='<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-3)">运行 <code>node update.js</code> 后自动填充</td></tr>';
-            return;
-        }
-        tbody.innerHTML=STATIC_STANDINGS.map(r=>{
-            let cls='';
-            if(r.rank<=4)cls='r-ucl';else if(r.rank<=6)cls='r-uel';else if(r.rank===7)cls='r-uecl';else if(r.rank>total-3)cls='r-rel';
-            const id=ESPN_IDS[r.team];const abbr=ABBR[r.team]||r.team.slice(0,3).toUpperCase();
-            const badge=id?`<img src="https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png" alt="${esc(r.team)}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="fb" style="display:none">${esc(abbr)}</div>`:`<div class="fb">${esc(abbr)}</div>`;
-            const gd=r.gd>0?'+'+r.gd:r.gd;
-            return `<tr class="${cls}"><td class="rank">${r.rank}</td><td><div class="team-cell">${badge}<span>${esc(r.team)}</span></div></td><td>${r.played}</td><td>${r.won}</td><td>${r.drawn}</td><td>${r.lost}</td><td>${r.gf}</td><td>${r.ga}</td><td>${gd}</td><td class="pts">${r.points}</td></tr>`;
-        }).join('');
-    })();
+    function mode(arr){
+        const m = new Map();
+        arr.forEach(x => m.set(x, (m.get(x)||0)+1));
+        let best = null, bestN = 0;
+        for (const [k,v] of m) if (v > bestN) { best = k; bestN = v; }
+        return best;
+    }
 
-    /* ============ 比赛日仪表盘 ============ */
-    (function renderDashboard(){
-        const roundSel=document.getElementById('roundSelect');
-        if(!roundSel)return;
-        function refresh(){
-            const r=Number(roundSel.value);
-            const roundFixtures=FIXTURES[r]||[];
-            const results=RESULTS[String(r+1)]||{};
-            const finished=roundFixtures.filter(m=>results[m.home+'|'+m.away]).length;
-            document.getElementById('dashRound').textContent='第 '+(r+1)+' 轮';
-            document.getElementById('dashFinished').textContent=finished+' / '+roundFixtures.length;
-            document.getElementById('dashPending').textContent=(roundFixtures.length-finished)+' 场';
-            try{
-                const hist=JSON.parse(localStorage.getItem('pl_prediction_history_v1')||'[]');
-                const pending=hist.filter(x=>x.actualHome==null||x.actualAway==null).length;
-                document.getElementById('dashSettle').textContent=pending;
-            }catch(e){document.getElementById('dashSettle').textContent='—';}
-        }
-        roundSel.addEventListener('change',refresh);
-        refresh();
-        setInterval(refresh,3000);
-    })();
-</script>
+    async function runBatch(){
+        const btn = document.getElementById('batchBtn');
+        if (!getKey()) return toast('请先填 Groq API Key', 'warn');
+        const calls = 10 * batchN;
+        if (calls > 30 && !confirm(`将消耗约 ${calls} 次 API 调用，确认？`)) return;
 
-<script>
-    /* ============ 历史记录 ============ */
-    (function(){
-        'use strict';
-        const KEY='pl_prediction_history_v1';const MAX_RECORDS=2000;
-        function toValidGoal(v){const n=Number(v);if(!isFinite(n)||n<0)return 0;return Math.min(Math.floor(n),20);}
-        const Store={
-            all(){try{const raw=localStorage.getItem(KEY);return raw?JSON.parse(raw):[];}catch(e){return[];}},
-            save(list){try{if(list.length>MAX_RECORDS)list=list.slice(0,MAX_RECORDS);localStorage.setItem(KEY,JSON.stringify(list));}catch(e){}},
-            add(rec){const list=this.all();const entry=Object.assign({id:'p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),createdAt:Date.now()},rec);list.unshift(entry);this.save(list);return entry;},
-            update(id,patch){const list=this.all();const i=list.findIndex(x=>x.id===id);if(i>=0){list[i]=Object.assign({},list[i],patch);this.save(list);}},
-            remove(id){this.save(this.all().filter(x=>x.id!==id));},
-            clear(){this.save([]);}
-        };
-        function sign(h,a){return h>a?1:(h<a?-1:0);}
-        function evaluate(rec){
-            if(rec.actualHome==null||rec.actualAway==null)return{status:'pending'};
-            const pH=Number(rec.predictedHome),pA=Number(rec.predictedAway);
-            const aH=Number(rec.actualHome),aA=Number(rec.actualAway);
-            if([pH,pA,aH,aA].some(n=>isNaN(n)))return{status:'pending'};
-            if(pH===aH&&pA===aA)return{status:'hit',kind:'exact'};
-            if(sign(pH,pA)===sign(aH,aA))return{status:'hit',kind:'outcome'};
-            return{status:'miss',kind:'miss'};
-        }
-        function stats(list){
-            let total=list.length,settled=0,exact=0,outcome=0,miss=0;
-            for(const r of list){const e=evaluate(r);if(e.status==='pending')continue;settled++;if(e.kind==='exact')exact++;else if(e.kind==='outcome')outcome++;else miss++;}
-            return{total,settled,exact,outcome,miss,hitRateAny:settled?(exact+outcome)/settled*100:0,hitRateExact:settled?exact/settled*100:0};
-        }
-        let currentFilter='all';let currentSearch='';
-        const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-        function fmtTime(ts){const d=new Date(ts),pad=n=>String(n).padStart(2,'0');return `${d.getMonth()+1}/${d.getDate()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;}
-        function list_pending(){return Store.all().filter(r=>evaluate(r).status==='pending').length;}
+        btn.disabled = true;
+        btn.textContent = '批量运行中…';
+        const r = +document.getElementById('roundSel').value || 0;
+        const intel = document.getElementById('intel').value.trim();
+        let ok = 0, fail = 0;
 
-        function renderStats(){
-            const s=stats(Store.all());
-            document.getElementById('plStats').innerHTML=`
-      <div class="stat"><div class="stat-label">总预测</div><div class="stat-value">${s.total}</div></div>
-      <div class="stat"><div class="stat-label">已录入赛果</div><div class="stat-value">${s.settled}</div></div>
-      <div class="stat"><div class="stat-label">胜平负命中率</div><div class="stat-value success">${s.settled?s.hitRateAny.toFixed(1)+'%':'—'}</div></div>
-      <div class="stat"><div class="stat-label">精确命中率</div><div class="stat-value success">${s.settled?s.hitRateExact.toFixed(1)+'%':'—'}</div></div>
-      <div class="stat"><div class="stat-label">命中 / 未中</div><div class="stat-value danger">${s.exact+s.outcome} / ${s.miss}</div></div>
-    `;
-            const hero=document.getElementById('heroHitRate');
-            if(hero)hero.textContent=s.settled?s.hitRateAny.toFixed(0)+'%':'—';
-            const navBadge=document.getElementById('navHistoryBadge');
-            const pendingN=list_pending();
-            if(navBadge){
-                if(pendingN>0){navBadge.textContent=pendingN>99?'99+':pendingN;navBadge.style.display='';}
-                else navBadge.style.display='none';
-            }
-        }
-
-        function renderRecords(){
-            const list=Store.all();const el=document.getElementById('plRecords');
-            const kw=currentSearch.trim().toLowerCase();
-            const filtered=list.filter(r=>{
-                const e=evaluate(r);
-                if(currentFilter==='pending'&&e.status!=='pending')return false;
-                if(currentFilter==='hit'&&e.status!=='hit')return false;
-                if(currentFilter==='miss'&&e.status!=='miss')return false;
-                if(kw){const hay=((r.homeTeam||'')+' '+(r.awayTeam||'')+' '+(r.round||'')).toLowerCase();if(!hay.includes(kw))return false;}
-                return true;
-            });
-            if(!filtered.length){
-                el.innerHTML=`<div class="hist-empty"><div class="icon">📭</div><div>${list.length?'当前筛选下没有记录':'还没有预测记录'}</div></div>`;
-                return;
-            }
-            el.innerHTML=filtered.map(r=>{
-                const e=evaluate(r);const prob=r.probability||{};
-                let verdict;
-                if(e.status==='pending')verdict=`<span class="verdict-tag pending">待录入</span>`;
-                else if(e.kind==='exact')verdict=`<span class="verdict-tag exact">✓ 精确命中</span>`;
-                else if(e.kind==='outcome')verdict=`<span class="verdict-tag outcome">◐ 胜平负命中</span>`;
-                else verdict=`<span class="verdict-tag miss">✕ 未命中</span>`;
-                return `<div class="rec" data-id="${esc(r.id)}">
-        <div class="rec-top">
-          <div>
-            <div class="rec-match">${esc(r.homeTeam||'主队')}<span class="vs">vs</span>${esc(r.awayTeam||'客队')}</div>
-            <div class="rec-meta">${esc(r.round||'')} · ${fmtTime(r.createdAt)}${r.confidence?' · '+esc(r.confidence):''}${r.runs&&r.runs>1?' · ×'+r.runs:''}</div>
-          </div>
-          <div style="text-align:right">
-            <div class="rec-score">${r.predictedHome??'?'} – ${r.predictedAway??'?'}</div>
-            <div style="margin-top:6px">${verdict}</div>
-          </div>
-        </div>
-        ${prob.home!=null?`<div class="rec-probs"><span class="rec-chip">主胜 ${prob.home}%</span><span class="rec-chip">平 ${prob.draw}%</span><span class="rec-chip">客胜 ${prob.away}%</span></div>`:''}
-        <div class="rec-actions">
-          <label>实际</label>
-          <input class="rec-input" data-act="home" type="number" min="0" max="20" value="${r.actualHome??''}" placeholder="?">
-          <span style="color:var(--text-4)">–</span>
-          <input class="rec-input" data-act="away" type="number" min="0" max="20" value="${r.actualAway??''}" placeholder="?">
-          <button class="btn-sm primary" data-action="save-actual">保存</button>
-          <button class="btn-sm" data-action="clear-actual">清除</button>
-          <button class="btn-sm danger" data-action="delete" style="margin-left:auto">删除</button>
-        </div>
-      </div>`;
-            }).join('');
-        }
-
-        function updateBadge(){
-            const n=list_pending();
-            const b=document.getElementById('plHistoryBadge');
-            if(n>0){b.textContent=n>99?'99+':n;b.style.display='';}
-            else b.style.display='none';
-        }
-
-        function renderAll(){renderStats();renderRecords();updateBadge();}
-        function openPanel(){document.getElementById('plHistoryOverlay').classList.add('open');document.body.style.overflow='hidden';renderAll();}
-        function closePanel(){document.getElementById('plHistoryOverlay').classList.remove('open');document.body.style.overflow='';}
-
-        document.getElementById('plHistoryFab').addEventListener('click',openPanel);
-        document.getElementById('navHistory').addEventListener('click',openPanel);
-        document.getElementById('plHistoryClose').addEventListener('click',closePanel);
-        document.getElementById('plHistoryOverlay').addEventListener('click',e=>{if(e.target.id==='plHistoryOverlay')closePanel();});
-        document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
-        document.getElementById('plSearch').addEventListener('input',e=>{currentSearch=e.target.value;renderRecords();});
-        document.getElementById('plFilters').addEventListener('click',e=>{
-            const btn=e.target.closest('.filter');if(!btn)return;
-            document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');currentFilter=btn.dataset.filter;renderRecords();
-        });
-        document.getElementById('plRecords').addEventListener('click',e=>{
-            const btn=e.target.closest('button[data-action]');if(!btn)return;
-            const card=btn.closest('.rec');const id=card.dataset.id;
-            if(btn.dataset.action==='save-actual'){
-                const h=card.querySelector('input[data-act="home"]').value;
-                const a=card.querySelector('input[data-act="away"]').value;
-                if(h===''||a===''){alert('请填写两个比分');return;}
-                Store.update(id,{actualHome:toValidGoal(h),actualAway:toValidGoal(a)});renderAll();
-            }else if(btn.dataset.action==='clear-actual'){Store.update(id,{actualHome:null,actualAway:null});renderAll();}
-            else if(btn.dataset.action==='delete'){if(confirm('删除这条预测记录？')){Store.remove(id);renderAll();}}
-        });
-        document.getElementById('plExport').addEventListener('click',()=>{
-            const blob=new Blob([JSON.stringify(Store.all(),null,2)],{type:'application/json'});
-            const url=URL.createObjectURL(blob);const a=document.createElement('a');
-            a.href=url;a.download='pl-history-'+new Date().toISOString().slice(0,10)+'.json';a.click();URL.revokeObjectURL(url);
-        });
-        const fileInput=document.getElementById('plImportFile');
-        document.getElementById('plImport').addEventListener('click',()=>fileInput.click());
-        fileInput.addEventListener('change',e=>{
-            const file=e.target.files[0];if(!file)return;
-            const reader=new FileReader();
-            reader.onload=()=>{
-                try{
-                    const imported=JSON.parse(reader.result);
-                    if(!Array.isArray(imported))throw new Error('不是数组');
-                    const now=Date.now();
-                    const safe=imported.map(x=>({...x,createdAt:Math.min(Number(x.createdAt)||now,now)}));
-                    const existing=Store.all();const ids=new Set(existing.map(x=>x.id));
-                    const merged=safe.filter(x=>x&&x.id&&!ids.has(x.id)).concat(existing).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-                    Store.save(merged);renderAll();
-                    alert(`成功导入 ${imported.length} 条（新增 ${merged.length-existing.length} 条）`);
-                }catch(err){alert('导入失败：'+err.message);}
-                fileInput.value='';
-            };
-            reader.readAsText(file);
-        });
-        document.getElementById('plClear').addEventListener('click',()=>{
-            if(!Store.all().length)return;
-            if(confirm('确定清空全部预测历史？此操作不可恢复。')){Store.clear();renderAll();}
-        });
-
-        window.PLHistory={
-            add(rec){const entry=Store.add(rec);updateBadge();if(document.getElementById('plHistoryOverlay').classList.contains('open'))renderAll();return entry;},
-            all:()=>Store.all(),clear:()=>{Store.clear();renderAll();},stats:()=>stats(Store.all()),open:openPanel
-        };
-        function init(){updateBadge();renderStats();}
-        if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
-        else init();
-    })();
-</script>
-
-<script>
-    /* ============ 配置同步 ============ */
-    (function(){
-        'use strict';
-        const SYNC_PREFIX='EPL1:';
-        const SYNC_KEYS=['epl_home','epl_away','epl_round','epl_intel','epl_provider','epl_apikey','epl_roundSel','epl_matchSel'];
-        const $=id=>document.getElementById(id);
-        function b64Encode(str){const bytes=new TextEncoder().encode(str);let bin='';bytes.forEach(b=>bin+=String.fromCharCode(b));return btoa(bin);}
-        function b64Decode(b64){const bin=atob(b64);const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));return new TextDecoder().decode(bytes);}
-        function exportConfig(){const data={};SYNC_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)data[k]=v;});return SYNC_PREFIX+b64Encode(JSON.stringify(data));}
-        function importConfig(text){
-            text=String(text||'').trim().replace(/\s+/g,'');
-            if(!text)throw new Error('内容为空');
-            if(!text.startsWith(SYNC_PREFIX))throw new Error('格式不正确');
-            const b64=text.slice(SYNC_PREFIX.length);
-            let data;try{data=JSON.parse(b64Decode(b64));}catch(e){throw new Error('解码失败');}
-            if(typeof data!=='object'||data===null)throw new Error('数据结构异常');
-            let n=0;Object.entries(data).forEach(([k,v])=>{if(SYNC_KEYS.includes(k)&&typeof v==='string'){localStorage.setItem(k,v);n++;}});
-            return n;
-        }
-        function bind(){
-            const panel=$('syncPanel');const text=$('syncText');if(!panel||!text)return;
-            $('syncExportBtn').addEventListener('click',()=>{try{text.value=exportConfig();panel.classList.add('open');text.select();text.setSelectionRange(0,99999);try{document.execCommand('copy');}catch(e){}}catch(e){alert('导出失败：'+e.message);}});
-            $('syncImportBtn').addEventListener('click',()=>{text.value='';panel.classList.add('open');text.focus();});
-            $('syncCopyBtn').addEventListener('click',async()=>{if(!text.value)return alert('没有内容');try{await navigator.clipboard.writeText(text.value);$('syncCopyBtn').textContent='已复制';setTimeout(()=>{$('syncCopyBtn').textContent='复制';},1500);}catch(e){text.select();document.execCommand('copy');}});
-            $('syncApplyBtn').addEventListener('click',()=>{const v=text.value.trim();if(!v)return alert('请先粘贴');try{const n=importConfig(v);alert('已导入 '+n+' 项配置，页面即将刷新');location.reload();}catch(e){alert('导入失败：'+e.message);}});
-            $('syncCloseBtn').addEventListener('click',()=>{panel.classList.remove('open');});
-        }
-        if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);
-        else bind();
-    })();
-</script>
-
-<script>
-    /* ============ 批量预测（支持多次跑 + 聚合 + 提醒） ============ */
-    (function(){
-        'use strict';
-        let running=false;let aborted=false;
-        const $=id=>document.getElementById(id);
-
-        function getRoundMatches(roundNum){
-            if(typeof FIXTURES==='undefined')throw new Error('未找到 FIXTURES 数组');
-            return FIXTURES[Number(roundNum)]||[];
-        }
-
-        function renderList(matches){
-            const list=$('plBatchList');list.innerHTML='';
-            matches.forEach((m,i)=>{
-                const el=document.createElement('div');
-                el.className='batch-item pending';
-                el.dataset.idx=i;
-                el.innerHTML=`<span>${m.home} vs ${m.away}</span><span class="score" data-role="result">待预测</span>`;
-                list.appendChild(el);
-            });
-        }
-        function updateItem(idx,cls,resultText,isMulti){
-            const el=document.querySelector(`.batch-item[data-idx="${idx}"]`);
-            if(!el)return;
-            el.className='batch-item '+cls+(isMulti?' multi':'');
-            el.querySelector('[data-role="result"]').innerHTML=resultText;
-        }
-        function setProgress(cur,total){
-            const pct=total===0?0:Math.round(cur/total*100);
-            $('plBatchBar').style.width=pct+'%';
-        }
-
-        function aggregate(results){
-            if(!results.length)throw new Error('全部预测失败');
-            if(results.length===1)return results[0];
-            const avg=(arr)=>arr.reduce((a,b)=>a+b,0)/arr.length;
-            let hw=Math.round(avg(results.map(r=>Number(r.probabilities?.homeWin)||0)));
-            let dr=Math.round(avg(results.map(r=>Number(r.probabilities?.draw)||0)));
-            let aw=Math.round(avg(results.map(r=>Number(r.probabilities?.awayWin)||0)));
-            const sum=hw+dr+aw;
-            if(sum!==100){
-                const diff=100-sum;
-                const maxVal=Math.max(hw,dr,aw);
-                if(hw===maxVal)hw+=diff;else if(dr===maxVal)dr+=diff;else aw+=diff;
-            }
-            const scoreCounts={};
-            results.forEach(r=>{const s=String(r.predictedScore||'0-0');scoreCounts[s]=(scoreCounts[s]||0)+1;});
-            const sorted=Object.entries(scoreCounts).sort((a,b)=>b[1]-a[1]);
-            const predictedScore=sorted[0][0];
-            const confCounts={};
-            results.forEach(r=>{const c=r.confidence||'中';confCounts[c]=(confCounts[c]||0)+1;});
-            const confidence=Object.entries(confCounts).sort((a,b)=>b[1]-a[1])[0][0];
-            const base=results[0];
-            return {
-                ...base,
-                probabilities:{homeWin:hw,draw:dr,awayWin:aw},
-                predictedScore,
-                confidence,
-                analysis:(base.analysis||'')+`（${results.length} 次平均）`
-            };
-        }
-
-        async function predictMulti(home,away,roundStr,intel,apiKey,provider,times){
-            const results=[];
-            for(let i=0;i<times;i++){
-                if(aborted)break;
-                try{
-                    const r=await runPrediction(home,away,roundStr,intel,apiKey,provider);
-                    results.push(r);
-                }catch(e){/* 单次失败继续 */}
-                if(i<times-1&&!aborted)await sleep(1200);
-            }
-            if(!results.length)throw new Error('所有尝试均失败');
-            return aggregate(results);
-        }
-
-        async function run(roundNum,intel,apiKey,provider,times){
-            if(running)return;
-            running=true;aborted=false;
-            $('plBatchRun').disabled=true;
-            $('plBatchRun').textContent='进行中…';
-
-            const matches=getRoundMatches(roundNum);
-            $('plBatchRound').textContent='第'+(Number(roundNum)+1)+'轮';
-            $('plBatchTotal').textContent=matches.length;
-            renderList(matches);
-            setProgress(0,matches.length);
-
-            let ok=0,fail=0;
-            for(let i=0;i<matches.length;i++){
-                if(aborted)break;
-                const m=matches[i];
-                updateItem(i,'running',times>1?`预测中（${times}次）…`:'预测中…');
-                try{
-                    const data=await predictMulti(m.home,m.away,'第'+(Number(roundNum)+1)+'轮',intel,apiKey,provider,times);
-                    const score=data?.predictedScore||'—';
-                    const probs=data?.probabilities;
-                    const probText=probs?` <span class="probs">${probs.homeWin}/${probs.draw}/${probs.awayWin}</span>`:'';
-                    const runBadge=times>1?`<span class="runs">×${times}</span>`:'';
-                    updateItem(i,'done',`${esc(score)}${probText}${runBadge}`,times>1);
-                    ok++;
-                    try{
-                        window.PLHistory?.add({
-                            round:'第'+(Number(roundNum)+1)+'轮',
-                            homeTeam:m.home,awayTeam:m.away,
-                            predictedHome:Number(parseScore(score).home),
-                            predictedAway:Number(parseScore(score).away),
-                            probability:probs?{home:probs.homeWin,draw:probs.draw,away:probs.awayWin}:{},
-                            confidence:data.confidence||'',analysis:data.analysis||'',
-                            actualHome:null,actualAway:null,
-                            runs:times
-                        });
-                    }catch(e){}
-                }catch(err){
-                    updateItem(i,'fail','失败：'+esc((err.message||'未知错误').slice(0,40)));
-                    fail++;
+        try {
+            const skill = await loadSkill();
+            for (let i = 0; i < FIXTURES[r].length; i++) {
+                const { home, away } = FIXTURES[r][i];
+                const runs = [];
+                for (let k = 0; k < batchN; k++) {
+                    try {
+                        const userPrompt =
+                            (intel ? `【今日情报】\n${intel}\n\n` : '') +
+                            `【预测指令】\n请预测：第 ${r+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
+                        const raw = await callGroq(skill, userPrompt);
+                        const p = JSON.parse(raw);
+                        const v = validateAndNormalizePrediction(p);
+                        if (v.ok) runs.push(v.data);
+                    } catch(e){ /* 单次失败忽略 */ }
                 }
-                setProgress(i+1,matches.length);
-                if(i<matches.length-1&&!aborted)await sleep(1500);
+                if (runs.length) {
+                    const agg = {
+                        homeWin: Math.round(runs.reduce((s,x)=>s+x.homeWin,0)/runs.length*100)/100,
+                        draw:    Math.round(runs.reduce((s,x)=>s+x.draw,0)/runs.length*100)/100,
+                        awayWin: Math.round(runs.reduce((s,x)=>s+x.awayWin,0)/runs.length*100)/100,
+                        score: mode(runs.map(x=>x.score)),
+                        confidence: mode(runs.map(x=>x.confidence)),
+                        keyFactors: runs[0].keyFactors,
+                        analysis: runs[0].analysis,
+                        headToHead: runs[0].headToHead,
+                        _multi: batchN
+                    };
+                    addHistory({ round:r, home, away, ...agg, ts:Date.now() });
+                    ok++;
+                } else { fail++; }
             }
-
-            running=false;
-            $('plBatchRun').disabled=false;
-            $('plBatchRun').textContent=`完成（成功 ${ok} / 失败 ${fail}）`;
-            setTimeout(()=>{$('plBatchRun').textContent='再次批量预测';},2500);
-
-            if(fail===0)toast(`✅ 批量预测完成：${ok} 场全部成功`);
-            else if(ok===0)toast(`❌ 批量预测失败：${fail} 场全部出错`);
-            else toast(`⚠️ 批量预测完成：成功 ${ok}，失败 ${fail}`);
+            toast(`批量完成：成功 ${ok} 场${fail?`，失败 ${fail} 场`:''}`, fail?'warn':'ok');
+            closeBatch();
+            refreshDashboard();
+        } catch(err){
+            toast(err.message, 'err');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '开始批量预测';
         }
+    }
 
-        function toast(msg){
-            let t=document.getElementById('plToast');
-            if(!t){
-                t=document.createElement('div');
-                t.id='plToast';
-                t.style.cssText='position:fixed;left:50%;top:32px;transform:translateX(-50%) translateY(-20px);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:14px 22px;border-radius:12px;font-size:13.5px;font-weight:500;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:99999;opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);backdrop-filter:blur(12px)';
-                document.body.appendChild(t);
-            }
-            t.textContent=msg;
-            requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
-            clearTimeout(t._timer);
-            t._timer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(-20px)';},3200);
-        }
+    /* ========================================================
+       14. 悬浮返回顶部
+    ======================================================== */
+    window.addEventListener('scroll', () => {
+        document.getElementById('topBtn').classList.toggle('show', window.scrollY > 400);
+    });
 
-        function updateWarn(){
-            const times=Number($('plBatchTimes').value)||1;
-            const roundSel=document.getElementById('roundSelect');
-            const matches=getRoundMatches(roundSel.value);
-            const total=matches.length*times;
-            $('plBatchWarn').textContent=`预计消耗 ${total} 次 API 调用（${matches.length} 场 × ${times} 次）`;
-            if(total>50)$('plBatchWarn').style.color='#ef4444';
-            else if(total>20)$('plBatchWarn').style.color='#fbbf24';
-            else $('plBatchWarn').style.color='#22c55e';
-        }
+    /* ========================================================
+       15. 启动
+    ======================================================== */
+    (function boot(){
+        const saved = localStorage.getItem('groq_key');
+        if (saved) document.getElementById('apiKey').value = saved;
 
-        function open(){
-            const roundSel=document.getElementById('roundSelect');
-            if(!roundSel){alert('未找到轮次选择器');return;}
-            $('plBatchRound').textContent='第'+(Number(roundSel.value)+1)+'轮';
-            $('plBatchOverlay').classList.add('open');
-            document.body.style.overflow='hidden';
-            const matches=getRoundMatches(roundSel.value);
-            $('plBatchTotal').textContent=matches.length;
-            renderList(matches);
-            $('plBatchBar').style.width='0%';
-            $('plBatchRun').textContent='开始批量预测';
-            $('plBatchRun').disabled=false;
-            updateWarn();
-        }
-        function close(){
-            if(running){
-                if(!confirm('批量预测正在进行，确定要中断吗？'))return;
-                aborted=true;
-            }
-            $('plBatchOverlay').classList.remove('open');
-            document.body.style.overflow='';
-        }
+        initSelectors();
+        renderStandings(STATIC_STANDINGS);
+        refreshDashboard();
 
-        document.getElementById('plBatchFab').addEventListener('click',open);
-        document.getElementById('plBatchClose').addEventListener('click',close);
-        document.getElementById('plBatchCancel').addEventListener('click',close);
-        document.getElementById('plBatchOverlay').addEventListener('click',e=>{if(e.target.id==='plBatchOverlay')close();});
-        document.getElementById('plBatchTimes').addEventListener('change',updateWarn);
-        document.getElementById('plBatchRun').addEventListener('click',()=>{
-            const roundSel=document.getElementById('roundSelect');
-            const roundNum=roundSel.value;
-            const intel=document.getElementById('intel').value.trim();
-            const apiKey=document.getElementById('apiKey').value.trim();
-            const provider=document.getElementById('provider').value;
-            const times=Number($('plBatchTimes').value)||1;
-            if(!apiKey){alert('请先填写 API Key');return;}
-            const matches=getRoundMatches(roundNum);
-            const total=matches.length*times;
-            if(total>30){
-                if(!confirm(`将消耗约 ${total} 次 API 调用，确定继续？`))return;
-            }
-            run(roundNum,intel,apiKey,provider,times);
-        });
+        document.getElementById('roundSel').addEventListener('change', refreshDashboard);
+        document.getElementById('matchSel').addEventListener('change', refreshDashboard);
     })();
 </script>
 </body>
