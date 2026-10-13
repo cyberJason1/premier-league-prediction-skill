@@ -22,7 +22,6 @@
         button{font-family:inherit}
         input,textarea,select{font-family:inherit}
 
-        /* ===== 球场夜色背景 ===== */
         body::before{content:"";position:fixed;inset:0;z-index:-2;background:radial-gradient(ellipse 90% 55% at 50% -10%,rgba(255,107,53,.09),transparent 60%),radial-gradient(ellipse 70% 45% at 85% 105%,rgba(96,165,250,.06),transparent 60%),#06070a}
         body::after{content:"";position:fixed;inset:0;z-index:-1;background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,#000,transparent 92%);-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 40%,#000,transparent 92%);pointer-events:none}
 
@@ -54,7 +53,6 @@
         .hero-stat .v{font-size:32px;font-weight:500;color:var(--text);letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
         .hero-stat .l{font-size:11px;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;font-weight:500}
 
-        /* ===== 比赛日仪表盘 ===== */
         .matchday-dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-top:36px}
         .matchday-dash .dash-item{background:linear-gradient(180deg,var(--surface) 0%,#0c0c0c 100%);padding:22px 20px;position:relative}
         .matchday-dash .dash-item .l{font-size:10px;color:var(--text-3);letter-spacing:.12em;text-transform:uppercase;font-weight:500;margin-bottom:12px}
@@ -139,7 +137,6 @@
         .score-dash{font-family:Georgia,serif;font-size:40px;color:var(--text-4);font-weight:300}
         .score-block::before{content:"";position:absolute;top:50%;left:50%;width:140%;height:140%;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(255,107,53,.06),transparent 60%);pointer-events:none}
 
-        /* ===== 环形概率 ===== */
         .prob-ring-wrap{display:grid;grid-template-columns:200px 1fr;gap:36px;align-items:center;margin-bottom:32px;padding:28px;background:linear-gradient(180deg,var(--surface-2),#0e0e0e);border:1px solid var(--border);border-radius:18px}
         @media (max-width:640px){.prob-ring-wrap{grid-template-columns:1fr;gap:20px}}
         .prob-ring{position:relative;width:180px;height:180px;margin:0 auto}
@@ -156,7 +153,6 @@
         .prob-legend .name{flex:1;font-size:13px;color:var(--text-2);letter-spacing:-.005em}
         .prob-legend .pct{font-family:Georgia,serif;font-size:24px;color:var(--text);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 
-        /* ===== 足球加载动画 ===== */
         .soccer-loader{width:44px;height:44px;position:relative;margin:0 auto}
         .soccer-loader .ball{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e0e0e0 60%,#c8c8c8);position:relative;animation:bounceRoll 1.5s cubic-bezier(.5,0,.5,1) infinite;box-shadow:inset -4px -6px 12px rgba(0,0,0,.15),0 8px 20px rgba(255,107,53,.2)}
         .soccer-loader .ball::before{content:"";position:absolute;inset:0;border-radius:50%;background-image:radial-gradient(circle at 50% 25%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 25% 70%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 75% 70%,#0a0a0a 0,#0a0a0a 3px,transparent 4px),radial-gradient(circle at 50% 50%,#0a0a0a 0,#0a0a0a 2.5px,transparent 3.5px)}
@@ -206,7 +202,6 @@
         .h2h-list .txt{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:12.5px}
         .h2h-empty{text-align:center;padding:20px;color:var(--text-4);font-size:13px;font-style:italic}
 
-        /* ===== FIFA 球员卡 ===== */
         .kp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
         @media (max-width:640px){.kp-grid{grid-template-columns:1fr}}
         .kp-side{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px}
@@ -296,7 +291,6 @@
         .sync-tip{font-size:11px;color:var(--text-4);margin-top:12px;line-height:1.6}
         .sync-tip.warn{color:#fbbf24}
 
-        /* 悬浮按钮 */
         .tool-btn{position:fixed;right:24px;bottom:24px;width:52px;height:52px;border-radius:50%;background:var(--accent);color:#0a0a0a;border:0;font-size:20px;cursor:pointer;box-shadow:0 12px 32px rgba(255,107,53,.35);z-index:9000;display:flex;align-items:center;justify-content:center;transition:all .3s}
         .tool-btn:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(255,107,53,.5)}
         .tool-btn .badge{position:absolute;top:-4px;right:-4px;background:var(--danger);color:#fff;border-radius:99px;padding:2px 7px;font-size:10px;font-weight:600;min-width:18px;text-align:center;border:2px solid var(--bg)}
@@ -307,7 +301,6 @@
         .back-top:hover{border-color:var(--border-2);color:var(--text);transform:translateY(-2px)}
         @media (max-width:640px){.tool-btn,.batch-btn{width:48px;height:48px;right:16px}.tool-btn{bottom:16px}.batch-btn{bottom:72px}.back-top{right:16px;bottom:128px}}
 
-        /* 历史 + 批量 overlay */
         .overlay{position:fixed;inset:0;background:rgba(5,5,5,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);z-index:9100;display:none;padding:24px;overflow-y:auto}
         .overlay.open{display:block;animation:fadeIn .25s}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -367,10 +360,13 @@
         .hist-empty .icon{font-size:40px;opacity:.25;margin-bottom:16px}
         .hist-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
 
-        /* 批量预测弹窗 */
         .batch-modal{max-width:720px;margin:40px auto;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;animation:slideUp .35s cubic-bezier(.16,1,.3,1);box-shadow:0 40px 100px rgba(0,0,0,.8)}
         .batch-modal h2{font-size:22px;font-weight:500;letter-spacing:-.02em;color:var(--text);margin-bottom:8px}
-        .batch-modal .sub{font-size:13px;color:var(--text-3);margin-bottom:24px}
+        .batch-modal .sub{font-size:13px;color:var(--text-3);margin-bottom:20px}
+        .batch-options{display:flex;justify-content:space-between;align-items:center;gap:16px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:20px;flex-wrap:wrap}
+        .batch-opt{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--text-2)}
+        .batch-opt select{width:auto;padding:8px 32px 8px 12px;font-size:13px}
+        .batch-warn{font-size:12px;color:#fbbf24;font-weight:500;letter-spacing:-.005em}
         .batch-progress{background:var(--surface-2);border-radius:8px;height:8px;overflow:hidden;margin-bottom:20px}
         .batch-progress-bar{height:100%;background:linear-gradient(90deg,#00d4ff,#3b82f6);width:0%;transition:width .3s ease}
         .batch-list{display:flex;flex-direction:column;gap:8px;max-height:52vh;overflow-y:auto;padding-right:4px;margin-bottom:20px}
@@ -378,9 +374,11 @@
         .batch-item.pending{opacity:.55}
         .batch-item.running{border-color:rgba(96,165,250,.4);background:rgba(96,165,250,.04)}
         .batch-item.done{border-color:rgba(34,197,94,.3);background:var(--success-soft)}
+        .batch-item.done.multi{background:linear-gradient(180deg,var(--success-soft),rgba(96,165,250,.05))}
         .batch-item.fail{border-color:rgba(239,68,68,.3);background:var(--danger-soft)}
         .batch-item .score{font-family:Georgia,serif;font-size:17px;color:var(--text);font-variant-numeric:tabular-nums}
         .batch-item .probs{font-size:11px;color:var(--text-3);margin-left:10px}
+        .batch-item .runs{font-size:11px;color:var(--text-3);margin-left:8px;font-weight:400}
         .batch-footer{display:flex;gap:10px;justify-content:flex-end;padding-top:20px;border-top:1px solid var(--border);flex-wrap:wrap}
         .batch-footer button{padding:10px 18px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text-2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s}
         .batch-footer button:hover{border-color:var(--border-2);color:var(--text)}
@@ -543,7 +541,20 @@
             <h2>批量预测本轮</h2>
             <button class="hist-close" id="plBatchClose">✕</button>
         </div>
-        <div class="sub">轮次：<span id="plBatchRound">—</span> · 共 <span id="plBatchTotal">0</span> 场 · 每场间隔 1.5 秒自动限速</div>
+        <div class="sub">
+            轮次：<span id="plBatchRound">—</span> · 共 <span id="plBatchTotal">0</span> 场
+        </div>
+        <div class="batch-options">
+            <label class="batch-opt">
+                <span>每场跑几次</span>
+                <select id="plBatchTimes">
+                    <option value="1">1 次（最快）</option>
+                    <option value="3">3 次（取平均，更稳）</option>
+                    <option value="5">5 次（最稳，耗额度）</option>
+                </select>
+            </label>
+            <div class="batch-warn" id="plBatchWarn">预计消耗 10 次 API 调用</div>
+        </div>
         <div class="batch-progress"><div class="batch-progress-bar" id="plBatchBar"></div></div>
         <div class="batch-list" id="plBatchList"></div>
         <div class="batch-footer">
@@ -797,7 +808,6 @@
         const rawJson=JSON.stringify(d,null,2);
         const cardCls=actual?'score-card finished':'score-card';
 
-        // 环形概率
         const C=2*Math.PI*70;
         const seg1=(hw/100)*C;const seg2=(dr/100)*C;const seg3=(aw/100)*C;
         const probRing=`
@@ -1039,7 +1049,7 @@
         <div class="rec-top">
           <div>
             <div class="rec-match">${esc(r.homeTeam||'主队')}<span class="vs">vs</span>${esc(r.awayTeam||'客队')}</div>
-            <div class="rec-meta">${esc(r.round||'')} · ${fmtTime(r.createdAt)}${r.confidence?' · '+esc(r.confidence):''}</div>
+            <div class="rec-meta">${esc(r.round||'')} · ${fmtTime(r.createdAt)}${r.confidence?' · '+esc(r.confidence):''}${r.runs&&r.runs>1?' · ×'+r.runs:''}</div>
           </div>
           <div style="text-align:right">
             <div class="rec-score">${r.predictedHome??'?'} – ${r.predictedAway??'?'}</div>
@@ -1167,7 +1177,7 @@
 </script>
 
 <script>
-    /* ============ 批量预测 ============ */
+    /* ============ 批量预测（支持多次跑 + 聚合 + 提醒） ============ */
     (function(){
         'use strict';
         let running=false;let aborted=false;
@@ -1188,10 +1198,10 @@
                 list.appendChild(el);
             });
         }
-        function updateItem(idx,cls,resultText){
+        function updateItem(idx,cls,resultText,isMulti){
             const el=document.querySelector(`.batch-item[data-idx="${idx}"]`);
             if(!el)return;
-            el.className='batch-item '+cls;
+            el.className='batch-item '+cls+(isMulti?' multi':'');
             el.querySelector('[data-role="result"]').innerHTML=resultText;
         }
         function setProgress(cur,total){
@@ -1199,7 +1209,51 @@
             $('plBatchBar').style.width=pct+'%';
         }
 
-        async function run(roundNum,intel,apiKey,provider){
+        function aggregate(results){
+            if(!results.length)throw new Error('全部预测失败');
+            if(results.length===1)return results[0];
+            const avg=(arr)=>arr.reduce((a,b)=>a+b,0)/arr.length;
+            let hw=Math.round(avg(results.map(r=>Number(r.probabilities?.homeWin)||0)));
+            let dr=Math.round(avg(results.map(r=>Number(r.probabilities?.draw)||0)));
+            let aw=Math.round(avg(results.map(r=>Number(r.probabilities?.awayWin)||0)));
+            const sum=hw+dr+aw;
+            if(sum!==100){
+                const diff=100-sum;
+                const maxVal=Math.max(hw,dr,aw);
+                if(hw===maxVal)hw+=diff;else if(dr===maxVal)dr+=diff;else aw+=diff;
+            }
+            const scoreCounts={};
+            results.forEach(r=>{const s=String(r.predictedScore||'0-0');scoreCounts[s]=(scoreCounts[s]||0)+1;});
+            const sorted=Object.entries(scoreCounts).sort((a,b)=>b[1]-a[1]);
+            const predictedScore=sorted[0][0];
+            const confCounts={};
+            results.forEach(r=>{const c=r.confidence||'中';confCounts[c]=(confCounts[c]||0)+1;});
+            const confidence=Object.entries(confCounts).sort((a,b)=>b[1]-a[1])[0][0];
+            const base=results[0];
+            return {
+                ...base,
+                probabilities:{homeWin:hw,draw:dr,awayWin:aw},
+                predictedScore,
+                confidence,
+                analysis:(base.analysis||'')+`（${results.length} 次平均）`
+            };
+        }
+
+        async function predictMulti(home,away,roundStr,intel,apiKey,provider,times){
+            const results=[];
+            for(let i=0;i<times;i++){
+                if(aborted)break;
+                try{
+                    const r=await runPrediction(home,away,roundStr,intel,apiKey,provider);
+                    results.push(r);
+                }catch(e){/* 单次失败继续 */}
+                if(i<times-1&&!aborted)await sleep(1200);
+            }
+            if(!results.length)throw new Error('所有尝试均失败');
+            return aggregate(results);
+        }
+
+        async function run(roundNum,intel,apiKey,provider,times){
             if(running)return;
             running=true;aborted=false;
             $('plBatchRun').disabled=true;
@@ -1215,15 +1269,15 @@
             for(let i=0;i<matches.length;i++){
                 if(aborted)break;
                 const m=matches[i];
-                updateItem(i,'running','预测中…');
+                updateItem(i,'running',times>1?`预测中（${times}次）…`:'预测中…');
                 try{
-                    const data=await runPrediction(m.home,m.away,'第'+(Number(roundNum)+1)+'轮',intel,apiKey,provider);
+                    const data=await predictMulti(m.home,m.away,'第'+(Number(roundNum)+1)+'轮',intel,apiKey,provider,times);
                     const score=data?.predictedScore||'—';
                     const probs=data?.probabilities;
                     const probText=probs?` <span class="probs">${probs.homeWin}/${probs.draw}/${probs.awayWin}</span>`:'';
-                    updateItem(i,'done',`${esc(score)}${probText}`);
+                    const runBadge=times>1?`<span class="runs">×${times}</span>`:'';
+                    updateItem(i,'done',`${esc(score)}${probText}${runBadge}`,times>1);
                     ok++;
-                    // 自动入库（不重复渲染）
                     try{
                         window.PLHistory?.add({
                             round:'第'+(Number(roundNum)+1)+'轮',
@@ -1232,7 +1286,8 @@
                             predictedAway:Number(parseScore(score).away),
                             probability:probs?{home:probs.homeWin,draw:probs.draw,away:probs.awayWin}:{},
                             confidence:data.confidence||'',analysis:data.analysis||'',
-                            actualHome:null,actualAway:null
+                            actualHome:null,actualAway:null,
+                            runs:times
                         });
                     }catch(e){}
                 }catch(err){
@@ -1247,6 +1302,35 @@
             $('plBatchRun').disabled=false;
             $('plBatchRun').textContent=`完成（成功 ${ok} / 失败 ${fail}）`;
             setTimeout(()=>{$('plBatchRun').textContent='再次批量预测';},2500);
+
+            if(fail===0)toast(`✅ 批量预测完成：${ok} 场全部成功`);
+            else if(ok===0)toast(`❌ 批量预测失败：${fail} 场全部出错`);
+            else toast(`⚠️ 批量预测完成：成功 ${ok}，失败 ${fail}`);
+        }
+
+        function toast(msg){
+            let t=document.getElementById('plToast');
+            if(!t){
+                t=document.createElement('div');
+                t.id='plToast';
+                t.style.cssText='position:fixed;left:50%;top:32px;transform:translateX(-50%) translateY(-20px);background:var(--surface);border:1px solid var(--border);color:var(--text);padding:14px 22px;border-radius:12px;font-size:13.5px;font-weight:500;box-shadow:0 20px 60px rgba(0,0,0,.6);z-index:99999;opacity:0;transition:all .3s cubic-bezier(.16,1,.3,1);backdrop-filter:blur(12px)';
+                document.body.appendChild(t);
+            }
+            t.textContent=msg;
+            requestAnimationFrame(()=>{t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';});
+            clearTimeout(t._timer);
+            t._timer=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(-20px)';},3200);
+        }
+
+        function updateWarn(){
+            const times=Number($('plBatchTimes').value)||1;
+            const roundSel=document.getElementById('roundSelect');
+            const matches=getRoundMatches(roundSel.value);
+            const total=matches.length*times;
+            $('plBatchWarn').textContent=`预计消耗 ${total} 次 API 调用（${matches.length} 场 × ${times} 次）`;
+            if(total>50)$('plBatchWarn').style.color='#ef4444';
+            else if(total>20)$('plBatchWarn').style.color='#fbbf24';
+            else $('plBatchWarn').style.color='#22c55e';
         }
 
         function open(){
@@ -1255,13 +1339,13 @@
             $('plBatchRound').textContent='第'+(Number(roundSel.value)+1)+'轮';
             $('plBatchOverlay').classList.add('open');
             document.body.style.overflow='hidden';
-            // 预渲染列表
             const matches=getRoundMatches(roundSel.value);
             $('plBatchTotal').textContent=matches.length;
             renderList(matches);
             $('plBatchBar').style.width='0%';
             $('plBatchRun').textContent='开始批量预测';
             $('plBatchRun').disabled=false;
+            updateWarn();
         }
         function close(){
             if(running){
@@ -1276,14 +1360,21 @@
         document.getElementById('plBatchClose').addEventListener('click',close);
         document.getElementById('plBatchCancel').addEventListener('click',close);
         document.getElementById('plBatchOverlay').addEventListener('click',e=>{if(e.target.id==='plBatchOverlay')close();});
+        document.getElementById('plBatchTimes').addEventListener('change',updateWarn);
         document.getElementById('plBatchRun').addEventListener('click',()=>{
             const roundSel=document.getElementById('roundSelect');
             const roundNum=roundSel.value;
             const intel=document.getElementById('intel').value.trim();
             const apiKey=document.getElementById('apiKey').value.trim();
             const provider=document.getElementById('provider').value;
+            const times=Number($('plBatchTimes').value)||1;
             if(!apiKey){alert('请先填写 API Key');return;}
-            run(roundNum,intel,apiKey,provider);
+            const matches=getRoundMatches(roundNum);
+            const total=matches.length*times;
+            if(total>30){
+                if(!confirm(`将消耗约 ${total} 次 API 调用，确定继续？`))return;
+            }
+            run(roundNum,intel,apiKey,provider,times);
         });
     })();
 </script>
