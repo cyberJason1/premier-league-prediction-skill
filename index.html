@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>英超预测引擎 v4.1</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#050810">
+    <title>英超预测引擎 v5.0</title>
     <style>
         :root{
             --bg:#050810; --bg2:#0a1220;
@@ -12,10 +13,14 @@
             --orange:#e85d3a; --orange2:#ff8b5a;
             --blue:#00d4ff; --green:#4ade80;
             --gold:#ffb648; --red:#f43f5e; --purple:#8b5cf6;
-            --txt:#e8eef7; --txt2:#8b98ab; --txt3:#5a6779;
+            --txt:#e8eef7; --txt2:#94a1b5; --txt3:#7a8699;
+            --r-xs:6px; --r-sm:10px; --r-md:14px; --r-lg:20px;
+            --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px;
+            --font-ui:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+            --font-serif:Georgia,"Times New Roman",serif;
         }
         *{box-sizing:border-box;margin:0;padding:0}
-        html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+        html,body{background:var(--bg);color:var(--txt);font-family:var(--font-ui);min-height:100vh;overflow-x:hidden;-webkit-text-size-adjust:100%}
         body::before{
             content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
             background:
@@ -30,35 +35,65 @@
                     radial-gradient(circle at 50% 50%,transparent 68%,#fff 68.5%,transparent 69%),
                     linear-gradient(90deg,transparent 49.8%,#fff 49.8%,#fff 50.2%,transparent 50.2%);
         }
-        .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:32px 22px 120px}
+        body.no-scroll{overflow:hidden}
+        .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:var(--s8) var(--s6) 120px}
+        @media(max-width:640px){.wrap{padding:var(--s5) var(--s3) 100px}}
+
+        /* 减少动画偏好 */
+        @media(prefers-reduced-motion:reduce){
+            *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+            .fade-in{opacity:1;transform:none}
+        }
+
+        /* 骨架屏 */
+        .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.04) 75%);background-size:200% 100%;animation:skeleton 1.4s ease-in-out infinite;border-radius:var(--r-xs)}
+        @keyframes skeleton{to{background-position:-200% 0}}
+        .sk-row{height:36px;margin-bottom:var(--s2)}
+
+        /* 淡入 */
         .fade-in{opacity:0;transform:translateY(14px);animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) forwards}
         @keyframes fadeUp{to{opacity:1;transform:none}}
         .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}.d6{animation-delay:.55s}
-        .hero{padding:28px 8px 22px;border-bottom:1px solid var(--line)}
-        .hero .kick{font-size:12px;letter-spacing:.28em;color:var(--orange);text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:10px}
+
+        /* Hero */
+        .hero{padding:var(--s6) 0 var(--s5);border-bottom:1px solid var(--line)}
+        .hero .kick{font-size:11px;letter-spacing:.24em;color:var(--orange);text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:var(--s2);margin-bottom:var(--s2)}
         .hero .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.6s infinite}
         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
-        .hero h1{font-family:Georgia,"Times New Roman",serif;font-size:52px;line-height:1.05;font-weight:400;margin:10px 0 6px;letter-spacing:-.02em}
+        .hero h1{font-family:var(--font-serif);font-size:clamp(34px,6vw,56px);line-height:1.05;font-weight:400;letter-spacing:-.02em;margin-bottom:var(--s2)}
         .hero h1 em{font-style:italic;color:var(--orange)}
-        .hero p{color:var(--txt2);font-size:14px;margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
-        .hero .tag-line{font-size:12px;color:var(--txt3);margin-top:10px}
-        .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 26px}
-        .cell{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;backdrop-filter:blur(12px);transition:border-color .2s,transform .2s}
+        .hero .sub{color:var(--txt2);font-size:14px}
+        .hero .tag-line{font-size:12px;color:var(--txt3);margin-top:var(--s3);display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap}
+        .hero .kbd-hint{display:inline-flex;gap:6px;align-items:center}
+        .hero kbd{font-family:var(--font-ui);font-size:10px;padding:2px 6px;border-radius:var(--r-xs);background:rgba(255,255,255,.06);border:1px solid var(--line2);color:var(--txt2)}
+
+        /* 仪表盘 */
+        .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3);margin:var(--s5) 0 var(--s6)}
+        @media(max-width:640px){.dash{grid-template-columns:repeat(2,1fr)}}
+        .cell{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s5);backdrop-filter:blur(12px);transition:border-color .2s,transform .2s;cursor:default}
         .cell:hover{border-color:var(--line2);transform:translateY(-2px)}
-        .cell .lbl{font-size:11px;letter-spacing:.2em;color:var(--txt3);text-transform:uppercase;display:flex;align-items:center;gap:6px}
-        .cell .val{font-family:Georgia,serif;font-size:34px;color:var(--txt);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums}
+        .cell .lbl{font-size:11px;letter-spacing:.14em;color:var(--txt3);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+        .cell .val{font-family:var(--font-serif);font-size:clamp(26px,4vw,34px);color:var(--txt);margin-top:var(--s2);line-height:1;font-variant-numeric:tabular-nums}
         .cell .val.orange{color:var(--orange)} .cell .val.blue{color:var(--blue)}
-        .grid{display:grid;grid-template-columns:400px 1fr;gap:22px}
-        @media(max-width:920px){.grid{grid-template-columns:1fr}.hero h1{font-size:38px}.dash{grid-template-columns:repeat(2,1fr)}}
-        .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;backdrop-filter:blur(12px);transition:border-color .25s}
+
+        /* 网格 */
+        .grid{display:grid;grid-template-columns:minmax(340px,400px) 1fr;gap:var(--s5)}
+        @media(max-width:1020px){.grid{grid-template-columns:1fr}}
+        .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s5);backdrop-filter:blur(12px);transition:border-color .25s}
         .card:hover{border-color:var(--line2)}
-        .card h3{font-size:12px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:14px}
-        .field{margin-bottom:14px}
-        .field label{display:block;font-size:12px;color:var(--txt2);margin-bottom:6px}
-        select,input,textarea{width:100%;background:#0a0f1a;border:1px solid var(--line2);color:var(--txt);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+        .card h3{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:var(--s3)}
+        .field{margin-bottom:var(--s3)}
+        .field label{display:block;font-size:12px;color:var(--txt2);margin-bottom:var(--s1)}
+        select,input,textarea{width:100%;background:#0a0f1a;border:1px solid var(--line2);color:var(--txt);border-radius:var(--r-sm);padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
         select:focus,input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,93,58,.15)}
+        select{cursor:pointer}
         textarea{resize:vertical;min-height:88px;line-height:1.5}
-        .btn{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08;font-weight:800;font-size:15px;letter-spacing:.06em;cursor:pointer;transition:transform .15s,filter .15s;position:relative;overflow:hidden}
+        .input-row{position:relative}
+        .input-row .toggle-vis{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:var(--txt3);cursor:pointer;padding:6px;font-size:12px}
+        .input-row .toggle-vis:hover{color:var(--orange)}
+
+        /* 按钮 */
+        .btn{width:100%;padding:13px;border:0;border-radius:var(--r-md);background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08;font-weight:800;font-size:15px;letter-spacing:.04em;cursor:pointer;transition:transform .15s,filter .15s;position:relative;overflow:hidden}
         .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
         .btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
         .btn.loading::after{content:"";position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:shimmer 1.4s ease-in-out infinite}
@@ -66,44 +101,57 @@
         .btn.loading::before{content:"";position:absolute;left:0;top:0;bottom:0;background:rgba(0,0,0,.15);width:100%}
         .btn.ghost{background:transparent;color:var(--txt2);border:1px solid var(--line2)}
         .btn.ghost:hover{color:var(--orange);border-color:var(--orange)}
-        .empty{color:var(--txt3);text-align:center;padding:60px 10px;font-size:14px}
-        .empty .empty-ball{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;background:
+        .btn.small{padding:8px 14px;font-size:13px;width:auto}
+
+        /* 空状态 */
+        .empty{color:var(--txt3);text-align:center;padding:50px var(--s3);font-size:14px;line-height:1.6}
+        .empty .empty-ball{width:54px;height:54px;margin:0 auto var(--s4);border-radius:50%;background:
                 radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
                 conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);
-            box-shadow:0 0 0 2px rgba(255,255,255,.06);
-            animation:spinSlow 8s linear infinite}
+            box-shadow:0 0 0 2px rgba(255,255,255,.06);animation:spinSlow 8s linear infinite}
         @keyframes spinSlow{to{transform:rotate(360deg)}}
-        .scoreboard{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px;animation:fadeUp .55s cubic-bezier(.2,.8,.2,1)}
-        .teams{display:flex;align-items:center;justify-content:center;gap:22px}
-        .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px}
+        .empty .hint{margin-top:var(--s2);font-size:12px;color:var(--txt3)}
+
+        /* 比分板 */
+        .scoreboard{text-align:center;padding:var(--s4) 0 var(--s5);border-bottom:1px solid var(--line);margin-bottom:var(--s4)}
+        .teams{display:flex;align-items:center;justify-content:center;gap:var(--s4);flex-wrap:nowrap}
+        .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--s2);min-width:0}
         .badge-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
-        .badge-wrap .badge{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s ease,transform .25s;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
+        .badge-wrap .badge{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s,transform .25s;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
         .badge-wrap .badge.loaded{opacity:1}
         .badge-wrap:hover .badge{transform:scale(1.06)}
-        .badge-wrap .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:var(--txt2);letter-spacing:.05em}
-        .team .nm{font-size:14px;font-weight:600}
-        .score{font-family:Georgia,serif;font-size:60px;color:var(--green);text-shadow:0 0 24px rgba(74,222,128,.35);letter-spacing:.02em;white-space:nowrap}
+        .badge-wrap .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:22px;color:var(--txt2);letter-spacing:.05em}
+        .team .nm{font-size:14px;font-weight:600;text-align:center;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+        .score{font-family:var(--font-serif);font-size:clamp(42px,7vw,64px);color:var(--green);text-shadow:0 0 24px rgba(74,222,128,.35);letter-spacing:.02em;white-space:nowrap}
         .score.pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1)}
         @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-        .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
-        .ring{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;transition:border-color .2s}
+
+        /* 概率环 */
+        .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);margin-bottom:var(--s3)}
+        @media(max-width:480px){.rings{gap:var(--s2)}}
+        .ring{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r-md);padding:var(--s4) var(--s2);text-align:center;transition:border-color .2s}
         .ring:hover{border-color:var(--line2)}
-        .ring svg{width:100px;height:100px;transform:rotate(-90deg)}
+        .ring svg{width:100%;max-width:100px;aspect-ratio:1;transform:rotate(-90deg)}
         .ring circle{fill:none;stroke-width:8;stroke-linecap:round}
         .ring .track{stroke:rgba(255,255,255,.07)}
         .ring .bar{transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
-        .ring .lbl2{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;margin-top:8px}
-        .ring .num{font-family:Georgia,serif;font-size:26px;margin-top:2px;font-variant-numeric:tabular-nums}
+        .ring .lbl2{font-size:11px;letter-spacing:.14em;color:var(--txt3);text-transform:uppercase;margin-top:var(--s2)}
+        .ring .num{font-family:var(--font-serif);font-size:clamp(20px,3vw,26px);margin-top:2px;font-variant-numeric:tabular-nums}
         .ring.h .num{color:var(--orange)} .ring.d .num{color:var(--txt2)} .ring.a .num{color:var(--blue)}
-        .compare{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;display:flex;border:1px solid var(--line);margin-bottom:20px}
-        .compare .seg{height:100%;transition:width 1s cubic-bezier(.4,0,.2,1)}
+
+        /* 概率对比条 */
+        .compare{display:flex;height:14px;background:var(--panel2);border-radius:var(--r-xs);overflow:hidden;border:1px solid var(--line);margin-bottom:var(--s4)}
+        .compare .seg{height:100%;transition:width 1s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#000;overflow:hidden}
         .compare .seg.h{background:linear-gradient(90deg,var(--orange),var(--orange2))}
-        .compare .seg.d{background:#5a6779}
+        .compare .seg.d{background:#7a8699;color:#fff}
         .compare .seg.a{background:linear-gradient(90deg,#0098cc,var(--blue))}
-        .sect{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
-        .sect .ttl{font-size:11px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:10px}
+        @media(max-width:480px){.compare .seg{font-size:0}}
+
+        /* 段落 */
+        .sect{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid var(--line)}
+        .sect .ttl{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:var(--s2)}
         .kv{color:var(--txt);font-size:14px;line-height:1.75}
-        .factors{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+        .factors{display:flex;flex-wrap:wrap;gap:var(--s2);margin-bottom:var(--s3)}
         .chip{background:rgba(232,93,58,.12);border:1px solid rgba(232,93,58,.28);color:#ffb59a;font-size:12px;padding:5px 11px;border-radius:999px;transition:transform .2s,background .2s}
         .chip:hover{transform:translateY(-1px);background:rgba(232,93,58,.2)}
         .conf{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
@@ -111,44 +159,53 @@
         .conf.中高{background:rgba(0,212,255,.14);color:var(--blue);border:1px solid rgba(0,212,255,.3)}
         .conf.中{background:rgba(255,182,72,.14);color:var(--gold);border:1px solid rgba(255,182,72,.3)}
         .conf.低{background:rgba(244,63,94,.14);color:var(--red);border:1px solid rgba(244,63,94,.3)}
-        .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:14px;padding:14px 16px;position:relative}
-        .h2h .tag{position:absolute;top:-9px;right:12px;font-size:10px;padding:3px 8px;border-radius:6px;letter-spacing:.1em;font-weight:700}
-        .h2h .tag.估算{background:rgba(255,182,72,.18);color:var(--gold);border:1px solid rgba(255,182,72,.4)}
-        .h2h .tag.资料库{background:rgba(74,222,128,.18);color:var(--green);border:1px solid rgba(74,222,128,.4)}
-        .h2h .tag.今日情报{background:rgba(0,212,255,.18);color:var(--blue);border:1px solid rgba(0,212,255,.4)}
-        .h2h .sum{font-size:14px;margin-bottom:8px}
+
+        /* H2H */
+        .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:var(--r-md);padding:var(--s4);position:relative;padding-top:18px}
+        .h2h .tag{position:absolute;top:-9px;left:14px;font-size:10px;padding:3px 8px;border-radius:var(--r-xs);letter-spacing:.06em;font-weight:700}
+        .h2h .tag.估算{background:#1a1a2e;color:var(--gold);border:1px solid rgba(255,182,72,.5)}
+        .h2h .tag.资料库{background:#0a1e16;color:var(--green);border:1px solid rgba(74,222,128,.5)}
+        .h2h .tag.今日情报{background:#0a1a24;color:var(--blue);border:1px solid rgba(0,212,255,.5)}
+        .h2h .sum{font-size:14px;margin-bottom:var(--s2)}
         .h2h ul{list-style:none;font-size:13px;color:var(--txt2)}
         .h2h li{padding:3px 0}
-        .h2h li::before{content:"›";color:var(--purple);margin-right:8px;font-weight:700}
-        .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-        .pcard{background:linear-gradient(160deg,rgba(232,93,58,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:14px;padding:12px;transition:transform .2s,box-shadow .2s}
+        .h2h li::before{content:"›";color:var(--purple);margin-right:var(--s2);font-weight:700}
+
+        /* 球员卡 */
+        .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:var(--s2)}
+        .pcard{background:linear-gradient(160deg,rgba(232,93,58,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:var(--r-md);padding:var(--s3);transition:transform .2s,box-shadow .2s}
         .pcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
-        .pcard .row{display:flex;justify-content:space-between;align-items:center}
-        .pcard .nm{font-size:13px;font-weight:700}
-        .pcard .pos{font-size:10px;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
-        .pcard .rt{margin-top:8px;display:flex;align-items:center;gap:8px}
-        .pcard .rating{font-family:Georgia,serif;font-size:24px;color:var(--orange);font-weight:700}
-        .pcard .note{font-size:11px;color:var(--txt2);line-height:1.5;margin-top:6px}
-        .standings{font-size:13px}
-        .standings table{width:100%;border-collapse:collapse}
-        .standings th{color:var(--txt3);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
-        .standings td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
-        .standings tr:hover td{background:rgba(255,255,255,.02)}
-        .standings td:first-child{font-family:Georgia,serif;color:var(--txt2);width:26px}
+        .pcard .row{display:flex;justify-content:space-between;align-items:center;gap:var(--s2)}
+        .pcard .nm{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .pcard .pos{font-size:10px;color:var(--txt3);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+        .pcard .rt{margin-top:var(--s2);display:flex;align-items:center;gap:var(--s2)}
+        .pcard .rating{font-family:var(--font-serif);font-size:24px;color:var(--orange);font-weight:700}
+        .pcard .note{font-size:11px;color:var(--txt2);line-height:1.5;margin-top:var(--s1)}
+
+        /* 积分榜 */
+        .standings{font-size:13px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+        .standings table{width:100%;border-collapse:collapse;min-width:600px}
+        .standings th{color:var(--txt3);font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-align:left;padding:var(--s2) 6px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#0a1220;z-index:1}
+        .standings td{padding:var(--s2) 6px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+        .standings tr{cursor:pointer}
+        .standings tr:hover td{background:rgba(232,93,58,.06)}
+        .standings td:first-child{font-family:var(--font-serif);color:var(--txt2);width:26px}
         .standings tr.ucl td:first-child{color:var(--green)}
         .standings tr.rel td:first-child{color:var(--red)}
-        .mini-badge-wrap{position:relative;display:inline-flex;width:20px;height:20px;vertical-align:middle;margin-right:8px}
-        .mini-badge{width:20px;height:20px;object-fit:contain;opacity:0;transition:opacity .25s}
+        .mini-badge-wrap{position:relative;display:inline-flex;width:22px;height:22px;vertical-align:middle;margin-right:var(--s2)}
+        .mini-badge{width:22px;height:22px;object-fit:contain;opacity:0;transition:opacity .25s}
         .mini-badge.loaded{opacity:1}
-        .mini-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:Georgia,serif;color:var(--txt3);background:rgba(255,255,255,.05);border-radius:4px}
+        .mini-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:var(--font-serif);color:var(--txt3);background:rgba(255,255,255,.05);border-radius:var(--r-xs)}
         .mini-badge.loaded ~ .mini-fallback{display:none}
         .standings .team-name{vertical-align:middle}
-        .last5{display:inline-flex;gap:3px}
-        .last5 span{width:14px;height:14px;border-radius:3px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
+        .last5{display:inline-flex;gap:2px}
+        .last5 span{width:15px;height:15px;border-radius:3px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
         .last5 span.W{background:rgba(74,222,128,.7)}
         .last5 span.D{background:rgba(139,152,171,.5)}
         .last5 span.L{background:rgba(244,63,94,.6)}
-        .loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:50px 0}
+
+        /* 加载 */
+        .loader{display:flex;flex-direction:column;align-items:center;gap:var(--s3);padding:var(--s8) 0}
         .ball{width:48px;height:48px;border-radius:50%;background:
                 radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
                 conic-gradient(from 0deg,#fff 0 25%,#111 25% 50%,#fff 50% 75%,#111 75% 100%);
@@ -156,64 +213,91 @@
             animation:bounce .7s cubic-bezier(.2,.6,.4,1) infinite alternate,spin 1.4s linear infinite}
         @keyframes bounce{to{transform:translateY(-22px)}}
         @keyframes spin{to{transform:rotate(360deg)}}
-        .loader .msg{font-size:13px;color:var(--txt2);letter-spacing:.05em}
-        .fab{position:fixed;right:24px;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .2s,filter .2s;z-index:60}
+        .loader .msg{font-size:13px;color:var(--txt2);letter-spacing:.04em;text-align:center}
+
+        /* FAB */
+        .fab{position:fixed;right:var(--s5);width:50px;height:50px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.5);transition:transform .2s,filter .2s;z-index:60}
+        @media(max-width:480px){.fab{right:var(--s3);width:46px;height:46px}}
         .fab:hover{transform:translateY(-2px) scale(1.05);filter:brightness(1.1)}
-        .fab.hist{bottom:24px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08}
-        .fab.batch{bottom:88px;background:linear-gradient(135deg,var(--blue),#5cc8ff);color:#02131c}
-        .fab.top{bottom:152px;background:rgba(255,255,255,.12);border:1px solid var(--line2);opacity:0;pointer-events:none;transition:opacity .25s}
+        .fab.hist{bottom:var(--s5);background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08}
+        .fab.batch{bottom:84px;background:linear-gradient(135deg,var(--blue),#5cc8ff);color:#02131c}
+        .fab.top{bottom:145px;background:rgba(255,255,255,.12);border:1px solid var(--line2);opacity:0;pointer-events:none;transition:opacity .25s}
         .fab.top.show{opacity:1;pointer-events:auto}
-        .fab .badge-n{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
-        .mask{position:fixed;inset:0;background:rgba(3,5,10,.78);backdrop-filter:blur(6px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
+        .fab .badge-n{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:19px;height:19px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+
+        /* 弹窗 */
+        .mask{position:fixed;inset:0;background:rgba(3,5,10,.8);backdrop-filter:blur(6px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:var(--s8) var(--s3);overflow-y:auto;-webkit-overflow-scrolling:touch}
         .mask.show{display:flex;animation:fadeIn .2s}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .modal{background:#0b1220;border:1px solid var(--line2);border-radius:20px;max-width:760px;width:100%;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:modalIn .3s cubic-bezier(.2,.8,.2,1)}
+        .modal{background:#0b1220;border:1px solid var(--line2);border-radius:var(--r-lg);max-width:760px;width:100%;padding:var(--s5);box-shadow:0 30px 80px rgba(0,0,0,.6);animation:modalIn .3s cubic-bezier(.2,.8,.2,1);outline:none}
         @keyframes modalIn{from{opacity:0;transform:translateY(-12px) scale(.98)}to{opacity:1;transform:none}}
-        .modal h2{font-family:Georgia,serif;font-size:26px;font-weight:400;margin-bottom:6px}
-        .modal .sub{color:var(--txt2);font-size:13px;margin-bottom:18px}
-        .modal .close{float:right;background:transparent;border:0;color:var(--txt3);font-size:22px;cursor:pointer;line-height:1}
-        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-        .stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-        .stat .n{font-family:Georgia,serif;font-size:26px;color:var(--orange)}
-        .stat .l{font-size:10px;letter-spacing:.15em;color:var(--txt3);text-transform:uppercase;margin-top:4px}
-        .filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+        .modal h2{font-family:var(--font-serif);font-size:24px;font-weight:400;margin-bottom:var(--s1);padding-right:30px}
+        .modal .sub{color:var(--txt2);font-size:13px;margin-bottom:var(--s4)}
+        .modal .close{position:absolute;top:var(--s4);right:var(--s4);background:transparent;border:0;color:var(--txt3);font-size:22px;cursor:pointer;line-height:1;padding:4px 8px;border-radius:var(--r-xs)}
+        .modal .close:hover{background:rgba(255,255,255,.06);color:var(--txt)}
+        .modal{position:relative}
+        .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s2);margin-bottom:var(--s4)}
+        @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}}
+        .stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3);text-align:center}
+        .stat .n{font-family:var(--font-serif);font-size:24px;color:var(--orange)}
+        .stat .l{font-size:10px;letter-spacing:.12em;color:var(--txt3);text-transform:uppercase;margin-top:var(--s1)}
+        .filters{display:flex;gap:var(--s1);margin-bottom:var(--s4);flex-wrap:wrap}
         .filter-btn{padding:6px 12px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .2s}
         .filter-btn:hover{color:var(--orange);border-color:var(--orange)}
         .filter-btn.on{background:rgba(232,93,58,.14);color:var(--orange);border-color:var(--orange)}
-        .hlist{max-height:440px;overflow-y:auto;margin-top:6px}
-        .hitem{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;transition:border-color .15s}
+        .hlist{max-height:min(440px,55vh);overflow-y:auto;margin-top:var(--s1)}
+        .hitem{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--r-sm);padding:var(--s3) var(--s4);margin-bottom:var(--s2);transition:border-color .15s}
         .hitem:hover{border-color:var(--line2)}
-        .hitem .top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
-        .hitem .teams2{font-weight:700}
-        .hitem .res-badge{font-size:10px;padding:3px 9px;border-radius:999px;letter-spacing:.08em;font-weight:700}
+        .hitem .top{display:flex;justify-content:space-between;align-items:center;font-size:13px;gap:var(--s2)}
+        .hitem .teams2{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .hitem .res-badge{font-size:10px;padding:3px 9px;border-radius:999px;letter-spacing:.06em;font-weight:700;flex-shrink:0}
         .res-badge.exact{background:rgba(74,222,128,.16);color:var(--green);border:1px solid rgba(74,222,128,.35)}
         .res-badge.wdl{background:rgba(255,182,72,.16);color:var(--gold);border:1px solid rgba(255,182,72,.35)}
         .res-badge.miss{background:rgba(244,63,94,.16);color:var(--red);border:1px solid rgba(244,63,94,.35)}
         .res-badge.pending{background:rgba(139,92,246,.16);color:var(--purple);border:1px solid rgba(139,92,246,.35)}
-        .hitem .multi{display:inline-block;font-size:10px;color:var(--blue);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);padding:1px 6px;border-radius:6px;margin-left:6px}
-        .hitem .meta{font-size:11px;color:var(--txt3);margin-top:6px}
-        .hitem .row2{display:flex;gap:8px;align-items:center;margin-top:8px}
-        .hitem input{padding:7px 10px;font-size:13px;text-align:center}
-        .hitem button{padding:7px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .15s}
+        .hitem .multi{display:inline-block;font-size:10px;color:var(--blue);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);padding:1px 6px;border-radius:var(--r-xs);margin-left:6px}
+        .hitem .meta{font-size:11px;color:var(--txt3);margin-top:var(--s1)}
+        .hitem .row2{display:flex;gap:var(--s2);align-items:center;margin-top:var(--s2)}
+        .hitem input{flex:1;padding:7px 10px;font-size:13px;text-align:center}
+        .hitem button{padding:7px 12px;border-radius:var(--r-xs);border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .15s;flex-shrink:0}
         .hitem button:hover{border-color:var(--orange);color:var(--orange)}
-        .batch-opts{display:flex;gap:8px;margin:12px 0}
-        .batch-opts button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700;transition:all .2s}
+
+        /* 批量 */
+        .batch-opts{display:flex;gap:var(--s2);margin:var(--s3) 0}
+        .batch-opts button{flex:1;padding:12px;border-radius:var(--r-md);border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700;transition:all .2s}
         .batch-opts button:hover{border-color:var(--orange);color:var(--orange)}
         .batch-opts button.on{border-color:var(--orange);background:rgba(232,93,58,.14);color:var(--orange)}
-        .quota{font-size:12px;padding:8px 12px;border-radius:10px;margin-top:10px;text-align:center}
+        .quota{font-size:12px;padding:var(--s2) var(--s3);border-radius:var(--r-sm);margin-top:var(--s2);text-align:center;transition:background .3s}
         .quota.ok{background:rgba(74,222,128,.1);color:var(--green)}
         .quota.warn{background:rgba(255,182,72,.12);color:var(--gold)}
         .quota.bad{background:rgba(244,63,94,.12);color:var(--red)}
-        .toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-        .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:14px;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease}
+
+        /* 进度条 */
+        .progress{height:4px;background:rgba(255,255,255,.06);border-radius:var(--r-xs);overflow:hidden;margin-top:var(--s2);display:none}
+        .progress.show{display:block}
+        .progress .bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--orange2));width:0;transition:width .3s}
+
+        /* Toast */
+        .toast-wrap{position:fixed;top:var(--s5);left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:var(--s2);pointer-events:none;max-width:calc(100vw - 32px)}
+        .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:var(--r-md);font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease;pointer-events:auto;cursor:pointer;max-width:420px;line-height:1.5}
         .toast.ok{border-color:rgba(74,222,128,.5)} .toast.ok::before{content:"✅ ";margin-right:4px}
         .toast.warn{border-color:rgba(255,182,72,.5)} .toast.warn::before{content:"⚠️ ";margin-right:4px}
         .toast.err{border-color:rgba(244,63,94,.5)} .toast.err::before{content:"❌ ";margin-right:4px}
         @keyframes slidein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+
+        /* 版本警告 */
         .verbar{position:fixed;top:0;left:0;right:0;z-index:300;background:#ffb648;color:#000;padding:8px 16px;font-size:13px;text-align:center;font-weight:600}
+
+        /* 彩带 */
         .confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:150;pointer-events:none;animation:fall linear forwards}
         @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-        .streak{display:inline-block;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(232,93,58,.2),rgba(255,182,72,.2));border:1px solid rgba(255,182,72,.4);color:var(--gold);font-size:11px;font-weight:700;margin-left:8px}
+
+        /* 连胜 */
+        .streak{display:inline-block;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(232,93,58,.2),rgba(255,182,72,.2));border:1px solid rgba(255,182,72,.4);color:var(--gold);font-size:11px;font-weight:700;margin-left:var(--s2)}
+
+        /* 焦点可见性 */
+        *:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:var(--r-xs)}
+        button:focus-visible{outline-offset:3px}
     </style>
 </head>
 <body>
@@ -222,8 +306,11 @@
     <div class="hero fade-in d1">
         <div class="kick"><span id="liveDot" class="live-dot" style="display:none"></span><span>Premier League 2026/27</span></div>
         <h1>英超 <em>预测</em> 引擎</h1>
-        <p><span>规则工程 + 前端工程 + 自动化</span><span>· v4.1</span></p>
-        <div class="tag-line" id="matchdayLine">加载中…</div>
+        <div class="sub">规则工程 + 前端工程 + 自动化 · v5.0</div>
+        <div class="tag-line">
+            <span id="matchdayLine">加载中…</span>
+            <span class="kbd-hint">· <kbd>Ctrl</kbd>+<kbd>Enter</kbd> 预测 · <kbd>Ctrl</kbd>+<kbd>H</kbd> 历史</span>
+        </div>
     </div>
 
     <div class="dash fade-in d2">
@@ -236,42 +323,56 @@
     <div class="grid">
         <div class="card fade-in d3">
             <h3>Groq API Key</h3>
-            <div class="field"><input type="password" id="apiKey" placeholder="gsk_... 只存本地浏览器"></div>
-            <div style="display:flex;gap:8px;margin-bottom:18px">
+            <div class="field">
+                <div class="input-row">
+                    <input type="password" id="apiKey" placeholder="gsk_... 只存本地浏览器" autocomplete="off">
+                    <button class="toggle-vis" type="button" onclick="toggleKeyVisibility()" aria-label="显示/隐藏 Key">👁</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:var(--s2);margin-bottom:var(--s5)">
                 <button class="btn ghost" style="flex:1" onclick="saveKey()">保存</button>
                 <button class="btn ghost" style="flex:1" onclick="clearKey()">清除</button>
             </div>
+
             <h3>比赛选择</h3>
-            <div class="field"><label>轮次</label><select id="roundSel"></select></div>
-            <div class="field"><label>对阵</label><select id="matchSel"></select></div>
-            <h3 style="margin-top:18px">今日情报（可选）</h3>
+            <div class="field"><label for="roundSel">轮次</label><select id="roundSel"></select></div>
+            <div class="field"><label for="matchSel">对阵</label><select id="matchSel"></select></div>
+
+            <h3 style="margin-top:var(--s5)">今日情报（可选）</h3>
             <div class="field"><textarea id="intel" placeholder="例：萨利巴背伤缺席；利物浦无锋阵；福登停赛..."></textarea></div>
+
             <button class="btn" id="predictBtn" onclick="startPredict()">开始预测</button>
-            <div style="margin-top:10px;font-size:11px;color:var(--txt3);text-align:center">Ctrl/⌘ + Enter 快速预测</div>
         </div>
 
-        <div class="card fade-in d4" id="resultCard">
+        <div class="card fade-in d4" id="resultCard" aria-live="polite">
             <div class="empty">
                 <div class="empty-ball"></div>
                 <div>选择比赛 → 填写情报 → 开始预测</div>
+                <div class="hint">提示：也可以点积分榜任意一行，自动跳到该队的比赛</div>
             </div>
         </div>
     </div>
 
-    <div class="card fade-in d5" style="margin-top:22px">
+    <div class="card fade-in d5" style="margin-top:var(--s5)">
         <h3>积分榜</h3>
-        <div class="standings" id="standings"><div class="empty">加载中…</div></div>
+        <div class="standings" id="standings">
+            <div class="skeleton sk-row"></div>
+            <div class="skeleton sk-row"></div>
+            <div class="skeleton sk-row"></div>
+            <div class="skeleton sk-row"></div>
+            <div class="skeleton sk-row"></div>
+        </div>
     </div>
 </div>
 
-<button class="fab hist" onclick="openHistory()">📊<span class="badge-n" id="histBadge" style="display:none">0</span></button>
-<button class="fab batch" onclick="openBatch()">⚡</button>
-<button class="fab top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<button class="fab hist" onclick="openHistory()" aria-label="历史记录">📊<span class="badge-n" id="histBadge" style="display:none">0</span></button>
+<button class="fab batch" onclick="openBatch()" aria-label="批量预测">⚡</button>
+<button class="fab top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="返回顶部">↑</button>
 
-<div class="mask" id="histMask">
-    <div class="modal">
-        <button class="close" onclick="closeHistory()">✕</button>
-        <h2>历史记录与命中率</h2>
+<div class="mask" id="histMask" role="dialog" aria-modal="true" aria-labelledby="histTitle">
+    <div class="modal" tabindex="-1">
+        <button class="close" onclick="closeHistory()" aria-label="关闭">✕</button>
+        <h2 id="histTitle">历史记录与命中率</h2>
         <div class="sub" id="histSub">录入实际赛果，自动判定命中</div>
         <div class="stats">
             <div class="stat"><div class="n" id="sTotal">0</div><div class="l">总预测</div></div>
@@ -286,19 +387,19 @@
             <button class="filter-btn" data-f="miss">未命中</button>
             <button class="filter-btn" data-f="pending">待录入</button>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:14px">
-            <button class="btn ghost" onclick="exportHistory()">导出 JSON</button>
-            <button class="btn ghost" onclick="importHistory()">导入 JSON</button>
-            <button class="btn ghost" onclick="clearHistory()">清空</button>
+        <div style="display:flex;gap:var(--s2);margin-bottom:var(--s4);flex-wrap:wrap">
+            <button class="btn ghost small" onclick="exportHistory()">导出 JSON</button>
+            <button class="btn ghost small" onclick="importHistory()">导入 JSON</button>
+            <button class="btn ghost small" onclick="clearHistory()">清空</button>
         </div>
         <div class="hlist" id="histList"></div>
     </div>
 </div>
 
-<div class="mask" id="batchMask">
-    <div class="modal">
-        <button class="close" onclick="closeBatch()">✕</button>
-        <h2>批量预测</h2>
+<div class="mask" id="batchMask" role="dialog" aria-modal="true" aria-labelledby="batchTitle">
+    <div class="modal" tabindex="-1">
+        <button class="close" onclick="closeBatch()" aria-label="关闭">✕</button>
+        <h2 id="batchTitle">批量预测</h2>
         <div class="sub">对当前轮次全部比赛进行预测（并发 3 场加速）</div>
         <div class="batch-opts" id="batchOpts">
             <button data-n="1" class="on">每场 1 次</button>
@@ -306,11 +407,12 @@
             <button data-n="5">每场 5 次</button>
         </div>
         <div class="quota ok" id="batchQuota">预计消耗 10 次调用</div>
-        <button class="btn" id="batchBtn" onclick="runBatch()">开始批量预测</button>
+        <div class="progress" id="batchProgress"><div class="bar" id="batchProgressBar"></div></div>
+        <button class="btn" id="batchBtn" onclick="runBatch()" style="margin-top:var(--s3)">开始批量预测</button>
     </div>
 </div>
 
-<div class="toast-wrap" id="toastWrap"></div>
+<div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 
 <script>
     /* ============================================================
@@ -321,6 +423,7 @@
     const GROQ_MODEL = 'openai/gpt-oss-120b';
     const SKILL_CACHE_KEY = 'pl_skill_cache_v1';
     const SKILL_CACHE_TTL = 24 * 3600 * 1000;
+    const REQUEST_TIMEOUT = 30000;
 
     const ABBR = {
         '阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','曼联':'MUN',
@@ -339,13 +442,13 @@
         '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
 
     /* ============================================================
-       1. 数据容器（从 data.json 加载）
+       1. 数据
     ============================================================ */
     const FIXTURES = [];
     const RESULTS = {};
     let STATIC_STANDINGS = [];
+    let _last5Cache = null;
 
-    // 回退：如果 data.json 加载失败，用算法生成占位赛程，避免页面空白
     (function fillFallbackFixtures(){
         if (FIXTURES.length) return;
         const out = [];
@@ -365,11 +468,7 @@
         const second = out.map(rd => rd.map(m => ({ home: m.away, away: m.home })));
         FIXTURES.push(...out, ...second);
     })();
-
-    // 回退积分榜（data.json 加载成功后会覆盖）
-    STATIC_STANDINGS = TEAMS.map(t => ({
-        team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0
-    }));
+    STATIC_STANDINGS = TEAMS.map(t => ({ team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 }));
 
     /* ============================================================
        2. 校验 + 归一化
@@ -382,46 +481,51 @@
             if (data[k] === undefined || data[k] === null) errors.push(`缺少字段：${k}`);
         }
         if (errors.length) return { ok:false, errors, warnings, data };
-
         let h = Number(data.homeWin), d = Number(data.draw), a = Number(data.awayWin);
-        if (![h,d,a].every(Number.isFinite)) {
-            errors.push('概率字段不是数字');
-            return { ok:false, errors, warnings, data };
-        }
+        if (![h,d,a].every(Number.isFinite)) { errors.push('概率不是数字'); return { ok:false, errors, warnings, data }; }
         const sum = h + d + a;
         const diff = Math.abs(sum - 100);
-        if (diff > 2) {
-            warnings.push(`概率总和 ${sum}，偏差 ${diff.toFixed(1)} > 2`);
-            return { ok:false, errors, warnings, data, hardFail:true };
-        }
+        if (diff > 2) { warnings.push(`概率总和 ${sum}，偏差 > 2`); return { ok:false, errors, warnings, data, hardFail:true }; }
         if (diff > 0) {
             const f = 100 / sum;
             const r = [Math.round(h*f*100), Math.round(d*f*100), Math.round(a*f*100)];
-            const delta = 10000 - (r[0]+r[1]+r[2]);
-            r[0] += delta;
+            r[0] += 10000 - (r[0]+r[1]+r[2]);
             data.homeWin = r[0]/100; data.draw = r[1]/100; data.awayWin = r[2]/100;
             warnings.push(`概率已归一化：原总和 ${sum}`);
         }
         if (!Array.isArray(data.keyFactors)) warnings.push('keyFactors 不是数组');
         if (data.headToHead && typeof data.headToHead === 'object') {
             const note = data.headToHead.note;
-            if (note && !['估算','资料库','今日情报'].includes(note)) warnings.push(`headToHead.note 非法值：${note}`);
-            if (!Array.isArray(data.headToHead.lastMatches)) warnings.push('headToHead.lastMatches 不是数组');
+            if (note && !['估算','资料库','今日情报'].includes(note)) warnings.push(`note 非法值：${note}`);
         } else warnings.push('headToHead 缺失');
         return { ok:true, errors, warnings, data };
     }
 
     /* ============================================================
-       3. Toast / 彩带
+       3. Toast（去重 + 可关闭 + 聚焦时暂停）
     ============================================================ */
-    function toast(msg, kind='ok') {
+    const _toastKeys = new Set();
+    function toast(msg, kind='ok', dur=3500) {
+        const key = kind + ':' + msg;
+        if (_toastKeys.has(key)) return;
+        _toastKeys.add(key);
         const el = document.createElement('div');
         el.className = 'toast ' + kind;
         el.textContent = msg;
+        el.title = '点击关闭';
+        el.onclick = () => el.remove();
         document.getElementById('toastWrap').appendChild(el);
-        setTimeout(() => el.remove(), 3200);
+        let timer = setTimeout(() => el.remove(), dur);
+        el.addEventListener('mouseenter', () => clearTimeout(timer));
+        el.addEventListener('mouseleave', () => { timer = setTimeout(() => el.remove(), 1500); });
+        const observer = new MutationObserver(() => {
+            if (!document.body.contains(el)) { _toastKeys.delete(key); observer.disconnect(); }
+        });
+        observer.observe(document.getElementById('toastWrap'), { childList:true });
     }
+
     function confetti(){
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         const colors = ['#4ade80','#ffb648','#00d4ff','#e85d3a'];
         for (let i = 0; i < 40; i++) {
             const el = document.createElement('div');
@@ -438,12 +542,16 @@
     /* ============================================================
        4. API Key
     ============================================================ */
+    function toggleKeyVisibility(){
+        const inp = document.getElementById('apiKey');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
     function saveKey(){ const k = document.getElementById('apiKey').value.trim(); if(!k) return toast('请输入 API Key','warn'); localStorage.setItem('groq_key', k); toast('已保存'); }
     function clearKey(){ localStorage.removeItem('groq_key'); document.getElementById('apiKey').value=''; toast('已清除','warn'); }
     function getKey(){ return localStorage.getItem('groq_key') || ''; }
 
     /* ============================================================
-       5. skill.md 加载
+       5. skill.md
     ============================================================ */
     let _skillCache = null;
     let _verBarShown = false;
@@ -453,14 +561,24 @@
             const cached = JSON.parse(localStorage.getItem(SKILL_CACHE_KEY) || 'null');
             if (cached && Date.now() - cached.ts < SKILL_CACHE_TTL && cached.version === EXPECTED_SKILL_VERSION) {
                 _skillCache = cached.text;
-                return _skillCache;
+                // 后台静默刷新
+                fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' })
+                    .then(r => r.text())
+                    .then(text => {
+                        const v = (text.match(/v(\d+\.\d+\.\d+)/)||[])[1];
+                        if (v === EXPECTED_SKILL_VERSION && text !== cached.text) {
+                            localStorage.setItem(SKILL_CACHE_KEY, JSON.stringify({ ts:Date.now(), version:v, text }));
+                            _skillCache = null;
+                        }
+                    }).catch(()=>{});
+                return cached.text;
             }
         } catch(e){}
+
         const res = await fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' });
         if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
         let text = await res.text();
         text = text.replace(/\r\n/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{2,}/g,'\n').replace(/<!--[\s\S]*?-->/g,'').trim();
-
         const vm = text.match(/v(\d+\.\d+\.\d+)/);
         const actualVersion = vm ? vm[1] : null;
         if (actualVersion !== EXPECTED_SKILL_VERSION && !_verBarShown) {
@@ -476,30 +594,40 @@
     }
 
     /* ============================================================
-       6. Groq 调用
+       6. Groq 调用（带超时）
     ============================================================ */
     async function callGroq(systemPrompt, userPrompt, maxRetry=3){
         const key = getKey();
         if (!key) throw new Error('未设置 API Key');
         let delay = 1500;
         for (let attempt = 0; attempt <= maxRetry; attempt++) {
-            const resp = await fetch(GROQ_URL, {
-                method:'POST',
-                headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
-                body: JSON.stringify({
-                    model: GROQ_MODEL,
-                    messages:[
-                        { role:'system', content: systemPrompt },
-                        { role:'user', content: userPrompt }
-                    ],
-                    temperature: 0.2,
-                    response_format: { type: 'json_object' }
-                })
-            });
-            if (resp.status === 429 && attempt < maxRetry) { await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
-            if (!resp.ok) { const txt = await resp.text(); throw new Error(`Groq ${resp.status}: ${txt.slice(0,240)}`); }
-            const j = await resp.json();
-            return j.choices?.[0]?.message?.content || '';
+            const ctrl = new AbortController();
+            const tid = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT);
+            try {
+                const resp = await fetch(GROQ_URL, {
+                    method:'POST',
+                    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
+                    body: JSON.stringify({
+                        model: GROQ_MODEL,
+                        messages:[
+                            { role:'system', content: systemPrompt },
+                            { role:'user', content: userPrompt }
+                        ],
+                        temperature: 0.2,
+                        response_format: { type: 'json_object' }
+                    }),
+                    signal: ctrl.signal
+                });
+                clearTimeout(tid);
+                if (resp.status === 429 && attempt < maxRetry) { await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
+                if (!resp.ok) { const txt = await resp.text(); throw new Error(`Groq ${resp.status}: ${txt.slice(0,240)}`); }
+                const j = await resp.json();
+                return j.choices?.[0]?.message?.content || '';
+            } catch(e) {
+                clearTimeout(tid);
+                if (e.name === 'AbortError') throw new Error('请求超时（30s），请检查网络或稍后重试');
+                throw e;
+            }
         }
         throw new Error('Groq 重试耗尽');
     }
@@ -536,8 +664,29 @@
         return { round: r, ...(round[i] || { home:'', away:'' }) };
     }
 
+    /* 从积分榜跳转到比赛 */
+    function jumpToTeam(team){
+        for (let r = 0; r < FIXTURES.length; r++) {
+            const round = FIXTURES[r];
+            for (let i = 0; i < round.length; i++) {
+                if (round[i].home === team || round[i].away === team) {
+                    document.getElementById('roundSel').value = r;
+                    fillMatches();
+                    document.getElementById('matchSel').value = i;
+                    localStorage.setItem('last_round', r);
+                    localStorage.setItem('last_match_'+r, i);
+                    refreshDashboard();
+                    document.querySelector('.grid').scrollIntoView({ behavior:'smooth', block:'start' });
+                    toast(`已定位：${round[i].home} vs ${round[i].away}`, 'ok');
+                    return;
+                }
+            }
+        }
+        toast(`未找到 ${team} 的比赛`, 'warn');
+    }
+
     /* ============================================================
-       8. 预测流程
+       8. 预测
     ============================================================ */
     async function startPredict(){
         const btn = document.getElementById('predictBtn');
@@ -549,24 +698,25 @@
         btn.disabled = true;
         btn.classList.add('loading');
         const card = document.getElementById('resultCard');
-        card.innerHTML = `<div class="loader"><div class="ball"></div><div class="msg">模型推理中…（约 10 秒）</div></div>`;
+        card.innerHTML = `<div class="loader"><div class="ball"></div><div class="msg">模型推理中…<br>（约 10 秒）</div></div>`;
 
         try {
             const skill = await loadSkill();
-            const userPrompt =
-                (intel ? `【今日情报】\n${intel}\n\n` : '') +
+            const userPrompt = (intel ? `【今日情报】\n${intel}\n\n` : '') +
                 `【预测指令】\n请预测：第 ${round+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
             const raw = await callGroq(skill, userPrompt);
 
             let parsed;
             try { parsed = JSON.parse(raw); }
             catch(e){
-                card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<br><pre style="white-space:pre-wrap;font-size:12px;color:#888;margin-top:12px">${raw.slice(0,500)}</pre></div>`;
+                card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<br><div class="hint">原始输出前 500 字：</div><pre style="white-space:pre-wrap;font-size:12px;color:#888;margin-top:12px;text-align:left">${raw.slice(0,500)}</pre>
+        <button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
                 return toast('模型返回非 JSON','err');
             }
             const v = validateAndNormalizePrediction(parsed);
             if (!v.ok) {
-                card.innerHTML = `<div class="empty">❌ 校验失败<br>${v.errors.join('<br>')}<br>${v.warnings.join('<br>')}</div>`;
+                card.innerHTML = `<div class="empty">❌ 校验失败<br>${v.errors.join('<br>')}<br>${v.warnings.join('<br>')}
+        <button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
                 return toast('预测校验失败','err');
             }
             if (v.warnings.length) console.warn('校验警告：', v.warnings);
@@ -576,7 +726,8 @@
             toast('预测完成');
         } catch(err){
             console.error(err);
-            card.innerHTML = `<div class="empty">❌ ${err.message}</div>`;
+            card.innerHTML = `<div class="empty">❌ ${err.message}
+      <button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
             toast(err.message.slice(0,80),'err');
         } finally {
             btn.disabled = false;
@@ -585,7 +736,7 @@
     }
 
     /* ============================================================
-       9. 队徽
+       9. 渲染
     ============================================================ */
     function espnUrl(name){ const id = ESPN_IDS[name]; return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null; }
     function badgeHtml(name){
@@ -593,7 +744,7 @@
         const abbr = ABBR[name] || String(name).slice(0,3);
         if (!url) return `<div class="badge-wrap"><div class="fallback">${abbr}</div></div>`;
         return `<div class="badge-wrap">
-    <img class="badge" src="${url}" alt="${name}" referrerpolicy="no-referrer" loading="eager" decoding="async"
+    <img class="badge" src="${url}" alt="${name} 队徽" referrerpolicy="no-referrer" loading="eager" decoding="async"
       onload="this.classList.add('loaded');this.nextElementSibling&&(this.nextElementSibling.style.display='none')"
       onerror="this.style.display='none'">
     <div class="fallback">${abbr}</div>
@@ -611,13 +762,14 @@
   </div>`;
     }
     function animateNumber(el, target, dur=900, suffix='%'){
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            el.textContent = Math.round(target) + suffix; return;
+        }
         const start = performance.now();
-        const from = 0;
         function tick(now){
             const t = Math.min(1, (now-start)/dur);
             const eased = 1 - Math.pow(1-t, 3);
-            const val = Math.round(from + (target-from)*eased);
-            el.textContent = val + suffix;
+            el.textContent = Math.round(target*eased) + suffix;
             if (t < 1) requestAnimationFrame(tick);
         }
         requestAnimationFrame(tick);
@@ -631,7 +783,7 @@
         const ring = (pct, cls) => {
             const color = cls==='h'?'#e85d3a':cls==='a'?'#00d4ff':'#8b98ab';
             return `<div class="ring ${cls}">
-      <svg viewBox="0 0 96 96">
+      <svg viewBox="0 0 96 96" aria-hidden="true">
         <circle class="track" cx="48" cy="48" r="${R}"></circle>
         <circle class="bar" cx="48" cy="48" r="${R}" stroke="${color}" stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle>
       </svg>
@@ -639,7 +791,6 @@
       <div class="num" data-target="${pct}">0%</div>
     </div>`;
         };
-
         const h2h = d.headToHead && d.headToHead.summary ? `
     <div class="sect">
       <div class="ttl">历史交锋</div>
@@ -650,7 +801,6 @@
             ? '<ul>' + d.headToHead.lastMatches.map(m=>`<li>${m}</li>`).join('') + '</ul>' : ''}
       </div>
     </div>` : '';
-
         const homePlayers = d.homeKeyPlayers || d.homePlayers || [];
         const awayPlayers = d.awayKeyPlayers || d.awayPlayers || [];
         const players = [...homePlayers, ...awayPlayers];
@@ -691,40 +841,39 @@
 
         requestAnimationFrame(() => requestAnimationFrame(() => {
             card.querySelectorAll('.ring .bar').forEach((el,i) => {
-                const pct = [h,dr,a][i];
-                el.style.strokeDashoffset = C * (1 - pct/100);
+                el.style.strokeDashoffset = C * (1 - [h,dr,a][i]/100);
             });
-            card.querySelectorAll('.ring .num').forEach(el => {
-                animateNumber(el, +el.dataset.target, 900);
-            });
+            card.querySelectorAll('.ring .num').forEach(el => animateNumber(el, +el.dataset.target, 900));
             const segs = card.querySelectorAll('.compare .seg');
-            if (segs[0]) segs[0].style.width = h + '%';
-            if (segs[1]) segs[1].style.width = dr + '%';
-            if (segs[2]) segs[2].style.width = a + '%';
+            if (segs[0]) { segs[0].style.width = h + '%'; segs[0].textContent = h + '%'; }
+            if (segs[1]) { segs[1].style.width = dr + '%'; segs[1].textContent = dr + '%'; }
+            if (segs[2]) { segs[2].style.width = a + '%'; segs[2].textContent = a + '%'; }
         }));
     }
 
     /* ============================================================
-       10. 积分榜
+       10. 积分榜（预计算 last5 + 行点击）
     ============================================================ */
-    function getLast5(team){
-        const arr = [];
+    function buildLast5Cache(){
+        _last5Cache = {};
         for (const roundKey in RESULTS) {
             const roundObj = RESULTS[roundKey];
             for (const key in roundObj) {
                 const [h,a] = key.split('|');
-                if (h !== team && a !== team) continue;
                 const sc = roundObj[key];
                 let hg, ag;
                 if (Array.isArray(sc)) { hg = sc[0]; ag = sc[1]; }
-                else { const parts = String(sc).split('-'); hg = +parts[0]; ag = +parts[1]; }
-                let r;
-                if (h === team) r = hg>ag ? 'W' : hg<ag ? 'L' : 'D';
-                else r = ag>hg ? 'W' : ag<hg ? 'L' : 'D';
-                arr.push({ r });
+                else { const p = String(sc).split('-'); hg = +p[0]; ag = +p[1]; }
+                const push = (t,r) => { if (!_last5Cache[t]) _last5Cache[t]=[]; _last5Cache[t].push(r); };
+                push(h, hg>ag?'W':hg<ag?'L':'D');
+                push(a, ag>hg?'W':ag<hg?'L':'D');
             }
         }
-        return arr.slice(-5);
+        Object.keys(_last5Cache).forEach(k => { _last5Cache[k] = _last5Cache[k].slice(-5); });
+    }
+    function getLast5(team){
+        if (!_last5Cache) buildLast5Cache();
+        return _last5Cache[team] || [];
     }
     function renderStandings(list){
         if (!list || !list.length) { document.getElementById('standings').innerHTML = '<div class="empty">暂无数据</div>'; return; }
@@ -734,7 +883,7 @@
             const abbr = ABBR[s.team] || String(s.team).slice(0,3);
             const badge = url
                 ? `<span class="mini-badge-wrap">
-           <img class="mini-badge" src="${url}" alt="${s.team}" referrerpolicy="no-referrer" loading="lazy" decoding="async"
+           <img class="mini-badge" src="${url}" alt="" referrerpolicy="no-referrer" loading="lazy" decoding="async" width="22" height="22"
              onload="this.classList.add('loaded')" onerror="this.style.display='none'">
            <span class="mini-fallback">${abbr}</span>
          </span>`
@@ -743,7 +892,7 @@
             const l5 = last5.length
                 ? `<span class="last5">${last5.map(x=>`<span class="${x.r}">${x.r}</span>`).join('')}</span>`
                 : '<span style="color:var(--txt3);font-size:11px">—</span>';
-            return `<tr class="${cls}">
+            return `<tr class="${cls}" onclick="jumpToTeam('${s.team}')" title="点击跳转到 ${s.team} 的比赛">
       <td>${i+1}</td>
       <td>${badge}<span class="team-name">${s.team}</span></td>
       <td>${s.played ?? 0}</td>
@@ -763,7 +912,7 @@
     }
 
     /* ============================================================
-       11. 仪表盘 + 比赛日 + 连胜
+       11. 仪表盘
     ============================================================ */
     function refreshDashboard(){
         const r = +document.getElementById('roundSel').value || 0;
@@ -787,11 +936,8 @@
             else break;
         }
         const sub = document.getElementById('histSub');
-        if (streak >= 3) {
-            sub.innerHTML = `录入实际赛果，自动判定命中 <span class="streak">🔥 ${streak} 连胜</span>`;
-        } else {
-            sub.textContent = '录入实际赛果，自动判定命中';
-        }
+        if (streak >= 3) sub.innerHTML = `录入实际赛果，自动判定命中 <span class="streak">🔥 ${streak} 连胜</span>`;
+        else sub.textContent = '录入实际赛果，自动判定命中';
     }
     function updateMatchdayLine(){
         const el = document.getElementById('matchdayLine');
@@ -802,8 +948,7 @@
             el.textContent = '🔴 比赛日 —— 记得录入上一轮实际赛果';
             dot.style.display = 'inline-block';
         } else {
-            const daysToSat = (6 - day + 7) % 7 || 7;
-            el.textContent = `距下个比赛日还有 ${daysToSat} 天`;
+            el.textContent = `距下个比赛日还有 ${(6 - day + 7) % 7 || 7} 天`;
             dot.style.display = 'none';
         }
     }
@@ -837,14 +982,13 @@
     }
     function renderHistory(){
         const raw = getHistory();
-        const filtered = histFilter === 'all' ? raw : raw.filter(h => judge(h) === histFilter);
+        const judged = raw.map((h,i) => ({ h, j: judge(h), i }));
+        const filtered = histFilter === 'all' ? judged : judged.filter(x => x.j === histFilter);
         const list = filtered.slice().reverse();
         const box = document.getElementById('histList');
         if (!list.length) { box.innerHTML = '<div class="empty">暂无记录</div>'; }
         else {
-            box.innerHTML = list.map((h) => {
-                const realIdx = raw.indexOf(h);
-                const j = judge(h);
+            box.innerHTML = list.map(({h,j,i:realIdx}) => {
                 const labels = { exact:'精确命中', wdl:'胜平负命中', miss:'未命中', pending:'待录入' };
                 const multi = h._multi && h._multi > 1 ? `<span class="multi">×${h._multi}</span>` : '';
                 return `<div class="hitem">
@@ -854,17 +998,16 @@
         </div>
         <div class="meta">预测 ${h.score} · ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
         <div class="row2">
-          <input placeholder="实际比分 如 2-1" value="${h.actual || ''}" onchange="setActual(${realIdx}, this.value)">
-          <button onclick="delHistory(${realIdx})">删除</button>
+          <input placeholder="实际比分 如 2-1" value="${h.actual || ''}" onchange="setActual(${realIdx}, this.value)" aria-label="实际比分">
+          <button onclick="delHistory(${realIdx})" aria-label="删除这条记录">删除</button>
         </div>
       </div>`;
             }).join('');
         }
-        const total = raw.length;
-        const done = raw.filter(h=>h.actual).length;
-        const wdl = raw.filter(h=>['wdl','exact'].includes(judge(h))).length;
-        const exact = raw.filter(h=>judge(h)==='exact').length;
-        document.getElementById('sTotal').textContent = total;
+        const done = judged.filter(x => x.h.actual).length;
+        const wdl = judged.filter(x => ['wdl','exact'].includes(x.j)).length;
+        const exact = judged.filter(x => x.j === 'exact').length;
+        document.getElementById('sTotal').textContent = raw.length;
         document.getElementById('sDone').textContent = done;
         document.getElementById('sWdl').textContent = done ? Math.round(wdl/done*100)+'%' : '0%';
         document.getElementById('sExact').textContent = done ? Math.round(exact/done*100)+'%' : '0%';
@@ -904,22 +1047,50 @@
         };
         inp.click();
     }
-    function openHistory(){ document.getElementById('histMask').classList.add('show'); renderHistory(); }
-    function closeHistory(){ document.getElementById('histMask').classList.remove('show'); }
 
-    document.getElementById('histFilters').addEventListener('click', e => {
-        const b = e.target.closest('button'); if (!b) return;
-        histFilter = b.dataset.f;
-        document.querySelectorAll('#histFilters button').forEach(x => x.classList.toggle('on', x === b));
-        renderHistory();
+    /* ============================================================
+       13. 模态框（焦点管理）
+    ============================================================ */
+    let _focusBefore = null;
+    function openModal(id){
+        _focusBefore = document.activeElement;
+        const mask = document.getElementById(id);
+        mask.classList.add('show');
+        document.body.classList.add('no-scroll');
+        setTimeout(() => mask.querySelector('.modal')?.focus(), 50);
+    }
+    function closeModal(id){
+        const mask = document.getElementById(id);
+        mask.classList.remove('show');
+        document.body.classList.remove('no-scroll');
+        _focusBefore?.focus();
+    }
+    function openHistory(){ openModal('histMask'); renderHistory(); }
+    function closeHistory(){ closeModal('histMask'); }
+    function openBatch(){ openModal('batchMask'); updateQuota(); }
+    function closeBatch(){ closeModal('batchMask'); }
+
+    // 点击遮罩关闭 + Esc
+    document.querySelectorAll('.mask').forEach(m => {
+        m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); });
+    });
+    // 焦点陷阱
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Tab') {
+            const activeMask = document.querySelector('.mask.show');
+            if (!activeMask) return;
+            const focusable = activeMask.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+            if (!focusable.length) return;
+            const first = focusable[0], last = focusable[focusable.length-1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
     });
 
     /* ============================================================
-       13. 批量预测
+       14. 批量预测（进度条）
     ============================================================ */
     let batchN = 1;
-    function openBatch(){ document.getElementById('batchMask').classList.add('show'); updateQuota(); }
-    function closeBatch(){ document.getElementById('batchMask').classList.remove('show'); }
     function updateQuota(){
         const calls = 10 * batchN;
         const el = document.getElementById('batchQuota');
@@ -943,8 +1114,7 @@
         const runs = [];
         for (let k = 0; k < batchN; k++) {
             try {
-                const userPrompt =
-                    (intel ? `【今日情报】\n${intel}\n\n` : '') +
+                const userPrompt = (intel ? `【今日情报】\n${intel}\n\n` : '') +
                     `【预测指令】\n请预测：第 ${r+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
                 const raw = await callGroq(skill, userPrompt);
                 const p = JSON.parse(raw);
@@ -978,7 +1148,11 @@
         btn.classList.add('loading');
         btn.textContent = '批量运行中…';
         const intel = document.getElementById('intel').value.trim();
-        let ok = 0, fail = 0;
+        const progressEl = document.getElementById('batchProgress');
+        const barEl = document.getElementById('batchProgressBar');
+        progressEl.classList.add('show');
+        barEl.style.width = '0%';
+        let ok = 0, fail = 0, done = 0;
 
         try {
             const skill = await loadSkill();
@@ -991,6 +1165,10 @@
                     const res = await predictOne(skill, r, home, away, intel);
                     if (res) { addHistory({ round:r, home, away, ...res, ts:Date.now() }); ok++; }
                     else fail++;
+                    done++;
+                    barEl.style.width = (done/round.length*100) + '%';
+                    document.getElementById('batchQuota').textContent =
+                        `进度 ${done}/${round.length} · 成功 ${ok} · 失败 ${fail}`;
                 }
             }
             await Promise.all(Array.from({length: Math.min(CONCURRENCY, round.length)}, worker));
@@ -1003,11 +1181,12 @@
             btn.disabled = false;
             btn.classList.remove('loading');
             btn.textContent = '开始批量预测';
+            setTimeout(() => { progressEl.classList.remove('show'); barEl.style.width = '0%'; }, 1500);
         }
     }
 
     /* ============================================================
-       14. 键盘快捷键 + 滚动
+       15. 快捷键
     ============================================================ */
     window.addEventListener('keydown', e => {
         const ctrl = e.ctrlKey || e.metaKey;
@@ -1021,14 +1200,17 @@
     });
 
     /* ============================================================
-       15. 加载 data.json + 启动
+       16. 加载 data.json + 启动
     ============================================================ */
     async function loadExternalData(){
         try {
             const res = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
-            if (!res.ok) { console.warn('⚠️ data.json 未找到，使用内置回退数据'); return; }
+            if (!res.ok) {
+                toast('data.json 加载失败，请跑一次 update.bat', 'warn', 5000);
+                console.warn('⚠️ data.json 未找到');
+                return;
+            }
             const data = await res.json();
-
             if (Array.isArray(data.fixtures) && data.fixtures.length) {
                 FIXTURES.length = 0;
                 FIXTURES.push(...data.fixtures);
@@ -1036,23 +1218,22 @@
             if (data.results && typeof data.results === 'object') {
                 Object.keys(RESULTS).forEach(k => delete RESULTS[k]);
                 Object.assign(RESULTS, data.results);
+                _last5Cache = null;
             }
             if (Array.isArray(data.standings) && data.standings.length) {
                 STATIC_STANDINGS = data.standings;
             }
-
             initSelectors();
             renderStandings(STATIC_STANDINGS);
             refreshDashboard();
-
             if (data.updatedAt && data.updatedAt !== '1970-01-01T00:00:00Z') {
-                const t = new Date(data.updatedAt).toLocaleString('zh-CN');
-                console.log(`✅ data.json 已加载（更新时间：${t}）`);
+                console.log(`✅ data.json 已加载（${new Date(data.updatedAt).toLocaleString('zh-CN')}）`);
             } else {
-                console.log('⚠️ data.json 是空壳，请跑一次 update.bat');
+                toast('data.json 是空壳，请跑一次 update.bat', 'warn', 5000);
             }
         } catch(e){
-            console.warn('⚠️ data.json 加载失败，使用内置回退数据', e);
+            toast('data.json 加载失败', 'warn');
+            console.warn('⚠️ data.json 加载失败', e);
         }
     }
 
@@ -1060,7 +1241,6 @@
         const saved = localStorage.getItem('groq_key');
         if (saved) document.getElementById('apiKey').value = saved;
 
-        // 事件监听（只绑一次）
         const rs = document.getElementById('roundSel');
         rs.addEventListener('change', () => { localStorage.setItem('last_round', rs.value); fillMatches(); refreshDashboard(); });
         document.getElementById('matchSel').addEventListener('change', () => {
@@ -1068,17 +1248,20 @@
             localStorage.setItem('last_match_'+r, document.getElementById('matchSel').value);
             refreshDashboard();
         });
+        document.getElementById('histFilters').addEventListener('click', e => {
+            const b = e.target.closest('button'); if (!b) return;
+            histFilter = b.dataset.f;
+            document.querySelectorAll('#histFilters button').forEach(x => x.classList.toggle('on', x === b));
+            renderHistory();
+        });
 
-        // 先用回退数据渲染，避免空白
         initSelectors();
         renderStandings(STATIC_STANDINGS);
         refreshDashboard();
         updateMatchdayLine();
 
-        // 异步加载真实数据
         await loadExternalData();
 
-        // 预加载队徽
         const preload = () => {
             Object.values(ESPN_IDS).forEach(id => {
                 const img = new Image();
@@ -1092,7 +1275,7 @@
     })();
 
     /* ============================================================
-       16. Service Worker 注册
+       17. Service Worker
     ============================================================ */
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
@@ -1106,16 +1289,12 @@
                         }
                     });
                 });
-            }).catch(err => console.warn('Service Worker 注册失败：', err));
-        });
-        navigator.serviceWorker.addEventListener('message', e => {
-            if (e.data && e.data.type === 'REFRESH') location.reload();
+            }).catch(err => console.warn('SW 注册失败：', err));
         });
     }
     function showUpdateToast(reg){
         const el = document.createElement('div');
         el.className = 'toast ok';
-        el.style.pointerEvents = 'auto';
         el.style.cursor = 'pointer';
         el.innerHTML = '🎉 新版本已就绪，<b>点击刷新</b>';
         el.onclick = () => {
