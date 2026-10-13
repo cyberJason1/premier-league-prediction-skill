@@ -1,5 +1,17 @@
+# IDE
 .idea/
 *.iml
 .vscode/
+
+# 依赖
+node_modules/
+
+# 敏感
+.env
+
+# 本地工具（仅本地用，不进仓库）
 index.html.bak
 update.bat
+
+# 日志
+*.log

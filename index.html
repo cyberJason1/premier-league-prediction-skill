@@ -3,107 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>英超预测引擎 v3.4</title>
+    <title>英超预测引擎 v4.0</title>
     <style>
         :root{
-            --bg:#050810; --bg2:#0a1220; --panel:rgba(16,22,36,.72);
+            --bg:#050810; --bg2:#0a1220;
+            --panel:rgba(16,22,36,.72); --panel2:rgba(10,15,26,.85);
             --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
-            --orange:#ff6b35; --blue:#00d4ff; --green:#00ff88;
+            --orange:#e85d3a; --orange2:#ff8b5a;
+            --blue:#00d4ff; --green:#4ade80;
             --gold:#ffb648; --red:#f43f5e; --purple:#8b5cf6;
             --txt:#e8eef7; --txt2:#8b98ab; --txt3:#5a6779;
         }
         *{box-sizing:border-box;margin:0;padding:0}
         html,body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+
+        /* 背景：光晕 + 微妙球场线纹理 */
         body::before{
             content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
             background:
-                    radial-gradient(1200px 600px at 50% -10%,rgba(255,107,53,.18),transparent 60%),
-                    radial-gradient(1000px 500px at 50% 110%,rgba(0,212,255,.12),transparent 60%),
-                    repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 1px,transparent 1px 60px),
-                    repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 60px);
+                    radial-gradient(1200px 600px at 50% -10%,rgba(232,93,58,.16),transparent 60%),
+                    radial-gradient(1000px 500px at 50% 110%,rgba(0,212,255,.10),transparent 60%),
+                    repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0 1px,transparent 1px 80px),
+                    repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 1px,transparent 1px 80px);
         }
+        /* 极淡球场 SVG 线条 */
+        body::after{
+            content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.03;
+            background-image:
+                    radial-gradient(circle at 50% 50%,transparent 68%,#fff 68.5%,transparent 69%),
+                    linear-gradient(90deg,transparent 49.8%,#fff 49.8%,#fff 50.2%,transparent 50.2%);
+        }
+
         .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:32px 22px 120px}
+
+        /* 页面依次淡入 */
+        .fade-in{opacity:0;transform:translateY(14px);animation:fadeUp .55s cubic-bezier(.2,.8,.2,1) forwards}
+        @keyframes fadeUp{to{opacity:1;transform:none}}
+        .d1{animation-delay:.05s}.d2{animation-delay:.15s}.d3{animation-delay:.25s}.d4{animation-delay:.35s}.d5{animation-delay:.45s}.d6{animation-delay:.55s}
+
         .hero{padding:28px 8px 22px;border-bottom:1px solid var(--line)}
-        .hero .kick{font-size:12px;letter-spacing:.28em;color:var(--orange);text-transform:uppercase;font-weight:700}
+        .hero .kick{font-size:12px;letter-spacing:.28em;color:var(--orange);text-transform:uppercase;font-weight:700;display:flex;align-items:center;gap:10px}
+        .hero .live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 1.6s infinite}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
         .hero h1{font-family:Georgia,"Times New Roman",serif;font-size:52px;line-height:1.05;font-weight:400;margin:10px 0 6px;letter-spacing:-.02em}
         .hero h1 em{font-style:italic;color:var(--orange)}
-        .hero p{color:var(--txt2);font-size:14px;margin-top:6px}
+        .hero p{color:var(--txt2);font-size:14px;margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
+        .hero .tag-line{font-size:12px;color:var(--txt3);margin-top:10px}
+
+        /* 仪表盘 */
         .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 26px}
-        .cell{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;backdrop-filter:blur(12px)}
-        .cell .lbl{font-size:11px;letter-spacing:.2em;color:var(--txt3);text-transform:uppercase}
-        .cell .val{font-family:Georgia,serif;font-size:32px;color:var(--txt);margin-top:6px;line-height:1}
+        .cell{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;backdrop-filter:blur(12px);transition:border-color .2s,transform .2s}
+        .cell:hover{border-color:var(--line2);transform:translateY(-2px)}
+        .cell .lbl{font-size:11px;letter-spacing:.2em;color:var(--txt3);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+        .cell .val{font-family:Georgia,serif;font-size:34px;color:var(--txt);margin-top:6px;line-height:1;font-variant-numeric:tabular-nums}
         .cell .val.orange{color:var(--orange)} .cell .val.blue{color:var(--blue)}
+
+        /* 网格 */
         .grid{display:grid;grid-template-columns:400px 1fr;gap:22px}
         @media(max-width:920px){.grid{grid-template-columns:1fr}.hero h1{font-size:38px}.dash{grid-template-columns:repeat(2,1fr)}}
-        .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;backdrop-filter:blur(12px)}
+
+        .card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;backdrop-filter:blur(12px);transition:border-color .25s}
+        .card:hover{border-color:var(--line2)}
         .card h3{font-size:12px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:14px}
         .field{margin-bottom:14px}
         .field label{display:block;font-size:12px;color:var(--txt2);margin-bottom:6px}
-        select,input,textarea{width:100%;background:#0a0f1a;border:1px solid var(--line2);color:var(--txt);border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
-        select:focus,input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,107,53,.18)}
+        select,input,textarea{width:100%;background:#0a0f1a;border:1px solid var(--line2);color:var(--txt);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s}
+        select:focus,input:focus,textarea:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,93,58,.15)}
         textarea{resize:vertical;min-height:88px;line-height:1.5}
-        .btn{width:100%;padding:14px;border:0;border-radius:12px;background:linear-gradient(135deg,#ff6b35,#ff8b5a);color:#1a0f08;font-weight:800;font-size:15px;letter-spacing:.06em;cursor:pointer;transition:transform .15s,filter .15s;position:relative;overflow:hidden}
+
+        /* 按钮 + 加载进度条 */
+        .btn{width:100%;padding:14px;border:0;border-radius:14px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08;font-weight:800;font-size:15px;letter-spacing:.06em;cursor:pointer;transition:transform .15s,filter .15s;position:relative;overflow:hidden}
         .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
-        .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+        .btn:disabled{opacity:.65;cursor:not-allowed;transform:none}
+        .btn.loading::after{content:"";position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);animation:shimmer 1.4s ease-in-out infinite}
+        @keyframes shimmer{0%{width:0;opacity:0}40%{opacity:1}100%{width:100%;opacity:0}}
+        .btn.loading::before{content:"";position:absolute;left:0;top:0;bottom:0;background:rgba(0,0,0,.15);width:100%}
         .btn.ghost{background:transparent;color:var(--txt2);border:1px solid var(--line2)}
+        .btn.ghost:hover{color:var(--orange);border-color:var(--orange)}
+
         .empty{color:var(--txt3);text-align:center;padding:60px 10px;font-size:14px}
-        .scoreboard{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px}
+        .empty .empty-ball{width:54px;height:54px;margin:0 auto 14px;border-radius:50%;background:
+                radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
+                conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);
+            box-shadow:0 0 0 2px rgba(255,255,255,.06);
+            animation:spinSlow 8s linear infinite}
+        @keyframes spinSlow{to{transform:rotate(360deg)}}
+
+        /* 比分板 */
+        .scoreboard{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px;animation:fadeUp .55s cubic-bezier(.2,.8,.2,1)}
         .teams{display:flex;align-items:center;justify-content:center;gap:22px}
         .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px}
         .badge-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
-        .badge-wrap .badge{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s ease;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
+        .badge-wrap .badge{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s ease,transform .25s;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
         .badge-wrap .badge.loaded{opacity:1}
+        .badge-wrap:hover .badge{transform:scale(1.06)}
         .badge-wrap .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:var(--txt2);letter-spacing:.05em}
         .team .nm{font-size:14px;font-weight:600}
-        .score{font-family:Georgia,serif;font-size:56px;color:var(--green);text-shadow:0 0 24px rgba(0,255,136,.35);letter-spacing:.02em;white-space:nowrap}
-        .score.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+        .score{font-family:Georgia,serif;font-size:60px;color:var(--green);text-shadow:0 0 24px rgba(74,222,128,.35);letter-spacing:.02em;white-space:nowrap}
+        .score.pop{animation:pop .55s cubic-bezier(.2,1.6,.4,1)}
         @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-        .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
-        .ring{background:rgba(10,15,26,.6);border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
-        .ring svg{width:96px;height:96px;transform:rotate(-90deg)}
+
+        /* 概率环 + 对比条 */
+        .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:14px}
+        .ring{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:16px 10px;text-align:center;transition:border-color .2s}
+        .ring:hover{border-color:var(--line2)}
+        .ring svg{width:100px;height:100px;transform:rotate(-90deg)}
         .ring circle{fill:none;stroke-width:8;stroke-linecap:round}
-        .ring .track{stroke:rgba(255,255,255,.08)}
+        .ring .track{stroke:rgba(255,255,255,.07)}
         .ring .bar{transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1)}
         .ring .lbl2{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;margin-top:8px}
-        .ring .num{font-family:Georgia,serif;font-size:24px;margin-top:2px}
+        .ring .num{font-family:Georgia,serif;font-size:26px;margin-top:2px;font-variant-numeric:tabular-nums}
         .ring.h .num{color:var(--orange)} .ring.d .num{color:var(--txt2)} .ring.a .num{color:var(--blue)}
+
+        /* 概率对比条 */
+        .compare{height:10px;background:var(--panel2);border-radius:999px;overflow:hidden;display:flex;border:1px solid var(--line);margin-bottom:20px}
+        .compare .seg{height:100%;transition:width 1s cubic-bezier(.4,0,.2,1)}
+        .compare .seg.h{background:linear-gradient(90deg,var(--orange),var(--orange2))}
+        .compare .seg.d{background:#5a6779}
+        .compare .seg.a{background:linear-gradient(90deg,#0098cc,var(--blue))}
+
+        /* 段落 */
         .sect{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
         .sect .ttl{font-size:11px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:10px}
-        .kv{color:var(--txt);font-size:14px;line-height:1.7}
-        .factors{display:flex;flex-wrap:wrap;gap:8px}
-        .chip{background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.28);color:#ffb59a;font-size:12px;padding:5px 10px;border-radius:999px}
+        .kv{color:var(--txt);font-size:14px;line-height:1.75}
+        .factors{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+        .chip{background:rgba(232,93,58,.12);border:1px solid rgba(232,93,58,.28);color:#ffb59a;font-size:12px;padding:5px 11px;border-radius:999px;transition:transform .2s,background .2s}
+        .chip:hover{transform:translateY(-1px);background:rgba(232,93,58,.2)}
         .conf{display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700}
-        .conf.高{background:rgba(0,255,136,.14);color:var(--green);border:1px solid rgba(0,255,136,.3)}
+        .conf.高{background:rgba(74,222,128,.14);color:var(--green);border:1px solid rgba(74,222,128,.3)}
         .conf.中高{background:rgba(0,212,255,.14);color:var(--blue);border:1px solid rgba(0,212,255,.3)}
         .conf.中{background:rgba(255,182,72,.14);color:var(--gold);border:1px solid rgba(255,182,72,.3)}
         .conf.低{background:rgba(244,63,94,.14);color:var(--red);border:1px solid rgba(244,63,94,.3)}
-        .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:12px;padding:14px 16px;position:relative}
+
+        /* H2H */
+        .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:14px;padding:14px 16px;position:relative}
         .h2h .tag{position:absolute;top:-9px;right:12px;font-size:10px;padding:3px 8px;border-radius:6px;letter-spacing:.1em;font-weight:700}
         .h2h .tag.估算{background:rgba(255,182,72,.18);color:var(--gold);border:1px solid rgba(255,182,72,.4)}
-        .h2h .tag.资料库{background:rgba(0,255,136,.18);color:var(--green);border:1px solid rgba(0,255,136,.4)}
+        .h2h .tag.资料库{background:rgba(74,222,128,.18);color:var(--green);border:1px solid rgba(74,222,128,.4)}
         .h2h .tag.今日情报{background:rgba(0,212,255,.18);color:var(--blue);border:1px solid rgba(0,212,255,.4)}
         .h2h .sum{font-size:14px;margin-bottom:8px}
         .h2h ul{list-style:none;font-size:13px;color:var(--txt2)}
         .h2h li{padding:3px 0}
         .h2h li::before{content:"›";color:var(--purple);margin-right:8px;font-weight:700}
+
+        /* 球员卡 */
         .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
-        .pcard{background:linear-gradient(160deg,rgba(255,107,53,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:12px;padding:12px;transition:transform .2s,box-shadow .2s}
+        .pcard{background:linear-gradient(160deg,rgba(232,93,58,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:14px;padding:12px;transition:transform .2s,box-shadow .2s}
         .pcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
         .pcard .row{display:flex;justify-content:space-between;align-items:center}
         .pcard .nm{font-size:13px;font-weight:700}
         .pcard .pos{font-size:10px;color:var(--txt3);letter-spacing:.12em;text-transform:uppercase}
         .pcard .rt{margin-top:8px;display:flex;align-items:center;gap:8px}
-        .pcard .rating{font-family:Georgia,serif;font-size:22px;color:var(--orange);font-weight:700}
+        .pcard .rating{font-family:Georgia,serif;font-size:24px;color:var(--orange);font-weight:700}
         .pcard .note{font-size:11px;color:var(--txt2);line-height:1.5;margin-top:6px}
+
+        /* 积分榜 */
         .standings{font-size:13px}
         .standings table{width:100%;border-collapse:collapse}
-        .standings th{color:var(--txt3);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
-        .standings td{padding:7px 6px;border-bottom:1px solid rgba(255,255,255,.04)}
+        .standings th{color:var(--txt3);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+        .standings td{padding:8px 6px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+        .standings tr:hover td{background:rgba(255,255,255,.02)}
         .standings td:first-child{font-family:Georgia,serif;color:var(--txt2);width:26px}
         .standings tr.ucl td:first-child{color:var(--green)}
         .standings tr.rel td:first-child{color:var(--red)}
+        .mini-badge-wrap{position:relative;display:inline-flex;width:20px;height:20px;vertical-align:middle;margin-right:8px}
+        .mini-badge{width:20px;height:20px;object-fit:contain;opacity:0;transition:opacity .25s}
+        .mini-badge.loaded{opacity:1}
+        .mini-fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-family:Georgia,serif;color:var(--txt3);background:rgba(255,255,255,.05);border-radius:4px}
+        .mini-badge.loaded ~ .mini-fallback{display:none}
+        .standings .team-name{vertical-align:middle}
+        /* 最近 5 场 */
+        .last5{display:inline-flex;gap:3px}
+        .last5 span{width:14px;height:14px;border-radius:3px;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;color:#fff}
+        .last5 span.W{background:rgba(74,222,128,.7)}
+        .last5 span.D{background:rgba(139,152,171,.5)}
+        .last5 span.L{background:rgba(244,63,94,.6)}
+
+        /* 加载动画 */
         .loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:50px 0}
-        .ball{width:46px;height:46px;border-radius:50%;background:
+        .ball{width:48px;height:48px;border-radius:50%;background:
                 radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
                 conic-gradient(from 0deg,#fff 0 25%,#111 25% 50%,#fff 50% 75%,#111 75% 100%);
             box-shadow:0 10px 24px rgba(0,0,0,.5),0 0 0 2px rgba(255,255,255,.06);
@@ -111,16 +189,22 @@
         @keyframes bounce{to{transform:translateY(-22px)}}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loader .msg{font-size:13px;color:var(--txt2);letter-spacing:.05em}
+
+        /* FAB */
         .fab{position:fixed;right:24px;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .2s,filter .2s;z-index:60}
         .fab:hover{transform:translateY(-2px) scale(1.05);filter:brightness(1.1)}
-        .fab.hist{bottom:24px;background:linear-gradient(135deg,#ff6b35,#ff8b5a);color:#1a0f08}
-        .fab.batch{bottom:88px;background:linear-gradient(135deg,#00d4ff,#5cc8ff);color:#02131c}
+        .fab.hist{bottom:24px;background:linear-gradient(135deg,var(--orange),var(--orange2));color:#1a0f08}
+        .fab.batch{bottom:88px;background:linear-gradient(135deg,var(--blue),#5cc8ff);color:#02131c}
         .fab.top{bottom:152px;background:rgba(255,255,255,.12);border:1px solid var(--line2);opacity:0;pointer-events:none;transition:opacity .25s}
         .fab.top.show{opacity:1;pointer-events:auto}
         .fab .badge-n{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+
+        /* 弹窗 */
         .mask{position:fixed;inset:0;background:rgba(3,5,10,.78);backdrop-filter:blur(6px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
-        .mask.show{display:flex}
-        .modal{background:#0b1220;border:1px solid var(--line2);border-radius:18px;max-width:760px;width:100%;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+        .mask.show{display:flex;animation:fadeIn .2s}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+        .modal{background:#0b1220;border:1px solid var(--line2);border-radius:20px;max-width:760px;width:100%;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:modalIn .3s cubic-bezier(.2,.8,.2,1)}
+        @keyframes modalIn{from{opacity:0;transform:translateY(-12px) scale(.98)}to{opacity:1;transform:none}}
         .modal h2{font-family:Georgia,serif;font-size:26px;font-weight:400;margin-bottom:6px}
         .modal .sub{color:var(--txt2);font-size:13px;margin-bottom:18px}
         .modal .close{float:right;background:transparent;border:0;color:var(--txt3);font-size:22px;cursor:pointer;line-height:1}
@@ -128,12 +212,17 @@
         .stat{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
         .stat .n{font-family:Georgia,serif;font-size:26px;color:var(--orange)}
         .stat .l{font-size:10px;letter-spacing:.15em;color:var(--txt3);text-transform:uppercase;margin-top:4px}
-        .hlist{max-height:460px;overflow-y:auto;margin-top:6px}
-        .hitem{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+        .filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+        .filter-btn{padding:6px 12px;border-radius:999px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .2s}
+        .filter-btn:hover{color:var(--orange);border-color:var(--orange)}
+        .filter-btn.on{background:rgba(232,93,58,.14);color:var(--orange);border-color:var(--orange)}
+        .hlist{max-height:440px;overflow-y:auto;margin-top:6px}
+        .hitem{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;transition:border-color .15s}
+        .hitem:hover{border-color:var(--line2)}
         .hitem .top{display:flex;justify-content:space-between;align-items:center;font-size:13px}
         .hitem .teams2{font-weight:700}
         .hitem .res-badge{font-size:10px;padding:3px 9px;border-radius:999px;letter-spacing:.08em;font-weight:700}
-        .res-badge.exact{background:rgba(0,255,136,.16);color:var(--green);border:1px solid rgba(0,255,136,.35)}
+        .res-badge.exact{background:rgba(74,222,128,.16);color:var(--green);border:1px solid rgba(74,222,128,.35)}
         .res-badge.wdl{background:rgba(255,182,72,.16);color:var(--gold);border:1px solid rgba(255,182,72,.35)}
         .res-badge.miss{background:rgba(244,63,94,.16);color:var(--red);border:1px solid rgba(244,63,94,.35)}
         .res-badge.pending{background:rgba(139,92,246,.16);color:var(--purple);border:1px solid rgba(139,92,246,.35)}
@@ -141,75 +230,84 @@
         .hitem .meta{font-size:11px;color:var(--txt3);margin-top:6px}
         .hitem .row2{display:flex;gap:8px;align-items:center;margin-top:8px}
         .hitem input{padding:7px 10px;font-size:13px;text-align:center}
-        .hitem button{padding:7px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer}
+        .hitem button{padding:7px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer;transition:all .15s}
         .hitem button:hover{border-color:var(--orange);color:var(--orange)}
+
+        /* 批量 */
         .batch-opts{display:flex;gap:8px;margin:12px 0}
-        .batch-opts button{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700}
-        .batch-opts button.on{border-color:var(--orange);background:rgba(255,107,53,.14);color:var(--orange)}
-        .quota{font-size:12px;padding:8px 12px;border-radius:8px;margin-top:10px;text-align:center}
-        .quota.ok{background:rgba(0,255,136,.1);color:var(--green)}
+        .batch-opts button{flex:1;padding:12px;border-radius:12px;border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700;transition:all .2s}
+        .batch-opts button:hover{border-color:var(--orange);color:var(--orange)}
+        .batch-opts button.on{border-color:var(--orange);background:rgba(232,93,58,.14);color:var(--orange)}
+        .quota{font-size:12px;padding:8px 12px;border-radius:10px;margin-top:10px;text-align:center}
+        .quota.ok{background:rgba(74,222,128,.1);color:var(--green)}
         .quota.warn{background:rgba(255,182,72,.12);color:var(--gold)}
         .quota.bad{background:rgba(244,63,94,.12);color:var(--red)}
+
+        /* Toast */
         .toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-        .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease}
-        .toast.ok{border-color:rgba(0,255,136,.5)} .toast.ok::before{content:"✅ ";margin-right:4px}
+        .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:14px;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease}
+        .toast.ok{border-color:rgba(74,222,128,.5)} .toast.ok::before{content:"✅ ";margin-right:4px}
         .toast.warn{border-color:rgba(255,182,72,.5)} .toast.warn::before{content:"⚠️ ";margin-right:4px}
         .toast.err{border-color:rgba(244,63,94,.5)} .toast.err::before{content:"❌ ";margin-right:4px}
         @keyframes slidein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+
+        /* 版本警告 */
         .verbar{position:fixed;top:0;left:0;right:0;z-index:300;background:#ffb648;color:#000;padding:8px 16px;font-size:13px;text-align:center;font-weight:600}
+
+        /* 彩带 */
+        .confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:150;pointer-events:none;animation:fall linear forwards}
+        @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+        /* 连胜成就 */
+        .streak{display:inline-block;padding:4px 10px;border-radius:999px;background:linear-gradient(135deg,rgba(232,93,58,.2),rgba(255,182,72,.2));border:1px solid rgba(255,182,72,.4);color:var(--gold);font-size:11px;font-weight:700;margin-left:8px}
     </style>
 </head>
 <body>
 
 <div class="wrap">
-    <div class="hero">
-        <div class="kick">Premier League 2026/27</div>
+    <div class="hero fade-in d1">
+        <div class="kick"><span id="liveDot" class="live-dot" style="display:none"></span><span>Premier League 2026/27</span></div>
         <h1>英超 <em>预测</em> 引擎</h1>
-        <p>规则工程 + 前端工程 + 自动化 · v3.4</p>
+        <p><span>规则工程 + 前端工程 + 自动化</span><span>· v4.0</span></p>
+        <div class="tag-line" id="matchdayLine">加载中…</div>
     </div>
 
-    <div class="dash">
-        <div class="cell"><div class="lbl">当前轮次</div><div class="val orange" id="dashRound">—</div></div>
-        <div class="cell"><div class="lbl">已完赛</div><div class="val" id="dashPlayed">—</div></div>
-        <div class="cell"><div class="lbl">本轮待预测</div><div class="val blue" id="dashPending">—</div></div>
-        <div class="cell"><div class="lbl">待录入赛果</div><div class="val" id="dashRecord">—</div></div>
+    <div class="dash fade-in d2">
+        <div class="cell"><div class="lbl">🏆 当前轮次</div><div class="val orange" id="dashRound">—</div></div>
+        <div class="cell"><div class="lbl">⚽ 已完赛</div><div class="val" id="dashPlayed">—</div></div>
+        <div class="cell"><div class="lbl">🎯 本轮待预测</div><div class="val blue" id="dashPending">—</div></div>
+        <div class="cell"><div class="lbl">📝 待录入赛果</div><div class="val" id="dashRecord">—</div></div>
     </div>
 
     <div class="grid">
-        <div class="card">
+        <div class="card fade-in d3">
             <h3>Groq API Key</h3>
-            <div class="field">
-                <input type="password" id="apiKey" placeholder="gsk_... 只存本地浏览器">
-            </div>
+            <div class="field"><input type="password" id="apiKey" placeholder="gsk_... 只存本地浏览器"></div>
             <div style="display:flex;gap:8px;margin-bottom:18px">
                 <button class="btn ghost" style="flex:1" onclick="saveKey()">保存</button>
                 <button class="btn ghost" style="flex:1" onclick="clearKey()">清除</button>
             </div>
 
             <h3>比赛选择</h3>
-            <div class="field">
-                <label>轮次</label>
-                <select id="roundSel"></select>
-            </div>
-            <div class="field">
-                <label>对阵</label>
-                <select id="matchSel"></select>
-            </div>
+            <div class="field"><label>轮次</label><select id="roundSel"></select></div>
+            <div class="field"><label>对阵</label><select id="matchSel"></select></div>
 
             <h3 style="margin-top:18px">今日情报（可选）</h3>
-            <div class="field">
-                <textarea id="intel" placeholder="例：萨利巴背伤缺席；利物浦无锋阵；福登停赛..."></textarea>
-            </div>
+            <div class="field"><textarea id="intel" placeholder="例：萨利巴背伤缺席；利物浦无锋阵；福登停赛..."></textarea></div>
 
             <button class="btn" id="predictBtn" onclick="startPredict()">开始预测</button>
+            <div style="margin-top:10px;font-size:11px;color:var(--txt3);text-align:center">Ctrl/⌘ + Enter 快速预测</div>
         </div>
 
-        <div class="card" id="resultCard">
-            <div class="empty">选择比赛 → 填写情报 → 开始预测</div>
+        <div class="card fade-in d4" id="resultCard">
+            <div class="empty">
+                <div class="empty-ball"></div>
+                <div>选择比赛 → 填写情报 → 开始预测</div>
+            </div>
         </div>
     </div>
 
-    <div class="card" style="margin-top:22px">
+    <div class="card fade-in d5" style="margin-top:22px">
         <h3>积分榜</h3>
         <div class="standings" id="standings"><div class="empty">加载中…</div></div>
     </div>
@@ -223,12 +321,19 @@
     <div class="modal">
         <button class="close" onclick="closeHistory()">✕</button>
         <h2>历史记录与命中率</h2>
-        <div class="sub">录入实际赛果，自动判定命中</div>
+        <div class="sub" id="histSub">录入实际赛果，自动判定命中</div>
         <div class="stats">
             <div class="stat"><div class="n" id="sTotal">0</div><div class="l">总预测</div></div>
             <div class="stat"><div class="n" id="sDone">0</div><div class="l">已录入</div></div>
             <div class="stat"><div class="n" id="sWdl">0%</div><div class="l">胜平负</div></div>
             <div class="stat"><div class="n" id="sExact">0%</div><div class="l">精确比分</div></div>
+        </div>
+        <div class="filters" id="histFilters">
+            <button class="filter-btn on" data-f="all">全部</button>
+            <button class="filter-btn" data-f="exact">精确命中</button>
+            <button class="filter-btn" data-f="wdl">胜平负命中</button>
+            <button class="filter-btn" data-f="miss">未命中</button>
+            <button class="filter-btn" data-f="pending">待录入</button>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:14px">
             <button class="btn ghost" onclick="exportHistory()">导出 JSON</button>
@@ -243,7 +348,7 @@
     <div class="modal">
         <button class="close" onclick="closeBatch()">✕</button>
         <h2>批量预测</h2>
-        <div class="sub">对当前轮次全部比赛进行预测</div>
+        <div class="sub">对当前轮次全部比赛进行预测（并发 3 场加速）</div>
         <div class="batch-opts" id="batchOpts">
             <button data-n="1" class="on">每场 1 次</button>
             <button data-n="3">每场 3 次</button>
@@ -257,12 +362,14 @@
 <div class="toast-wrap" id="toastWrap"></div>
 
 <script>
-    /* ========================================================
+    /* ============================================================
        0. 常量
-    ======================================================== */
+    ============================================================ */
     const EXPECTED_SKILL_VERSION = '2.1.0';
     const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
     const GROQ_MODEL = 'openai/gpt-oss-120b';
+    const SKILL_CACHE_KEY = 'pl_skill_cache_v1';
+    const SKILL_CACHE_TTL = 24 * 3600 * 1000;
 
     const ABBR = {
         '阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','曼联':'MUN',
@@ -280,52 +387,10 @@
         '布莱顿','埃弗顿','富勒姆','水晶宫','布伦特福德','伯恩茅斯','诺丁汉森林',
         '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
 
-    /* ========================================================
-       1. 赛程 —— update.js 会用真实数据覆盖
-          ⚠️ 必须保持「const XXX = [...];」字面量格式
-    ======================================================== */
-    const FIXTURES = [
-  [{home:'阿森纳',away:'考文垂城'},{home:'赫尔城',away:'曼联'},{home:'伊普斯维奇镇',away:'桑德兰'},{home:'诺丁汉森林',away:'利兹联'},{home:'埃弗顿',away:'水晶宫'},{home:'布伦特福德',away:'热刺'},{home:'曼城',away:'伯恩茅斯'},{home:'布莱顿',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'利物浦'},{home:'富勒姆',away:'切尔西'}],
-  [{home:'水晶宫',away:'曼城'},{home:'利物浦',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'埃弗顿'},{home:'考文垂城',away:'赫尔城'},{home:'热刺',away:'纽卡斯尔联'},{home:'桑德兰',away:'富勒姆'},{home:'切尔西',away:'布莱顿'},{home:'利兹联',away:'布伦特福德'},{home:'曼联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'阿森纳'}],
-  [{home:'伊普斯维奇镇',away:'利物浦'},{home:'纽卡斯尔联',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'热刺'},{home:'曼城',away:'考文垂城'},{home:'布莱顿',away:'利兹联'},{home:'布伦特福德',away:'桑德兰'},{home:'富勒姆',away:'水晶宫'},{home:'赫尔城',away:'阿斯顿维拉'},{home:'埃弗顿',away:'曼联'},{home:'阿森纳',away:'切尔西'}],
-  [{home:'水晶宫',away:'伊普斯维奇镇'},{home:'利物浦',away:'富勒姆'},{home:'阿斯顿维拉',away:'诺丁汉森林'},{home:'伯恩茅斯',away:'布伦特福德'},{home:'切尔西',away:'赫尔城'},{home:'热刺',away:'埃弗顿'},{home:'桑德兰',away:'阿森纳'},{home:'考文垂城',away:'布莱顿'},{home:'曼联',away:'曼城'},{home:'利兹联',away:'纽卡斯尔联'}],
-  [{home:'布伦特福德',away:'切尔西'},{home:'热刺',away:'阿斯顿维拉'},{home:'埃弗顿',away:'伊普斯维奇镇'},{home:'布莱顿',away:'阿森纳'},{home:'纽卡斯尔联',away:'赫尔城'},{home:'诺丁汉森林',away:'考文垂城'},{home:'伯恩茅斯',away:'利物浦'},{home:'利兹联',away:'水晶宫'},{home:'曼城',away:'桑德兰'},{home:'富勒姆',away:'曼联'}],
-  [{home:'阿森纳',away:'利兹联'},{home:'桑德兰',away:'布莱顿'},{home:'切尔西',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'富勒姆'},{home:'阿斯顿维拉',away:'布伦特福德'},{home:'曼联',away:'热刺'},{home:'赫尔城',away:'埃弗顿'},{home:'水晶宫',away:'诺丁汉森林'},{home:'利物浦',away:'曼城'},{home:'考文垂城',away:'纽卡斯尔联'}],
-  [{home:'埃弗顿',away:'切尔西'},{home:'富勒姆',away:'赫尔城'},{home:'曼城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'利物浦'},{home:'纽卡斯尔联',away:'阿斯顿维拉'},{home:'伯恩茅斯',away:'桑德兰'},{home:'利兹联',away:'曼联'},{home:'布莱顿',away:'水晶宫'},{home:'诺丁汉森林',away:'阿森纳'},{home:'热刺',away:'考文垂城'}],
-  [{home:'伊普斯维奇镇',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'曼城'},{home:'阿森纳',away:'埃弗顿'},{home:'考文垂城',away:'富勒姆'},{home:'切尔西',away:'热刺'},{home:'利物浦',away:'布莱顿'},{home:'水晶宫',away:'纽卡斯尔联'},{home:'曼联',away:'伯恩茅斯'},{home:'赫尔城',away:'布伦特福德'},{home:'桑德兰',away:'利兹联'}],
-  [{home:'切尔西',away:'曼联'},{home:'曼城',away:'布莱顿'},{home:'伯恩茅斯',away:'利兹联'},{home:'考文垂城',away:'桑德兰'},{home:'赫尔城',away:'伊普斯维奇镇'},{home:'布伦特福德',away:'诺丁汉森林'},{home:'热刺',away:'水晶宫'},{home:'阿斯顿维拉',away:'富勒姆'},{home:'利物浦',away:'阿森纳'},{home:'纽卡斯尔联',away:'埃弗顿'}],
-  [{home:'埃弗顿',away:'考文垂城'},{home:'利兹联',away:'热刺'},{home:'阿森纳',away:'赫尔城'},{home:'富勒姆',away:'纽卡斯尔联'},{home:'诺丁汉森林',away:'曼城'},{home:'水晶宫',away:'利物浦'},{home:'桑德兰',away:'切尔西'},{home:'伊普斯维奇镇',away:'伯恩茅斯'},{home:'布莱顿',away:'布伦特福德'},{home:'曼联',away:'阿斯顿维拉'}],
-  [{home:'曼城',away:'富勒姆'},{home:'切尔西',away:'利兹联'},{home:'阿斯顿维拉',away:'桑德兰'},{home:'伯恩茅斯',away:'诺丁汉森林'},{home:'热刺',away:'伊普斯维奇镇'},{home:'考文垂城',away:'水晶宫'},{home:'纽卡斯尔联',away:'阿森纳'},{home:'赫尔城',away:'布莱顿'},{home:'利物浦',away:'曼联'},{home:'布伦特福德',away:'埃弗顿'}],
-  [{home:'诺丁汉森林',away:'切尔西'},{home:'利兹联',away:'考文垂城'},{home:'曼联',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'阿斯顿维拉'},{home:'埃弗顿',away:'利物浦'},{home:'富勒姆',away:'伯恩茅斯'},{home:'布莱顿',away:'纽卡斯尔联'},{home:'桑德兰',away:'热刺'},{home:'水晶宫',away:'赫尔城'},{home:'阿森纳',away:'曼城'}],
-  [{home:'热刺',away:'富勒姆'},{home:'利物浦',away:'桑德兰'},{home:'赫尔城',away:'诺丁汉森林'},{home:'切尔西',away:'水晶宫'},{home:'阿斯顿维拉',away:'埃弗顿'},{home:'布伦特福德',away:'阿森纳'},{home:'考文垂城',away:'伊普斯维奇镇'},{home:'曼城',away:'利兹联'},{home:'纽卡斯尔联',away:'曼联'},{home:'伯恩茅斯',away:'布莱顿'}],
-  [{home:'热刺',away:'阿森纳'},{home:'曼联',away:'考文垂城'},{home:'利兹联',away:'伊普斯维奇镇'},{home:'纽卡斯尔联',away:'桑德兰'},{home:'切尔西',away:'利物浦'},{home:'布伦特福德',away:'曼城'},{home:'伯恩茅斯',away:'赫尔城'},{home:'阿斯顿维拉',away:'水晶宫'},{home:'诺丁汉森林',away:'布莱顿'},{home:'埃弗顿',away:'富勒姆'}],
-  [{home:'桑德兰',away:'诺丁汉森林'},{home:'水晶宫',away:'曼联'},{home:'赫尔城',away:'热刺'},{home:'布莱顿',away:'埃弗顿'},{home:'伊普斯维奇镇',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿斯顿维拉'},{home:'阿森纳',away:'伯恩茅斯'},{home:'曼城',away:'切尔西'},{home:'利物浦',away:'利兹联'},{home:'富勒姆',away:'布伦特福德'}],
-  [{home:'利兹联',away:'富勒姆'},{home:'布莱顿',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'埃弗顿'},{home:'布伦特福德',away:'纽卡斯尔联'},{home:'曼城',away:'赫尔城'},{home:'桑德兰',away:'水晶宫'},{home:'伯恩茅斯',away:'考文垂城'},{home:'阿森纳',away:'曼联'},{home:'利物浦',away:'热刺'},{home:'切尔西',away:'阿斯顿维拉'}],
-  [{home:'阿斯顿维拉',away:'利兹联'},{home:'埃弗顿',away:'桑德兰'},{home:'富勒姆',away:'布莱顿'},{home:'热刺',away:'伯恩茅斯'},{home:'伊普斯维奇镇',away:'布伦特福德'},{home:'赫尔城',away:'利物浦'},{home:'纽卡斯尔联',away:'曼城'},{home:'考文垂城',away:'切尔西'},{home:'曼联',away:'诺丁汉森林'},{home:'水晶宫',away:'阿森纳'}],
-  [{home:'赫尔城',away:'利兹联'},{home:'热刺',away:'布莱顿'},{home:'埃弗顿',away:'曼城'},{home:'富勒姆',away:'阿森纳'},{home:'考文垂城',away:'布伦特福德'},{home:'纽卡斯尔联',away:'诺丁汉森林'},{home:'曼联',away:'桑德兰'},{home:'水晶宫',away:'伯恩茅斯'},{home:'阿斯顿维拉',away:'利物浦'},{home:'伊普斯维奇镇',away:'切尔西'}],
-  [{home:'利兹联',away:'埃弗顿'},{home:'布莱顿',away:'曼联'},{home:'布伦特福德',away:'水晶宫'},{home:'阿森纳',away:'伊普斯维奇镇'},{home:'桑德兰',away:'赫尔城'},{home:'利物浦',away:'考文垂城'},{home:'诺丁汉森林',away:'富勒姆'},{home:'伯恩茅斯',away:'阿斯顿维拉'},{home:'切尔西',away:'纽卡斯尔联'},{home:'曼城',away:'热刺'}],
-  [{home:'阿森纳',away:'布伦特福德'},{home:'布莱顿',away:'伯恩茅斯'},{home:'诺丁汉森林',away:'赫尔城'},{home:'埃弗顿',away:'阿斯顿维拉'},{home:'桑德兰',away:'利物浦'},{home:'富勒姆',away:'热刺'},{home:'水晶宫',away:'切尔西'},{home:'伊普斯维奇镇',away:'考文垂城'},{home:'利兹联',away:'曼城'},{home:'曼联',away:'纽卡斯尔联'}],
-  [{home:'伯恩茅斯',away:'伊普斯维奇镇'},{home:'曼城',away:'诺丁汉森林'},{home:'切尔西',away:'桑德兰'},{home:'布伦特福德',away:'布莱顿'},{home:'阿斯顿维拉',away:'曼联'},{home:'热刺',away:'利兹联'},{home:'考文垂城',away:'埃弗顿'},{home:'利物浦',away:'水晶宫'},{home:'赫尔城',away:'阿森纳'},{home:'纽卡斯尔联',away:'富勒姆'}],
-  [{home:'伊普斯维奇镇',away:'赫尔城'},{home:'埃弗顿',away:'布伦特福德'},{home:'桑德兰',away:'考文垂城'},{home:'诺丁汉森林',away:'伯恩茅斯'},{home:'阿森纳',away:'纽卡斯尔联'},{home:'利兹联',away:'切尔西'},{home:'富勒姆',away:'阿斯顿维拉'},{home:'曼联',away:'利物浦'},{home:'布莱顿',away:'曼城'},{home:'水晶宫',away:'热刺'}],
-  [{home:'热刺',away:'桑德兰'},{home:'布伦特福德',away:'曼联'},{home:'纽卡斯尔联',away:'布莱顿'},{home:'赫尔城',away:'水晶宫'},{home:'考文垂城',away:'利兹联'},{home:'伯恩茅斯',away:'富勒姆'},{home:'切尔西',away:'诺丁汉森林'},{home:'利物浦',away:'埃弗顿'},{home:'曼城',away:'阿森纳'},{home:'阿斯顿维拉',away:'伊普斯维奇镇'}],
-  [{home:'阿森纳',away:'利物浦'},{home:'布莱顿',away:'赫尔城'},{home:'桑德兰',away:'阿斯顿维拉'},{home:'水晶宫',away:'考文垂城'},{home:'伊普斯维奇镇',away:'热刺'},{home:'埃弗顿',away:'纽卡斯尔联'},{home:'富勒姆',away:'曼城'},{home:'利兹联',away:'伯恩茅斯'},{home:'曼联',away:'切尔西'},{home:'诺丁汉森林',away:'布伦特福德'}],
-  [{home:'埃弗顿',away:'利兹联'},{home:'考文垂城',away:'利物浦'},{home:'赫尔城',away:'桑德兰'},{home:'阿斯顿维拉',away:'伯恩茅斯'},{home:'水晶宫',away:'布伦特福德'},{home:'纽卡斯尔联',away:'切尔西'},{home:'富勒姆',away:'诺丁汉森林'},{home:'热刺',away:'曼城'},{home:'曼联',away:'布莱顿'},{home:'伊普斯维奇镇',away:'阿森纳'}],
-  [{home:'曼城',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'水晶宫'},{home:'布伦特福德',away:'考文垂城'},{home:'切尔西',away:'伊普斯维奇镇'},{home:'利物浦',away:'赫尔城'},{home:'阿森纳',away:'富勒姆'},{home:'诺丁汉森林',away:'曼联'},{home:'布莱顿',away:'热刺'},{home:'桑德兰',away:'埃弗顿'},{home:'利兹联',away:'阿斯顿维拉'}],
-  [{home:'水晶宫',away:'桑德兰'},{home:'曼联',away:'阿森纳'},{home:'伊普斯维奇镇',away:'布莱顿'},{home:'考文垂城',away:'伯恩茅斯'},{home:'埃弗顿',away:'诺丁汉森林'},{home:'富勒姆',away:'利兹联'},{home:'阿斯顿维拉',away:'切尔西'},{home:'热刺',away:'利物浦'},{home:'纽卡斯尔联',away:'布伦特福德'},{home:'赫尔城',away:'曼城'}],
-  [{home:'诺丁汉森林',away:'纽卡斯尔联'},{home:'伯恩茅斯',away:'热刺'},{home:'曼城',away:'埃弗顿'},{home:'阿森纳',away:'水晶宫'},{home:'利兹联',away:'赫尔城'},{home:'桑德兰',away:'曼联'},{home:'利物浦',away:'阿斯顿维拉'},{home:'布莱顿',away:'富勒姆'},{home:'布伦特福德',away:'伊普斯维奇镇'},{home:'切尔西',away:'考文垂城'}],
-  [{home:'利兹联',away:'布莱顿'},{home:'热刺',away:'诺丁汉森林'},{home:'水晶宫',away:'富勒姆'},{home:'利物浦',away:'伊普斯维奇镇'},{home:'考文垂城',away:'曼城'},{home:'伯恩茅斯',away:'纽卡斯尔联'},{home:'切尔西',away:'阿森纳'},{home:'阿斯顿维拉',away:'赫尔城'},{home:'曼联',away:'埃弗顿'},{home:'桑德兰',away:'布伦特福德'}],
-  [{home:'布伦特福德',away:'伯恩茅斯'},{home:'布莱顿',away:'考文垂城'},{home:'曼城',away:'曼联'},{home:'伊普斯维奇镇',away:'水晶宫'},{home:'阿森纳',away:'桑德兰'},{home:'富勒姆',away:'利物浦'},{home:'赫尔城',away:'切尔西'},{home:'诺丁汉森林',away:'阿斯顿维拉'},{home:'埃弗顿',away:'热刺'},{home:'纽卡斯尔联',away:'利兹联'}],
-  [{home:'桑德兰',away:'伊普斯维奇镇'},{home:'利兹联',away:'诺丁汉森林'},{home:'曼联',away:'赫尔城'},{home:'切尔西',away:'富勒姆'},{home:'利物浦',away:'纽卡斯尔联'},{home:'考文垂城',away:'阿森纳'},{home:'伯恩茅斯',away:'曼城'},{home:'水晶宫',away:'埃弗顿'},{home:'热刺',away:'布伦特福德'},{home:'阿斯顿维拉',away:'布莱顿'}],
-  [{home:'布莱顿',away:'切尔西'},{home:'富勒姆',away:'桑德兰'},{home:'布伦特福德',away:'利兹联'},{home:'诺丁汉森林',away:'利物浦'},{home:'赫尔城',away:'考文垂城'},{home:'阿森纳',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'曼联'},{home:'曼城',away:'水晶宫'},{home:'纽卡斯尔联',away:'热刺'},{home:'埃弗顿',away:'伯恩茅斯'}],
-  [{home:'切尔西',away:'曼城'},{home:'伯恩茅斯',away:'阿森纳'},{home:'热刺',away:'赫尔城'},{home:'曼联',away:'水晶宫'},{home:'埃弗顿',away:'布莱顿'},{home:'诺丁汉森林',away:'桑德兰'},{home:'纽卡斯尔联',away:'伊普斯维奇镇'},{home:'阿斯顿维拉',away:'考文垂城'},{home:'布伦特福德',away:'富勒姆'},{home:'利兹联',away:'利物浦'}],
-  [{home:'桑德兰',away:'纽卡斯尔联'},{home:'布莱顿',away:'诺丁汉森林'},{home:'考文垂城',away:'曼联'},{home:'赫尔城',away:'伯恩茅斯'},{home:'曼城',away:'布伦特福德'},{home:'富勒姆',away:'埃弗顿'},{home:'利物浦',away:'切尔西'},{home:'阿森纳',away:'热刺'},{home:'水晶宫',away:'阿斯顿维拉'},{home:'伊普斯维奇镇',away:'利兹联'}],
-  [{home:'曼城',away:'利物浦'},{home:'利兹联',away:'阿森纳'},{home:'富勒姆',away:'伊普斯维奇镇'},{home:'诺丁汉森林',away:'水晶宫'},{home:'布伦特福德',away:'阿斯顿维拉'},{home:'纽卡斯尔联',away:'考文垂城'},{home:'布莱顿',away:'桑德兰'},{home:'热刺',away:'切尔西'},{home:'埃弗顿',away:'赫尔城'},{home:'伯恩茅斯',away:'曼联'}],
-  [{home:'赫尔城',away:'富勒姆'},{home:'曼联',away:'利兹联'},{home:'水晶宫',away:'布莱顿'},{home:'阿斯顿维拉',away:'纽卡斯尔联'},{home:'切尔西',away:'埃弗顿'},{home:'考文垂城',away:'热刺'},{home:'桑德兰',away:'伯恩茅斯'},{home:'利物浦',away:'布伦特福德'},{home:'伊普斯维奇镇',away:'曼城'},{home:'阿森纳',away:'诺丁汉森林'}],
-  [{home:'布伦特福德',away:'赫尔城'},{home:'纽卡斯尔联',away:'水晶宫'},{home:'热刺',away:'曼联'},{home:'利兹联',away:'桑德兰'},{home:'布莱顿',away:'利物浦'},{home:'诺丁汉森林',away:'伊普斯维奇镇'},{home:'伯恩茅斯',away:'切尔西'},{home:'富勒姆',away:'考文垂城'},{home:'埃弗顿',away:'阿森纳'},{home:'曼城',away:'阿斯顿维拉'}],
-  [{home:'伊普斯维奇镇',away:'埃弗顿'},{home:'阿森纳',away:'布莱顿'},{home:'利物浦',away:'伯恩茅斯'},{home:'考文垂城',away:'诺丁汉森林'},{home:'阿斯顿维拉',away:'热刺'},{home:'赫尔城',away:'纽卡斯尔联'},{home:'曼联',away:'富勒姆'},{home:'桑德兰',away:'曼城'},{home:'切尔西',away:'布伦特福德'},{home:'水晶宫',away:'利兹联'}]
-];
-
-    // 备用赛程：仅在 update.js 未跑过时填充，避免页面空白
+    /* ============================================================
+       1. 赛程 / 结果 / 积分榜（update.js 覆盖）
+    ============================================================ */
+    const FIXTURES = [];
     (function fillFallbackFixtures(){
         if (FIXTURES.length) return;
         const out = [];
@@ -346,47 +411,37 @@
         FIXTURES.push(...out, ...second);
     })();
 
-    // 已完赛结果 —— update.js 会覆盖
-    const RESULTS = {
-  '1':{'阿森纳|考文垂城':[3,0],'赫尔城|曼联':[2,0],'伊普斯维奇镇|桑德兰':[2,1],'诺丁汉森林|利兹联':[0,1],'埃弗顿|水晶宫':[2,0],'布伦特福德|热刺':[3,0],'曼城|伯恩茅斯':[2,1],'布莱顿|阿斯顿维拉':[4,0],'纽卡斯尔联|利物浦':[2,2],'富勒姆|切尔西':[2,3]},
-  '2':{'水晶宫|曼城':[1,4],'利物浦|诺丁汉森林':[2,2],'伯恩茅斯|埃弗顿':[1,1],'考文垂城|赫尔城':[0,1],'热刺|纽卡斯尔联':[0,2],'桑德兰|富勒姆':[1,0],'切尔西|布莱顿':[4,3],'利兹联|布伦特福德':[1,1],'曼联|伊普斯维奇镇':[5,2],'阿斯顿维拉|阿森纳':[0,1]},
-  '3':{'伊普斯维奇镇|利物浦':[0,2],'纽卡斯尔联|伯恩茅斯':[2,2],'诺丁汉森林|热刺':[0,0],'曼城|考文垂城':[1,0],'布莱顿|利兹联':[1,1],'布伦特福德|桑德兰':[1,1],'富勒姆|水晶宫':[2,3],'赫尔城|阿斯顿维拉':[0,0],'埃弗顿|曼联':[2,2],'阿森纳|切尔西':[2,1]},
-  '4':{'水晶宫|伊普斯维奇镇':[2,3],'利物浦|富勒姆':[0,0],'阿斯顿维拉|诺丁汉森林':[1,2],'伯恩茅斯|布伦特福德':[2,2],'切尔西|赫尔城':[2,2],'热刺|埃弗顿':[0,0],'桑德兰|阿森纳':[0,2],'考文垂城|布莱顿':[0,5],'曼联|曼城':[0,1],'利兹联|纽卡斯尔联':[4,1]},
-  '5':{'布伦特福德|切尔西':[3,0],'热刺|阿斯顿维拉':[2,3],'埃弗顿|伊普斯维奇镇':[1,0],'布莱顿|阿森纳':[3,0],'纽卡斯尔联|赫尔城':[2,1],'诺丁汉森林|考文垂城':[0,1],'伯恩茅斯|利物浦':[0,1],'利兹联|水晶宫':[0,0],'曼城|桑德兰':[5,3],'富勒姆|曼联':[1,1]},
-  '6':{'阿森纳|利兹联':[2,1],'桑德兰|布莱顿':[0,2],'切尔西|伯恩茅斯':[5,1],'伊普斯维奇镇|富勒姆':[2,1],'阿斯顿维拉|布伦特福德':[2,2],'曼联|热刺':[1,1]}
-};
+    const RESULTS = {};
 
-    // 积分榜 —— update.js 会覆盖（保持数组字面量格式）
-    const STATIC_STANDINGS=[
-  {rank:1,team:'曼城',played:6,won:6,drawn:0,lost:0,gf:16,ga:5,gd:11,points:18},
-  {rank:2,team:'阿森纳',played:6,won:5,drawn:0,lost:1,gf:10,ga:5,gd:5,points:15},
-  {rank:3,team:'布莱顿',played:6,won:4,drawn:1,lost:1,gf:18,ga:5,gd:13,points:13},
-  {rank:4,team:'布伦特福德',played:6,won:2,drawn:4,lost:0,gf:12,ga:6,gd:6,points:10},
-  {rank:5,team:'埃弗顿',played:6,won:2,drawn:4,lost:0,gf:8,ga:5,gd:3,points:10},
-  {rank:6,team:'切尔西',played:6,won:3,drawn:1,lost:2,gf:15,ga:13,gd:2,points:10},
-  {rank:7,team:'利兹联',played:6,won:2,drawn:3,lost:1,gf:8,ga:5,gd:3,points:9},
-  {rank:8,team:'赫尔城',played:6,won:2,drawn:3,lost:1,gf:8,ga:6,gd:2,points:9},
-  {rank:9,team:'利物浦',played:6,won:2,drawn:3,lost:1,gf:7,ga:7,gd:0,points:9},
-  {rank:10,team:'伊普斯维奇镇',played:6,won:3,drawn:0,lost:3,gf:9,ga:12,gd:-3,points:9},
-  {rank:11,team:'纽卡斯尔联',played:6,won:2,drawn:2,lost:2,gf:10,ga:13,gd:-3,points:8},
-  {rank:12,team:'水晶宫',played:6,won:2,drawn:1,lost:3,gf:9,ga:12,gd:-3,points:7},
-  {rank:13,team:'曼联',played:6,won:1,drawn:3,lost:2,gf:9,ga:9,gd:0,points:6},
-  {rank:14,team:'考文垂城',played:6,won:2,drawn:0,lost:4,gf:5,ga:11,gd:-6,points:6},
-  {rank:15,team:'诺丁汉森林',played:6,won:1,drawn:2,lost:3,gf:5,ga:8,gd:-3,points:5},
-  {rank:16,team:'阿斯顿维拉',played:6,won:1,drawn:2,lost:3,gf:6,ga:11,gd:-5,points:5},
-  {rank:17,team:'桑德兰',played:6,won:1,drawn:1,lost:4,gf:6,ga:12,gd:-6,points:4},
-  {rank:18,team:'伯恩茅斯',played:6,won:0,drawn:3,lost:3,gf:7,ga:13,gd:-6,points:3},
-  {rank:19,team:'热刺',played:6,won:0,drawn:3,lost:3,gf:3,ga:9,gd:-6,points:3},
-  {rank:20,team:'富勒姆',played:6,won:0,drawn:2,lost:4,gf:6,ga:10,gd:-4,points:2}
-];
+    const STATIC_STANDINGS = [
+        { team: '阿森纳',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '曼城',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '利物浦',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '切尔西',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '热刺',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '曼联',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '纽卡斯尔联',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '阿斯顿维拉',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '布莱顿',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '埃弗顿',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '富勒姆',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '水晶宫',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '布伦特福德',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '伯恩茅斯',    played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '诺丁汉森林',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '利兹联',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '桑德兰',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '考文垂城',    played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '赫尔城',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '伊普斯维奇镇',played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 }
+    ];
 
-    /* ========================================================
+    /* ============================================================
        2. 校验 + 归一化
-    ======================================================== */
+    ============================================================ */
     function validateAndNormalizePrediction(raw) {
         const errors = [], warnings = [];
         const data = JSON.parse(JSON.stringify(raw));
-
         const required = ['homeWin','draw','awayWin','score','confidence','keyFactors','analysis'];
         for (const k of required) {
             if (data[k] === undefined || data[k] === null) errors.push(`缺少字段：${k}`);
@@ -398,15 +453,12 @@
             errors.push('概率字段不是数字');
             return { ok:false, errors, warnings, data };
         }
-
         const sum = h + d + a;
         const diff = Math.abs(sum - 100);
-
         if (diff > 2) {
-            warnings.push(`概率总和 ${sum}，偏差 ${diff.toFixed(1)} > 2，判定为无效`);
+            warnings.push(`概率总和 ${sum}，偏差 ${diff.toFixed(1)} > 2`);
             return { ok:false, errors, warnings, data, hardFail:true };
         }
-
         if (diff > 0) {
             const f = 100 / sum;
             const r = [Math.round(h*f*100), Math.round(d*f*100), Math.round(a*f*100)];
@@ -415,24 +467,18 @@
             data.homeWin = r[0]/100; data.draw = r[1]/100; data.awayWin = r[2]/100;
             warnings.push(`概率已归一化：原总和 ${sum}`);
         }
-
         if (!Array.isArray(data.keyFactors)) warnings.push('keyFactors 不是数组');
         if (data.headToHead && typeof data.headToHead === 'object') {
             const note = data.headToHead.note;
-            if (note && !['估算','资料库','今日情报'].includes(note)) {
-                warnings.push(`headToHead.note 非法值：${note}`);
-            }
+            if (note && !['估算','资料库','今日情报'].includes(note)) warnings.push(`headToHead.note 非法值：${note}`);
             if (!Array.isArray(data.headToHead.lastMatches)) warnings.push('headToHead.lastMatches 不是数组');
-        } else {
-            warnings.push('headToHead 缺失');
-        }
-
+        } else warnings.push('headToHead 缺失');
         return { ok:true, errors, warnings, data };
     }
 
-    /* ========================================================
-       3. Toast
-    ======================================================== */
+    /* ============================================================
+       3. Toast / 彩带
+    ============================================================ */
     function toast(msg, kind='ok') {
         const el = document.createElement('div');
         el.className = 'toast ' + kind;
@@ -440,57 +486,68 @@
         document.getElementById('toastWrap').appendChild(el);
         setTimeout(() => el.remove(), 3200);
     }
+    function confetti(){
+        const colors = ['#4ade80','#ffb648','#00d4ff','#e85d3a'];
+        for (let i = 0; i < 40; i++) {
+            const el = document.createElement('div');
+            el.className = 'confetti';
+            el.style.left = Math.random()*100 + 'vw';
+            el.style.background = colors[Math.floor(Math.random()*colors.length)];
+            el.style.animationDuration = (1.6 + Math.random()*1.4) + 's';
+            el.style.animationDelay = (Math.random()*0.3) + 's';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3200);
+        }
+    }
 
-    /* ========================================================
+    /* ============================================================
        4. API Key
-    ======================================================== */
-    function saveKey(){
-        const k = document.getElementById('apiKey').value.trim();
-        if (!k) return toast('请输入 API Key', 'warn');
-        localStorage.setItem('groq_key', k);
-        toast('已保存 API Key');
-    }
-    function clearKey(){
-        localStorage.removeItem('groq_key');
-        document.getElementById('apiKey').value = '';
-        toast('已清除 API Key', 'warn');
-    }
-    function getKey(){
-        return localStorage.getItem('groq_key') || '';
-    }
+    ============================================================ */
+    function saveKey(){ const k = document.getElementById('apiKey').value.trim(); if(!k) return toast('请输入 API Key','warn'); localStorage.setItem('groq_key', k); toast('已保存'); }
+    function clearKey(){ localStorage.removeItem('groq_key'); document.getElementById('apiKey').value=''; toast('已清除','warn'); }
+    function getKey(){ return localStorage.getItem('groq_key') || ''; }
 
-    /* ========================================================
-       5. skill.md 加载
-    ======================================================== */
+    /* ============================================================
+       5. skill.md 加载（带 localStorage 缓存）
+    ============================================================ */
     let _skillCache = null;
     let _verBarShown = false;
     async function loadSkill(){
         if (_skillCache) return _skillCache;
+        try {
+            const cached = JSON.parse(localStorage.getItem(SKILL_CACHE_KEY) || 'null');
+            if (cached && Date.now() - cached.ts < SKILL_CACHE_TTL && cached.version === EXPECTED_SKILL_VERSION) {
+                _skillCache = cached.text;
+                return _skillCache;
+            }
+        } catch(e){}
+
         const res = await fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' });
         if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
-        const text = await res.text();
+        let text = await res.text();
+        text = text.replace(/\r\n/g,'\n').replace(/[ \t]+\n/g,'\n').replace(/\n{2,}/g,'\n').replace(/<!--[\s\S]*?-->/g,'').trim();
 
         const vm = text.match(/v(\d+\.\d+\.\d+)/);
         const actualVersion = vm ? vm[1] : null;
         if (actualVersion !== EXPECTED_SKILL_VERSION && !_verBarShown) {
-            console.warn(`⚠️ skill.md 版本不符\n期望：${EXPECTED_SKILL_VERSION}\n实际：${actualVersion ?? '未找到'}`);
+            console.warn(`⚠️ skill.md 版本不符：期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}`);
             const bar = document.createElement('div');
             bar.className = 'verbar';
             bar.textContent = `⚠️ skill.md 版本不符（期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}）`;
             document.body.appendChild(bar);
             _verBarShown = true;
         }
+        try { localStorage.setItem(SKILL_CACHE_KEY, JSON.stringify({ ts:Date.now(), version:actualVersion, text })); } catch(e){}
         _skillCache = text;
         return text;
     }
 
-    /* ========================================================
-       6. Groq 调用（429 自动重试）
-    ======================================================== */
-    async function callGroq(systemPrompt, userPrompt, maxRetry = 3) {
+    /* ============================================================
+       6. Groq 调用
+    ============================================================ */
+    async function callGroq(systemPrompt, userPrompt, maxRetry=3){
         const key = getKey();
         if (!key) throw new Error('未设置 API Key');
-
         let delay = 1500;
         for (let attempt = 0; attempt <= maxRetry; attempt++) {
             const resp = await fetch(GROQ_URL, {
@@ -498,32 +555,25 @@
                 headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer '+key },
                 body: JSON.stringify({
                     model: GROQ_MODEL,
-                    messages: [
+                    messages:[
                         { role:'system', content: systemPrompt },
-                        { role:'user',   content: userPrompt }
+                        { role:'user', content: userPrompt }
                     ],
                     temperature: 0.2,
                     response_format: { type: 'json_object' }
                 })
             });
-            if (resp.status === 429 && attempt < maxRetry) {
-                await new Promise(r => setTimeout(r, delay));
-                delay *= 2;
-                continue;
-            }
-            if (!resp.ok) {
-                const txt = await resp.text();
-                throw new Error(`Groq ${resp.status}: ${txt.slice(0,240)}`);
-            }
+            if (resp.status === 429 && attempt < maxRetry) { await new Promise(r => setTimeout(r, delay)); delay *= 2; continue; }
+            if (!resp.ok) { const txt = await resp.text(); throw new Error(`Groq ${resp.status}: ${txt.slice(0,240)}`); }
             const j = await resp.json();
             return j.choices?.[0]?.message?.content || '';
         }
         throw new Error('Groq 重试耗尽');
     }
 
-    /* ========================================================
-       7. 轮次 / 比赛选择器
-    ======================================================== */
+    /* ============================================================
+       7. 选择器
+    ============================================================ */
     function initSelectors(){
         const rs = document.getElementById('roundSel');
         if (!FIXTURES.length) {
@@ -534,12 +584,7 @@
         rs.innerHTML = FIXTURES.map((_,i) => `<option value="${i}">第 ${i+1} 轮</option>`).join('');
         const saved = localStorage.getItem('last_round');
         if (saved !== null && FIXTURES[+saved]) rs.value = saved;
-
-        rs.addEventListener('change', () => {
-            localStorage.setItem('last_round', rs.value);
-            fillMatches();
-            refreshDashboard();
-        });
+        rs.addEventListener('change', () => { localStorage.setItem('last_round', rs.value); fillMatches(); refreshDashboard(); });
         document.getElementById('matchSel').addEventListener('change', () => {
             const r = +rs.value || 0;
             localStorage.setItem('last_match_'+r, document.getElementById('matchSel').value);
@@ -552,8 +597,7 @@
         const ms = document.getElementById('matchSel');
         const round = FIXTURES[r] || [];
         if (!round.length) { ms.innerHTML = '<option>—</option>'; return; }
-        ms.innerHTML = round.map((m,i) =>
-            `<option value="${i}">${m.home} vs ${m.away}</option>`).join('');
+        ms.innerHTML = round.map((m,i) => `<option value="${i}">${m.home} vs ${m.away}</option>`).join('');
         const saved = localStorage.getItem('last_match_'+r);
         if (saved !== null && round[+saved]) ms.value = saved;
     }
@@ -564,90 +608,70 @@
         return { round: r, ...(round[i] || { home:'', away:'' }) };
     }
 
-    /* ========================================================
+    /* ============================================================
        8. 预测流程
-    ======================================================== */
+    ============================================================ */
     async function startPredict(){
         const btn = document.getElementById('predictBtn');
         const { round, home, away } = currentMatch();
-        if (!home || !away) return toast('未选择比赛', 'warn');
+        if (!home || !away) return toast('未选择比赛','warn');
         const intel = document.getElementById('intel').value.trim();
-
-        if (!getKey()) return toast('请先填 Groq API Key', 'warn');
+        if (!getKey()) return toast('请先填 Groq API Key','warn');
 
         btn.disabled = true;
+        btn.classList.add('loading');
         const card = document.getElementById('resultCard');
-        card.innerHTML = `
-    <div class="loader">
-      <div class="ball"></div>
-      <div class="msg">模型推理中…（第一次约 10 秒）</div>
-    </div>`;
+        card.innerHTML = `<div class="loader"><div class="ball"></div><div class="msg">模型推理中…（约 10 秒）</div></div>`;
 
         try {
             const skill = await loadSkill();
             const userPrompt =
                 (intel ? `【今日情报】\n${intel}\n\n` : '') +
-                `【预测指令】\n请预测：第 ${round+1} 轮  ${home} vs ${away}\n` +
-                `严格按 skill.md 输出契约返回 JSON。`;
-
+                `【预测指令】\n请预测：第 ${round+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
             const raw = await callGroq(skill, userPrompt);
 
             let parsed;
             try { parsed = JSON.parse(raw); }
             catch(e){
                 card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<br><pre style="white-space:pre-wrap;font-size:12px;color:#888;margin-top:12px">${raw.slice(0,500)}</pre></div>`;
-                return toast('模型返回非 JSON，请重试', 'err');
+                return toast('模型返回非 JSON','err');
             }
-
             const v = validateAndNormalizePrediction(parsed);
             if (!v.ok) {
                 card.innerHTML = `<div class="empty">❌ 校验失败<br>${v.errors.join('<br>')}<br>${v.warnings.join('<br>')}</div>`;
-                return toast('预测校验失败', 'err');
+                return toast('预测校验失败','err');
             }
             if (v.warnings.length) console.warn('校验警告：', v.warnings);
 
             renderResult(v.data, { round, home, away, intel });
             addHistory({ round, home, away, ...v.data, ts: Date.now() });
             toast('预测完成');
-        } catch(err) {
+        } catch(err){
             console.error(err);
             card.innerHTML = `<div class="empty">❌ ${err.message}</div>`;
-            toast(err.message.slice(0, 80), 'err');
+            toast(err.message.slice(0,80),'err');
         } finally {
             btn.disabled = false;
+            btn.classList.remove('loading');
         }
     }
 
-    /* ========================================================
-       9. 渲染结果
-    ======================================================== */
-    function espnUrl(name){
-        const id = ESPN_IDS[name];
-        return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null;
-    }
-
+    /* ============================================================
+       9. 队徽
+    ============================================================ */
+    function espnUrl(name){ const id = ESPN_IDS[name]; return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null; }
     function badgeHtml(name){
         const url = espnUrl(name);
         const abbr = ABBR[name] || String(name).slice(0,3);
         if (!url) return `<div class="badge-wrap"><div class="fallback">${abbr}</div></div>`;
-        // 先显示缩写占位，图片加载完淡入并隐藏缩写
         return `<div class="badge-wrap">
-    <img class="badge" src="${url}" alt="${name}"
-      referrerpolicy="no-referrer"
-      loading="eager"
-      decoding="async"
+    <img class="badge" src="${url}" alt="${name}" referrerpolicy="no-referrer" loading="eager" decoding="async"
       onload="this.classList.add('loaded');this.nextElementSibling&&(this.nextElementSibling.style.display='none')"
       onerror="this.style.display='none'">
     <div class="fallback">${abbr}</div>
   </div>`;
     }
-
-    function confClass(c){
-        if (c === '高') return '高';
-        if (c === '中高') return '中高';
-        if (c === '中') return '中';
-        return '低';
-    }
+    function confClass(c){ return ['高','中高','中','低'].includes(c) ? c : '低'; }
     function playerCard(p){
         const name = p.name || p.球员 || '';
         const pos = p.position || p.位置 || '';
@@ -658,6 +682,21 @@
     <div class="rt"><div class="rating">${rating}</div>${note?`<div class="note">${note}</div>`:''}</div>
   </div>`;
     }
+
+    /* 数字滚动 */
+    function animateNumber(el, target, dur=900, suffix='%'){
+        const start = performance.now();
+        const from = 0;
+        function tick(now){
+            const t = Math.min(1, (now-start)/dur);
+            const eased = 1 - Math.pow(1-t, 3);
+            const val = Math.round(from + (target-from)*eased);
+            el.textContent = val + suffix;
+            if (t < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+    }
+
     function renderResult(d, ctx){
         const { home, away } = ctx;
         const card = document.getElementById('resultCard');
@@ -665,15 +704,14 @@
         const R = 42, C = 2 * Math.PI * R;
 
         const ring = (pct, cls) => {
-            const color = cls === 'h' ? '#ff6b35' : cls === 'a' ? '#00d4ff' : '#8b98ab';
+            const color = cls==='h'?'#e85d3a':cls==='a'?'#00d4ff':'#8b98ab';
             return `<div class="ring ${cls}">
       <svg viewBox="0 0 96 96">
         <circle class="track" cx="48" cy="48" r="${R}"></circle>
-        <circle class="bar" cx="48" cy="48" r="${R}" stroke="${color}"
-          stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle>
+        <circle class="bar" cx="48" cy="48" r="${R}" stroke="${color}" stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle>
       </svg>
       <div class="lbl2">${cls==='h'?'主胜':cls==='d'?'平局':'客胜'}</div>
-      <div class="num">${pct}%</div>
+      <div class="num" data-target="${pct}">0%</div>
     </div>`;
         };
 
@@ -684,8 +722,7 @@
         <div class="tag ${d.headToHead.note || '估算'}">${d.headToHead.note || '估算'}</div>
         <div class="sum">${d.headToHead.summary}</div>
         ${Array.isArray(d.headToHead.lastMatches) && d.headToHead.lastMatches.length
-            ? '<ul>' + d.headToHead.lastMatches.map(m=>`<li>${m}</li>`).join('') + '</ul>'
-            : ''}
+            ? '<ul>' + d.headToHead.lastMatches.map(m=>`<li>${m}</li>`).join('') + '</ul>' : ''}
       </div>
     </div>` : '';
 
@@ -705,143 +742,203 @@
         <div class="score pop">${d.score}</div>
         <div class="team">${badgeHtml(away)}<div class="nm">${away}</div></div>
       </div>
-      <div style="margin-top:14px">
-        <span class="conf ${confClass(d.confidence)}">置信度：${d.confidence}</span>
-      </div>
+      <div style="margin-top:14px"><span class="conf ${confClass(d.confidence)}">置信度：${d.confidence}</span></div>
     </div>
 
     <div class="rings">${ring(h,'h')}${ring(dr,'d')}${ring(a,'a')}</div>
+
+    <div class="compare">
+      <div class="seg h" style="width:0"></div>
+      <div class="seg d" style="width:0"></div>
+      <div class="seg a" style="width:0"></div>
+    </div>
 
     ${h2h}
 
     <div class="sect">
       <div class="ttl">关键因素</div>
       <div class="factors">${(d.keyFactors||[]).map(f=>`<span class="chip">${f}</span>`).join('')}</div>
-    </div>
-
-    <div class="sect">
-      <div class="ttl">分析</div>
       <div class="kv">${d.analysis || ''}</div>
     </div>
 
     ${playersHtml}
   `;
 
-        // 环形动画：初值 C → 双层 rAF → 目标值
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                const bars = card.querySelectorAll('.ring .bar');
-                [h, dr, a].forEach((pct, i) => {
-                    if (bars[i]) bars[i].style.strokeDashoffset = C * (1 - pct/100);
-                });
+        // 触发动画
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            card.querySelectorAll('.ring .bar').forEach((el,i) => {
+                const pct = [h,dr,a][i];
+                el.style.strokeDashoffset = C * (1 - pct/100);
             });
-        });
+            card.querySelectorAll('.ring .num').forEach(el => {
+                animateNumber(el, +el.dataset.target, 900);
+            });
+            const segs = card.querySelectorAll('.compare .seg');
+            if (segs[0]) segs[0].style.width = h + '%';
+            if (segs[1]) segs[1].style.width = dr + '%';
+            if (segs[2]) segs[2].style.width = a + '%';
+        }));
     }
 
-    /* ========================================================
+    /* ============================================================
        10. 积分榜
-    ======================================================== */
-    function renderStandings(list){
-        if (!list || !list.length) {
-            document.getElementById('standings').innerHTML = '<div class="empty">暂无数据</div>';
-            return;
+    ============================================================ */
+    function getLast5(team){
+        const arr = [];
+        for (const key in RESULTS) {
+            const [h,a] = key.split('|');
+            if (h !== team && a !== team) continue;
+            const sc = RESULTS[key];
+            const [hg,ag] = sc.split('-').map(Number);
+            let r;
+            if (h === team) r = hg>ag ? 'W' : hg<ag ? 'L' : 'D';
+            else r = ag>hg ? 'W' : ag<hg ? 'L' : 'D';
+            arr.push({ r, t: key });
         }
+        return arr.slice(-5);
+    }
+
+    function renderStandings(list){
+        if (!list || !list.length) { document.getElementById('standings').innerHTML = '<div class="empty">暂无数据</div>'; return; }
         const rows = list.map((s,i) => {
             const cls = i < 4 ? 'ucl' : i >= list.length - 3 ? 'rel' : '';
+            const url = espnUrl(s.team);
+            const abbr = ABBR[s.team] || String(s.team).slice(0,3);
+            const badge = url
+                ? `<span class="mini-badge-wrap">
+           <img class="mini-badge" src="${url}" alt="${s.team}" referrerpolicy="no-referrer" loading="lazy" decoding="async"
+             onload="this.classList.add('loaded')" onerror="this.style.display='none'">
+           <span class="mini-fallback">${abbr}</span>
+         </span>`
+                : `<span class="mini-badge-wrap"><span class="mini-fallback">${abbr}</span></span>`;
+            const last5 = getLast5(s.team);
+            const l5 = last5.length
+                ? `<span class="last5">${last5.map(x=>`<span class="${x.r}">${x.r}</span>`).join('')}</span>`
+                : '<span style="color:var(--txt3);font-size:11px">—</span>';
             return `<tr class="${cls}">
       <td>${i+1}</td>
-      <td>${s.team}</td>
+      <td>${badge}<span class="team-name">${s.team}</span></td>
       <td>${s.played ?? 0}</td>
       <td>${s.won ?? 0}</td>
       <td>${s.drawn ?? 0}</td>
       <td>${s.lost ?? 0}</td>
       <td>${s.gf ?? 0}:${s.ga ?? 0}</td>
+      <td>${l5}</td>
       <td style="color:#ffb648;font-weight:700">${s.points ?? 0}</td>
     </tr>`;
         }).join('');
         document.getElementById('standings').innerHTML = `
     <table>
-      <thead><tr><th>#</th><th>球队</th><th>赛</th><th>胜</th><th>平</th><th>负</th><th>进:失</th><th>分</th></tr></thead>
+      <thead><tr><th>#</th><th>球队</th><th>赛</th><th>胜</th><th>平</th><th>负</th><th>进:失</th><th>近5场</th><th>分</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
     }
 
-    /* ========================================================
-       11. 仪表盘
-    ======================================================== */
+    /* ============================================================
+       11. 仪表盘 + 比赛日气氛 + 连胜
+    ============================================================ */
     function refreshDashboard(){
         const r = +document.getElementById('roundSel').value || 0;
         document.getElementById('dashRound').textContent = '第 ' + (r+1) + ' 轮';
-
         document.getElementById('dashPlayed').textContent = Object.keys(RESULTS).length;
-
         const hist = getHistory();
         const roundFixtures = FIXTURES[r] || [];
         const predicted = new Set(hist.filter(h => h.round === r).map(h => `${h.home}|${h.away}`));
-        const pending = Math.max(0, roundFixtures.length - predicted.size);
-        document.getElementById('dashPending').textContent = pending;
-
+        document.getElementById('dashPending').textContent = Math.max(0, roundFixtures.length - predicted.size);
         const toRecord = hist.filter(h => !h.actual).length;
         document.getElementById('dashRecord').textContent = toRecord;
-
         const badge = document.getElementById('histBadge');
         if (toRecord > 0) { badge.style.display = 'flex'; badge.textContent = toRecord; }
-        else { badge.style.display = 'none'; }
+        else badge.style.display = 'none';
+
+        // 连胜
+        const done = hist.filter(h => h.actual);
+        let streak = 0;
+        for (let i = done.length - 1; i >= 0; i--) {
+            const j = judge(done[i]);
+            if (j === 'exact' || j === 'wdl') streak++;
+            else break;
+        }
+        const sub = document.getElementById('histSub');
+        if (streak >= 3) {
+            sub.innerHTML = `录入实际赛果，自动判定命中 <span class="streak">🔥 ${streak} 连胜</span>`;
+        } else {
+            sub.textContent = '录入实际赛果，自动判定命中';
+        }
     }
 
-    /* ========================================================
-       12. 历史记录
-    ======================================================== */
-    const HIST_KEY = 'pl_history_v1';
+    /* 比赛日气氛：简单规则 */
+    function updateMatchdayLine(){
+        const el = document.getElementById('matchdayLine');
+        const dot = document.getElementById('liveDot');
+        // 用浏览器日期判断（周六/周日视为比赛日）
+        const d = new Date();
+        const day = d.getDay();
+        if (day === 0 || day === 6) {
+            el.textContent = '🔴 比赛日 —— 记得录入上一轮实际赛果';
+            dot.style.display = 'inline-block';
+        } else {
+            // 计算距离下个周六的天数
+            const daysToSat = (6 - day + 7) % 7 || 7;
+            el.textContent = `距下个比赛日还有 ${daysToSat} 天`;
+            dot.style.display = 'none';
+        }
+    }
+
+    /* ============================================================
+       12. 历史记录（压缩存储 + 筛选）
+    ============================================================ */
+    const HIST_KEY = 'pl_history_v2';
+    let histFilter = 'all';
+
     function getHistory(){
         try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); }
         catch { return []; }
     }
     function setHistory(list){
-        if (list.length > 500) toast('记录超过 500 条，建议导出后清空', 'warn');
-        localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(-800)));
+        if (list.length > 500) toast('记录超过 500 条，建议导出后清空','warn');
+        // 压缩存储：去掉 keyFactors / analysis / *_players
+        const slim = list.slice(-800).map(h => {
+            const o = { round:h.round, home:h.home, away:h.away, homeWin:h.homeWin, draw:h.draw, awayWin:h.awayWin, score:h.score, confidence:h.confidence, ts:h.ts };
+            if (h.actual) o.actual = h.actual;
+            if (h._multi && h._multi > 1) o._multi = h._multi;
+            if (h.headToHead) o.headToHead = h.headToHead;
+            return o;
+        });
+        localStorage.setItem(HIST_KEY, JSON.stringify(slim));
     }
-    function addHistory(rec){
-        const list = getHistory();
-        list.push(rec);
-        setHistory(list);
-        refreshDashboard();
-        if (document.getElementById('histMask').classList.contains('show')) renderHistory();
-    }
+    function addHistory(rec){ const list = getHistory(); list.push(rec); setHistory(list); refreshDashboard(); if (document.getElementById('histMask').classList.contains('show')) renderHistory(); }
     function judge(rec){
         if (!rec.actual) return 'pending';
         if (rec.actual === rec.score) return 'exact';
-        const wdl = s => {
-            const [a,b] = s.split('-').map(Number);
-            return a>b ? 'H' : a<b ? 'A' : 'D';
-        };
+        const wdl = s => { const [a,b] = s.split('-').map(Number); return a>b?'H':a<b?'A':'D'; };
         return wdl(rec.actual) === wdl(rec.score) ? 'wdl' : 'miss';
     }
     function renderHistory(){
         const raw = getHistory();
-        const list = raw.slice().reverse();
+        const filtered = histFilter === 'all' ? raw : raw.filter(h => judge(h) === histFilter);
+        const list = filtered.slice().reverse();
         const box = document.getElementById('histList');
-        if (!list.length) { box.innerHTML = '<div class="empty">暂无记录</div>'; return; }
-
-        box.innerHTML = list.map((h,idx) => {
-            const realIdx = raw.length - 1 - idx;
-            const j = judge(h);
-            const labels = { exact:'精确命中', wdl:'胜平负命中', miss:'未命中', pending:'待录入' };
-            const multi = h._multi && h._multi > 1 ? `<span class="multi">×${h._multi}</span>` : '';
-            return `<div class="hitem">
-      <div class="top">
-        <div class="teams2">${h.home} vs ${h.away}${multi}</div>
-        <div class="res-badge ${j}">${labels[j]}</div>
-      </div>
-      <div class="meta">预测 ${h.score} · ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
-      <div class="row2">
-        <input placeholder="实际比分 如 2-1" value="${h.actual || ''}"
-          onchange="setActual(${realIdx}, this.value)">
-        <button onclick="delHistory(${realIdx})">删除</button>
-      </div>
-    </div>`;
-        }).join('');
-
+        if (!list.length) { box.innerHTML = '<div class="empty">暂无记录</div>'; }
+        else {
+            box.innerHTML = list.map((h) => {
+                const realIdx = raw.indexOf(h);
+                const j = judge(h);
+                const labels = { exact:'精确命中', wdl:'胜平负命中', miss:'未命中', pending:'待录入' };
+                const multi = h._multi && h._multi > 1 ? `<span class="multi">×${h._multi}</span>` : '';
+                return `<div class="hitem">
+        <div class="top">
+          <div class="teams2">${h.home} vs ${h.away}${multi}</div>
+          <div class="res-badge ${j}">${labels[j]}</div>
+        </div>
+        <div class="meta">预测 ${h.score} · ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
+        <div class="row2">
+          <input placeholder="实际比分 如 2-1" value="${h.actual || ''}" onchange="setActual(${realIdx}, this.value)">
+          <button onclick="delHistory(${realIdx})">删除</button>
+        </div>
+      </div>`;
+            }).join('');
+        }
         const total = raw.length;
         const done = raw.filter(h=>h.actual).length;
         const wdl = raw.filter(h=>['wdl','exact'].includes(judge(h))).length;
@@ -855,27 +952,18 @@
         const list = getHistory();
         if (!list[idx]) return;
         val = val.trim();
-        if (val && !/^\d+-\d+$/.test(val)) return toast('格式应为 2-1', 'warn');
+        if (val && !/^\d+-\d+$/.test(val)) return toast('格式应为 2-1','warn');
+        const wasExact = judge(list[idx]) === 'exact';
         list[idx].actual = val || undefined;
         setHistory(list);
         renderHistory();
         refreshDashboard();
+        if (!wasExact && judge(list[idx]) === 'exact') confetti();
     }
-    function delHistory(idx){
-        const list = getHistory();
-        list.splice(idx,1);
-        setHistory(list);
-        renderHistory();
-        refreshDashboard();
-    }
-    function clearHistory(){
-        if (!confirm('确定清空全部历史记录？')) return;
-        localStorage.removeItem(HIST_KEY);
-        renderHistory();
-        refreshDashboard();
-    }
+    function delHistory(idx){ const list = getHistory(); list.splice(idx,1); setHistory(list); renderHistory(); refreshDashboard(); }
+    function clearHistory(){ if(!confirm('确定清空全部历史记录？')) return; localStorage.removeItem(HIST_KEY); renderHistory(); refreshDashboard(); }
     function exportHistory(){
-        const blob = new Blob([JSON.stringify(getHistory(), null, 2)], {type:'application/json'});
+        const blob = new Blob([JSON.stringify(getHistory(),null,2)], {type:'application/json'});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `pl-history-${new Date().toISOString().slice(0,10)}.json`;
@@ -888,14 +976,8 @@
             const f = e.target.files[0]; if (!f) return;
             const r = new FileReader();
             r.onload = () => {
-                try {
-                    const arr = JSON.parse(r.result);
-                    if (!Array.isArray(arr)) throw 0;
-                    setHistory(arr);
-                    renderHistory();
-                    refreshDashboard();
-                    toast('导入成功');
-                } catch { toast('导入失败：文件格式错误', 'err'); }
+                try { const arr = JSON.parse(r.result); if(!Array.isArray(arr)) throw 0; setHistory(arr); renderHistory(); refreshDashboard(); toast('导入成功'); }
+                catch { toast('导入失败：文件格式错误','err'); }
             };
             r.readAsText(f);
         };
@@ -904,9 +986,16 @@
     function openHistory(){ document.getElementById('histMask').classList.add('show'); renderHistory(); }
     function closeHistory(){ document.getElementById('histMask').classList.remove('show'); }
 
-    /* ========================================================
-       13. 批量预测
-    ======================================================== */
+    document.getElementById('histFilters').addEventListener('click', e => {
+        const b = e.target.closest('button'); if (!b) return;
+        histFilter = b.dataset.f;
+        document.querySelectorAll('#histFilters button').forEach(x => x.classList.toggle('on', x === b));
+        renderHistory();
+    });
+
+    /* ============================================================
+       13. 批量预测（并发 3）
+    ============================================================ */
     let batchN = 1;
     function openBatch(){ document.getElementById('batchMask').classList.add('show'); updateQuota(); }
     function closeBatch(){ document.getElementById('batchMask').classList.remove('show'); }
@@ -931,74 +1020,94 @@
         return best;
     }
 
+    async function predictOne(skill, r, home, away, intel){
+        const runs = [];
+        for (let k = 0; k < batchN; k++) {
+            try {
+                const userPrompt =
+                    (intel ? `【今日情报】\n${intel}\n\n` : '') +
+                    `【预测指令】\n请预测：第 ${r+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
+                const raw = await callGroq(skill, userPrompt);
+                const p = JSON.parse(raw);
+                const v = validateAndNormalizePrediction(p);
+                if (v.ok) runs.push(v.data);
+            } catch(e){}
+        }
+        if (!runs.length) return null;
+        return {
+            homeWin: Math.round(runs.reduce((s,x)=>s+x.homeWin,0)/runs.length*100)/100,
+            draw: Math.round(runs.reduce((s,x)=>s+x.draw,0)/runs.length*100)/100,
+            awayWin: Math.round(runs.reduce((s,x)=>s+x.awayWin,0)/runs.length*100)/100,
+            score: mode(runs.map(x=>x.score)),
+            confidence: mode(runs.map(x=>x.confidence)),
+            keyFactors: runs[0].keyFactors,
+            analysis: runs[0].analysis,
+            headToHead: runs[0].headToHead,
+            _multi: batchN
+        };
+    }
+
     async function runBatch(){
         const btn = document.getElementById('batchBtn');
-        if (!getKey()) return toast('请先填 Groq API Key', 'warn');
+        if (!getKey()) return toast('请先填 Groq API Key','warn');
         const r = +document.getElementById('roundSel').value || 0;
         const round = FIXTURES[r] || [];
-        if (!round.length) return toast('本轮无赛程', 'warn');
-
+        if (!round.length) return toast('本轮无赛程','warn');
         const calls = round.length * batchN;
         if (calls > 30 && !confirm(`将消耗约 ${calls} 次 API 调用，确认？`)) return;
 
         btn.disabled = true;
+        btn.classList.add('loading');
         btn.textContent = '批量运行中…';
         const intel = document.getElementById('intel').value.trim();
         let ok = 0, fail = 0;
 
         try {
             const skill = await loadSkill();
-            for (let i = 0; i < round.length; i++) {
-                const { home, away } = round[i];
-                const runs = [];
-                for (let k = 0; k < batchN; k++) {
-                    try {
-                        const userPrompt =
-                            (intel ? `【今日情报】\n${intel}\n\n` : '') +
-                            `【预测指令】\n请预测：第 ${r+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
-                        const raw = await callGroq(skill, userPrompt);
-                        const p = JSON.parse(raw);
-                        const v = validateAndNormalizePrediction(p);
-                        if (v.ok) runs.push(v.data);
-                    } catch(e){ /* 忽略单次失败 */ }
+            // 并发池：同时最多 3 场
+            const CONCURRENCY = 3;
+            let cursor = 0;
+            async function worker(){
+                while (cursor < round.length) {
+                    const i = cursor++;
+                    const { home, away } = round[i];
+                    const res = await predictOne(skill, r, home, away, intel);
+                    if (res) { addHistory({ round:r, home, away, ...res, ts:Date.now() }); ok++; }
+                    else fail++;
                 }
-                if (runs.length) {
-                    const agg = {
-                        homeWin: Math.round(runs.reduce((s,x)=>s+x.homeWin,0)/runs.length*100)/100,
-                        draw:    Math.round(runs.reduce((s,x)=>s+x.draw,0)/runs.length*100)/100,
-                        awayWin: Math.round(runs.reduce((s,x)=>s+x.awayWin,0)/runs.length*100)/100,
-                        score: mode(runs.map(x=>x.score)),
-                        confidence: mode(runs.map(x=>x.confidence)),
-                        keyFactors: runs[0].keyFactors,
-                        analysis: runs[0].analysis,
-                        headToHead: runs[0].headToHead,
-                        _multi: batchN
-                    };
-                    addHistory({ round:r, home, away, ...agg, ts:Date.now() });
-                    ok++;
-                } else { fail++; }
             }
+            await Promise.all(Array.from({length: Math.min(CONCURRENCY, round.length)}, worker));
             toast(`批量完成：成功 ${ok} 场${fail?`，失败 ${fail} 场`:''}`, fail?'warn':'ok');
             closeBatch();
             refreshDashboard();
         } catch(err){
-            toast(err.message.slice(0, 80), 'err');
+            toast(err.message.slice(0,80),'err');
         } finally {
             btn.disabled = false;
+            btn.classList.remove('loading');
             btn.textContent = '开始批量预测';
         }
     }
 
-    /* ========================================================
-       14. 返回顶部按钮
-    ======================================================== */
+    /* ============================================================
+       14. 键盘快捷键
+    ============================================================ */
+    window.addEventListener('keydown', e => {
+        const ctrl = e.ctrlKey || e.metaKey;
+        if (ctrl && e.key === 'Enter') { e.preventDefault(); if (!document.getElementById('predictBtn').disabled) startPredict(); }
+        if (ctrl && e.key.toLowerCase() === 'h') { e.preventDefault(); openHistory(); }
+        if (ctrl && e.key.toLowerCase() === 'b') { e.preventDefault(); openBatch(); }
+        if (e.key === 'Escape') { closeHistory(); closeBatch(); }
+    });
+
+    /* 返回顶部 */
     window.addEventListener('scroll', () => {
         document.getElementById('topBtn').classList.toggle('show', window.scrollY > 400);
     });
 
-    /* ========================================================
+    /* ============================================================
        15. 启动
-    ======================================================== */
+    ============================================================ */
     (function boot(){
         const saved = localStorage.getItem('groq_key');
         if (saved) document.getElementById('apiKey').value = saved;
@@ -1006,17 +1115,74 @@
         initSelectors();
         renderStandings(STATIC_STANDINGS);
         refreshDashboard();
+        updateMatchdayLine();
 
-        // 预加载全部 20 队队徽到浏览器缓存（延迟 1 秒，避免抢占首屏资源）
-        setTimeout(() => {
+        // 空闲时预加载队徽
+        const preload = () => {
             Object.values(ESPN_IDS).forEach(id => {
                 const img = new Image();
                 img.referrerPolicy = 'no-referrer';
                 img.src = `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
             });
             console.log('✅ 已预加载 20 队队徽');
-        }, 1000);
+        };
+        if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2000 });
+        else setTimeout(preload, 1200);
     })();
+    /* ============================================================
+   16. Service Worker 注册 + 更新提示
+============================================================ */
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').then(reg => {
+                // 检测新版本
+                reg.addEventListener('updatefound', () => {
+                    const newSW = reg.installing;
+                    if (!newSW) return;
+                    newSW.addEventListener('statechange', () => {
+                        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                            showUpdateToast(reg);
+                        }
+                    });
+                });
+            }).catch(err => {
+                console.warn('Service Worker 注册失败：', err);
+            });
+        });
+
+        // SW 主动要求刷新时
+        navigator.serviceWorker.addEventListener('message', e => {
+            if (e.data && e.data.type === 'REFRESH') location.reload();
+        });
+
+        // 首次获得控制权时刷新（让新 SW 立即生效）
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            // 如果之前已有 controller（说明是更新），才刷新
+            if (navigator.serviceWorker.controller) {
+                // 这里不做自动刷新，避免打断用户
+            }
+        });
+    }
+
+    function showUpdateToast(reg){
+        const el = document.createElement('div');
+        el.className = 'toast ok';
+        el.style.pointerEvents = 'auto';
+        el.style.cursor = 'pointer';
+        el.innerHTML = '🎉 新版本已就绪，<b>点击刷新</b>';
+        el.onclick = () => {
+            if (reg.waiting) {
+                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            }
+            setTimeout(() => location.reload(), 200);
+        };
+        document.getElementById('toastWrap').appendChild(el);
+        // 8 秒后自动消失
+        setTimeout(() => el.remove(), 8000);
+    }
 </script>
 </body>
 </html>
