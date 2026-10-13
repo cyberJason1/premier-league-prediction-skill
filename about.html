@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#08090d">
+    <title>关于 · 英超预测引擎</title>
+
+    <!-- OG / Twitter 分享卡 -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="英超预测引擎 · 2026/27">
+    <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
+    <meta property="og:image" content="https://cyberJason1.github.io/premier-league-prediction-skill/og.png">
+    <meta property="og:url" content="https://cyberJason1.github.io/premier-league-prediction-skill/about.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="英超预测引擎 · 2026/27">
+    <meta name="twitter:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
+    <meta name="twitter:image" content="https://cyberJason1.github.io/premier-league-prediction-skill/og.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --bg:#08090d;--bg-2:#0d1016;
+            --surface:rgba(18,22,32,.7);--surface-2:rgba(12,15,22,.85);--surface-hi:rgba(24,30,44,.8);
+            --border:rgba(255,255,255,.06);--border-hi:rgba(255,255,255,.12);
+            --amber:#ff9f43;--amber-soft:rgba(255,159,67,.14);--amber-glow:rgba(255,159,67,.35);
+            --cyan:#22d3ee;--emerald:#34d399;--rose:#ef4444;--violet:#a78bfa;--gold:#fbbf24;
+            --text:#f1f5f9;--text-2:#a8b5c7;--text-3:#7d8a9c;--text-4:#5a6675;
+            --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-full:999px;
+            --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;
+            --font-sans:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+            --font-serif:"Playfair Display",Georgia,"Times New Roman",serif;
+            --font-mono:"SF Mono","JetBrains Mono",Consolas,monospace;
+            --ease:cubic-bezier(.16,1,.3,1);
+            --ease-spring:cubic-bezier(.2,1.6,.4,1);
+        }
+        *{box-sizing:border-box;margin:0;padding:0}
+        html{background:var(--bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+        body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+        body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1200px 700px at 50% -10%,rgba(255,159,67,.1),transparent 55%),radial-gradient(900px 500px at 50% 110%,rgba(34,211,238,.06),transparent 55%)}
+        body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");mix-blend-mode:overlay}
+
+        /* 固定返回按钮 */
+        .back-btn{position:fixed;top:24px;left:24px;padding:10px 18px;
+            background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-full);
+            color:var(--text);text-decoration:none;font-size:13px;font-weight:500;
+            backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:50;
+            transition:all .25s var(--ease);display:inline-flex;align-items:center;gap:6px}
+        .back-btn:hover{border-color:rgba(255,159,67,.5);color:var(--amber);transform:translateX(-2px);box-shadow:0 0 20px -4px var(--amber-glow)}
+        @media(max-width:640px){.back-btn{top:16px;left:16px;padding:8px 14px;font-size:12px}}
+
+        .wrap{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:100px var(--sp-6) 120px}
+        @media(max-width:640px){.wrap{padding:80px var(--sp-4) 100px}}
+
+        /* Hero */
+        .hero{padding-bottom:var(--sp-10);border-bottom:1px solid var(--border);margin-bottom:var(--sp-10)}
+        .hero .kick{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-3)}
+        .hero h1{font-family:var(--font-serif);font-size:clamp(36px,6vw,56px);font-weight:500;line-height:1.1;letter-spacing:-.03em;margin-bottom:var(--sp-4);perspective:800px}
+        .hero h1 em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--amber) 0%,#ffb968 60%,var(--cyan) 120%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+        .hero h1 .char{display:inline-block;opacity:0;transform:translateY(30px) rotateX(-90deg);transform-origin:50% 100%;animation:charIn .9s var(--ease) forwards;backface-visibility:hidden}
+        .hero h1 em .char{background:inherit;-webkit-background-clip:inherit;background-clip:inherit;-webkit-text-fill-color:inherit}
+        @keyframes charIn{0%{opacity:0;transform:translateY(40px) rotateX(-90deg)}60%{opacity:1;transform:translateY(0) rotateX(8deg)}100%{opacity:1;transform:translateY(0) rotateX(0)}}
+        .hero .lead{font-size:17px;color:var(--text-2);max-width:640px;line-height:1.7}
+
+        /* Section */
+        section{margin-bottom:var(--sp-12);opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+        section.visible{opacity:1;transform:none}
+        section h2{font-family:var(--font-serif);font-size:clamp(24px,3.5vw,32px);font-weight:500;letter-spacing:-.02em;margin-bottom:var(--sp-5);position:relative;padding-left:var(--sp-5)}
+        section h2::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:linear-gradient(180deg,var(--amber),var(--cyan));border-radius:2px;box-shadow:0 0 12px var(--amber-glow)}
+        section h3{font-size:15px;font-weight:600;color:var(--text);margin:var(--sp-5) 0 var(--sp-3);letter-spacing:-.01em}
+        section p{color:var(--text-2);margin-bottom:var(--sp-4);font-size:14.5px;line-height:1.8}
+        section p strong{color:var(--text);font-weight:600}
+        section a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,159,67,.3);transition:border-color .2s var(--ease)}
+        section a:hover{border-bottom-color:var(--amber)}
+
+        /* 卡片 */
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);margin-bottom:var(--sp-4);transition:border-color .3s var(--ease),transform .3s var(--ease)}
+        .card:hover{border-color:var(--border-hi)}
+        .card .lbl{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-2)}
+        .card .num{font-family:var(--font-serif);font-weight:500;font-size:32px;color:var(--amber);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+
+        /* 四层约束 */
+        .layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-3);margin:var(--sp-5) 0}
+        .layer{background:linear-gradient(160deg,rgba(255,159,67,.06),rgba(34,211,238,.03));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-4);position:relative}
+        .layer .n{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--amber);margin-bottom:var(--sp-2);letter-spacing:.1em}
+        .layer .t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:var(--sp-2)}
+        .layer .d{font-size:12px;color:var(--text-3);line-height:1.6}
+
+        /* 引用块 */
+        .quote{border-left:3px solid var(--amber);padding:var(--sp-2) 0 var(--sp-2) var(--sp-5);margin:var(--sp-5) 0;font-family:var(--font-serif);font-size:18px;font-style:italic;color:var(--text-2);line-height:1.6}
+        .quote .src{display:block;margin-top:var(--sp-3);font-family:var(--font-sans);font-size:12px;font-style:normal;color:var(--text-4);letter-spacing:.02em}
+
+        /* 列表 */
+        .list{list-style:none;margin:var(--sp-4) 0}
+        .list li{padding:var(--sp-3) 0 var(--sp-3) var(--sp-6);border-bottom:1px solid var(--border);position:relative;color:var(--text-2);font-size:14px;line-height:1.7}
+        .list li:last-child{border-bottom:0}
+        .list li::before{content:"";position:absolute;left:var(--sp-2);top:calc(var(--sp-3) + 10px);width:6px;height:6px;border-radius:50%;background:var(--amber);box-shadow:0 0 8px var(--amber-glow)}
+        .list li strong{color:var(--text);font-weight:600}
+        .list li code{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:var(--amber)}
+
+        /* 里程碑时间轴 */
+        .timeline{position:relative;padding-left:var(--sp-6);margin:var(--sp-5) 0}
+        .timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,var(--amber),var(--cyan),transparent)}
+        .tl-item{position:relative;padding:var(--sp-2) 0 var(--sp-3);font-size:13.5px;color:var(--text-2);line-height:1.6}
+        .tl-item::before{content:"";position:absolute;left:-22px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--amber);box-shadow:0 0 10px var(--amber-glow)}
+        .tl-item.done::before{background:var(--emerald);border-color:var(--emerald);box-shadow:0 0 10px rgba(52,211,153,.4)}
+        .tl-item strong{color:var(--text);font-weight:600;display:inline-block;min-width:26px}
+
+        /* 免责声明块 */
+        .legal-box{border:1px solid rgba(239,68,68,.3);background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(239,68,68,.02));border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);margin:var(--sp-5) 0}
+        .legal-box h3{color:var(--rose);margin-top:0}
+        .legal-box p{color:var(--text-2);font-size:14px;margin-bottom:var(--sp-3)}
+        .legal-box p:last-child{margin-bottom:0}
+
+        /* 数据源表格 */
+        .src-table{width:100%;border-collapse:collapse;margin:var(--sp-4) 0;font-size:13.5px}
+        .src-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);padding:var(--sp-3) var(--sp-3);border-bottom:1px solid var(--border)}
+        .src-table td{padding:var(--sp-3) var(--sp-3);border-bottom:1px solid rgba(255,255,255,.03);color:var(--text-2);vertical-align:top;line-height:1.6}
+        .src-table td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
+        .src-table tr:last-child td{border-bottom:0}
+
+        /* 底部 */
+        footer{margin-top:var(--sp-12);padding-top:var(--sp-6);border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--text-4);line-height:1.9}
+        footer a{color:var(--text-3);text-decoration:none;margin:0 8px;transition:color .2s var(--ease)}
+        footer a:hover{color:var(--amber)}
+        footer .ver{margin-top:var(--sp-3);font-family:var(--font-mono);font-size:10px}
+
+        @media(prefers-reduced-motion:reduce){
+            *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+            section{opacity:1!important;transform:none!important}
+        }
+    </style>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← 返回预测</a>
+
+<div class="wrap">
+
+    <div class="hero">
+        <div class="kick">About · 关于此项目</div>
+        <h1 id="aboutTitle">英超 <em>预测</em> 引擎</h1>
+        <p class="lead">一个完全开源、零成本、可持续运营的 AI 足球预测引擎。它不训练模型，不依赖 GPU，只用「提示词工程 + 真实数据 + 前端工程」三件事，让任何拥有浏览器的人都能做英超比分预测。</p>
+    </div>
+
+    <!-- ═══════════ ① 这是什么 ═══════════ -->
+    <section id="what">
+        <h2>这是什么</h2>
+        <p>它不是机器学习模型，也不需要数据科学背景。本质上是把一份精心设计的 <code>skill.md</code> 规则文档，作为 <strong>system 提示词</strong>塞给任意 OpenAI 兼容接口的大模型，让模型在严格约束下推理并输出 JSON。</p>
+
+        <div class="quote">
+            「规则工程 + 前端工程 + 自动化工程 + 安全流程 = 一个独立开发者的完整技能栈。」
+            <span class="src">— 项目核心方法论</span>
+        </div>
+
+        <h3>四层约束架构</h3>
+        <div class="layers">
+            <div class="layer">
+                <div class="n">LAYER 01</div>
+                <div class="t">资料库</div>
+                <div class="d">20 队完整资料写死，只许引用，不许编造</div>
+            </div>
+            <div class="layer">
+                <div class="n">LAYER 02</div>
+                <div class="t">方法论</div>
+                <div class="d">近期状态 40%、硬实力 30%、历史交锋 10%、情境因素 20%</div>
+            </div>
+            <div class="layer">
+                <div class="n">LAYER 03</div>
+                <div class="t">输出契约</div>
+                <div class="d">严格 JSON 格式，字段、类型、长度全部锁死</div>
+            </div>
+            <div class="layer">
+                <div class="n">LAYER 04</div>
+                <div class="t">动态情报区</div>
+                <div class="d">每日手动更新，优先级最高，冲突时以此为准</div>
+            </div>
+        </div>
+
+        <p>这套架构解决的问题是：<strong>杜绝模型瞎编历史、瞎编伤病、格式飘忽、信息过时</strong>。模型很聪明，但也会偷懒——必须用提示词强制约束。</p>
+    </section>
+
+    <!-- ═══════════ ② 怎么做的 ═══════════ -->
+    <section id="how">
+        <h2>怎么做的</h2>
+
+        <h3>技术栈</h3>
+        <ul class="list">
+            <li><strong>规则层</strong> — <code>skill.md</code> v2.1.0 提示词工程（压缩至约 6300 tokens 以适配 Groq TPM）</li>
+            <li><strong>前端层</strong> — 单文件 <code>index.html</code>，原生 HTML/CSS/JS，零依赖零构建</li>
+            <li><strong>数据层</strong> — <code>data.json</code> 与代码完全分离，GitHub Actions 每天自动更新</li>
+            <li><strong>推理层</strong> — Groq 免费 API，模型 <code>openai/gpt-oss-120b</code>，每天 1000 次额度</li>
+            <li><strong>部署层</strong> — GitHub Pages + Service Worker 离线缓存，零服务器成本</li>
+        </ul>
+
+        <h3>数据从哪来</h3>
+        <table class="src-table">
+            <thead>
+            <tr><th>类型</th><th>来源</th><th>用途</th></tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>比赛数据</td>
+                <td><a href="https://www.football-data.org/" target="_blank" rel="noopener">football-data.org</a></td>
+                <td>积分榜、赛程、完赛比分</td>
+            </tr>
+            <tr>
+                <td>球队队徽</td>
+                <td>ESPN CDN</td>
+                <td>20 队徽章展示（版权归各俱乐部所有）</td>
+            </tr>
+            <tr>
+                <td>AI 推理</td>
+                <td><a href="https://groq.com/" target="_blank" rel="noopener">Groq</a></td>
+                <td>根据 skill.md 生成结构化预测</td>
+            </tr>
+            <tr>
+                <td>球员评分</td>
+                <td>Sofascore / WhoScored / FotMob</td>
+                <td>焦点球员综合评分（人工整理，写入 skill.md）</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3>自动化流程</h3>
+        <p>GitHub Actions 每天下午 2 点（马来西亚时间）在云端运行 <code>update.js</code>，从 football-data.org 拉取最新数据，写入 <code>data.json</code> 并自动 commit + push。用户本地无需任何操作，网页下次刷新即拿到最新数据。Token 保存在 GitHub Secrets，不进代码库。</p>
+    </section>
+
+    <!-- ═══════════ ③ 隐私与安全 ═══════════ -->
+    <section id="legal">
+        <h2>隐私与安全</h2>
+
+        <h3>你的数据</h3>
+        <ul class="list">
+            <li><strong>API Key</strong> — 只存于你浏览器的 <code>localStorage</code>，从不发送到除 Groq 官方接口外的任何服务器</li>
+            <li><strong>历史记录</strong> — 只存于本地浏览器，可随时导出为 JSON 或一键清空</li>
+            <li><strong>无追踪</strong> — 不接入任何分析统计、不写 Cookie、不收集 IP</li>
+        </ul>
+
+        <h3>分享原理</h3>
+        <p>朋友打开你的网页链接，能看到网页界面，<strong>但看不到你的 API Key</strong>。他们想使用预测功能，必须自己注册 Groq 获取 Key——消耗的是他们自己的额度，不是你的。</p>
+
+        <div class="legal-box">
+            <h3>⚠️ 免责声明</h3>
+            <p><strong>本页所有预测结果由 AI 模型生成，仅供娱乐与学习参考，不构成任何投注、博彩或财务建议。</strong>预测准确率不保证，请勿据此进行任何形式的金钱投注。</p>
+            <p>请遵守你所在国家/地区的法律法规。理性观赛，远离非法赌博。</p>
+            <p>项目代码开源、数据来源于第三方、AI 推理由第三方提供。作者不对使用本工具产生的任何直接或间接后果负责。</p>
+        </div>
+
+        <h3>版权说明</h3>
+        <ul class="list">
+            <li><strong>球队队徽</strong> — 版权归各英超俱乐部及 ESPN 所有，本项目仅用于学习演示，<strong>不做商业用途</strong></li>
+            <li><strong>比赛数据</strong> — 遵循 football-data.org 免费层条款</li>
+            <li><strong>项目代码</strong> — <a href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub 仓库</a>，可自由 Fork、学习、修改</li>
+        </ul>
+
+        <h3>反馈与联系</h3>
+        <p>发现问题、有建议、或想报告 bug？欢迎到 <a href="https://github.com/cyberJason1/premier-league-prediction-skill/issues" target="_blank" rel="noopener">GitHub Issues</a> 提出。</p>
+    </section>
+
+    <!-- ═══════════ ④ 成长历程 ═══════════ -->
+    <section id="journey">
+        <h2>成长历程</h2>
+        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 18 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
+
+        <div class="timeline">
+            <div class="tl-item done"><strong>01</strong> 理解并改写 <code>skill.md</code> 提示词工程</div>
+            <div class="tl-item done"><strong>02</strong> 学会 GitHub 安全 Fork / Clone / Commit / Push</div>
+            <div class="tl-item done"><strong>03</strong> 用 GitHub Pages 部署公网可访问网页</div>
+            <div class="tl-item done"><strong>04</strong> 用 HTML/CSS/JS 构建交互式界面</div>
+            <div class="tl-item done"><strong>05</strong> 接入 Groq 免费 API，实现零成本运行</div>
+            <div class="tl-item done"><strong>06</strong> 从虚构宇宙迁移到真实 2026-27 英超数据</div>
+            <div class="tl-item done"><strong>07</strong> 编写 <code>update.js</code> + <code>update.bat</code> 实现本地自动化</div>
+            <div class="tl-item done"><strong>08</strong> 用 GitHub Actions 实现云端定时更新</div>
+            <div class="tl-item done"><strong>09</strong> 用 Secrets 安全存储 token</div>
+            <div class="tl-item done"><strong>10</strong> 建立「静态规则 + 动态情报」方法论</div>
+            <div class="tl-item done"><strong>11</strong> 设计历史记录 + 命中率 + 批量预测</div>
+            <div class="tl-item done"><strong>12</strong> 集成焦点球员 + 真实队徽 + 积分榜</div>
+            <div class="tl-item done"><strong>13</strong> 添加 Service Worker 离线支持</div>
+            <div class="tl-item done"><strong>14</strong> 数据独立到 <code>data.json</code>，改代码不丢数据</div>
+            <div class="tl-item done"><strong>15</strong> 沉浸式体验（光标 + 粒子 + 3D 倾斜）</div>
+            <div class="tl-item done"><strong>16</strong> 命令面板 + 快捷键 + 工具提示</div>
+            <div class="tl-item done"><strong>17</strong> MatchPicker + 球队统计 + 分享图 + URL 同步</div>
+            <div class="tl-item done"><strong>18</strong> 预测对比实际 + 命中率趋势图</div>
+        </div>
+    </section>
+
+    <footer>
+        <div>
+            <a href="index.html">返回预测</a>
+            <span style="color:var(--text-4)">·</span>
+            <a href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub</a>
+            <span style="color:var(--text-4)">·</span>
+            <a href="#legal">免责声明</a>
+        </div>
+        <div class="ver">Premier League Prediction Engine · v8.1.1</div>
+    </footer>
+</div>
+
+<script>
+    // Hero 标题逐字翻转
+    (function splitHeroTitle(){
+        const h1 = document.getElementById('aboutTitle');
+        if (!h1) return;
+        let idx = 0;
+        const walk = (node) => {
+            [...node.childNodes].forEach(child => {
+                if (child.nodeType === 3) {
+                    const text = child.textContent;
+                    const frag = document.createDocumentFragment();
+                    [...text].forEach(ch => {
+                        if (ch === ' ' || ch === '\n') { frag.appendChild(document.createTextNode(ch)); return; }
+                        const span = document.createElement('span');
+                        span.className = 'char';
+                        span.textContent = ch;
+                        span.style.animationDelay = (0.15 + idx * 0.05) + 's';
+                        idx++;
+                        frag.appendChild(span);
+                    });
+                    node.replaceChild(frag, child);
+                } else if (child.nodeType === 1) walk(child);
+            });
+        };
+        walk(h1);
+    })();
+
+    // 滚动淡入
+    (function setupReveal(){
+        if (window.matchMedia('(prefers-reduced-motion:reduce)').matches ||
+            !('IntersectionObserver' in window)) {
+            document.querySelectorAll('section').forEach(el => el.classList.add('visible'));
+            return;
+        }
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: .12, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('section').forEach(el => io.observe(el));
+    })();
+</script>
+</body>
+</html>

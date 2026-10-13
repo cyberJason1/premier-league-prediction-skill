@@ -39,6 +39,10 @@ async function fetchFromApi(token){
     if(!sRes.ok) throw new Error(`Standings API ${sRes.status}：${await sRes.text()}`);
     const sData = await sRes.json();
 
+    if (!sData.standings || !sData.standings[0] || !Array.isArray(sData.standings[0].table)) {
+        throw new Error('Standings 返回格式异常：缺少 standings[0].table');
+    }
+
     const standings = sData.standings[0].table.map(row => {
         const zh = toChinese(row.team.name);
         if(!zh){ console.warn('⚠️ 未知球队：' + row.team.name); return null; }
@@ -49,9 +53,17 @@ async function fetchFromApi(token){
         };
     }).filter(Boolean);
 
+    if (standings.length !== 20) {
+        console.warn(`⚠️ 积分榜返回 ${standings.length} 队（预期 20），可能有球队名未映射`);
+    }
+
     const mRes = await fetch(base + '/matches', { headers });
     if(!mRes.ok) throw new Error(`Matches API ${mRes.status}：${await mRes.text()}`);
     const mData = await mRes.json();
+
+    if (!Array.isArray(mData.matches)) {
+        throw new Error('Matches 返回格式异常：缺少 matches 数组');
+    }
 
     // fixtures: 数组，index 0 = 第 1 轮
     const fixtures = [];
@@ -60,19 +72,27 @@ async function fetchFromApi(token){
     // results: 对象 { "1": { "阿森纳|利兹联": [3,0] }, ... }
     const results = {};
 
+    let skipped = 0;
     mData.matches.forEach(m => {
         const h = toChinese(m.homeTeam.name);
         const a = toChinese(m.awayTeam.name);
-        if(!h || !a) return;
+        if(!h || !a){ skipped++; return; }
         const md = m.matchday;
         if (md >= 1 && md <= 38) {
             fixtures[md - 1].push({ home: h, away: a });
         }
-        if(m.status === 'FINISHED' && m.score?.fullTime){
+        if(m.status === 'FINISHED' && m.score && m.score.fullTime){
             if (!results[md]) results[md] = {};
             results[md][`${h}|${a}`] = [m.score.fullTime.home, m.score.fullTime.away];
         }
     });
+
+    if (skipped > 0) console.warn(`⚠️ 跳过 ${skipped} 场（球队名未映射）`);
+
+    const filledRounds = fixtures.filter(f => f.length).length;
+    if (filledRounds < 38) {
+        console.warn(`⚠️ 只有 ${filledRounds}/38 轮有赛程，可能赛季尚未完全排期`);
+    }
 
     return { standings, results, fixtures };
 }
@@ -90,6 +110,15 @@ async function main(){
     console.log(`✅ 积分榜：${standings.length} 队`);
     console.log(`✅ 赛程：${fixtures.filter(f => f.length).length} 轮`);
     console.log(`✅ 已完赛：${Object.keys(results).length} 轮`);
+
+    if (standings.length === 0) {
+        console.error('❌ 积分榜为空，拒绝写入，避免覆盖已有数据');
+        process.exit(1);
+    }
+    if (fixtures.filter(f => f.length).length === 0) {
+        console.error('❌ 赛程为空，拒绝写入，避免覆盖已有数据');
+        process.exit(1);
+    }
 
     const payload = {
         updatedAt: new Date().toISOString(),

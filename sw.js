@@ -2,14 +2,16 @@
 // 英超预测引擎 Service Worker
 // 版本号：改这个数字会触发更新（重要）
 // ============================================================
-const CACHE_VERSION = 'v8.1.0';
+const CACHE_VERSION = 'v8.1.2';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存
 const APP_SHELL = [
     './',
     './index.html',
-    './skill.md'
+    './skill.md',
+    './data.json',
+    './about.html'
 ];
 
 // ---------- 安装 ----------
@@ -78,14 +80,30 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 3. 同源静态文件（index.html、skill.md）：network-first（保证拿到最新）
+    // 3. 同源静态文件（index.html、skill.md、data.json）：network-first
+    //    同时清理同路径带 ?v= 的旧缓存，避免无限增长
     if (url.origin === self.location.origin) {
         event.respondWith(
             fetch(req)
                 .then(res => {
                     if (res && res.status === 200) {
                         const clone = res.clone();
-                        caches.open(CACHE_NAME).then(c => c.put(req, clone));
+                        caches.open(CACHE_NAME).then(async cache => {
+                            try {
+                                // 先删掉同路径的其他缓存（忽略 query）
+                                const keys = await cache.keys();
+                                const bare = url.origin + url.pathname;
+                                await Promise.all(
+                                    keys.filter(k => {
+                                        try {
+                                            const ku = new URL(k.url);
+                                            return ku.origin + ku.pathname === bare && k.url !== req.url;
+                                        } catch { return false; }
+                                    }).map(k => cache.delete(k))
+                                );
+                            } catch(e) { /* 忽略清理错误 */ }
+                            cache.put(req, clone);
+                        });
                     }
                     return res;
                 })
