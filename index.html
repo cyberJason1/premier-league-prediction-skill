@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>英超预测引擎 v3.3</title>
+    <title>英超预测引擎 v3.4</title>
     <style>
         :root{
             --bg:#050810; --bg2:#0a1220; --panel:rgba(16,22,36,.72);
@@ -53,9 +53,7 @@
         .badge-wrap{position:relative;width:88px;height:88px;display:flex;align-items:center;justify-content:center}
         .badge-wrap .badge{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s ease;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
         .badge-wrap .badge.loaded{opacity:1}
-        .badge-wrap:hover .badge{transform:scale(1.06);transition:transform .25s}
-        .badge-wrap .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:var(--txt2);letter-spacing:.05em;z-index:1}
-        .badge-wrap .badge.loaded + .fallback{display:none}
+        .badge-wrap .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:var(--txt2);letter-spacing:.05em}
         .team .nm{font-size:14px;font-weight:600}
         .score{font-family:Georgia,serif;font-size:56px;color:var(--green);text-shadow:0 0 24px rgba(0,255,136,.35);letter-spacing:.02em;white-space:nowrap}
         .score.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
@@ -167,7 +165,7 @@
     <div class="hero">
         <div class="kick">Premier League 2026/27</div>
         <h1>英超 <em>预测</em> 引擎</h1>
-        <p>规则工程 + 前端工程 + 自动化 · v3.3</p>
+        <p>规则工程 + 前端工程 + 自动化 · v3.4</p>
     </div>
 
     <div class="dash">
@@ -579,8 +577,7 @@
     ======================================================== */
     function espnUrl(name){
         const id = ESPN_IDS[name];
-        // 100×100 版本，体积只有 500 的 1/20，加载快 5-10 倍
-        return id ? `https://a.espncdn.com/i/teamlogos/soccer/100/${id}.png` : null;
+        return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null;
     }
 
     function badgeHtml(name){
@@ -593,8 +590,8 @@
       referrerpolicy="no-referrer"
       loading="eager"
       decoding="async"
-      onload="this.classList.add('loaded')"
-      onerror="this.remove()">
+      onload="this.classList.add('loaded');this.nextElementSibling&&(this.nextElementSibling.style.display='none')"
+      onerror="this.style.display='none'">
     <div class="fallback">${abbr}</div>
   </div>`;
     }
@@ -963,6 +960,16 @@
         initSelectors();
         renderStandings(STATIC_STANDINGS);
         refreshDashboard();
+
+        // 预加载全部 20 队队徽到浏览器缓存（延迟 1 秒，避免抢占首屏资源）
+        setTimeout(() => {
+            Object.values(ESPN_IDS).forEach(id => {
+                const img = new Image();
+                img.referrerPolicy = 'no-referrer';
+                img.src = `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`;
+            });
+            console.log('✅ 已预加载 20 队队徽');
+        }, 1000);
     })();
 </script>
 </body>
