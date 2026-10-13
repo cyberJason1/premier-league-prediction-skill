@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>英超预测引擎 v3.1</title>
+    <title>英超预测引擎 v3.2</title>
     <style>
         :root{
             --bg:#050810; --bg2:#0a1220; --panel:rgba(16,22,36,.72);
@@ -136,6 +136,7 @@
         .res-badge.wdl{background:rgba(255,182,72,.16);color:var(--gold);border:1px solid rgba(255,182,72,.35)}
         .res-badge.miss{background:rgba(244,63,94,.16);color:var(--red);border:1px solid rgba(244,63,94,.35)}
         .res-badge.pending{background:rgba(139,92,246,.16);color:var(--purple);border:1px solid rgba(139,92,246,.35)}
+        .hitem .multi{display:inline-block;font-size:10px;color:var(--blue);background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);padding:1px 6px;border-radius:6px;margin-left:6px}
         .hitem .meta{font-size:11px;color:var(--txt3);margin-top:6px}
         .hitem .row2{display:flex;gap:8px;align-items:center;margin-top:8px}
         .hitem input{padding:7px 10px;font-size:13px;text-align:center}
@@ -163,14 +164,14 @@
     <div class="hero">
         <div class="kick">Premier League 2026/27</div>
         <h1>英超 <em>预测</em> 引擎</h1>
-        <p>规则工程 + 前端工程 + 自动化 · v3.1</p>
+        <p>规则工程 + 前端工程 + 自动化 · v3.2</p>
     </div>
 
     <div class="dash">
         <div class="cell"><div class="lbl">当前轮次</div><div class="val orange" id="dashRound">—</div></div>
         <div class="cell"><div class="lbl">已完赛</div><div class="val" id="dashPlayed">—</div></div>
-        <div class="cell"><div class="lbl">待预测</div><div class="val blue" id="dashPending">—</div></div>
-        <div class="cell"><div class="lbl">待录入</div><div class="val" id="dashRecord">—</div></div>
+        <div class="cell"><div class="lbl">本轮待预测</div><div class="val blue" id="dashPending">—</div></div>
+        <div class="cell"><div class="lbl">待录入赛果</div><div class="val" id="dashRecord">—</div></div>
     </div>
 
     <div class="grid">
@@ -241,7 +242,7 @@
     <div class="modal">
         <button class="close" onclick="closeBatch()">✕</button>
         <h2>批量预测</h2>
-        <div class="sub">对当前轮次全部 10 场进行预测</div>
+        <div class="sub">对当前轮次全部比赛进行预测</div>
         <div class="batch-opts" id="batchOpts">
             <button data-n="1" class="on">每场 1 次</button>
             <button data-n="3">每场 3 次</button>
@@ -260,8 +261,9 @@
     ======================================================== */
     const EXPECTED_SKILL_VERSION = '2.1.0';
     const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+    // ⚠️ 8B 版本免费额度 20000 TPM，能装下完整 skill.md
     const GROQ_MODEL = 'llama-3.1-8b-instant';
-    
+
     const ABBR = {
         '阿森纳':'ARS','曼城':'MCI','利物浦':'LIV','切尔西':'CHE','热刺':'TOT','曼联':'MUN',
         '纽卡斯尔联':'NEW','阿斯顿维拉':'AVL','布莱顿':'BHA','埃弗顿':'EVE','富勒姆':'FUL',
@@ -279,9 +281,14 @@
         '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
 
     /* ========================================================
-       1. 赛程（update.js 会覆盖）
+       1. 赛程 —— update.js 会用真实数据覆盖
+          ⚠️ 必须保持「const XXX = [...];」字面量格式
     ======================================================== */
-    const FIXTURES = (function(){
+    const FIXTURES = [];
+
+    // 备用赛程：仅在 update.js 未跑过时填充，避免页面空白
+    (function fillFallbackFixtures(){
+        if (FIXTURES.length) return;
         const out = [];
         const n = TEAMS.length;
         const idx = [...Array(n).keys()];
@@ -297,17 +304,38 @@
             idx.splice(1, 0, idx.pop());
         }
         const second = out.map(rd => rd.map(m => ({ home: m.away, away: m.home })));
-        return [...out, ...second];
+        FIXTURES.push(...out, ...second);
     })();
 
+    // 已完赛结果 —— update.js 会覆盖
     const RESULTS = {};
 
-    const STATIC_STANDINGS = TEAMS.map(t => ({
-        team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0
-    }));
+    // 积分榜 —— update.js 会覆盖（保持数组字面量格式）
+    const STATIC_STANDINGS = [
+        { team: '阿森纳',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '曼城',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '利物浦',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '切尔西',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '热刺',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '曼联',        played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '纽卡斯尔联',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '阿斯顿维拉',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '布莱顿',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '埃弗顿',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '富勒姆',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '水晶宫',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '布伦特福德',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '伯恩茅斯',    played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '诺丁汉森林',  played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '利兹联',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '桑德兰',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '考文垂城',    played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '赫尔城',      played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 },
+        { team: '伊普斯维奇镇',played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0 }
+    ];
 
     /* ========================================================
-       2. 补丁3：校验 + 归一化
+       2. 校验 + 归一化
     ======================================================== */
     function validateAndNormalizePrediction(raw) {
         const errors = [], warnings = [];
@@ -386,9 +414,10 @@
     }
 
     /* ========================================================
-       5. skill.md 加载（补丁2）
+       5. skill.md 加载
     ======================================================== */
     let _skillCache = null;
+    let _verBarShown = false;
     async function loadSkill(){
         if (_skillCache) return _skillCache;
         const res = await fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' });
@@ -397,19 +426,20 @@
 
         const vm = text.match(/v(\d+\.\d+\.\d+)/);
         const actualVersion = vm ? vm[1] : null;
-        if (actualVersion !== EXPECTED_SKILL_VERSION) {
+        if (actualVersion !== EXPECTED_SKILL_VERSION && !_verBarShown) {
             console.warn(`⚠️ skill.md 版本不符\n期望：${EXPECTED_SKILL_VERSION}\n实际：${actualVersion ?? '未找到'}`);
             const bar = document.createElement('div');
             bar.className = 'verbar';
             bar.textContent = `⚠️ skill.md 版本不符（期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}）`;
             document.body.appendChild(bar);
+            _verBarShown = true;
         }
         _skillCache = text;
         return text;
     }
 
     /* ========================================================
-       6. Groq 调用（带 429 重试）
+       6. Groq 调用（429 自动重试）
     ======================================================== */
     async function callGroq(systemPrompt, userPrompt, maxRetry = 3) {
         const key = getKey();
@@ -437,7 +467,7 @@
             }
             if (!resp.ok) {
                 const txt = await resp.text();
-                throw new Error(`Groq ${resp.status}: ${txt.slice(0,180)}`);
+                throw new Error(`Groq ${resp.status}: ${txt.slice(0,240)}`);
             }
             const j = await resp.json();
             return j.choices?.[0]?.message?.content || '';
@@ -450,33 +480,42 @@
     ======================================================== */
     function initSelectors(){
         const rs = document.getElementById('roundSel');
+        if (!FIXTURES.length) {
+            rs.innerHTML = '<option>无赛程</option>';
+            document.getElementById('matchSel').innerHTML = '<option>—</option>';
+            return;
+        }
         rs.innerHTML = FIXTURES.map((_,i) => `<option value="${i}">第 ${i+1} 轮</option>`).join('');
         const saved = localStorage.getItem('last_round');
         if (saved !== null && FIXTURES[+saved]) rs.value = saved;
+
         rs.addEventListener('change', () => {
             localStorage.setItem('last_round', rs.value);
             fillMatches();
             refreshDashboard();
         });
-        fillMatches();
         document.getElementById('matchSel').addEventListener('change', () => {
-            const r = +document.getElementById('roundSel').value || 0;
+            const r = +rs.value || 0;
             localStorage.setItem('last_match_'+r, document.getElementById('matchSel').value);
             refreshDashboard();
         });
+        fillMatches();
     }
     function fillMatches(){
         const r = +document.getElementById('roundSel').value || 0;
         const ms = document.getElementById('matchSel');
-        ms.innerHTML = FIXTURES[r].map((m,i) =>
+        const round = FIXTURES[r] || [];
+        if (!round.length) { ms.innerHTML = '<option>—</option>'; return; }
+        ms.innerHTML = round.map((m,i) =>
             `<option value="${i}">${m.home} vs ${m.away}</option>`).join('');
         const saved = localStorage.getItem('last_match_'+r);
-        if (saved !== null && FIXTURES[r][+saved]) ms.value = saved;
+        if (saved !== null && round[+saved]) ms.value = saved;
     }
     function currentMatch(){
         const r = +document.getElementById('roundSel').value || 0;
         const i = +document.getElementById('matchSel').value || 0;
-        return { round: r, ...FIXTURES[r][i] };
+        const round = FIXTURES[r] || [];
+        return { round: r, ...(round[i] || { home:'', away:'' }) };
     }
 
     /* ========================================================
@@ -485,6 +524,7 @@
     async function startPredict(){
         const btn = document.getElementById('predictBtn');
         const { round, home, away } = currentMatch();
+        if (!home || !away) return toast('未选择比赛', 'warn');
         const intel = document.getElementById('intel').value.trim();
 
         if (!getKey()) return toast('请先填 Groq API Key', 'warn');
@@ -526,7 +566,7 @@
         } catch(err) {
             console.error(err);
             card.innerHTML = `<div class="empty">❌ ${err.message}</div>`;
-            toast(err.message, 'err');
+            toast(err.message.slice(0, 80), 'err');
         } finally {
             btn.disabled = false;
         }
@@ -539,19 +579,15 @@
         const id = ESPN_IDS[name];
         return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null;
     }
-
-    /* --- 修复后的 badgeHtml：referrerpolicy + 实体转义 + onerror 防循环 --- */
     function badgeHtml(name){
         const url = espnUrl(name);
         const abbr = ABBR[name] || String(name).slice(0,3);
         if (!url) return `<div class="fallback">${abbr}</div>`;
         const safeName = String(name).replace(/"/g,'&quot;');
         return `<img class="badge" src="${url}" alt="${safeName}"
-    referrerpolicy="no-referrer"
-    loading="eager"
+    referrerpolicy="no-referrer" loading="eager"
     onerror="this.onerror=null;this.outerHTML='&lt;div class=&quot;fallback&quot;&gt;${abbr}&lt;/div&gt;'">`;
     }
-
     function confClass(c){
         if (c === '高') return '高';
         if (c === '中高') return '中高';
@@ -572,16 +608,15 @@
         const { home, away } = ctx;
         const card = document.getElementById('resultCard');
         const h = d.homeWin, dr = d.draw, a = d.awayWin;
+        const R = 42, C = 2 * Math.PI * R;
 
         const ring = (pct, cls) => {
-            const R = 42, C = 2 * Math.PI * R;
-            const off = C * (1 - pct/100);
             const color = cls === 'h' ? '#ff6b35' : cls === 'a' ? '#00d4ff' : '#8b98ab';
             return `<div class="ring ${cls}">
       <svg viewBox="0 0 96 96">
         <circle class="track" cx="48" cy="48" r="${R}"></circle>
         <circle class="bar" cx="48" cy="48" r="${R}" stroke="${color}"
-          stroke-dasharray="${C}" stroke-dashoffset="${off}"></circle>
+          stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle>
       </svg>
       <div class="lbl2">${cls==='h'?'主胜':cls==='d'?'平局':'客胜'}</div>
       <div class="num">${pct}%</div>
@@ -612,24 +647,16 @@
         card.innerHTML = `
     <div class="scoreboard">
       <div class="teams">
-        <div class="team">
-          ${badgeHtml(home)}
-          <div class="nm">${home}</div>
-        </div>
+        <div class="team">${badgeHtml(home)}<div class="nm">${home}</div></div>
         <div class="score pop">${d.score}</div>
-        <div class="team">
-          ${badgeHtml(away)}
-          <div class="nm">${away}</div>
-        </div>
+        <div class="team">${badgeHtml(away)}<div class="nm">${away}</div></div>
       </div>
       <div style="margin-top:14px">
         <span class="conf ${confClass(d.confidence)}">置信度：${d.confidence}</span>
       </div>
     </div>
 
-    <div class="rings">
-      ${ring(h,'h')}${ring(dr,'d')}${ring(a,'a')}
-    </div>
+    <div class="rings">${ring(h,'h')}${ring(dr,'d')}${ring(a,'a')}</div>
 
     ${h2h}
 
@@ -645,12 +672,26 @@
 
     ${playersHtml}
   `;
+
+        // 环形动画：初值 C → 延迟一帧 → 目标值
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const bars = card.querySelectorAll('.ring .bar');
+                [h, dr, a].forEach((pct, i) => {
+                    if (bars[i]) bars[i].style.strokeDashoffset = C * (1 - pct/100);
+                });
+            });
+        });
     }
 
     /* ========================================================
        10. 积分榜
     ======================================================== */
     function renderStandings(list){
+        if (!list || !list.length) {
+            document.getElementById('standings').innerHTML = '<div class="empty">暂无数据</div>';
+            return;
+        }
         const rows = list.map((s,i) => {
             const cls = i < 4 ? 'ucl' : i >= list.length - 3 ? 'rel' : '';
             return `<tr class="${cls}">
@@ -678,16 +719,19 @@
         const r = +document.getElementById('roundSel').value || 0;
         document.getElementById('dashRound').textContent = '第 ' + (r+1) + ' 轮';
 
-        const totalPlayed = Object.keys(RESULTS).length;
-        document.getElementById('dashPlayed').textContent = totalPlayed;
+        document.getElementById('dashPlayed').textContent = Object.keys(RESULTS).length;
 
         const hist = getHistory();
-        const pending = hist.filter(h => !h.actual).length;
-        document.getElementById('dashPending').textContent = hist.length;
-        document.getElementById('dashRecord').textContent = pending;
+        const roundFixtures = FIXTURES[r] || [];
+        const predicted = new Set(hist.filter(h => h.round === r).map(h => `${h.home}|${h.away}`));
+        const pending = Math.max(0, roundFixtures.length - predicted.size);
+        document.getElementById('dashPending').textContent = pending;
+
+        const toRecord = hist.filter(h => !h.actual).length;
+        document.getElementById('dashRecord').textContent = toRecord;
 
         const badge = document.getElementById('histBadge');
-        if (pending > 0) { badge.style.display = 'flex'; badge.textContent = pending; }
+        if (toRecord > 0) { badge.style.display = 'flex'; badge.textContent = toRecord; }
         else { badge.style.display = 'none'; }
     }
 
@@ -720,17 +764,19 @@
         return wdl(rec.actual) === wdl(rec.score) ? 'wdl' : 'miss';
     }
     function renderHistory(){
-        const list = getHistory().slice().reverse();
+        const raw = getHistory();
+        const list = raw.slice().reverse();
         const box = document.getElementById('histList');
         if (!list.length) { box.innerHTML = '<div class="empty">暂无记录</div>'; return; }
 
         box.innerHTML = list.map((h,idx) => {
-            const realIdx = getHistory().length - 1 - idx;
+            const realIdx = raw.length - 1 - idx;
             const j = judge(h);
             const labels = { exact:'精确命中', wdl:'胜平负命中', miss:'未命中', pending:'待录入' };
+            const multi = h._multi && h._multi > 1 ? `<span class="multi">×${h._multi}</span>` : '';
             return `<div class="hitem">
       <div class="top">
-        <div class="teams2">${h.home} vs ${h.away}</div>
+        <div class="teams2">${h.home} vs ${h.away}${multi}</div>
         <div class="res-badge ${j}">${labels[j]}</div>
       </div>
       <div class="meta">预测 ${h.score} · ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
@@ -742,10 +788,10 @@
     </div>`;
         }).join('');
 
-        const total = getHistory().length;
-        const done = getHistory().filter(h=>h.actual).length;
-        const wdl = getHistory().filter(h=>['wdl','exact'].includes(judge(h))).length;
-        const exact = getHistory().filter(h=>judge(h)==='exact').length;
+        const total = raw.length;
+        const done = raw.filter(h=>h.actual).length;
+        const wdl = raw.filter(h=>['wdl','exact'].includes(judge(h))).length;
+        const exact = raw.filter(h=>judge(h)==='exact').length;
         document.getElementById('sTotal').textContent = total;
         document.getElementById('sDone').textContent = done;
         document.getElementById('sWdl').textContent = done ? Math.round(wdl/done*100)+'%' : '0%';
@@ -834,19 +880,22 @@
     async function runBatch(){
         const btn = document.getElementById('batchBtn');
         if (!getKey()) return toast('请先填 Groq API Key', 'warn');
-        const calls = 10 * batchN;
+        const r = +document.getElementById('roundSel').value || 0;
+        const round = FIXTURES[r] || [];
+        if (!round.length) return toast('本轮无赛程', 'warn');
+
+        const calls = round.length * batchN;
         if (calls > 30 && !confirm(`将消耗约 ${calls} 次 API 调用，确认？`)) return;
 
         btn.disabled = true;
         btn.textContent = '批量运行中…';
-        const r = +document.getElementById('roundSel').value || 0;
         const intel = document.getElementById('intel').value.trim();
         let ok = 0, fail = 0;
 
         try {
             const skill = await loadSkill();
-            for (let i = 0; i < FIXTURES[r].length; i++) {
-                const { home, away } = FIXTURES[r][i];
+            for (let i = 0; i < round.length; i++) {
+                const { home, away } = round[i];
                 const runs = [];
                 for (let k = 0; k < batchN; k++) {
                     try {
@@ -879,7 +928,7 @@
             closeBatch();
             refreshDashboard();
         } catch(err){
-            toast(err.message, 'err');
+            toast(err.message.slice(0, 80), 'err');
         } finally {
             btn.disabled = false;
             btn.textContent = '开始批量预测';
