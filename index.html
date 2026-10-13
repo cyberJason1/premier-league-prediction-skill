@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
-    <title>英超预测引擎 v8.1.1</title>
+    <title>英超预测引擎 v8.4.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -214,15 +214,39 @@
         .h2h ul{list-style:none;font-size:13px;color:var(--text-2);display:flex;flex-direction:column;gap:6px}
         .h2h li{display:flex;align-items:center;gap:var(--sp-2)}
         .h2h li::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--violet);flex-shrink:0;box-shadow:0 0 6px var(--violet)}
-        .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:var(--sp-2)}
+        .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--sp-2)}
         .pcard{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .4s var(--ease);position:relative;overflow:hidden}
         .pcard:hover{transform:translateY(-4px) scale(1.02);border-color:rgba(255,159,67,.35);box-shadow:0 16px 32px -8px rgba(255,159,67,.25)}
+        .pcard.is-focal{border-color:rgba(255,159,67,.5);background:linear-gradient(160deg,rgba(255,159,67,.12),rgba(34,211,238,.05));box-shadow:0 0 0 1px rgba(255,159,67,.15),0 8px 24px -8px rgba(255,159,67,.25)}
         .pcard .row{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-2)}
         .pcard .nm{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em}
         .pcard .pos{font-size:9px;font-weight:600;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
-        .pcard .rt{display:flex;align-items:baseline;gap:var(--sp-2)}
+        .pcard .rt{display:flex;align-items:baseline;gap:var(--sp-2);flex-wrap:wrap}
         .pcard .rating{font-family:var(--font-serif);font-weight:500;font-size:26px;line-height:1;color:var(--amber);font-variant-numeric:tabular-nums;text-shadow:0 0 20px var(--amber-glow)}
-        .pcard .note{font-size:11px;color:var(--text-2);line-height:1.5;margin-top:2px}
+        .pcard .note{font-size:11px;color:var(--text-2);line-height:1.5;margin-top:6px}
+        .pcard-focal{display:inline-block;margin-right:4px;font-size:11px;filter:drop-shadow(0 0 6px var(--gold))}
+        .pcard-status{font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:var(--r-full);text-transform:uppercase}
+        .pcard-status.hot{background:rgba(239,68,68,.15);color:#ff7a7a;border:1px solid rgba(239,68,68,.4);animation:pulse 2s ease-in-out infinite}
+        .pcard-status.warm{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.4)}
+        .pcard-status.cold{background:rgba(148,163,184,.12);color:var(--text-3);border:1px solid rgba(148,163,184,.3)}
+        .pcard-chance{margin-top:8px}
+        .pcard-chance-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:4px}
+        .pcard-chance-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:2px;box-shadow:0 0 8px var(--amber-glow);transition:width .8s var(--ease)}
+        .pcard-chance-label{font-size:10px;color:var(--text-3)}
+        .pcard-chance-label b{color:var(--amber);font-weight:700}
+        .pcard-reason{font-size:11px;color:var(--text-2);margin-top:8px;padding:6px 8px;background:rgba(34,211,238,.05);border-left:2px solid var(--cyan);border-radius:3px;line-height:1.5}
+
+        .scorer-list{display:flex;flex-direction:column;gap:var(--sp-2)}
+        .scorer-item{background:linear-gradient(135deg,rgba(255,159,67,.06),rgba(255,159,67,.02));border:1px solid rgba(255,159,67,.2);border-radius:var(--r-md);padding:10px 14px;transition:transform .25s var(--ease),border-color .25s var(--ease)}
+        .scorer-item:hover{transform:translateX(3px);border-color:rgba(255,159,67,.4)}
+        .scorer-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+        .scorer-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em}
+        .scorer-team{font-size:11px;color:var(--text-3);flex:1}
+        .scorer-pct{font-family:var(--font-serif);font-size:18px;font-weight:500;color:var(--amber);font-variant-numeric:tabular-nums;text-shadow:0 0 12px var(--amber-glow)}
+        .scorer-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:6px}
+        .scorer-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:3px;box-shadow:0 0 10px var(--amber-glow);transition:width .9s var(--ease)}
+        .scorer-reason{font-size:11px;color:var(--text-2);line-height:1.5;font-style:italic;padding-left:8px;border-left:2px solid rgba(255,159,67,.4)}
+
         .standings{font-size:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 calc(-1 * var(--sp-6));padding:0 var(--sp-6)}
         @media(max-width:640px){.standings{margin:0 calc(-1 * var(--sp-4));padding:0 var(--sp-4)}}
         .standings table{width:100%;border-collapse:collapse;min-width:680px}
@@ -262,7 +286,7 @@
         .mask{position:fixed;inset:0;background:rgba(4,5,8,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:var(--sp-12) var(--sp-4);overflow-y:auto;-webkit-overflow-scrolling:touch}
         .mask.show{display:flex;animation:fadeIn .3s var(--ease)}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-        .modal{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-xl);max-width:780px;width:100%;padding:var(--sp-6);box-shadow:0 40px 80px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05),0 0 0 1px rgba(255,159,67,.05);animation:modalIn .4s var(--ease-spring);outline:none;position:relative}
+        .modal{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-xl);max-width:820px;width:100%;padding:var(--sp-6);box-shadow:0 40px 80px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05),0 0 0 1px rgba(255,159,67,.05);animation:modalIn .4s var(--ease-spring);outline:none;position:relative}
         @keyframes modalIn{from{opacity:0;transform:translateY(-24px) scale(.94)}to{opacity:1;transform:none}}
         .modal h2{font-family:var(--font-serif);font-weight:500;font-size:28px;letter-spacing:-.02em;margin-bottom:var(--sp-2);padding-right:40px}
         .modal .sub{color:var(--text-2);font-size:13px;margin-bottom:var(--sp-5)}
@@ -297,6 +321,73 @@
         .hitem input{flex:1;padding:8px 12px;font-size:13px;text-align:center;font-weight:600}
         .hitem button{padding:8px 14px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s var(--ease);flex-shrink:0}
         .hitem button:hover{border-color:rgba(239,68,68,.5);color:var(--rose);background:var(--rose-soft)}
+        .vs-row{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);margin:var(--sp-3) 0;padding:var(--sp-3) var(--sp-4);background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md)}
+        .vs-side{text-align:center;flex:1;min-width:0}
+        .vs-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+        .vs-score{font-family:var(--font-serif);font-size:26px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums}
+        .vs-side.pred .vs-score{color:var(--amber)}
+        .vs-side.real .vs-score{color:var(--text)}
+        .vs-side.real.hit .vs-score{color:var(--emerald);text-shadow:0 0 16px rgba(52,211,153,.4)}
+        .vs-side.real.miss .vs-score{color:var(--rose)}
+        .vs-arrow{color:var(--text-4);font-size:18px;flex-shrink:0}
+        .deviations{display:flex;flex-direction:column;gap:5px;margin:var(--sp-2) 0}
+        .dev-item{font-size:11.5px;color:var(--text-2);padding:5px 10px;background:rgba(255,255,255,.02);border-left:2px solid var(--border-hi);border-radius:3px;line-height:1.5}
+        .dev-item.bad{border-left-color:var(--rose);color:var(--rose)}
+        .dev-item.ok{border-left-color:var(--emerald);color:var(--emerald)}
+        .dev-item.neutral{border-left-color:var(--gold);color:var(--gold)}
+        .dev-item.info{border-left-color:var(--cyan);color:var(--cyan)}
+        .da-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px;letter-spacing:.04em}
+        .da-badge.hit{background:var(--emerald-soft);color:var(--emerald);border:1px solid rgba(52,211,153,.35)}
+        .da-badge.miss{background:var(--rose-soft);color:var(--rose);border:1px solid rgba(239,68,68,.35)}
+        .deep-analysis{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-4);overflow:hidden}
+        .da-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;user-select:none;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);transition:background .2s var(--ease)}
+        .da-head:hover{background:rgba(255,255,255,.03)}
+        .da-head .da-arrow{transition:transform .3s var(--ease);font-size:10px;color:var(--text-3)}
+        .deep-analysis.open .da-head .da-arrow{transform:rotate(180deg)}
+        .da-body{max-height:0;overflow:hidden;transition:max-height .6s var(--ease),padding .3s var(--ease);padding:0 18px}
+        .deep-analysis.open .da-body{max-height:5000px;padding:0 18px 18px}
+        .da-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--sp-2);margin-bottom:var(--sp-4)}
+        .da-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;text-align:center}
+        .da-card.mini{padding:10px 8px}
+        .da-card.mini .da-val{font-size:22px}
+        .da-card.mini .da-lbl{font-size:8px}
+        .da-card .da-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
+        .da-card .da-val{font-family:var(--font-serif);font-size:28px;font-weight:500;line-height:1;color:var(--amber);font-variant-numeric:tabular-nums}
+        .da-card .da-sub{font-size:10px;color:var(--text-4);margin-top:4px}
+        .da-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:var(--sp-3)}
+        .da-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:var(--sp-3)}
+        @media(max-width:480px){.da-grid-4{grid-template-columns:repeat(2,1fr)}}
+        .da-section{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--border)}
+        .da-section:first-child{margin-top:0;padding-top:0;border-top:0}
+        .da-ttl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-2)}
+        .da-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-2);padding:5px 0;gap:12px}
+        .da-row > span:first-child{flex-shrink:0}
+        .da-row .da-num{font-family:var(--font-mono);font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;text-align:right}
+        .da-row.warn .da-num{color:var(--gold)}
+        .da-row.bad .da-num{color:var(--rose)}
+        .da-row.good .da-num{color:var(--emerald)}
+        .da-hint{font-size:10px;color:var(--text-4);margin-top:4px;font-style:italic}
+        .da-bar-row{display:flex;align-items:center;gap:var(--sp-2);font-size:11.5px;padding:4px 0}
+        .da-bar-row > span:first-child{width:44px;color:var(--text-3);flex-shrink:0}
+        .da-bar-row > span:last-child{width:46px;text-align:right;font-family:var(--font-mono);font-weight:600;color:var(--text);flex-shrink:0;font-variant-numeric:tabular-nums}
+        .da-bar{flex:1;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+        .da-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:3px;transition:width .8s var(--ease)}
+        .da-hist{display:flex;gap:2px;align-items:flex-end;height:60px;margin:var(--sp-2) 0;padding:8px 4px;background:rgba(255,255,255,.02);border-radius:6px}
+        .da-hist-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+        .da-hist-bar{width:100%;background:linear-gradient(180deg,var(--amber),#ffb968);border-radius:3px 3px 0 0;transition:height .6s var(--ease);min-height:2px}
+        .da-hist-bar.real{background:linear-gradient(180deg,var(--cyan),#67e8f9)}
+        .da-hist-lbl{font-size:8px;color:var(--text-4);font-family:var(--font-mono)}
+        .da-hist-legend{display:flex;gap:12px;font-size:10px;color:var(--text-3);justify-content:center;margin-top:6px}
+        .da-hist-legend span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+        .da-hist-legend .l-pred::before{background:var(--amber)}
+        .da-hist-legend .l-real::before{background:var(--cyan)}
+        .da-calib-row{display:flex;align-items:center;gap:8px;font-size:11px;padding:4px 0}
+        .da-calib-row > span:first-child{width:52px;color:var(--text-3);flex-shrink:0;font-family:var(--font-mono)}
+        .da-calib-row > span:last-child{width:70px;text-align:right;font-family:var(--font-mono);font-weight:600;flex-shrink:0;font-variant-numeric:tabular-nums}
+        .da-calib-bar{flex:1;height:8px;background:rgba(255,255,255,.05);border-radius:4px;position:relative;overflow:hidden}
+        .da-calib-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:4px}
+        .da-calib-ref{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+        .live-dot-inline{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);margin-right:6px;animation:pulse 2s ease-in-out infinite}
         .batch-opts{display:flex;gap:var(--sp-2);margin:var(--sp-4) 0}
         .batch-opts button{flex:1;padding:12px;border-radius:var(--r-md);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .25s var(--ease)}
         .batch-opts button:hover{border-color:var(--border-focus);color:var(--amber);transform:translateY(-1px)}
@@ -360,7 +451,6 @@
         ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px;border:3px solid var(--bg)}
         ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
 
-        /* ══════════════ MatchPicker ══════════════ */
         .match-picker{position:relative;width:100%}
         .match-picker .trigger{width:100%;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--r-md);color:var(--text);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);transition:border-color .2s var(--ease),background .2s var(--ease),box-shadow .25s var(--ease)}
         .match-picker .trigger:hover{border-color:rgba(255,255,255,.18)}
@@ -401,7 +491,6 @@
         .mrow-meta .score{font-family:var(--font-serif);font-size:14px;font-weight:600;color:var(--text);padding:0 6px}
         .match-picker .empty-list{padding:30px 14px;text-align:center;font-size:12px;color:var(--text-4)}
 
-        /* ══════════════ Team Modal ══════════════ */
         .team-modal .team-head{display:flex;align-items:center;gap:var(--sp-4);margin-bottom:var(--sp-5);padding-bottom:var(--sp-4);border-bottom:1px solid var(--border)}
         .team-modal .team-head .badge-big{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
         .team-modal .team-head .info{flex:1;min-width:0}
@@ -428,7 +517,6 @@
         .team-modal .recent-item .res.L{color:var(--rose);background:rgba(239,68,68,.12)}
         .team-modal .recent-item .score{font-family:var(--font-serif);font-weight:600;color:var(--text);padding:0 8px}
 
-        /* ══════════════ Trend Chart ══════════════ */
         .trend-chart{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);margin-bottom:var(--sp-4)}
         .trend-chart .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-3);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
         .trend-chart .head .v{font-family:var(--font-serif);font-size:18px;color:var(--amber);letter-spacing:-.01em;text-transform:none}
@@ -457,7 +545,7 @@
             <span>Premier League 2026/27</span>
         </div>
         <h1 id="heroTitle">英超 <em>预测</em> 引擎</h1>
-        <div class="sub">规则工程 · 前端工程 · 自动化 · v8.1.1</div>
+        <div class="sub">规则工程 · 前端工程 · 自动化 · v8.4.0</div>
         <div class="tag-line">
             <a href="about.html" style="color:var(--amber);text-decoration:none;font-weight:500">关于 →</a>
             <span style="color:var(--text-4)">·</span>
@@ -553,7 +641,7 @@
         <div class="legal">
             ⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。
         </div>
-        <div class="ver">Premier League Prediction Engine · v8.1.1</div>
+        <div class="ver">Premier League Prediction Engine · v8.4.0</div>
     </footer>
 </div>
 
@@ -571,6 +659,17 @@
             <div class="stat"><div class="n" id="sDone">0</div><div class="l">已录入</div></div>
             <div class="stat"><div class="n" id="sWdl">0%</div><div class="l">胜平负</div></div>
             <div class="stat"><div class="n" id="sExact">0%</div><div class="l">精确比分</div></div>
+        </div>
+        <div class="deep-analysis" id="deepAnalysis">
+            <div class="da-head" onclick="toggleDeepAnalysis()">
+                <span>📊 深度分析</span>
+                <span class="da-arrow">▼</span>
+            </div>
+            <div class="da-body" id="deepAnalysisBody"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--text-4);margin-bottom:var(--sp-3);padding:0 4px">
+            <span><span class="live-dot-inline"></span>实时同步已启用（每 5 分钟检查）</span>
+            <button class="btn ghost small" onclick="manualSync()" style="padding:4px 10px;font-size:11px">🔄 立即同步</button>
         </div>
         <div class="trend-chart" id="trendChart">
             <div class="head">
@@ -1019,7 +1118,6 @@
         const res = await fetch(`skill.md?v=${Date.now()}`, { cache:'no-store' });
         if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
         let text = await res.text();
-        // 压缩：\r\n → \n，行尾空白去掉，3+ 连续换行压成 2 个（保留 Markdown 段落语义），去注释
         text = text
             .replace(/\r\n/g,'\n')
             .replace(/[ \t]+\n/g,'\n')
@@ -1066,14 +1164,11 @@
                     signal: ctrl.signal
                 });
                 clearTimeout(tid);
-
-                // 429：指数退避重试
                 if (resp.status === 429 && attempt < maxRetry) {
                     await new Promise(r => setTimeout(r, delay));
                     delay *= 2;
                     continue;
                 }
-                // 413：payload 过大，不重试，给出明确提示
                 if (resp.status === 413) {
                     throw new Error('情报过长（超出模型 TPM 限制），请精简今日情报后重试');
                 }
@@ -1321,6 +1416,51 @@
     }
 
     /* ═══════════════════════════════════════════
+       球队攻防统计（实时计算，不缓存）
+    ═══════════════════════════════════════════ */
+    function computeTeamAttackStats(){
+        const map = {};
+        for (const rk of Object.keys(RESULTS)) {
+            const ro = RESULTS[rk];
+            if (!ro || typeof ro !== 'object') continue;
+            for (const key of Object.keys(ro)) {
+                const [h, a] = key.split('|');
+                if (!h || !a) continue;
+                const sc = ro[key];
+                let hg, ag;
+                if (Array.isArray(sc)) { hg = +sc[0]; ag = +sc[1]; }
+                else if (typeof sc === 'string') { const p = sc.split(/[-:]/); hg = +p[0]; ag = +p[1]; }
+                else if (sc && typeof sc === 'object') { hg = +(sc.home ?? sc[0]); ag = +(sc.away ?? sc[1]); }
+                if (!Number.isFinite(hg) || !Number.isFinite(ag)) continue;
+                if (!map[h]) map[h] = { team:h, played:0, gf:0, ga:0, cleanSheets:0, over25:0, btts:0, homeGF:0, homeGA:0, homePlayed:0, awayGF:0, awayGA:0, awayPlayed:0, form:[] };
+                if (!map[a]) map[a] = { team:a, played:0, gf:0, ga:0, cleanSheets:0, over25:0, btts:0, homeGF:0, homeGA:0, homePlayed:0, awayGF:0, awayGA:0, awayPlayed:0, form:[] };
+                map[h].played++; map[h].gf += hg; map[h].ga += ag;
+                map[h].homePlayed++; map[h].homeGF += hg; map[h].homeGA += ag;
+                map[a].played++; map[a].gf += ag; map[a].ga += hg;
+                map[a].awayPlayed++; map[a].awayGF += ag; map[a].awayGA += hg;
+                if (ag === 0) map[h].cleanSheets++;
+                if (hg === 0) map[a].cleanSheets++;
+                if (hg + ag > 2.5) { map[h].over25++; map[a].over25++; }
+                if (hg > 0 && ag > 0) { map[h].btts++; map[a].btts++; }
+                map[h].form.push(hg > ag ? 'W' : hg < ag ? 'L' : 'D');
+                map[a].form.push(ag > hg ? 'W' : ag < hg ? 'L' : 'D');
+            }
+        }
+        return Object.values(map).map(t => ({
+            ...t,
+            avgGF: t.played ? t.gf / t.played : 0,
+            avgGA: t.played ? t.ga / t.played : 0,
+            avgHomeGF: t.homePlayed ? t.homeGF / t.homePlayed : 0,
+            avgHomeGA: t.homePlayed ? t.homeGA / t.homePlayed : 0,
+            avgAwayGF: t.awayPlayed ? t.awayGF / t.awayPlayed : 0,
+            avgAwayGA: t.awayPlayed ? t.awayGA / t.awayPlayed : 0,
+            over25Rate: t.played ? Math.round(t.over25 / t.played * 100) : 0,
+            bttsRate: t.played ? Math.round(t.btts / t.played * 100) : 0,
+            form5: t.form.slice(-5)
+        })).sort((a, b) => b.avgGF - a.avgGF);
+    }
+
+    /* ═══════════════════════════════════════════
        预测
     ═══════════════════════════════════════════ */
     async function startPredict(retryCount = 0){
@@ -1336,7 +1476,19 @@
         card.innerHTML = `<div class="loader"><div class="ball"></div><div class="msg">模型推理中<br>约 10 秒</div></div>`;
         try {
             const skill = await loadSkill();
-            const userPrompt = (intel ? `【今日情报】\n${intel}\n\n` : '') + `【预测指令】\n请预测：第 ${round+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
+            const teamStats = computeTeamAttackStats();
+            const homeAtk = teamStats.find(t => t.team === home);
+            const awayAtk = teamStats.find(t => t.team === away);
+            const atkContext = (homeAtk || awayAtk) ? `【实时攻防数据】\n` +
+                (homeAtk ? `${home}（主）：场均进 ${homeAtk.avgGF.toFixed(2)} / 失 ${homeAtk.avgGA.toFixed(2)}，主场进 ${homeAtk.avgHomeGF.toFixed(2)} / 失 ${homeAtk.avgHomeGA.toFixed(2)}，零封 ${homeAtk.cleanSheets} 场，大2.5率 ${homeAtk.over25Rate}%，BTTS ${homeAtk.bttsRate}%\n` : '') +
+                (awayAtk ? `${away}（客）：场均进 ${awayAtk.avgGF.toFixed(2)} / 失 ${awayAtk.avgGA.toFixed(2)}，客场进 ${awayAtk.avgAwayGF.toFixed(2)} / 失 ${awayAtk.avgAwayGA.toFixed(2)}，零封 ${awayAtk.cleanSheets} 场，大2.5率 ${awayAtk.over25Rate}%，BTTS ${awayAtk.bttsRate}%\n` : '') + `\n` : '';
+            const userPrompt = (intel ? `【今日情报】\n${intel}\n\n` : '') + atkContext +
+                `【预测指令】\n请预测：第 ${round+1} 轮  ${home} vs ${away}\n` +
+                `要求：\n` +
+                `1. 严格按 skill.md 输出契约返回 JSON\n` +
+                `2. likelyScorers 至少 3 人、最多 5 人，每人必须含 name/team/chance/reason\n` +
+                `3. homeKeyPlayers / awayKeyPlayers 各至少 2 人，其中 1 人标记 isFocal: true\n` +
+                `4. reason 必须含具体依据（数据/对位/状态），禁止写空话`;
             const raw = await callGroq(skill, userPrompt);
             let parsed;
             try { parsed = JSON.parse(raw); }
@@ -1384,14 +1536,39 @@
   </div>`;
     }
     function confClass(c){ return ['高','中高','中','低'].includes(c) ? c : '低'; }
+
     function playerCard(p){
         const name = p.name || p.球员 || '';
         const pos = p.position || p.位置 || '';
         const rating = p.rating || p.评分 || '';
         const note = p.note || p.备注 || '';
-        return `<div class="pcard">
-    <div class="row"><div class="nm">${escapeHtml(name)}</div><div class="pos">${escapeHtml(pos)}</div></div>
-    <div class="rt"><div class="rating">${escapeHtml(rating)}</div>${note?`<div class="note">${escapeHtml(note)}</div>`:''}</div>
+        const reason = p.reason || p.原因 || '';
+        const chance = p.scoreChance ?? p.进球概率 ?? null;
+        const status = p.status || p.状态 || '';
+        const isFocal = p.isFocal ?? p.焦点 ?? false;
+        const statusMap = {
+            hot: { label: '火热', cls: 'hot' },
+            warm: { label: '正常', cls: 'warm' },
+            cold: { label: '低迷', cls: 'cold' }
+        };
+        const st = statusMap[status] || null;
+        let chanceHtml = '';
+        if (chance !== null && chance !== undefined && !isNaN(+chance)) {
+            const pctVal = (+chance > 1 ? +chance : +chance * 100).toFixed(0);
+            chanceHtml = `<div class="pcard-chance">
+                <div class="pcard-chance-bar"><div class="pcard-chance-fill" style="width:${pctVal}%"></div></div>
+                <span class="pcard-chance-label">进球概率 <b>${pctVal}%</b></span>
+            </div>`;
+        }
+        const reasonHtml = reason ? `<div class="pcard-reason">💡 ${escapeHtml(reason)}</div>` : '';
+        const statusHtml = st ? `<span class="pcard-status ${st.cls}">${st.label}</span>` : '';
+        const focalHtml = isFocal ? `<span class="pcard-focal">⭐</span>` : '';
+        return `<div class="pcard${isFocal ? ' is-focal' : ''}">
+    <div class="row"><div class="nm">${focalHtml}${escapeHtml(name)}</div><div class="pos">${escapeHtml(pos)}</div></div>
+    <div class="rt"><div class="rating">${escapeHtml(rating)}</div>${statusHtml}</div>
+    ${chanceHtml}
+    ${note ? `<div class="note">${escapeHtml(note)}</div>` : ''}
+    ${reasonHtml}
   </div>`;
     }
     function animateNumber(el, target, dur=1200, suffix='%'){
@@ -1454,9 +1631,32 @@
         const homePlayers = d.homeKeyPlayers || d.homePlayers || [];
         const awayPlayers = d.awayKeyPlayers || d.awayPlayers || [];
         const players = [...homePlayers, ...awayPlayers];
+        const likelyScorers = d.likelyScorers || d.推荐得分球员 || [];
+        const scorerHtml = likelyScorers.length ? `
+    <div class="sect">
+      <div class="ttl">⚽ 推荐得分球员</div>
+      <div class="scorer-list">
+        ${likelyScorers.map(s => {
+            const sname = s.name || s.球员 || '';
+            const steam = s.team || s.球队 || '';
+            const schance = s.chance ?? s.概率 ?? 0;
+            const sreason = s.reason || s.原因 || '';
+            const pctVal = (+schance > 1 ? +schance : +schance * 100).toFixed(0);
+            return `<div class="scorer-item">
+                <div class="scorer-head">
+                    <span class="scorer-name">${escapeHtml(sname)}</span>
+                    <span class="scorer-team">${escapeHtml(steam)}</span>
+                    <span class="scorer-pct">${pctVal}%</span>
+                </div>
+                <div class="scorer-bar"><div class="scorer-bar-fill" style="width:${pctVal}%"></div></div>
+                ${sreason ? `<div class="scorer-reason">${escapeHtml(sreason)}</div>` : ''}
+            </div>`;
+        }).join('')}
+      </div>
+    </div>` : '';
         const playersHtml = players.length ? `
     <div class="sect">
-      <div class="ttl">本场焦点球员</div>
+      <div class="ttl">🎯 本场焦点球员</div>
       <div class="players">${players.map(playerCard).join('')}</div>
     </div>` : '';
         const multiRunsHtml = d._runs && d._runs.length > 1
@@ -1490,6 +1690,7 @@
       <div class="factors">${(d.keyFactors||[]).map(f=>`<span class="chip">${escapeHtml(f)}</span>`).join('')}</div>
       <div class="kv">${escapeHtml(d.analysis || '')}</div>
     </div>
+    ${scorerHtml}
     ${playersHtml}
   `;
         requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1506,7 +1707,7 @@
     function copyResult(){
         if (!_lastResult) return;
         const { d, ctx } = _lastResult;
-        const text = `【第${ctx.round+1}轮预测】${ctx.home} vs ${ctx.away}\n比分：${d.score}\n概率：主胜 ${d.homeWin}% / 平局 ${d.draw}% / 客胜 ${d.awayWin}%\n置信度：${d.confidence}\n关键因素：${(d.keyFactors||[]).join('、')}\n分析：${d.analysis}\n${d.headToHead?.summary ? '交锋：' + d.headToHead.summary + '\n' : ''}—— 英超预测引擎`;
+        const text = `【第${ctx.round+1}轮预测】${ctx.home} vs ${ctx.away}\n比分：${d.score}\n概率：主胜 ${d.homeWin}% / 平局 ${d.draw}% / 客胜 ${d.awayWin}%\n置信度：${d.confidence}\n关键因素：${(d.keyFactors||[]).join('、')}\n分析：${d.analysis}\n${d.headToHead?.summary ? '交锋：' + d.headToHead.summary + '\n' : ''}${(d.likelyScorers||[]).length ? '推荐得分：' + d.likelyScorers.map(s => `${s.name}(${Math.round((s.chance||0)*100)}%)`).join('、') + '\n' : ''}—— 英超预测引擎`;
         navigator.clipboard.writeText(text).then(() => toast('预测已复制到剪贴板')).catch(() => {
             const ta = document.createElement('textarea');
             ta.value = text; document.body.appendChild(ta); ta.select();
@@ -1529,8 +1730,6 @@
         const rg = c.createRadialGradient(W/2, 0, 0, W/2, 0, 600);
         rg.addColorStop(0, 'rgba(255,159,67,.14)'); rg.addColorStop(1, 'rgba(255,159,67,0)');
         c.fillStyle = rg; c.fillRect(0, 0, W, 400);
-
-        // fallback：画一个缩写圆底
         function makeFallback(abbr){
             const c2 = document.createElement('canvas');
             c2.width = c2.height = 120;
@@ -1722,6 +1921,11 @@
             if (h._multi && h._multi > 1) o._multi = h._multi;
             if (h._runs) o._runs = h._runs;
             if (h.headToHead) o.headToHead = h.headToHead;
+            if (h.keyFactors) o.keyFactors = h.keyFactors;
+            if (h.analysis) o.analysis = h.analysis;
+            if (h.likelyScorers) o.likelyScorers = h.likelyScorers;
+            if (h.homeKeyPlayers) o.homeKeyPlayers = h.homeKeyPlayers;
+            if (h.awayKeyPlayers) o.awayKeyPlayers = h.awayKeyPlayers;
             return o;
         });
         localStorage.setItem(HIST_KEY, JSON.stringify(slim));
@@ -1734,12 +1938,399 @@
         refreshDashboard();
         if (document.getElementById('histMask').classList.contains('show')) renderHistory();
     }
-    function judge(rec){
-        if (!rec.actual) return 'pending';
-        if (rec.actual === rec.score) return 'exact';
-        const wdl = s => { const [a,b] = s.split('-').map(Number); return a>b?'H':a<b?'A':'D'; };
-        return wdl(rec.actual) === wdl(rec.score) ? 'wdl' : 'miss';
+
+    const WDL_NAMES = { H: '主胜', D: '平局', A: '客胜' };
+
+    function analyzeRecord(rec){
+        const base = { verdict: 'pending' };
+        if (!rec.actual || !/^\d+-\d+$/.test(rec.actual) || !/^\d+-\d+$/.test(rec.score)) return base;
+        const [ph, pa] = rec.score.split('-').map(Number);
+        const [ah, aa] = rec.actual.split('-').map(Number);
+        if (![ph,pa,ah,aa].every(Number.isFinite)) return base;
+        const pWdl = ph > pa ? 'H' : ph < pa ? 'A' : 'D';
+        const aWdl = ah > aa ? 'H' : ah < aa ? 'A' : 'D';
+        const hitExact = ph === ah && pa === aa;
+        const hitWdl = pWdl === aWdl;
+        const verdict = hitExact ? 'exact' : hitWdl ? 'wdl' : 'miss';
+        const pTotal = ph + pa, aTotal = ah + aa;
+        const ou25 = { pred: pTotal > 2.5 ? 'over' : 'under', actual: aTotal > 2.5 ? 'over' : 'under' };
+        const ou15 = { pred: pTotal > 1.5 ? 'over' : 'under', actual: aTotal > 1.5 ? 'over' : 'under' };
+        const ou35 = { pred: pTotal > 3.5 ? 'over' : 'under', actual: aTotal > 3.5 ? 'over' : 'under' };
+        const hitOU25 = ou25.pred === ou25.actual;
+        const hitOU15 = ou15.pred === ou15.actual;
+        const hitOU35 = ou35.pred === ou35.actual;
+        const pBTTS = ph > 0 && pa > 0;
+        const aBTTS = ah > 0 && aa > 0;
+        const hitBTTS = pBTTS === aBTTS;
+        const pMargin = ph - pa;
+        const aMargin = ah - aa;
+        const diffMargin = pMargin - aMargin;
+        const hitMargin = pMargin === aMargin;
+        const diffHome = ph - ah;
+        const diffAway = pa - aa;
+        const diffTotal = pTotal - aTotal;
+        const hitHomeGoals = ph === ah;
+        const hitAwayGoals = pa === aa;
+        const deviations = [];
+        if (hitExact) {
+            deviations.push({ type: 'ok', text: '✅ 比分精确命中' });
+        } else {
+            deviations.push({ type: hitWdl ? 'ok' : 'bad', text: hitWdl ? `✅ 方向命中（${WDL_NAMES[aWdl]}）` : `❌ 方向反了（预测${WDL_NAMES[pWdl]}，实际${WDL_NAMES[aWdl]}）` });
+            if (diffHome !== 0) deviations.push({ type: diffHome > 0 ? 'neutral' : 'info', text: `📊 主队${diffHome > 0 ? '高估' : '低估'} ${Math.abs(diffHome)} 球` });
+            if (diffAway !== 0) deviations.push({ type: diffAway > 0 ? 'neutral' : 'info', text: `📊 客队${diffAway > 0 ? '高估' : '低估'} ${Math.abs(diffAway)} 球` });
+            if (!hitOU25) deviations.push({ type: 'neutral', text: `⚽ 大小球 2.5 猜错（预测${ou25.pred === 'over' ? '大' : '小'}，实际${ou25.actual === 'over' ? '大' : '小'}）` });
+            if (!hitBTTS) deviations.push({ type: 'neutral', text: `🥅 BTTS 猜错（预测${pBTTS ? '双方进球' : '有零封'}）` });
+            if (!hitMargin) deviations.push({ type: 'neutral', text: `⚖️ 分差偏差 ${diffMargin > 0 ? '+' : ''}${diffMargin} 球` });
+        }
+        return {
+            verdict, hitExact, hitWdl, hitOU25, hitOU15, hitOU35, hitBTTS, hitMargin, hitHomeGoals, hitAwayGoals,
+            predicted: { h: ph, a: pa, wdl: pWdl, total: pTotal, ou25: ou25.pred, ou15: ou15.pred, ou35: ou35.pred, btts: pBTTS, margin: pMargin },
+            actual:    { h: ah, a: aa, wdl: aWdl, total: aTotal, ou25: ou25.actual, ou15: ou15.actual, ou35: ou35.actual, btts: aBTTS, margin: aMargin },
+            diffHome, diffAway, diffTotal, diffMargin, deviations
+        };
     }
+
+    function judge(rec){ return analyzeRecord(rec).verdict; }
+
+    function computeDeepStats(records){
+        const done = records.filter(r => r.actual && /^\d+-\d+$/.test(r.actual));
+        if (!done.length) return null;
+        const S = {
+            total: done.length, exact: 0, wdl: 0, miss: 0,
+            ou25: 0, ou15: 0, ou35: 0, btts: 0, margin: 0,
+            homeGoals: 0, awayGoals: 0,
+            byPredWdl: { H:{total:0,hit:0}, D:{total:0,hit:0}, A:{total:0,hit:0} },
+            byConf: {}, byRound: {}, byTeam: {}, byScorePred: {},
+            predTotalDist: [0,0,0,0,0,0,0,0],
+            realTotalDist: [0,0,0,0,0,0,0,0],
+            calibBins: { '0-20':{pred:0,hit:0}, '20-40':{pred:0,hit:0}, '40-60':{pred:0,hit:0}, '60-80':{pred:0,hit:0}, '80-100':{pred:0,hit:0} },
+            sumDiffHome: 0, sumDiffAway: 0, sumDiffTotal: 0,
+            sumPredTotal: 0, sumActualTotal: 0,
+            hitSequence: []
+        };
+        const sorted = [...done].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+        for (const rec of sorted) {
+            const a = analyzeRecord(rec);
+            if (a.verdict === 'pending') continue;
+            if (a.verdict === 'exact') S.exact++;
+            if (a.hitWdl) S.wdl++;
+            if (a.verdict === 'miss') S.miss++;
+            if (a.hitOU25) S.ou25++;
+            if (a.hitOU15) S.ou15++;
+            if (a.hitOU35) S.ou35++;
+            if (a.hitBTTS) S.btts++;
+            if (a.hitMargin) S.margin++;
+            if (a.hitHomeGoals) S.homeGoals++;
+            if (a.hitAwayGoals) S.awayGoals++;
+            S.hitSequence.push(a.hitWdl);
+            const pw = a.predicted.wdl;
+            S.byPredWdl[pw].total++;
+            if (a.hitWdl) S.byPredWdl[pw].hit++;
+            const c = rec.confidence || '未知';
+            if (!S.byConf[c]) S.byConf[c] = { total:0, hit:0 };
+            S.byConf[c].total++;
+            if (a.hitWdl) S.byConf[c].hit++;
+            S.sumDiffHome += a.diffHome;
+            S.sumDiffAway += a.diffAway;
+            S.sumDiffTotal += a.diffTotal;
+            S.sumPredTotal += a.predicted.total;
+            S.sumActualTotal += a.actual.total;
+            const rk = rec.round;
+            if (!S.byRound[rk]) S.byRound[rk] = { total:0, hit:0 };
+            S.byRound[rk].total++;
+            if (a.hitWdl) S.byRound[rk].hit++;
+            for (const t of [rec.home, rec.away]) {
+                if (!S.byTeam[t]) S.byTeam[t] = { total:0, hit:0 };
+                S.byTeam[t].total++;
+                if (a.hitWdl) S.byTeam[t].hit++;
+            }
+            const key = rec.score;
+            if (!S.byScorePred[key]) S.byScorePred[key] = { total:0, hit:0 };
+            S.byScorePred[key].total++;
+            if (a.hitExact) S.byScorePred[key].hit++;
+            const pIdx = Math.min(a.predicted.total, 7);
+            const aIdx = Math.min(a.actual.total, 7);
+            S.predTotalDist[pIdx]++;
+            S.realTotalDist[aIdx]++;
+            const mainProb = Math.max(rec.homeWin || 0, rec.draw || 0, rec.awayWin || 0);
+            const binKey = mainProb < 20 ? '0-20' : mainProb < 40 ? '20-40' : mainProb < 60 ? '40-60' : mainProb < 80 ? '60-80' : '80-100';
+            S.calibBins[binKey].pred++;
+            const maxDir = (rec.homeWin >= rec.draw && rec.homeWin >= rec.awayWin) ? 'H' : (rec.draw >= rec.awayWin) ? 'D' : 'A';
+            if (maxDir === a.actual.wdl) S.calibBins[binKey].hit++;
+        }
+        S.avgDiffHome = S.sumDiffHome / S.total;
+        S.avgDiffAway = S.sumDiffAway / S.total;
+        S.avgDiffTotal = S.sumDiffTotal / S.total;
+        S.avgPredTotal = S.sumPredTotal / S.total;
+        S.avgActualTotal = S.sumActualTotal / S.total;
+        let maxWin = 0, maxLose = 0, curWin = 0, curLose = 0;
+        for (const h of S.hitSequence) {
+            if (h) { curWin++; curLose = 0; maxWin = Math.max(maxWin, curWin); }
+            else { curLose++; curWin = 0; maxLose = Math.max(maxLose, curLose); }
+        }
+        S.maxWin = maxWin;
+        S.maxLose = maxLose;
+        let cur = 0, curType = null;
+        for (let i = S.hitSequence.length - 1; i >= 0; i--) {
+            if (curType === null) { curType = S.hitSequence[i]; cur = 1; }
+            else if (S.hitSequence[i] === curType) cur++;
+            else break;
+        }
+        S.currentStreak = { type: curType, count: cur };
+        const recent5 = S.hitSequence.slice(-5);
+        S.recent5Rate = recent5.length ? recent5.filter(Boolean).length / recent5.length : 0;
+        const rounds = Object.entries(S.byRound).filter(([_,v]) => v.total >= 3).map(([k,v]) => ({ round:+k, rate:v.hit/v.total, ...v }));
+        if (rounds.length >= 2) {
+            S.bestRound = rounds.reduce((a,b) => a.rate > b.rate ? a : b);
+            S.worstRound = rounds.reduce((a,b) => a.rate < b.rate ? a : b);
+        }
+        const teams = Object.entries(S.byTeam).filter(([_,v]) => v.total >= 2).map(([k,v]) => ({ team:k, rate:v.hit/v.total, ...v }));
+        if (teams.length >= 2) {
+            S.bestTeam = teams.reduce((a,b) => a.rate > b.rate ? a : b);
+            S.worstTeam = teams.reduce((a,b) => a.rate < b.rate ? a : b);
+        }
+        S.topScores = Object.entries(S.byScorePred)
+            .sort((a,b) => b[1].total - a[1].total)
+            .slice(0, 5)
+            .map(([score, v]) => ({ score, total: v.total, hit: v.hit, rate: v.hit / v.total }));
+        return S;
+    }
+
+    function pct(n){ return Math.round(n * 100) + '%'; }
+    function fmtDiff(n){ return (n > 0 ? '+' : '') + n.toFixed(2) + ' 球/场'; }
+    function avgBiasCls(n){ return Math.abs(n) >= 0.5 ? 'warn' : Math.abs(n) <= 0.15 ? 'good' : ''; }
+
+    function renderDeepAnalysis(){
+        const box = document.getElementById('deepAnalysisBody');
+        if (!box) return;
+        const S = computeDeepStats(getHistory());
+        if (!S) {
+            box.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-4);font-size:12px">录入实际比分后显示</div>';
+            return;
+        }
+        const barRow = (key, label) => {
+            const b = S.byPredWdl[key];
+            if (!b.total) return `<div class="da-bar-row"><span>${label}</span><div class="da-bar"><div class="da-bar-fill" style="width:0%"></div></div><span>—</span></div>`;
+            const r = b.hit / b.total;
+            return `<div class="da-bar-row"><span>${label}</span><div class="da-bar"><div class="da-bar-fill" style="width:${r*100}%"></div></div><span>${pct(r)}</span></div>`;
+        };
+        const confOrder = ['高','中高','中','低'];
+        const confRow = (c) => {
+            const b = S.byConf[c];
+            if (!b) return '';
+            const r = b.hit / b.total;
+            return `<div class="da-row ${r >= 0.7 ? 'good' : r <= 0.4 ? 'bad' : ''}"><span>置信度 ${c}</span><span class="da-num">${pct(r)} <span style="color:var(--text-4);font-weight:400">(${b.hit}/${b.total})</span></span></div>`;
+        };
+        const histCol = (pred, real, max, label) => {
+            const ph = max ? Math.max(2, (pred / max) * 100) : 0;
+            const rh = max ? Math.max(2, (real / max) * 100) : 0;
+            return `<div class="da-hist-col">
+                <div class="da-hist-bar" style="height:${ph}%"></div>
+                <div class="da-hist-bar real" style="height:${rh}%"></div>
+                <div class="da-hist-lbl">${label}</div>
+            </div>`;
+        };
+        const maxDist = Math.max(...S.predTotalDist, ...S.realTotalDist, 1);
+
+        let html = '';
+        html += `<div class="da-grid">
+            <div class="da-card"><div class="da-lbl">方向命中率</div><div class="da-val">${pct(S.wdl/S.total)}</div><div class="da-sub">${S.wdl} / ${S.total} 场</div></div>
+            <div class="da-card"><div class="da-lbl">精确比分</div><div class="da-val">${pct(S.exact/S.total)}</div><div class="da-sub">${S.exact} / ${S.total} 场</div></div>
+        </div>`;
+        html += `<div class="da-section"><div class="da-ttl">大小球 / 双方进球</div>
+            <div class="da-grid-4">
+                <div class="da-card mini"><div class="da-lbl">大 1.5</div><div class="da-val">${pct(S.ou15/S.total)}</div></div>
+                <div class="da-card mini"><div class="da-lbl">大 2.5</div><div class="da-val">${pct(S.ou25/S.total)}</div></div>
+                <div class="da-card mini"><div class="da-lbl">大 3.5</div><div class="da-val">${pct(S.ou35/S.total)}</div></div>
+                <div class="da-card mini"><div class="da-lbl">BTTS</div><div class="da-val">${pct(S.btts/S.total)}</div></div>
+            </div>
+        </div>`;
+        html += `<div class="da-section"><div class="da-ttl">分差 / 单队进球</div>
+            <div class="da-grid-3">
+                <div class="da-card mini"><div class="da-lbl">分差命中</div><div class="da-val">${pct(S.margin/S.total)}</div></div>
+                <div class="da-card mini"><div class="da-lbl">主队进球数</div><div class="da-val">${pct(S.homeGoals/S.total)}</div></div>
+                <div class="da-card mini"><div class="da-lbl">客队进球数</div><div class="da-val">${pct(S.awayGoals/S.total)}</div></div>
+            </div>
+        </div>`;
+        html += `<div class="da-section"><div class="da-ttl">进球偏差</div>
+            <div class="da-row"><span>平均预测总进球</span><span class="da-num">${S.avgPredTotal.toFixed(2)}</span></div>
+            <div class="da-row"><span>平均实际总进球</span><span class="da-num">${S.avgActualTotal.toFixed(2)}</span></div>
+            <div class="da-row ${avgBiasCls(S.avgDiffTotal)}"><span>系统性偏差</span><span class="da-num">${fmtDiff(S.avgDiffTotal)}</span></div>
+            <div class="da-hint">正数 = AI 高估进球，负数 = AI 低估</div>
+        </div>`;
+        html += `<div class="da-section"><div class="da-ttl">主客偏差</div>
+            <div class="da-row ${avgBiasCls(S.avgDiffHome)}"><span>主队平均偏差</span><span class="da-num">${fmtDiff(S.avgDiffHome)}</span></div>
+            <div class="da-row ${avgBiasCls(S.avgDiffAway)}"><span>客队平均偏差</span><span class="da-num">${fmtDiff(S.avgDiffAway)}</span></div>
+            <div class="da-hint">正数 = 高估，负数 = 低估</div>
+        </div>`;
+        html += `<div class="da-section"><div class="da-ttl">进球数分布（预测 vs 实际）</div>
+            <div class="da-hist">
+                ${S.predTotalDist.map((_, i) => histCol(S.predTotalDist[i], S.realTotalDist[i], maxDist, i === 7 ? '7+' : i)).join('')}
+            </div>
+            <div class="da-hist-legend"><span class="l-pred">AI 预测</span><span class="l-real">实际</span></div>
+        </div>`;
+        html += `<div class="da-section"><div class="da-ttl">按预测方向</div>
+            ${barRow('H', '主胜')}${barRow('D', '平局')}${barRow('A', '客胜')}
+        </div>`;
+        const confRows = confOrder.map(confRow).filter(Boolean).join('');
+        if (confRows) {
+            html += `<div class="da-section"><div class="da-ttl">按置信度</div>${confRows}</div>`;
+        }
+        html += `<div class="da-section"><div class="da-ttl">概率校准 <span style="color:var(--text-4);font-size:9px;letter-spacing:0;text-transform:none;font-style:italic">（模型说 X% 时，实际命中多少）</span></div>`;
+        const calibKeys = ['0-20','20-40','40-60','60-80','80-100'];
+        for (const k of calibKeys) {
+            const b = S.calibBins[k];
+            if (!b.pred) continue;
+            const r = b.hit / b.pred;
+            const mid = parseInt(k.split('-')[0]) + 10;
+            html += `<div class="da-calib-row">
+                <span>${k}%</span>
+                <div class="da-calib-bar">
+                    <div class="da-calib-fill" style="width:${r*100}%"></div>
+                    <div class="da-calib-ref" style="left:${mid}%" title="理想位置"></div>
+                </div>
+                <span>${pct(r)} (${b.hit}/${b.pred})</span>
+            </div>`;
+        }
+        html += `<div class="da-hint">青色竖线 = 理想位置。条形右端超过竖线 = 模型低估；不到 = 高估</div></div>`;
+        if (S.topScores.length) {
+            html += `<div class="da-section"><div class="da-ttl">最常预测的比分</div>`;
+            for (const s of S.topScores) {
+                html += `<div class="da-row"><span>${escapeHtml(s.score)} <span style="color:var(--text-4);font-size:10px">(${s.total}次)</span></span><span class="da-num">${pct(s.rate)} 命中 <span style="color:var(--text-4);font-weight:400">(${s.hit}/${s.total})</span></span></div>`;
+            }
+            html += `</div>`;
+        }
+        html += `<div class="da-section"><div class="da-ttl">连续记录</div>
+            <div class="da-row good"><span>🔥 最长连胜</span><span class="da-num">${S.maxWin} 场</span></div>
+            <div class="da-row bad"><span>❄️ 最长连败</span><span class="da-num">${S.maxLose} 场</span></div>`;
+        if (S.currentStreak.type !== null) {
+            const isWin = S.currentStreak.type;
+            html += `<div class="da-row ${isWin ? 'good' : 'bad'}"><span>当前${isWin ? '连胜' : '连败'}</span><span class="da-num">${S.currentStreak.count} 场</span></div>`;
+        }
+        html += `<div class="da-row"><span>近 5 场命中率</span><span class="da-num ${S.recent5Rate >= 0.6 ? 'good' : S.recent5Rate <= 0.4 ? 'bad' : ''}">${pct(S.recent5Rate)}</span></div>`;
+        html += `</div>`;
+
+        // 球队攻防数据
+        const teamAtk = computeTeamAttackStats();
+        if (teamAtk.length) {
+            html += `<div class="da-section"><div class="da-ttl">球队攻防数据（本赛季累计，实时）</div>
+                <div style="overflow-x:auto;margin:0 -8px">
+                <table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px">
+                <thead><tr style="border-bottom:1px solid var(--border)">
+                    <th style="text-align:left;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px;letter-spacing:.12em;text-transform:uppercase">球队</th>
+                    <th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">场均进</th>
+                    <th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">场均失</th>
+                    <th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">零封</th>
+                    <th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">大2.5</th>
+                    <th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">BTTS</th>
+                    <th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">场次</th>
+                </tr></thead><tbody>
+                ${teamAtk.map(t => `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
+                    <td style="padding:6px 8px;color:var(--text);font-weight:500">${escapeHtml(t.team)}</td>
+                    <td style="padding:6px 8px;text-align:right;color:var(--amber);font-family:var(--font-mono)">${t.avgGF.toFixed(2)}</td>
+                    <td style="padding:6px 8px;text-align:right;color:var(--rose);font-family:var(--font-mono)">${t.avgGA.toFixed(2)}</td>
+                    <td style="padding:6px 8px;text-align:right;color:var(--emerald);font-family:var(--font-mono)">${t.cleanSheets}</td>
+                    <td style="padding:6px 8px;text-align:right;font-family:var(--font-mono)">${t.over25Rate}%</td>
+                    <td style="padding:6px 8px;text-align:right;font-family:var(--font-mono)">${t.bttsRate}%</td>
+                    <td style="padding:6px 8px;text-align:right;color:var(--text-4);font-family:var(--font-mono)">${t.played}</td>
+                </tr>`).join('')}
+                </tbody></table></div>
+                <div class="da-hint">按场均进球排序 · 实时计算自 data.json</div>
+            </div>`;
+        }
+
+        if (S.bestRound || S.bestTeam) {
+            html += `<div class="da-section"><div class="da-ttl">最佳 / 最差</div>`;
+            if (S.bestRound) html += `<div class="da-row good"><span>🏆 最准轮次</span><span class="da-num">第 ${S.bestRound.round} 轮（${pct(S.bestRound.rate)}）</span></div>`;
+            if (S.worstRound) html += `<div class="da-row bad"><span>⚠️ 最不准轮次</span><span class="da-num">第 ${S.worstRound.round} 轮（${pct(S.worstRound.rate)}）</span></div>`;
+            if (S.bestTeam) html += `<div class="da-row good"><span>✅ 最准球队</span><span class="da-num">${escapeHtml(S.bestTeam.team)}（${pct(S.bestTeam.rate)}）</span></div>`;
+            if (S.worstTeam) html += `<div class="da-row bad"><span>❌ 最不准球队</span><span class="da-num">${escapeHtml(S.worstTeam.team)}（${pct(S.worstTeam.rate)}）</span></div>`;
+            html += `</div>`;
+        }
+        box.innerHTML = html;
+    }
+
+    function toggleDeepAnalysis(){
+        const el = document.getElementById('deepAnalysis');
+        if (!el) return;
+        el.classList.toggle('open');
+        if (el.classList.contains('open')) renderDeepAnalysis();
+    }
+
+    /* ═══════════════════════════════════════════
+       实时同步：从 data.json 的 RESULTS 自动填充历史
+    ═══════════════════════════════════════════ */
+    function findActualScore(home, away){
+        const key = `${home}|${away}`;
+        for (const rk of Object.keys(RESULTS)) {
+            const ro = RESULTS[rk];
+            if (!ro || typeof ro !== 'object') continue;
+            if (ro[key]) {
+                const sc = ro[key];
+                let hg, ag;
+                if (Array.isArray(sc)) { hg = +sc[0]; ag = +sc[1]; }
+                else if (typeof sc === 'string') { const p = sc.split(/[-:]/); hg = +p[0]; ag = +p[1]; }
+                else if (sc && typeof sc === 'object') { hg = +(sc.home ?? sc[0]); ag = +(sc.away ?? sc[1]); }
+                if (Number.isFinite(hg) && Number.isFinite(ag)) return `${hg}-${ag}`;
+            }
+        }
+        return null;
+    }
+    function syncActualsToHistory(silent = false){
+        const hist = getHistory();
+        let count = 0;
+        for (const rec of hist) {
+            if (rec.actual) continue;
+            const actual = findActualScore(rec.home, rec.away);
+            if (actual) { rec.actual = actual; count++; }
+        }
+        if (count > 0) {
+            setHistory(hist);
+            if (!silent) toast(`✅ 已自动同步 ${count} 场实际比分`, 'ok', 4500);
+            return count;
+        }
+        return 0;
+    }
+    function manualSync(){
+        const n = syncActualsToHistory(false);
+        refreshDashboard();
+        if (document.getElementById('histMask').classList.contains('show')) renderHistory();
+        if (n === 0) toast('暂无新结果', 'warn', 2500);
+    }
+
+    let _lastDataUpdatedAt = null;
+    async function pollDataUpdate(){
+        try {
+            const res = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (!data.updatedAt) return;
+            if (_lastDataUpdatedAt === null) { _lastDataUpdatedAt = data.updatedAt; return; }
+            if (_lastDataUpdatedAt === data.updatedAt) return;
+            _lastDataUpdatedAt = data.updatedAt;
+            if (data.results && typeof data.results === 'object') {
+                Object.keys(RESULTS).forEach(k => delete RESULTS[k]);
+                Object.assign(RESULTS, data.results);
+                _last5Cache = null;
+            }
+            if (Array.isArray(data.standings) && data.standings.length) STATIC_STANDINGS = data.standings;
+            if (Array.isArray(data.fixtures) && data.fixtures.length) {
+                FIXTURES.length = 0;
+                FIXTURES.push(...data.fixtures);
+            }
+            const n = syncActualsToHistory(true);
+            renderStandings(STATIC_STANDINGS);
+            refreshDashboard();
+            if (document.getElementById('histMask').classList.contains('show')) {
+                renderHistory();
+                renderDeepAnalysis();
+            }
+            if (_lastResult) renderResult(_lastResult.d, _lastResult.ctx);
+            if (n > 0) toast(`🔄 自动同步 ${n} 场新结果`, 'ok', 4000);
+            else toast('🔄 数据已更新', 'ok', 2500);
+        } catch(e){ /* 静默 */ }
+    }
+
     function renderHistory(){
         const raw = getHistory();
         const judged = raw.map((h,i) => ({ h, j: judge(h), i }));
@@ -1751,9 +2342,35 @@
             box.innerHTML = list.map(({h,j,i:realIdx}) => {
                 const labels = { exact:'精确命中', wdl:'胜平负命中', miss:'未命中', pending:'待录入' };
                 const multi = h._multi && h._multi > 1 ? `<span class="multi">×${h._multi}</span>` : '';
+                const a = analyzeRecord(h);
+                let vsHtml = '';
+                let devHtml = '';
+                let badgesHtml = '';
+                if (h.actual) {
+                    const cls = a.verdict === 'exact' ? 'hit' : a.verdict === 'miss' ? 'miss' : '';
+                    vsHtml = `<div class="vs-row">
+        <div class="vs-side pred"><div class="vs-lbl">AI 预测</div><div class="vs-score">${escapeHtml(h.score)}</div></div>
+        <div class="vs-arrow">→</div>
+        <div class="vs-side real ${cls}"><div class="vs-lbl">实际</div><div class="vs-score">${escapeHtml(h.actual)}</div></div>
+      </div>`;
+                    const badges = [
+                        { hit: a.hitOU25, label: '大小球 2.5' },
+                        { hit: a.hitBTTS, label: 'BTTS' },
+                        { hit: a.hitMargin, label: '分差' },
+                        { hit: a.hitHomeGoals, label: '主队进球' },
+                        { hit: a.hitAwayGoals, label: '客队进球' }
+                    ];
+                    badgesHtml = `<div style="display:flex;flex-wrap:wrap;gap:4px;margin:6px 0">` +
+                        badges.map(b => `<span class="da-badge ${b.hit ? 'hit' : 'miss'}">${b.hit ? '✓' : '✗'} ${b.label}</span>`).join('') +
+                        `</div>`;
+                    devHtml = `<div class="deviations">${a.deviations.map(d => `<div class="dev-item ${d.type}">${d.text}</div>`).join('')}</div>`;
+                }
                 return `<div class="hitem">
         <div class="top"><div class="teams2">${escapeHtml(h.home)} vs ${escapeHtml(h.away)}${multi}</div><div class="res-badge ${j}">${labels[j]}</div></div>
-        <div class="meta">预测 ${escapeHtml(h.score)} · ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
+        ${vsHtml}
+        ${badgesHtml}
+        ${devHtml}
+        <div class="meta">预测概率 ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div>
         <div class="row2">
           <input placeholder="实际比分 如 2-1" value="${escapeHtml(h.actual || '')}" onchange="setActual(${realIdx}, this.value)" aria-label="实际比分">
           <button onclick="delHistory(${realIdx})">删除</button>
@@ -1769,6 +2386,7 @@
         document.getElementById('sWdl').textContent = done ? Math.round(wdl/done*100)+'%' : '0%';
         document.getElementById('sExact').textContent = done ? Math.round(exact/done*100)+'%' : '0%';
         renderTrendChart();
+        renderDeepAnalysis();
     }
     function renderTrendChart(){
         const svg = document.getElementById('trendContent');
@@ -1888,6 +2506,28 @@
             ? `<img class="badge-big" src="${url}" alt="${escapeHtml(team)}" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
             : `<div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:18px;color:var(--text-2)">${escapeHtml(abbr)}</div>`;
         const formHtml = form.length ? form.map(r => `<span class="l5-cell ${r}">${r}</span>`).join('') : '<span style="color:var(--text-4);font-size:12px">暂无战绩</span>';
+        const attackStats = computeTeamAttackStats().find(t => t.team === team) || { avgGF: 0, avgGA: 0, cleanSheets: 0, over25Rate: 0, bttsRate: 0, played: 0, avgHomeGF:0, avgHomeGA:0, homePlayed:0, avgAwayGF:0, avgAwayGA:0, awayPlayed:0 };
+        const attackHtml = `<div class="team-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:var(--sp-3)">
+            <div class="stat-box"><div class="n" style="color:var(--amber)">${attackStats.avgGF.toFixed(2)}</div><div class="l">场均进球</div></div>
+            <div class="stat-box"><div class="n" style="color:var(--rose)">${attackStats.avgGA.toFixed(2)}</div><div class="l">场均失球</div></div>
+            <div class="stat-box"><div class="n" style="color:var(--emerald)">${attackStats.cleanSheets}</div><div class="l">零封场次</div></div>
+        </div>
+        <div class="team-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:var(--sp-3)">
+            <div class="stat-box"><div class="n" style="color:var(--amber)">${attackStats.over25Rate}%</div><div class="l">大 2.5 球率</div></div>
+            <div class="stat-box"><div class="n" style="color:var(--cyan)">${attackStats.bttsRate}%</div><div class="l">双方进球率</div></div>
+        </div>
+        <div class="team-stats" style="grid-template-columns:repeat(2,1fr);margin-bottom:var(--sp-3);background:rgba(255,255,255,.02);padding:var(--sp-3);border-radius:var(--r-md);border:1px solid var(--border)">
+            <div style="text-align:center">
+                <div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--cyan);margin-bottom:6px">主场</div>
+                <div style="font-family:var(--font-serif);font-size:16px;color:var(--text)">${attackStats.avgHomeGF.toFixed(2)} 进 · ${attackStats.avgHomeGA.toFixed(2)} 失</div>
+                <div style="font-size:10px;color:var(--text-4);margin-top:2px">${attackStats.homePlayed} 场</div>
+            </div>
+            <div style="text-align:center">
+                <div style="font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px">客场</div>
+                <div style="font-family:var(--font-serif);font-size:16px;color:var(--text)">${attackStats.avgAwayGF.toFixed(2)} 进 · ${attackStats.avgAwayGA.toFixed(2)} 失</div>
+                <div style="font-size:10px;color:var(--text-4);margin-top:2px">${attackStats.awayPlayed} 场</div>
+            </div>
+        </div>`;
         const recentHtml = recent.slice(0, 8).map(r => `
     <div class="recent-item">
       <span>第 ${r.round} 轮 · ${r.isHome ? '主' : '客'} vs ${escapeHtml(r.opp)}</span>
@@ -1911,6 +2551,7 @@
       <div class="stat-box"><div class="n">${standing?.lost ?? 0}</div><div class="l">负</div></div>
       <div class="stat-box"><div class="n">${standing?.gf ?? 0}:${standing?.ga ?? 0}</div><div class="l">进:失</div></div>
     </div>
+    ${attackHtml}
     <div class="form-row"><span class="lbl3">近 5 场</span><span class="last5">${formHtml}</span></div>
     <div class="form-row" style="flex-direction:column;align-items:stretch;gap:var(--sp-2)">
       <div style="display:flex;justify-content:space-between;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);font-weight:600">
@@ -1986,7 +2627,14 @@
         const runs = [];
         for (let k = 0; k < batchN; k++) {
             try {
-                const userPrompt = (intel ? `【今日情报】\n${intel}\n\n` : '') + `【预测指令】\n请预测：第 ${r+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
+                const teamStats = computeTeamAttackStats();
+                const homeAtk = teamStats.find(t => t.team === home);
+                const awayAtk = teamStats.find(t => t.team === away);
+                const atkContext = (homeAtk || awayAtk) ? `【实时攻防数据】\n` +
+                    (homeAtk ? `${home}：进 ${homeAtk.avgGF.toFixed(2)}/失 ${homeAtk.avgGA.toFixed(2)}，零封 ${homeAtk.cleanSheets}，大2.5率 ${homeAtk.over25Rate}%\n` : '') +
+                    (awayAtk ? `${away}：进 ${awayAtk.avgGF.toFixed(2)}/失 ${awayAtk.avgGA.toFixed(2)}，零封 ${awayAtk.cleanSheets}，大2.5率 ${awayAtk.over25Rate}%\n` : '') + `\n` : '';
+                const userPrompt = (intel ? `【今日情报】\n${intel}\n\n` : '') + atkContext +
+                    `【预测指令】\n请预测：第 ${r+1} 轮  ${home} vs ${away}\n严格按 skill.md 输出契约返回 JSON。`;
                 const raw = await callGroq(skill, userPrompt);
                 const p = JSON.parse(raw);
                 const v = validateAndNormalizePrediction(p);
@@ -2003,6 +2651,9 @@
             keyFactors: runs[0].keyFactors,
             analysis: runs[0].analysis,
             headToHead: runs[0].headToHead,
+            likelyScorers: runs[0].likelyScorers,
+            homeKeyPlayers: runs[0].homeKeyPlayers,
+            awayKeyPlayers: runs[0].awayKeyPlayers,
             _runs: runs.map(x => x.score),
             _multi: batchN
         };
@@ -2058,6 +2709,7 @@
             { icon:'🎨', label:'切换氛围开关', action: () => { toggleAmbient(); closeCmd(); toast('氛围已' + (Ambient.isEnabled() ? '开启' : '关闭')); } },
             { icon:'📋', label:'复制当前预测', action: () => { copyResult(); closeCmd(); } },
             { icon:'📷', label:'生成分享图', action: () => { generateShareCard(); closeCmd(); } },
+            { icon:'🔄', label:'立即同步数据', action: () => { manualSync(); closeCmd(); } },
             { icon:'🔑', label:'保存 API Key', action: () => { saveKey(); closeCmd(); } },
             { icon:'🗑️', label:'清除 API Key', action: () => { clearKey(); closeCmd(); } },
             { icon:'📤', label:'导出历史记录', action: () => { exportHistory(); closeCmd(); } },
@@ -2178,7 +2830,6 @@
         Ambient.init();
         LoadingBar.start();
 
-        // 首次访问轻量提示
         if (!localStorage.getItem('pl_welcomed')) {
             setTimeout(() => {
                 toast('👋 第一次用？先填 Groq API Key，再选比赛 →', 'ok', 6500);
@@ -2209,7 +2860,6 @@
             document.querySelectorAll('#histFilters button').forEach(x => x.classList.toggle('on', x === b));
             renderHistory();
         });
-        // intel 字数统计
         const intelEl = document.getElementById('intel');
         const intelCountEl = document.getElementById('intelCount');
         const intelBoxEl = document.getElementById('intelCountBox');
@@ -2222,7 +2872,6 @@
         intelEl.addEventListener('input', updateIntelCount);
         updateIntelCount();
 
-        // 事件委托：点击积分榜任意行打开球队详情
         document.getElementById('standings').addEventListener('click', e => {
             const tr = e.target.closest('tr[data-team]');
             if (tr) openTeamModal(tr.dataset.team);
@@ -2235,7 +2884,25 @@
 
         await loadExternalData();
 
-        // URL 状态恢复
+        const n0 = syncActualsToHistory(true);
+        if (n0 > 0) {
+            renderStandings(STATIC_STANDINGS);
+            refreshDashboard();
+            setTimeout(() => toast(`✅ 已自动同步 ${n0} 场结果`, 'ok', 4500), 2600);
+        }
+
+        try {
+            const r0 = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
+            if (r0.ok) {
+                const d0 = await r0.json();
+                _lastDataUpdatedAt = d0.updatedAt || null;
+            }
+        } catch(e){}
+        setInterval(pollDataUpdate, 5 * 60 * 1000);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) pollDataUpdate();
+        });
+
         const urlState = readURL();
         if (urlState && FIXTURES[urlState.round]?.[urlState.match] !== undefined) {
             document.getElementById('roundSel').value = urlState.round;
