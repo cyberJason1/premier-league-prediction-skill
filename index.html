@@ -23,19 +23,16 @@
                     repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0 1px,transparent 1px 60px);
         }
         .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:32px 22px 120px}
-        /* HERO */
         .hero{padding:28px 8px 22px;border-bottom:1px solid var(--line)}
         .hero .kick{font-size:12px;letter-spacing:.28em;color:var(--orange);text-transform:uppercase;font-weight:700}
         .hero h1{font-family:Georgia,"Times New Roman",serif;font-size:52px;line-height:1.05;font-weight:400;margin:10px 0 6px;letter-spacing:-.02em}
         .hero h1 em{font-style:italic;color:var(--orange)}
         .hero p{color:var(--txt2);font-size:14px;margin-top:6px}
-        /* DASHBOARD */
         .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0 26px}
         .cell{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;backdrop-filter:blur(12px)}
         .cell .lbl{font-size:11px;letter-spacing:.2em;color:var(--txt3);text-transform:uppercase}
         .cell .val{font-family:Georgia,serif;font-size:32px;color:var(--txt);margin-top:6px;line-height:1}
         .cell .val.orange{color:var(--orange)} .cell .val.blue{color:var(--blue)}
-        /* GRID */
         .grid{display:grid;grid-template-columns:400px 1fr;gap:22px}
         @media(max-width:920px){.grid{grid-template-columns:1fr}.hero h1{font-size:38px}.dash{grid-template-columns:repeat(2,1fr)}}
         .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px;backdrop-filter:blur(12px)}
@@ -49,19 +46,17 @@
         .btn:hover{transform:translateY(-1px);filter:brightness(1.08)}
         .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
         .btn.ghost{background:transparent;color:var(--txt2);border:1px solid var(--line2)}
-        /* RESULT */
         .empty{color:var(--txt3);text-align:center;padding:60px 10px;font-size:14px}
         .scoreboard{text-align:center;padding:14px 0 20px;border-bottom:1px solid var(--line);margin-bottom:18px}
         .teams{display:flex;align-items:center;justify-content:center;gap:22px}
         .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px}
-        .badge{width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5));transition:transform .25s;position:relative}
+        .badge{width:88px;height:88px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5));transition:transform .25s;position:relative;display:block}
         .badge:hover{transform:scale(1.08)}
         .team .fallback{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:22px;color:var(--txt2);letter-spacing:.05em}
         .team .nm{font-size:14px;font-weight:600}
         .score{font-family:Georgia,serif;font-size:56px;color:var(--green);text-shadow:0 0 24px rgba(0,255,136,.35);letter-spacing:.02em;white-space:nowrap}
         .score.pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
         @keyframes pop{0%{transform:scale(.4);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1)}}
-        /* RINGS */
         .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
         .ring{background:rgba(10,15,26,.6);border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
         .ring svg{width:96px;height:96px;transform:rotate(-90deg)}
@@ -71,7 +66,6 @@
         .ring .lbl2{font-size:11px;letter-spacing:.18em;color:var(--txt3);text-transform:uppercase;margin-top:8px}
         .ring .num{font-family:Georgia,serif;font-size:24px;margin-top:2px}
         .ring.h .num{color:var(--orange)} .ring.d .num{color:var(--txt2)} .ring.a .num{color:var(--blue)}
-        /* SECTIONS */
         .sect{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
         .sect .ttl{font-size:11px;letter-spacing:.22em;color:var(--txt3);text-transform:uppercase;font-weight:700;margin-bottom:10px}
         .kv{color:var(--txt);font-size:14px;line-height:1.7}
@@ -82,7 +76,6 @@
         .conf.中高{background:rgba(0,212,255,.14);color:var(--blue);border:1px solid rgba(0,212,255,.3)}
         .conf.中{background:rgba(255,182,72,.14);color:var(--gold);border:1px solid rgba(255,182,72,.3)}
         .conf.低{background:rgba(244,63,94,.14);color:var(--red);border:1px solid rgba(244,63,94,.3)}
-        /* H2H */
         .h2h{border:1px solid rgba(139,92,246,.35);background:rgba(139,92,246,.06);border-radius:12px;padding:14px 16px;position:relative}
         .h2h .tag{position:absolute;top:-9px;right:12px;font-size:10px;padding:3px 8px;border-radius:6px;letter-spacing:.1em;font-weight:700}
         .h2h .tag.估算{background:rgba(255,182,72,.18);color:var(--gold);border:1px solid rgba(255,182,72,.4)}
@@ -92,7 +85,6 @@
         .h2h ul{list-style:none;font-size:13px;color:var(--txt2)}
         .h2h li{padding:3px 0}
         .h2h li::before{content:"›";color:var(--purple);margin-right:8px;font-weight:700}
-        /* PLAYERS */
         .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
         .pcard{background:linear-gradient(160deg,rgba(255,107,53,.14),rgba(0,212,255,.08));border:1px solid var(--line2);border-radius:12px;padding:12px;transition:transform .2s,box-shadow .2s}
         .pcard:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.4)}
@@ -102,7 +94,6 @@
         .pcard .rt{margin-top:8px;display:flex;align-items:center;gap:8px}
         .pcard .rating{font-family:Georgia,serif;font-size:22px;color:var(--orange);font-weight:700}
         .pcard .note{font-size:11px;color:var(--txt2);line-height:1.5;margin-top:6px}
-        /* STANDINGS */
         .standings{font-size:13px}
         .standings table{width:100%;border-collapse:collapse}
         .standings th{color:var(--txt3);font-size:10px;letter-spacing:.15em;text-transform:uppercase;text-align:left;padding:6px 6px;border-bottom:1px solid var(--line)}
@@ -110,7 +101,6 @@
         .standings td:first-child{font-family:Georgia,serif;color:var(--txt2);width:26px}
         .standings tr.ucl td:first-child{color:var(--green)}
         .standings tr.rel td:first-child{color:var(--red)}
-        /* LOADER */
         .loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:50px 0}
         .ball{width:46px;height:46px;border-radius:50%;background:
                 radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),
@@ -120,7 +110,6 @@
         @keyframes bounce{to{transform:translateY(-22px)}}
         @keyframes spin{to{transform:rotate(360deg)}}
         .loader .msg{font-size:13px;color:var(--txt2);letter-spacing:.05em}
-        /* FLOAT BTNS */
         .fab{position:fixed;right:24px;width:52px;height:52px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.45);transition:transform .2s,filter .2s;z-index:60}
         .fab:hover{transform:translateY(-2px) scale(1.05);filter:brightness(1.1)}
         .fab.hist{bottom:24px;background:linear-gradient(135deg,#ff6b35,#ff8b5a);color:#1a0f08}
@@ -128,7 +117,6 @@
         .fab.top{bottom:152px;background:rgba(255,255,255,.12);border:1px solid var(--line2);opacity:0;pointer-events:none;transition:opacity .25s}
         .fab.top.show{opacity:1;pointer-events:auto}
         .fab .badge-n{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
-        /* MODAL */
         .mask{position:fixed;inset:0;background:rgba(3,5,10,.78);backdrop-filter:blur(6px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:40px 18px;overflow-y:auto}
         .mask.show{display:flex}
         .modal{background:#0b1220;border:1px solid var(--line2);border-radius:18px;max-width:760px;width:100%;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
@@ -153,7 +141,6 @@
         .hitem input{padding:7px 10px;font-size:13px;text-align:center}
         .hitem button{padding:7px 12px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--txt2);font-size:12px;cursor:pointer}
         .hitem button:hover{border-color:var(--orange);color:var(--orange)}
-        /* BATCH */
         .batch-opts{display:flex;gap:8px;margin:12px 0}
         .batch-opts button{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--txt2);cursor:pointer;font-weight:700}
         .batch-opts button.on{border-color:var(--orange);background:rgba(255,107,53,.14);color:var(--orange)}
@@ -161,14 +148,12 @@
         .quota.ok{background:rgba(0,255,136,.1);color:var(--green)}
         .quota.warn{background:rgba(255,182,72,.12);color:var(--gold)}
         .quota.bad{background:rgba(244,63,94,.12);color:var(--red)}
-        /* TOAST */
         .toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none}
         .toast{background:#0d1522;border:1px solid var(--line2);color:var(--txt);padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:slidein .3s ease}
         .toast.ok{border-color:rgba(0,255,136,.5)} .toast.ok::before{content:"✅ ";margin-right:4px}
         .toast.warn{border-color:rgba(255,182,72,.5)} .toast.warn::before{content:"⚠️ ";margin-right:4px}
         .toast.err{border-color:rgba(244,63,94,.5)} .toast.err::before{content:"❌ ";margin-right:4px}
         @keyframes slidein{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
-        /* VERSION BAR */
         .verbar{position:fixed;top:0;left:0;right:0;z-index:300;background:#ffb648;color:#000;padding:8px 16px;font-size:13px;text-align:center;font-weight:600}
     </style>
 </head>
@@ -189,7 +174,6 @@
     </div>
 
     <div class="grid">
-        <!-- LEFT -->
         <div class="card">
             <h3>Groq API Key</h3>
             <div class="field">
@@ -218,25 +202,21 @@
             <button class="btn" id="predictBtn" onclick="startPredict()">开始预测</button>
         </div>
 
-        <!-- RIGHT -->
         <div class="card" id="resultCard">
             <div class="empty">选择比赛 → 填写情报 → 开始预测</div>
         </div>
     </div>
 
-    <!-- STANDINGS -->
     <div class="card" style="margin-top:22px">
         <h3>积分榜</h3>
         <div class="standings" id="standings"><div class="empty">加载中…</div></div>
     </div>
 </div>
 
-<!-- FABS -->
 <button class="fab hist" onclick="openHistory()">📊<span class="badge-n" id="histBadge" style="display:none">0</span></button>
 <button class="fab batch" onclick="openBatch()">⚡</button>
 <button class="fab top" id="topBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
-<!-- HISTORY MODAL -->
 <div class="mask" id="histMask">
     <div class="modal">
         <button class="close" onclick="closeHistory()">✕</button>
@@ -257,7 +237,6 @@
     </div>
 </div>
 
-<!-- BATCH MODAL -->
 <div class="mask" id="batchMask">
     <div class="modal">
         <button class="close" onclick="closeBatch()">✕</button>
@@ -295,15 +274,12 @@
         '水晶宫':384,'布伦特福德':337,'伯恩茅斯':349,'诺丁汉森林':393,'利兹联':357,
         '桑德兰':366,'考文垂城':388,'赫尔城':306,'伊普斯维奇镇':373
     };
-
-    // 20 队真实 2026-27 英超（football-data.org 会覆盖）
     const TEAMS = ['阿森纳','曼城','利物浦','切尔西','热刺','曼联','纽卡斯尔联','阿斯顿维拉',
         '布莱顿','埃弗顿','富勒姆','水晶宫','布伦特福德','伯恩茅斯','诺丁汉森林',
         '利兹联','桑德兰','考文垂城','赫尔城','伊普斯维奇镇'];
 
     /* ========================================================
-       1. 赛程生成（38 轮 380 场）—— update.js / Actions 会替换
-          若使用云端自动更新，下面 FIXTURES 会被覆盖
+       1. 赛程（update.js 会覆盖）
     ======================================================== */
     const FIXTURES = (function(){
         const out = [];
@@ -324,11 +300,9 @@
         return [...out, ...second];
     })();
 
-    // RESULTS: { "阿森纳|考文垂城": "3-0", ... }
     const RESULTS = {};
 
-    // 初始积分榜（会被 update.js 覆盖）
-    const STATIC_STANDINGS = TEAMS.map((t,i) => ({
+    const STATIC_STANDINGS = TEAMS.map(t => ({
         team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0
     }));
 
@@ -482,8 +456,14 @@
         rs.addEventListener('change', () => {
             localStorage.setItem('last_round', rs.value);
             fillMatches();
+            refreshDashboard();
         });
         fillMatches();
+        document.getElementById('matchSel').addEventListener('change', () => {
+            const r = +document.getElementById('roundSel').value || 0;
+            localStorage.setItem('last_match_'+r, document.getElementById('matchSel').value);
+            refreshDashboard();
+        });
     }
     function fillMatches(){
         const r = +document.getElementById('roundSel').value || 0;
@@ -492,7 +472,6 @@
             `<option value="${i}">${m.home} vs ${m.away}</option>`).join('');
         const saved = localStorage.getItem('last_match_'+r);
         if (saved !== null && FIXTURES[r][+saved]) ms.value = saved;
-        ms.addEventListener('change', () => localStorage.setItem('last_match_'+r, ms.value), { once:true });
     }
     function currentMatch(){
         const r = +document.getElementById('roundSel').value || 0;
@@ -560,12 +539,19 @@
         const id = ESPN_IDS[name];
         return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null;
     }
+
+    /* --- 修复后的 badgeHtml：referrerpolicy + 实体转义 + onerror 防循环 --- */
     function badgeHtml(name){
         const url = espnUrl(name);
-        const abbr = ABBR[name] || name.slice(0,3);
+        const abbr = ABBR[name] || String(name).slice(0,3);
         if (!url) return `<div class="fallback">${abbr}</div>`;
-        return `<img class="badge" src="${url}" alt="${name}" onerror="this.outerHTML='<div class=\\'fallback\\'>${abbr}</div>'">`;
+        const safeName = String(name).replace(/"/g,'&quot;');
+        return `<img class="badge" src="${url}" alt="${safeName}"
+    referrerpolicy="no-referrer"
+    loading="eager"
+    onerror="this.onerror=null;this.outerHTML='&lt;div class=&quot;fallback&quot;&gt;${abbr}&lt;/div&gt;'">`;
     }
+
     function confClass(c){
         if (c === '高') return '高';
         if (c === '中高') return '中高';
@@ -595,7 +581,7 @@
       <svg viewBox="0 0 96 96">
         <circle class="track" cx="48" cy="48" r="${R}"></circle>
         <circle class="bar" cx="48" cy="48" r="${R}" stroke="${color}"
-          stroke-dasharray="${C}" stroke-dashoffset="${C}"></circle>
+          stroke-dasharray="${C}" stroke-dashoffset="${off}"></circle>
       </svg>
       <div class="lbl2">${cls==='h'?'主胜':cls==='d'?'平局':'客胜'}</div>
       <div class="num">${pct}%</div>
@@ -616,7 +602,7 @@
 
         const homePlayers = d.homeKeyPlayers || d.homePlayers || [];
         const awayPlayers = d.awayKeyPlayers || d.awayPlayers || [];
-        const players = [...homePlayers.map(p=>({...p,_side:'home'})), ...awayPlayers.map(p=>({...p,_side:'away'}))];
+        const players = [...homePlayers, ...awayPlayers];
         const playersHtml = players.length ? `
     <div class="sect">
       <div class="ttl">本场焦点球员</div>
@@ -659,14 +645,6 @@
 
     ${playersHtml}
   `;
-
-        requestAnimationFrame(() => {
-            card.querySelectorAll('.ring .bar').forEach((el,i) => {
-                const pct = [h,dr,a][i];
-                const R = 42, C = 2*Math.PI*R;
-                el.style.strokeDashoffset = C * (1 - pct/100);
-            });
-        });
     }
 
     /* ========================================================
@@ -722,9 +700,7 @@
         catch { return []; }
     }
     function setHistory(list){
-        if (list.length > 500) {
-            toast('记录超过 500 条，建议导出后清空', 'warn');
-        }
+        if (list.length > 500) toast('记录超过 500 条，建议导出后清空', 'warn');
         localStorage.setItem(HIST_KEY, JSON.stringify(list.slice(-800)));
     }
     function addHistory(rec){
@@ -881,7 +857,7 @@
                         const p = JSON.parse(raw);
                         const v = validateAndNormalizePrediction(p);
                         if (v.ok) runs.push(v.data);
-                    } catch(e){ /* 单次失败忽略 */ }
+                    } catch(e){ /* 忽略单次失败 */ }
                 }
                 if (runs.length) {
                     const agg = {
@@ -911,7 +887,7 @@
     }
 
     /* ========================================================
-       14. 悬浮返回顶部
+       14. 返回顶部按钮
     ======================================================== */
     window.addEventListener('scroll', () => {
         document.getElementById('topBtn').classList.toggle('show', window.scrollY > 400);
@@ -927,9 +903,6 @@
         initSelectors();
         renderStandings(STATIC_STANDINGS);
         refreshDashboard();
-
-        document.getElementById('roundSel').addEventListener('change', refreshDashboard);
-        document.getElementById('matchSel').addEventListener('change', refreshDashboard);
     })();
 </script>
 </body>
