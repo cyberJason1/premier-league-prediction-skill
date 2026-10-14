@@ -5,7 +5,7 @@
  * 用法：FD_TOKEN=你的密钥 node update.js
  *
  * 最后更新：2026-10-14
- * 特性：断点续传 + 429 自动等待 + 单次批量限制
+ * 特性：断点续传 + 429 自动等待 + 单次批量限制 + 手动补照片
  */
 
 const fs = require('fs');
@@ -67,6 +67,7 @@ const PLAYER_NAME_MAP = {
     '卡尔弗特-勒温': 'Dominic Calvert-Lewin',
     '蒂耶尔诺·巴里': 'Thierno Barry',
     '塔科夫斯基': 'James Tarkowski',
+    '皮克福德': 'Jordan Pickford',
     // 富勒姆
     '希门尼斯': 'Raul Jimenez',
     // 水晶宫
@@ -95,6 +96,31 @@ const PLAYER_NAME_MAP = {
     'Tzolakis': 'Konstantinos Tzolakis',
     // 伊普斯维奇
     '杰克·克拉克': 'Jack Clarke'
+};
+
+// ─────────────────────────────────────────────
+// 手动补照片（TheSportsDB 找不到的球员）
+//
+// ⚠️ 下面的 ID 需要通过验证：
+//   1. 浏览器打开对应的 URL
+//   2. 如果显示的是正确的球员照片 → ID 对了
+//   3. 如果显示 404 或别的球员 → 去下面网址查 ID：
+//      https://www.espn.com/soccer/ 搜索球员英文名
+//      球员主页地址栏 /player/_/id/{数字}/ 里的数字就是 ID
+//
+// ⚠️ 如果照片加载失败，前端会自动回退到名字缩写（不影响使用）
+// ─────────────────────────────────────────────
+const FALLBACK_PHOTOS = {
+    // 切尔西
+    '若昂·佩德罗': 'https://a.espncdn.com/i/headshots/soccer/players/full/259428.png',
+    '摩根·罗杰斯': 'https://a.espncdn.com/i/headshots/soccer/players/full/267928.png',
+    '帕尔默': 'https://a.espncdn.com/i/headshots/soccer/players/full/254436.png',
+
+    // 热刺
+    '麦迪逊': 'https://a.espncdn.com/i/headshots/soccer/players/full/193110.png',
+
+    // 埃弗顿
+    '皮克福德': 'https://a.espncdn.com/i/headshots/soccer/players/full/159443.png',
 };
 
 // ─────────────────────────────────────────────
@@ -161,7 +187,7 @@ async function fetchFromApi(token){
 }
 
 // ─────────────────────────────────────────────
-// TheSportsDB 球员照片拉取（断点续传 + 限速保护）
+// TheSportsDB 球员照片拉取（断点续传 + 限速保护 + 手动补照片）
 // ─────────────────────────────────────────────
 async function fetchPlayerPhotos(){
     // 1. 读取现有缓存（断点续传）
@@ -174,18 +200,19 @@ async function fetchPlayerPhotos(){
         }
     } catch (e) { /* 首次运行，无旧文件 */ }
 
-    const photos = { ...existingPhotos };
+    // 2. 合并：FALLBACK_PHOTOS 优先覆盖（保证手动补的照片一定生效）
+    const photos = { ...existingPhotos, ...FALLBACK_PHOTOS };
     const allEntries = Object.entries(PLAYER_NAME_MAP);
     const missing = allEntries.filter(([zh]) => !photos[zh]);
 
-    console.log(`📸 已有 ${Object.keys(existingPhotos).length} 张，待拉取 ${missing.length} 张`);
+    console.log(`📸 已有 ${Object.keys(existingPhotos).length} 张，手动补 ${Object.keys(FALLBACK_PHOTOS).length} 张，待拉取 ${missing.length} 张`);
 
     if (missing.length === 0) {
-        console.log('✅ 所有球员照片已缓存，跳过拉取');
+        console.log('✅ 所有球员照片已齐，跳过拉取');
         return photos;
     }
 
-    // 2. 单次最多拉 15 个（避免连续触发 429）
+    // 3. 单次最多拉 15 个（避免连续触发 429）
     const BATCH_LIMIT = 15;
     const batch = missing.slice(0, BATCH_LIMIT);
     if (missing.length > BATCH_LIMIT) {
@@ -229,11 +256,11 @@ async function fetchPlayerPhotos(){
                         console.log(`  ✅ ${zhName}`);
                         okCount++;
                     } else {
-                        console.log(`  ⚠️ ${zhName} 无照片字段`);
+                        console.log(`  ⚠️ ${zhName} 无照片字段（已加入 FALLBACK_PHOTOS 手动补）`);
                         missCount++;
                     }
                 } else {
-                    console.log(`  ⚠️ ${zhName} 未找到`);
+                    console.log(`  ⚠️ ${zhName} 未找到（已加入 FALLBACK_PHOTOS 手动补）`);
                     missCount++;
                 }
                 success = true;
@@ -260,7 +287,7 @@ async function fetchPlayerPhotos(){
     if (Object.keys(photos).length < allEntries.length) {
         console.log(`💡 还有 ${allEntries.length - Object.keys(photos).length} 张未拉取，再跑一次 node update.js 继续`);
     } else {
-        console.log('🎉 全部球员照片已拉齐');
+        console.log('🎉 全部球员照片已齐');
     }
 
     return photos;
@@ -316,7 +343,7 @@ async function main(){
     console.log(`   球员照片：${Object.keys(playerPhotos).length} 张`);
     console.log('下一步：');
     console.log('  git add data.json update.js');
-    console.log('  git commit -m "Update PL data + player photos"');
+    console.log('  git commit -m "v8.4.1: 球员照片 + FALLBACK 手动补照片"');
     console.log('  git push origin main');
 }
 
