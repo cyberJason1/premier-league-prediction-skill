@@ -2,7 +2,7 @@
 // 英超预测引擎 Service Worker
 // 版本号：改这个数字会触发更新（重要）
 // ============================================================
-const CACHE_VERSION = 'v9.0.0';
+const CACHE_VERSION = 'v9.1.0';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存
@@ -63,7 +63,8 @@ self.addEventListener('fetch', event => {
 
     // 2. 队徽 CDN：stale-while-revalidate（先给缓存，同时后台更新）
     if (url.hostname.includes('espncdn.com') ||
-        url.hostname.includes('thesportsdb.com')) {
+        url.hostname.includes('thesportsdb.com') ||
+        url.hostname.includes('bzzoiro.com')) {
         event.respondWith(
             caches.open(CACHE_NAME).then(cache =>
                 cache.match(req).then(cached => {
