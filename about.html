@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
     <title>关于 · 英超预测引擎</title>
 
-    <!-- OG / Twitter 分享卡 -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
@@ -27,7 +27,7 @@
             --border:rgba(255,255,255,.06);--border-hi:rgba(255,255,255,.12);
             --amber:#ff9f43;--amber-soft:rgba(255,159,67,.14);--amber-glow:rgba(255,159,67,.35);
             --cyan:#22d3ee;--emerald:#34d399;--rose:#ef4444;--violet:#a78bfa;--gold:#fbbf24;
-            --text:#f1f5f9;--text-2:#a8b5c7;--text-3:#7d8a9c;--text-4:#5a6675;
+            --text:#f1f5f9;--text-2:#b0bccd;--text-3:#8a97a8;--text-4:#616d7c;
             --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-full:999px;
             --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;
             --font-sans:"Inter",-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
@@ -42,7 +42,6 @@
         body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1200px 700px at 50% -10%,rgba(255,159,67,.1),transparent 55%),radial-gradient(900px 500px at 50% 110%,rgba(34,211,238,.06),transparent 55%)}
         body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");mix-blend-mode:overlay}
 
-        /* 固定返回按钮 */
         .back-btn{position:fixed;top:24px;left:24px;padding:10px 18px;
             background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-full);
             color:var(--text);text-decoration:none;font-size:13px;font-weight:500;
@@ -54,7 +53,6 @@
         .wrap{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:100px var(--sp-6) 120px}
         @media(max-width:640px){.wrap{padding:80px var(--sp-4) 100px}}
 
-        /* Hero */
         .hero{padding-bottom:var(--sp-10);border-bottom:1px solid var(--border);margin-bottom:var(--sp-10)}
         .hero .kick{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-3)}
         .hero h1{font-family:var(--font-serif);font-size:clamp(36px,6vw,56px);font-weight:500;line-height:1.1;letter-spacing:-.03em;margin-bottom:var(--sp-4);perspective:800px}
@@ -64,7 +62,6 @@
         @keyframes charIn{0%{opacity:0;transform:translateY(40px) rotateX(-90deg)}60%{opacity:1;transform:translateY(0) rotateX(8deg)}100%{opacity:1;transform:translateY(0) rotateX(0)}}
         .hero .lead{font-size:17px;color:var(--text-2);max-width:640px;line-height:1.7}
 
-        /* Section */
         section{margin-bottom:var(--sp-12);opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
         section.visible{opacity:1;transform:none}
         section h2{font-family:var(--font-serif);font-size:clamp(24px,3.5vw,32px);font-weight:500;letter-spacing:-.02em;margin-bottom:var(--sp-5);position:relative;padding-left:var(--sp-5)}
@@ -75,24 +72,20 @@
         section a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,159,67,.3);transition:border-color .2s var(--ease)}
         section a:hover{border-bottom-color:var(--amber)}
 
-        /* 卡片 */
         .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);margin-bottom:var(--sp-4);transition:border-color .3s var(--ease),transform .3s var(--ease)}
         .card:hover{border-color:var(--border-hi)}
         .card .lbl{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-2)}
         .card .num{font-family:var(--font-serif);font-weight:500;font-size:32px;color:var(--amber);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
 
-        /* 四层约束 */
         .layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-3);margin:var(--sp-5) 0}
         .layer{background:linear-gradient(160deg,rgba(255,159,67,.06),rgba(34,211,238,.03));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-4);position:relative}
         .layer .n{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--amber);margin-bottom:var(--sp-2);letter-spacing:.1em}
         .layer .t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:var(--sp-2)}
         .layer .d{font-size:12px;color:var(--text-3);line-height:1.6}
 
-        /* 引用块 */
         .quote{border-left:3px solid var(--amber);padding:var(--sp-2) 0 var(--sp-2) var(--sp-5);margin:var(--sp-5) 0;font-family:var(--font-serif);font-size:18px;font-style:italic;color:var(--text-2);line-height:1.6}
         .quote .src{display:block;margin-top:var(--sp-3);font-family:var(--font-sans);font-size:12px;font-style:normal;color:var(--text-4);letter-spacing:.02em}
 
-        /* 列表 */
         .list{list-style:none;margin:var(--sp-4) 0}
         .list li{padding:var(--sp-3) 0 var(--sp-3) var(--sp-6);border-bottom:1px solid var(--border);position:relative;color:var(--text-2);font-size:14px;line-height:1.7}
         .list li:last-child{border-bottom:0}
@@ -100,7 +93,6 @@
         .list li strong{color:var(--text);font-weight:600}
         .list li code{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px;color:var(--amber)}
 
-        /* 里程碑时间轴 */
         .timeline{position:relative;padding-left:var(--sp-6);margin:var(--sp-5) 0}
         .timeline::before{content:"";position:absolute;left:9px;top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,var(--amber),var(--cyan),transparent)}
         .tl-item{position:relative;padding:var(--sp-2) 0 var(--sp-3);font-size:13.5px;color:var(--text-2);line-height:1.6}
@@ -108,20 +100,17 @@
         .tl-item.done::before{background:var(--emerald);border-color:var(--emerald);box-shadow:0 0 10px rgba(52,211,153,.4)}
         .tl-item strong{color:var(--text);font-weight:600;display:inline-block;min-width:26px}
 
-        /* 免责声明块 */
         .legal-box{border:1px solid rgba(239,68,68,.3);background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(239,68,68,.02));border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);margin:var(--sp-5) 0}
         .legal-box h3{color:var(--rose);margin-top:0}
         .legal-box p{color:var(--text-2);font-size:14px;margin-bottom:var(--sp-3)}
         .legal-box p:last-child{margin-bottom:0}
 
-        /* 数据源表格 */
         .src-table{width:100%;border-collapse:collapse;margin:var(--sp-4) 0;font-size:13.5px}
         .src-table th{text-align:left;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);padding:var(--sp-3) var(--sp-3);border-bottom:1px solid var(--border)}
         .src-table td{padding:var(--sp-3) var(--sp-3);border-bottom:1px solid rgba(255,255,255,.03);color:var(--text-2);vertical-align:top;line-height:1.6}
         .src-table td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
         .src-table tr:last-child td{border-bottom:0}
 
-        /* 底部 */
         footer{margin-top:var(--sp-12);padding-top:var(--sp-6);border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--text-4);line-height:1.9}
         footer a{color:var(--text-3);text-decoration:none;margin:0 8px;transition:color .2s var(--ease)}
         footer a:hover{color:var(--amber)}
@@ -190,9 +179,19 @@
         <ul class="list">
             <li><strong>规则层</strong> — <code>skill.md</code> v2.1.0 提示词工程（压缩至约 6300 tokens 以适配 Groq TPM）</li>
             <li><strong>前端层</strong> — 单文件 <code>index.html</code>，原生 HTML/CSS/JS，零依赖零构建</li>
-            <li><strong>数据层</strong> — <code>data.json</code> 与代码完全分离，GitHub Actions 每天自动更新</li>
+            <li><strong>数据层</strong> — <code>data.json</code> 与代码完全分离，GitHub Actions 每 3 小时自动更新</li>
             <li><strong>推理层</strong> — Groq 免费 API，模型 <code>openai/gpt-oss-120b</code>，每天 1000 次额度</li>
             <li><strong>部署层</strong> — GitHub Pages + Service Worker 离线缓存，零服务器成本</li>
+        </ul>
+
+        <h3>核心功能</h3>
+        <ul class="list">
+            <li><strong>智能预测</strong> — 严格 JSON 输出，18 维深度分析（大小球/BTTS/概率校准/命中趋势）</li>
+            <li><strong>球员信息</strong> — 1539 张球员照片、进球概率、状态标签、推荐得分球员</li>
+            <li><strong>比赛选择</strong> — 按轮次 / 按球队双模式，球队下拉显示 38 轮完整赛程</li>
+            <li><strong>历史追踪</strong> — 自动去重、实际比分自动同步、命中率趋势图</li>
+            <li><strong>批量预测</strong> — 一轮 10 场并发跑，每场可选跑 1/3/5 次取众数</li>
+            <li><strong>沉浸体验</strong> — 光标光晕、漂浮粒子、3D 倾斜、命令面板、快捷键</li>
         </ul>
 
         <h3>数据从哪来</h3>
@@ -212,6 +211,11 @@
                 <td>20 队徽章展示（版权归各俱乐部所有）</td>
             </tr>
             <tr>
+                <td>球员照片</td>
+                <td><a href="https://sports.bzzoiro.com/" target="_blank" rel="noopener">Bzzoiro Sports Data</a> + TheSportsDB</td>
+                <td>1539 张全队球员照片（双源合并）</td>
+            </tr>
+            <tr>
                 <td>AI 推理</td>
                 <td><a href="https://groq.com/" target="_blank" rel="noopener">Groq</a></td>
                 <td>根据 skill.md 生成结构化预测</td>
@@ -225,7 +229,7 @@
         </table>
 
         <h3>自动化流程</h3>
-        <p>GitHub Actions 每天下午 2 点（马来西亚时间）在云端运行 <code>update.js</code>，从 football-data.org 拉取最新数据，写入 <code>data.json</code> 并自动 commit + push。用户本地无需任何操作，网页下次刷新即拿到最新数据。Token 保存在 GitHub Secrets，不进代码库。</p>
+        <p>GitHub Actions <strong>每 3 小时</strong>在云端运行 <code>update.js</code>，从 football-data.org 拉取最新比赛数据，从 Bzzoiro + TheSportsDB 双源拉取球员照片，写入 <code>data.json</code> 并自动 commit + push。用户本地无需任何操作，网页下次刷新即拿到最新数据。Token 保存在 GitHub Secrets，不进代码库。</p>
     </section>
 
     <!-- ═══════════ ③ 隐私与安全 ═══════════ -->
@@ -252,6 +256,7 @@
         <h3>版权说明</h3>
         <ul class="list">
             <li><strong>球队队徽</strong> — 版权归各英超俱乐部及 ESPN 所有，本项目仅用于学习演示，<strong>不做商业用途</strong></li>
+            <li><strong>球员照片</strong> — 来源于 Bzzoiro Sports Data 和 TheSportsDB，版权归原始来源</li>
             <li><strong>比赛数据</strong> — 遵循 football-data.org 免费层条款</li>
             <li><strong>项目代码</strong> — <a href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub 仓库</a>，可自由 Fork、学习、修改</li>
         </ul>
@@ -263,7 +268,7 @@
     <!-- ═══════════ ④ 成长历程 ═══════════ -->
     <section id="journey">
         <h2>成长历程</h2>
-        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 18 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
+        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 22 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
 
         <div class="timeline">
             <div class="tl-item done"><strong>01</strong> 理解并改写 <code>skill.md</code> 提示词工程</div>
@@ -284,6 +289,10 @@
             <div class="tl-item done"><strong>16</strong> 命令面板 + 快捷键 + 工具提示</div>
             <div class="tl-item done"><strong>17</strong> MatchPicker + 球队统计 + 分享图 + URL 同步</div>
             <div class="tl-item done"><strong>18</strong> 预测对比实际 + 命中率趋势图</div>
+            <div class="tl-item done"><strong>19</strong> 按球队筛选 + 18 维深度分析</div>
+            <div class="tl-item done"><strong>20</strong> 双源球员照片 1539 张（Bzzoiro + TheSportsDB）</div>
+            <div class="tl-item done"><strong>21</strong> 预测去重 + 中英球员映射 + 移动端优化</div>
+            <div class="tl-item done"><strong>22</strong> A11y 无障碍 + ETag 性能优化 + 赛季总览</div>
         </div>
     </section>
 
@@ -295,12 +304,11 @@
             <span style="color:var(--text-4)">·</span>
             <a href="#legal">免责声明</a>
         </div>
-        <div class="ver">Premier League Prediction Engine · v8.1.1</div>
+        <div class="ver">Premier League Prediction Engine · v9.1</div>
     </footer>
 </div>
 
 <script>
-    // Hero 标题逐字翻转
     (function splitHeroTitle(){
         const h1 = document.getElementById('aboutTitle');
         if (!h1) return;
@@ -326,7 +334,6 @@
         walk(h1);
     })();
 
-    // 滚动淡入
     (function setupReveal(){
         if (window.matchMedia('(prefers-reduced-motion:reduce)').matches ||
             !('IntersectionObserver' in window)) {
