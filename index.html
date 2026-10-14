@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
-    <title>英超预测引擎 v8.4.0</title>
+    <title>英超预测引擎 v8.4.1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -215,9 +215,14 @@
         .h2h li{display:flex;align-items:center;gap:var(--sp-2)}
         .h2h li::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--violet);flex-shrink:0;box-shadow:0 0 6px var(--violet)}
         .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--sp-2)}
-        .pcard{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .4s var(--ease);position:relative;overflow:hidden}
+        .pcard{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .4s var(--ease);position:relative;overflow:hidden;display:flex;gap:var(--sp-3);align-items:flex-start}
         .pcard:hover{transform:translateY(-4px) scale(1.02);border-color:rgba(255,159,67,.35);box-shadow:0 16px 32px -8px rgba(255,159,67,.25)}
         .pcard.is-focal{border-color:rgba(255,159,67,.5);background:linear-gradient(160deg,rgba(255,159,67,.12),rgba(34,211,238,.05));box-shadow:0 0 0 1px rgba(255,159,67,.15),0 8px 24px -8px rgba(255,159,67,.25)}
+        .pcard .photo-wrap{position:relative;width:52px;height:52px;flex-shrink:0;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#1a2233,#0d1420);border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center}
+        .pcard.is-focal .photo-wrap{border-color:rgba(255,159,67,.6);box-shadow:0 0 16px -4px var(--amber-glow)}
+        .pcard .photo-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+        .pcard .photo-wrap .photo-fb{font-size:14px;font-weight:700;color:var(--text-3);font-family:var(--font-serif)}
+        .pcard .info{flex:1;min-width:0}
         .pcard .row{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-2)}
         .pcard .nm{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em}
         .pcard .pos{font-size:9px;font-weight:600;color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
@@ -237,8 +242,12 @@
         .pcard-reason{font-size:11px;color:var(--text-2);margin-top:8px;padding:6px 8px;background:rgba(34,211,238,.05);border-left:2px solid var(--cyan);border-radius:3px;line-height:1.5}
 
         .scorer-list{display:flex;flex-direction:column;gap:var(--sp-2)}
-        .scorer-item{background:linear-gradient(135deg,rgba(255,159,67,.06),rgba(255,159,67,.02));border:1px solid rgba(255,159,67,.2);border-radius:var(--r-md);padding:10px 14px;transition:transform .25s var(--ease),border-color .25s var(--ease)}
+        .scorer-item{background:linear-gradient(135deg,rgba(255,159,67,.06),rgba(255,159,67,.02));border:1px solid rgba(255,159,67,.2);border-radius:var(--r-md);padding:10px 14px;transition:transform .25s var(--ease),border-color .25s var(--ease);display:flex;gap:var(--sp-3);align-items:center}
         .scorer-item:hover{transform:translateX(3px);border-color:rgba(255,159,67,.4)}
+        .scorer-photo{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#1a2233,#0d1420);border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center}
+        .scorer-photo img{width:100%;height:100%;object-fit:cover;display:block}
+        .scorer-photo .photo-fb{font-size:12px;font-weight:700;color:var(--text-3);font-family:var(--font-serif)}
+        .scorer-body{flex:1;min-width:0}
         .scorer-head{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
         .scorer-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:-.01em}
         .scorer-team{font-size:11px;color:var(--text-3);flex:1}
@@ -525,6 +534,13 @@
         .trend-chart svg path.area{fill:url(#trendGrad);stroke:none}
         .trend-chart svg line.grid{stroke:rgba(255,255,255,.05);stroke-width:1}
         .trend-chart svg circle.dot{fill:var(--amber);stroke:var(--bg);stroke-width:2}
+
+        .picker-mode{display:flex;gap:6px;margin-bottom:var(--sp-3)}
+        .picker-mode button{flex:1;padding:9px 8px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-3);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s var(--ease)}
+        .picker-mode button:hover{color:var(--amber);border-color:var(--border-focus)}
+        .picker-mode button.on{background:var(--amber-soft);color:var(--amber);border-color:rgba(255,159,67,.4);box-shadow:0 0 12px -4px var(--amber-glow)}
+        .team-select-wrap{display:none;margin-bottom:var(--sp-3)}
+        .team-select-wrap.show{display:block}
     </style>
 </head>
 <body>
@@ -545,7 +561,7 @@
             <span>Premier League 2026/27</span>
         </div>
         <h1 id="heroTitle">英超 <em>预测</em> 引擎</h1>
-        <div class="sub">规则工程 · 前端工程 · 自动化 · v8.4.0</div>
+        <div class="sub">规则工程 · 前端工程 · 自动化 · v8.4.1</div>
         <div class="tag-line">
             <a href="about.html" style="color:var(--amber);text-decoration:none;font-weight:500">关于 →</a>
             <span style="color:var(--text-4)">·</span>
@@ -566,7 +582,7 @@
     </div>
 
     <div class="warn-banner" id="fallbackBanner">
-        ⚠️ <b>data.json 加载失败</b>，当前显示的是循环赛算法生成的<b>临时赛程</b>（对阵正确但轮次顺序不一定准确）。请运行 <code>update.bat</code> 或等待 GitHub Actions 自动更新。
+        ⚠️ <b>data.json 加载失败</b>，当前显示的是循环赛算法生成的<b>临时赛程</b>。请运行 <code>update.bat</code> 或等待 GitHub Actions 自动更新。
     </div>
 
     <div class="grid">
@@ -584,7 +600,15 @@
             </div>
 
             <h3>比赛选择</h3>
-            <div class="field"><label for="roundSel">轮次</label><select id="roundSel"></select></div>
+            <div class="picker-mode" id="pickerMode">
+                <button data-mode="round" class="on">按轮次</button>
+                <button data-mode="team">按球队</button>
+            </div>
+            <div class="field" id="roundSelectWrap"><label for="roundSel">轮次</label><select id="roundSel"></select></div>
+            <div class="team-select-wrap" id="teamSelectWrap">
+                <label style="display:block;font-size:11px;font-weight:500;color:var(--text-2);margin-bottom:var(--sp-2);letter-spacing:.02em">球队</label>
+                <select id="teamSel"></select>
+            </div>
             <div class="field">
                 <label>对阵</label>
                 <div class="match-picker" id="matchPicker">
@@ -641,7 +665,7 @@
         <div class="legal">
             ⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。
         </div>
-        <div class="ver">Premier League Prediction Engine · v8.4.0</div>
+        <div class="ver">Premier League Prediction Engine · v8.4.1</div>
     </footer>
 </div>
 
@@ -918,7 +942,7 @@
 
     function attachRipple(){
         document.addEventListener('pointerdown', e => {
-            const btn = e.target.closest('.btn, .fab, .filter-btn, .batch-opts button');
+            const btn = e.target.closest('.btn, .fab, .filter-btn, .batch-opts button, .picker-mode button');
             if (!btn) return;
             if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
             const r = btn.getBoundingClientRect();
@@ -987,6 +1011,7 @@
     let STATIC_STANDINGS = [];
     let _last5Cache = null;
     let _usingFallback = false;
+    let PLAYER_PHOTOS = {};
 
     (function fillFallbackFixtures(){
         if (FIXTURES.length) return;
@@ -1194,7 +1219,9 @@
         const id = ESPN_IDS[name];
         return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null;
     }
-
+    function playerPhotoUrl(playerName){
+        return PLAYER_PHOTOS[playerName] || null;
+    }
     function getForm(team, n=5){
         if (!_last5Cache) buildLast5Cache();
         return (_last5Cache[team] || []).slice(-n);
@@ -1240,7 +1267,75 @@
     }
 
     /* ═══════════════════════════════════════════
-       历史缓存（MatchPicker 用）
+       按球队筛选
+    ═══════════════════════════════════════════ */
+    function getTeamFixtures(teamName){
+        const result = [];
+        for (let r = 0; r < FIXTURES.length; r++) {
+            const round = FIXTURES[r];
+            if (!round) continue;
+            for (let m = 0; m < round.length; m++) {
+                const match = round[m];
+                if (match.home === teamName || match.away === teamName) {
+                    result.push({
+                        round: r,
+                        home: match.home,
+                        away: match.away,
+                        isHome: match.home === teamName,
+                        opponent: match.home === teamName ? match.away : match.home,
+                        matchIdx: m
+                    });
+                }
+            }
+        }
+        return result;
+    }
+
+    let _filterMode = 'round';
+    let _currentTeam = '';
+    let _teamFixtures = [];
+    let _teamSelectedIdx = 0;
+
+    function setFilterMode(mode){
+        _filterMode = mode;
+        document.querySelectorAll('#pickerMode button').forEach(b => {
+            b.classList.toggle('on', b.dataset.mode === mode);
+        });
+        document.getElementById('roundSelectWrap').style.display = mode === 'round' ? '' : 'none';
+        document.getElementById('teamSelectWrap').classList.toggle('show', mode === 'team');
+        if (mode === 'team') {
+            const savedTeam = localStorage.getItem('last_team');
+            if (savedTeam && TEAMS.includes(savedTeam)) _currentTeam = savedTeam;
+            else _currentTeam = TEAMS[0];
+            document.getElementById('teamSel').value = _currentTeam;
+            loadTeamFixtures();
+        } else {
+            MatchPicker.setRound(+document.getElementById('roundSel').value || 0);
+        }
+        refreshDashboard();
+    }
+
+    function loadTeamFixtures(){
+        _teamFixtures = getTeamFixtures(_currentTeam);
+        const savedMatch = localStorage.getItem('last_team_match_' + _currentTeam);
+        _teamSelectedIdx = savedMatch !== null && _teamFixtures[+savedMatch] ? +savedMatch : 0;
+        if (_filterMode === 'team') {
+            const fix = _teamFixtures[_teamSelectedIdx];
+            if (fix) {
+                document.getElementById('roundSel').value = fix.round;
+                localStorage.setItem('last_round', fix.round);
+            }
+            MatchPicker.setRound(_teamFixtures[_teamSelectedIdx]?.round || 0);
+            if (document.getElementById('matchPicker').classList.contains('open')) {
+                MatchPicker.renderList(document.getElementById('matchSearch').value);
+            }
+        }
+        MatchPicker.updateLabel();
+        updateURL();
+    }
+
+    /* ═══════════════════════════════════════════
+       历史缓存
     ═══════════════════════════════════════════ */
     let _histCache = null;
     let _histCacheRound = -1;
@@ -1279,32 +1374,67 @@
 
         function renderList(query=''){
             const list = document.getElementById('matchList');
-            const round = FIXTURES[currentRound] || [];
             const q = query.trim().toLowerCase();
-            filtered = round.map((m, i) => ({ ...m, idx: i })).filter(m => {
-                if (!q) return true;
-                return m.home.toLowerCase().includes(q) || m.away.toLowerCase().includes(q);
-            });
-            if (!filtered.length) { list.innerHTML = '<div class="empty-list">无匹配比赛</div>'; return; }
-            const hist = getHistoryForRound(currentRound);
-            const predictedKeys = new Set(hist.filter(h => h.round === currentRound).map(h => `${h.home}|${h.away}`));
-            list.innerHTML = filtered.map((m, i) => {
-                const st = getMatchStatus(m.home, m.away, currentRound);
-                const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
-                const isSelected = m.idx === selectedIdx;
-                const cls = ['mrow', isSelected?'selected':'', isPredicted?'predicted':''].filter(Boolean).join(' ');
-                let statusHtml = '';
-                if (st.status === 'finished') {
-                    statusHtml = `<span class="status finished">已完赛 · 第 ${st.round} 轮</span><span class="score">${escapeHtml(st.score)}</span>`;
-                } else {
-                    statusHtml = `<span class="status upcoming">第 ${currentRound+1} 轮 · 未开赛</span>`;
-                }
-                return `<div class="${cls}" data-idx="${i}" data-midx="${m.idx}">
-        <div class="mrow-team">${teamBadgeMini(m.home)}<span class="side home">主</span><span class="name">${escapeHtml(m.home)}</span>${rankChip(m.home)}${formBlocks(m.home)}</div>
-        <div class="mrow-team">${teamBadgeMini(m.away)}<span class="side away">客</span><span class="name">${escapeHtml(m.away)}</span>${rankChip(m.away)}${formBlocks(m.away)}</div>
-        <div class="mrow-meta">${statusHtml}</div>
-      </div>`;
-            }).join('');
+            let items = [];
+
+            if (_filterMode === 'team' && _teamFixtures.length) {
+                items = _teamFixtures.map((m, i) => ({ ...m, idx: i }));
+                if (q) items = items.filter(m => m.opponent.toLowerCase().includes(q));
+                if (!items.length) { list.innerHTML = '<div class="empty-list">无匹配比赛</div>'; return; }
+                const hist = getHistory();
+                const predictedKeys = new Set(hist.map(h => `${h.home}|${h.away}`));
+                list.innerHTML = items.map((m, i) => {
+                    const st = getMatchStatus(m.home, m.away, m.round);
+                    const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
+                    const isSelected = m.idx === _teamSelectedIdx;
+                    const cls = ['mrow', isSelected?'selected':'', isPredicted?'predicted':''].filter(Boolean).join(' ');
+                    const sideTag = m.isHome ? '<span class="side home">主</span>' : '<span class="side away">客</span>';
+                    const vsOrAt = m.isHome ? 'vs' : '@';
+                    let statusHtml = '';
+                    if (st.status === 'finished') {
+                        statusHtml = `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>`;
+                    } else {
+                        statusHtml = `<span class="status upcoming">未开赛</span>`;
+                    }
+                    return `<div class="${cls}" data-idx="${i}" data-midx="${m.idx}">
+                        <div class="mrow-team">
+                            <span class="round-tag" style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text-3);padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.04);flex-shrink:0">第${m.round+1}轮</span>
+                            ${sideTag}
+                            ${teamBadgeMini(m.opponent)}
+                            <span class="name">${escapeHtml(m.opponent)}</span>
+                            ${rankChip(m.opponent)}${formBlocks(m.opponent)}
+                        </div>
+                        <div class="mrow-meta">${statusHtml}</div>
+                    </div>`;
+                }).join('');
+            } else {
+                const round = FIXTURES[currentRound] || [];
+                filtered = round.map((m, i) => ({ ...m, idx: i })).filter(m => {
+                    if (!q) return true;
+                    return m.home.toLowerCase().includes(q) || m.away.toLowerCase().includes(q);
+                });
+                if (!filtered.length) { list.innerHTML = '<div class="empty-list">无匹配比赛</div>'; return; }
+                const hist = getHistoryForRound(currentRound);
+                const predictedKeys = new Set(hist.filter(h => h.round === currentRound).map(h => `${h.home}|${h.away}`));
+                list.innerHTML = filtered.map((m, i) => {
+                    const st = getMatchStatus(m.home, m.away, currentRound);
+                    const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
+                    const isSelected = m.idx === selectedIdx;
+                    const cls = ['mrow', isSelected?'selected':'', isPredicted?'predicted':''].filter(Boolean).join(' ');
+                    let statusHtml = '';
+                    if (st.status === 'finished') {
+                        statusHtml = `<span class="status finished">已完赛 · 第 ${st.round} 轮</span><span class="score">${escapeHtml(st.score)}</span>`;
+                    } else {
+                        statusHtml = `<span class="status upcoming">第 ${currentRound+1} 轮 · 未开赛</span>`;
+                    }
+                    return `<div class="${cls}" data-idx="${i}" data-midx="${m.idx}">
+                        <div class="mrow-team">${teamBadgeMini(m.home)}<span class="side home">主</span><span class="name">${escapeHtml(m.home)}</span>${rankChip(m.home)}${formBlocks(m.home)}</div>
+                        <div class="mrow-team">${teamBadgeMini(m.away)}<span class="side away">客</span><span class="name">${escapeHtml(m.away)}</span>${rankChip(m.away)}${formBlocks(m.away)}</div>
+                        <div class="mrow-meta">${statusHtml}</div>
+                    </div>`;
+                }).join('');
+            }
+
             focusIdx = 0;
             list.querySelectorAll('.mrow').forEach((el, i) => {
                 if (i === 0) el.classList.add('on');
@@ -1317,8 +1447,19 @@
         }
 
         function selectMatch(idx){
-            selectedIdx = idx;
-            localStorage.setItem('last_match_'+currentRound, idx);
+            if (_filterMode === 'team') {
+                _teamSelectedIdx = idx;
+                localStorage.setItem('last_team_match_' + _currentTeam, idx);
+                const fix = _teamFixtures[idx];
+                if (fix) {
+                    document.getElementById('roundSel').value = fix.round;
+                    localStorage.setItem('last_round', fix.round);
+                    MatchPicker.setRound(fix.round);
+                }
+            } else {
+                selectedIdx = idx;
+                localStorage.setItem('last_match_'+currentRound, idx);
+            }
             updateLabel();
             refreshDashboard();
             updateURL();
@@ -1327,12 +1468,21 @@
 
         function updateLabel(){
             const label = document.getElementById('matchLabel');
-            const round = FIXTURES[currentRound] || [];
-            const m = round[selectedIdx];
-            if (!m) { label.textContent = '选择比赛…'; return; }
-            const st = getMatchStatus(m.home, m.away, currentRound);
-            const score = st.status === 'finished' ? ` <span style="color:var(--cyan);font-family:var(--font-serif);font-weight:600">${escapeHtml(st.score)}</span>` : '';
-            label.innerHTML = `<span style="font-weight:600">${escapeHtml(m.home)}</span><span style="color:var(--text-4);font-size:11px">vs</span><span style="font-weight:600">${escapeHtml(m.away)}</span>${score}`;
+            if (_filterMode === 'team' && _teamFixtures.length) {
+                const m = _teamFixtures[_teamSelectedIdx];
+                if (!m) { label.textContent = '选择比赛…'; return; }
+                const st = getMatchStatus(m.home, m.away, m.round);
+                const score = st.status === 'finished' ? ` <span style="color:var(--cyan);font-family:var(--font-serif);font-weight:600">${escapeHtml(st.score)}</span>` : '';
+                const vsOrAt = m.isHome ? 'vs' : '@';
+                label.innerHTML = `<span style="font-weight:600">第${m.round+1}轮</span><span style="color:var(--text-4);font-size:11px">${vsOrAt}</span><span style="font-weight:600">${escapeHtml(m.opponent)}</span>${score}`;
+            } else {
+                const round = FIXTURES[currentRound] || [];
+                const m = round[selectedIdx];
+                if (!m) { label.textContent = '选择比赛…'; return; }
+                const st = getMatchStatus(m.home, m.away, currentRound);
+                const score = st.status === 'finished' ? ` <span style="color:var(--cyan);font-family:var(--font-serif);font-weight:600">${escapeHtml(st.score)}</span>` : '';
+                label.innerHTML = `<span style="font-weight:600">${escapeHtml(m.home)}</span><span style="color:var(--text-4);font-size:11px">vs</span><span style="font-weight:600">${escapeHtml(m.away)}</span>${score}`;
+            }
         }
 
         function bind(){
@@ -1379,6 +1529,11 @@
         refreshDashboard();
     }
     function currentMatch(){
+        if (_filterMode === 'team' && _teamFixtures.length) {
+            const m = _teamFixtures[_teamSelectedIdx];
+            if (!m) return { round: 0, home: '', away: '' };
+            return { round: m.round, home: m.home, away: m.away };
+        }
         const { round, idx } = MatchPicker.getSelected();
         const arr = FIXTURES[round] || [];
         return { round, ...(arr[idx] || { home:'', away:'' }) };
@@ -1395,28 +1550,39 @@
         const saved = oldVal || localStorage.getItem('last_round');
         if (saved !== null && FIXTURES[+saved]) rs.value = saved;
         MatchPicker.setRound(+rs.value || 0);
+
+        const ts = document.getElementById('teamSel');
+        ts.innerHTML = TEAMS.map(t => `<option value="${t}">${t}</option>`).join('');
     }
 
     function updateURL(){
-        const { round, idx } = MatchPicker.getSelected();
         const url = new URL(location.href);
-        url.hash = `round=${round+1}&match=${idx+1}`;
+        if (_filterMode === 'team') {
+            url.hash = `team=${encodeURIComponent(_currentTeam)}&round=${(_teamFixtures[_teamSelectedIdx]?.round || 0)+1}&match=${_teamSelectedIdx+1}`;
+        } else {
+            const { round, idx } = MatchPicker.getSelected();
+            url.hash = `round=${round+1}&match=${idx+1}`;
+        }
         history.replaceState(null, '', url.toString());
     }
     function readURL(){
         const hash = location.hash.slice(1);
         if (!hash) return null;
         const params = new URLSearchParams(hash);
+        const team = params.get('team');
         const r = parseInt(params.get('round'), 10);
         const m = parseInt(params.get('match'), 10);
+        if (team && TEAMS.includes(team)) {
+            return { mode: 'team', team, round: (Number.isFinite(r) ? r - 1 : 0), match: (Number.isFinite(m) ? m - 1 : 0) };
+        }
         if (Number.isFinite(r) && Number.isFinite(m) && r >= 1 && m >= 1) {
-            return { round: r - 1, match: m - 1 };
+            return { mode: 'round', round: r - 1, match: m - 1 };
         }
         return null;
     }
 
     /* ═══════════════════════════════════════════
-       球队攻防统计（实时计算，不缓存）
+       球队攻防统计
     ═══════════════════════════════════════════ */
     function computeTeamAttackStats(){
         const map = {};
@@ -1536,7 +1702,12 @@
   </div>`;
     }
     function confClass(c){ return ['高','中高','中','低'].includes(c) ? c : '低'; }
-
+    function playerPhoto(name){
+        const url = playerPhotoUrl(name);
+        const abbr = name.slice(0, 2);
+        if (!url) return `<div class="photo-wrap"><span class="photo-fb">${escapeHtml(abbr)}</span></div>`;
+        return `<div class="photo-wrap"><img src="${url}" alt="${escapeHtml(name)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="photo-fb" style="display:none">${escapeHtml(abbr)}</span></div>`;
+    }
     function playerCard(p){
         const name = p.name || p.球员 || '';
         const pos = p.position || p.位置 || '';
@@ -1564,11 +1735,14 @@
         const statusHtml = st ? `<span class="pcard-status ${st.cls}">${st.label}</span>` : '';
         const focalHtml = isFocal ? `<span class="pcard-focal">⭐</span>` : '';
         return `<div class="pcard${isFocal ? ' is-focal' : ''}">
-    <div class="row"><div class="nm">${focalHtml}${escapeHtml(name)}</div><div class="pos">${escapeHtml(pos)}</div></div>
-    <div class="rt"><div class="rating">${escapeHtml(rating)}</div>${statusHtml}</div>
-    ${chanceHtml}
-    ${note ? `<div class="note">${escapeHtml(note)}</div>` : ''}
-    ${reasonHtml}
+    ${playerPhoto(name)}
+    <div class="info">
+        <div class="row"><div class="nm">${focalHtml}${escapeHtml(name)}</div><div class="pos">${escapeHtml(pos)}</div></div>
+        <div class="rt"><div class="rating">${escapeHtml(rating)}</div>${statusHtml}</div>
+        ${chanceHtml}
+        ${note ? `<div class="note">${escapeHtml(note)}</div>` : ''}
+        ${reasonHtml}
+    </div>
   </div>`;
     }
     function animateNumber(el, target, dur=1200, suffix='%'){
@@ -1642,14 +1816,21 @@
             const schance = s.chance ?? s.概率 ?? 0;
             const sreason = s.reason || s.原因 || '';
             const pctVal = (+schance > 1 ? +schance : +schance * 100).toFixed(0);
+            const photo = playerPhotoUrl(sname);
+            const photoHtml = photo
+                ? `<div class="scorer-photo"><img src="${photo}" alt="${escapeHtml(sname)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="photo-fb" style="display:none">${escapeHtml(sname.slice(0,2))}</span></div>`
+                : `<div class="scorer-photo"><span class="photo-fb">${escapeHtml(sname.slice(0,2))}</span></div>`;
             return `<div class="scorer-item">
-                <div class="scorer-head">
-                    <span class="scorer-name">${escapeHtml(sname)}</span>
-                    <span class="scorer-team">${escapeHtml(steam)}</span>
-                    <span class="scorer-pct">${pctVal}%</span>
+                ${photoHtml}
+                <div class="scorer-body">
+                    <div class="scorer-head">
+                        <span class="scorer-name">${escapeHtml(sname)}</span>
+                        <span class="scorer-team">${escapeHtml(steam)}</span>
+                        <span class="scorer-pct">${pctVal}%</span>
+                    </div>
+                    <div class="scorer-bar"><div class="scorer-bar-fill" style="width:${pctVal}%"></div></div>
+                    ${sreason ? `<div class="scorer-reason">${escapeHtml(sreason)}</div>` : ''}
                 </div>
-                <div class="scorer-bar"><div class="scorer-bar-fill" style="width:${pctVal}%"></div></div>
-                ${sreason ? `<div class="scorer-reason">${escapeHtml(sreason)}</div>` : ''}
             </div>`;
         }).join('')}
       </div>
@@ -2210,7 +2391,6 @@
         html += `<div class="da-row"><span>近 5 场命中率</span><span class="da-num ${S.recent5Rate >= 0.6 ? 'good' : S.recent5Rate <= 0.4 ? 'bad' : ''}">${pct(S.recent5Rate)}</span></div>`;
         html += `</div>`;
 
-        // 球队攻防数据
         const teamAtk = computeTeamAttackStats();
         if (teamAtk.length) {
             html += `<div class="da-section"><div class="da-ttl">球队攻防数据（本赛季累计，实时）</div>
@@ -2258,7 +2438,7 @@
     }
 
     /* ═══════════════════════════════════════════
-       实时同步：从 data.json 的 RESULTS 自动填充历史
+       实时同步
     ═══════════════════════════════════════════ */
     function findActualScore(home, away){
         const key = `${home}|${away}`;
@@ -2317,6 +2497,9 @@
             if (Array.isArray(data.fixtures) && data.fixtures.length) {
                 FIXTURES.length = 0;
                 FIXTURES.push(...data.fixtures);
+            }
+            if (data.playerPhotos && typeof data.playerPhotos === 'object') {
+                PLAYER_PHOTOS = data.playerPhotos;
             }
             const n = syncActualsToHistory(true);
             renderStandings(STATIC_STANDINGS);
@@ -2777,9 +2960,7 @@
         document.getElementById('topBtn').classList.toggle('show', window.scrollY > 400);
     });
 
-    /* ═══════════════════════════════════════════
-       data.json 加载
-    ═══════════════════════════════════════════ */
+    /* data.json 加载 */
     async function loadExternalData(){
         const banner = document.getElementById('fallbackBanner');
         try {
@@ -2805,6 +2986,9 @@
             if (Array.isArray(data.standings) && data.standings.length) {
                 STATIC_STANDINGS = data.standings;
             }
+            if (data.playerPhotos && typeof data.playerPhotos === 'object') {
+                PLAYER_PHOTOS = data.playerPhotos;
+            }
             _usingFallback = !hasRealFixtures;
             banner.classList.toggle('show', _usingFallback);
             initSelectors();
@@ -2823,9 +3007,7 @@
         }
     }
 
-    /* ═══════════════════════════════════════════
-       Boot
-    ═══════════════════════════════════════════ */
+    /* Boot */
     (async function boot(){
         Ambient.init();
         LoadingBar.start();
@@ -2851,9 +3033,27 @@
         const rs = document.getElementById('roundSel');
         rs.addEventListener('change', () => {
             localStorage.setItem('last_round', rs.value);
-            fillMatches();
-            updateURL();
+            if (_filterMode === 'round') {
+                fillMatches();
+                updateURL();
+            }
         });
+
+        // 筛选模式按钮
+        document.getElementById('pickerMode').addEventListener('click', e => {
+            const b = e.target.closest('button');
+            if (!b || b.dataset.mode === _filterMode) return;
+            setFilterMode(b.dataset.mode);
+        });
+
+        // 球队下拉
+        document.getElementById('teamSel').addEventListener('change', e => {
+            _currentTeam = e.target.value;
+            localStorage.setItem('last_team', _currentTeam);
+            loadTeamFixtures();
+            refreshDashboard();
+        });
+
         document.getElementById('histFilters').addEventListener('click', e => {
             const b = e.target.closest('button'); if (!b) return;
             histFilter = b.dataset.f;
@@ -2903,16 +3103,32 @@
             if (!document.hidden) pollDataUpdate();
         });
 
+        // URL 状态恢复
         const urlState = readURL();
-        if (urlState && FIXTURES[urlState.round]?.[urlState.match] !== undefined) {
-            document.getElementById('roundSel').value = urlState.round;
-            localStorage.setItem('last_round', urlState.round);
-            localStorage.setItem('last_match_'+urlState.round, urlState.match);
-            MatchPicker.setRound(urlState.round);
+        if (urlState) {
+            if (urlState.mode === 'team') {
+                _currentTeam = urlState.team;
+                document.getElementById('teamSel').value = _currentTeam;
+                setFilterMode('team');
+                _teamSelectedIdx = urlState.match;
+                localStorage.setItem('last_team_match_' + _currentTeam, urlState.match);
+                loadTeamFixtures();
+            } else if (FIXTURES[urlState.round]?.[urlState.match] !== undefined) {
+                document.getElementById('roundSel').value = urlState.round;
+                localStorage.setItem('last_round', urlState.round);
+                localStorage.setItem('last_match_'+urlState.round, urlState.match);
+                MatchPicker.setRound(urlState.round);
+            }
         }
         window.addEventListener('hashchange', () => {
             const s = readURL();
-            if (s && FIXTURES[s.round]) {
+            if (s && s.mode === 'team' && TEAMS.includes(s.team)) {
+                _currentTeam = s.team;
+                document.getElementById('teamSel').value = s.team;
+                setFilterMode('team');
+                _teamSelectedIdx = s.match;
+                loadTeamFixtures();
+            } else if (s && FIXTURES[s.round]) {
                 document.getElementById('roundSel').value = s.round;
                 localStorage.setItem('last_match_'+s.round, s.match);
                 MatchPicker.setRound(s.round);

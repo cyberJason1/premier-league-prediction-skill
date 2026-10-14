@@ -1,15 +1,22 @@
 #!/usr/bin/env node
 /**
- * 英超预测引擎 - 真实数据自动更新
- * 数据写入独立的 data.json，不再碰 index.html
+ * 英超预测引擎 - 真实数据自动更新 + 球员照片拉取
+ * 数据写入独立的 data.json
  * 用法：FD_TOKEN=你的密钥 node update.js
+ *
+ * 最后更新：2026-10-14
+ * 特性：断点续传 + 429 自动等待 + 单次批量限制
  */
 
 const fs = require('fs');
 const path = require('path');
 
 const DATA_FILE = path.join(__dirname, 'data.json');
+const SPORTSDB_KEY = '3';
 
+// ─────────────────────────────────────────────
+// 球队英文名 → 中文名映射
+// ─────────────────────────────────────────────
 const TEAM_MAP = {
     'Arsenal':'阿森纳','Manchester City':'曼城','Liverpool':'利物浦','Chelsea':'切尔西',
     'Tottenham Hotspur':'热刺','Aston Villa':'阿斯顿维拉','Newcastle United':'纽卡斯尔联',
@@ -22,30 +29,104 @@ const TEAM_MAP = {
     'Ipswich Town FC':'伊普斯维奇镇','Ipswich Town':'伊普斯维奇镇'
 };
 
+// ─────────────────────────────────────────────
+// 核心球员中文名 → 英文名映射（2026-27 赛季最新）
+// 已移除：孙兴慜（2026年8月转会洛杉矶 FC）
+// ─────────────────────────────────────────────
+const PLAYER_NAME_MAP = {
+    // 阿森纳
+    '萨卡': 'Bukayo Saka',
+    '厄德高': 'Martin Odegaard',
+    '热苏斯': 'Gabriel Jesus',
+    // 曼城
+    '哈兰德': 'Erling Haaland',
+    '谢尔基': 'Rayan Cherki',
+    '罗德里': 'Rodri',
+    // 利物浦
+    '萨拉赫': 'Mohamed Salah',
+    '伊萨克': 'Alexander Isak',
+    '加克波': 'Cody Gakpo',
+    // 切尔西
+    '若昂·佩德罗': 'Joao Pedro',
+    '摩根·罗杰斯': 'Morgan Rogers',
+    '帕尔默': 'Cole Palmer',
+    // 热刺
+    '麦迪逊': 'James Maddison',
+    // 曼联
+    'B费': 'Bruno Fernandes',
+    '拉什福德': 'Marcus Rashford',
+    // 纽卡
+    '吉马良斯': 'Bruno Guimaraes',
+    // 维拉
+    '沃特金斯': 'Ollie Watkins',
+    '麦金': 'John McGinn',
+    // 布莱顿
+    '三笘薰': 'Kaoru Mitoma',
+    '维尔贝克': 'Danny Welbeck',
+    // 埃弗顿
+    '卡尔弗特-勒温': 'Dominic Calvert-Lewin',
+    '蒂耶尔诺·巴里': 'Thierno Barry',
+    '塔科夫斯基': 'James Tarkowski',
+    // 富勒姆
+    '希门尼斯': 'Raul Jimenez',
+    // 水晶宫
+    '埃泽': 'Eberechi Eze',
+    '马特塔': 'Jean-Philippe Mateta',
+    // 布伦特福德
+    '姆贝乌莫': 'Bryan Mbeumo',
+    '维萨': 'Yoane Wissa',
+    // 伯恩茅斯
+    '索兰克': 'Dominic Solanke',
+    '塞梅尼奥': 'Antoine Semenyo',
+    // 诺丁汉森林
+    '伍德': 'Chris Wood',
+    '吉布斯-怀特': 'Morgan Gibbs-White',
+    // 利兹联
+    '皮罗': 'Joel Piroe',
+    '尼奥托': 'Wilfried Gnonto',
+    // 桑德兰
+    '布罗比': 'Brian Brobbey',
+    '伊西多': 'Wilson Isidor',
+    // 考文垂城
+    '哈吉·赖特': 'Haji Wright',
+    '杰克·鲁多尼': 'Jack Rudoni',
+    // 赫尔城
+    '贝卢米': 'Mohamed Belloumi',
+    'Tzolakis': 'Konstantinos Tzolakis',
+    // 伊普斯维奇
+    '杰克·克拉克': 'Jack Clarke'
+};
+
+// ─────────────────────────────────────────────
+// 球队名转换
+// ─────────────────────────────────────────────
 function toChinese(name){
-    if(!name) return null;
-    if(TEAM_MAP[name]) return TEAM_MAP[name];
-    for(const [en,zh] of Object.entries(TEAM_MAP)){
-        if(name.toLowerCase().includes(en.toLowerCase())) return zh;
+    if (!name) return null;
+    if (TEAM_MAP[name]) return TEAM_MAP[name];
+    for (const [en, zh] of Object.entries(TEAM_MAP)) {
+        if (name.toLowerCase().includes(en.toLowerCase())) return zh;
     }
     return null;
 }
 
+// ─────────────────────────────────────────────
+// football-data.org 拉取
+// ─────────────────────────────────────────────
 async function fetchFromApi(token){
     const headers = { 'X-Auth-Token': token };
     const base = 'https://api.football-data.org/v4/competitions/PL';
 
     const sRes = await fetch(base + '/standings', { headers });
-    if(!sRes.ok) throw new Error(`Standings API ${sRes.status}：${await sRes.text()}`);
+    if (!sRes.ok) throw new Error(`Standings API ${sRes.status}`);
     const sData = await sRes.json();
 
     if (!sData.standings || !sData.standings[0] || !Array.isArray(sData.standings[0].table)) {
-        throw new Error('Standings 返回格式异常：缺少 standings[0].table');
+        throw new Error('Standings 返回格式异常');
     }
 
     const standings = sData.standings[0].table.map(row => {
         const zh = toChinese(row.team.name);
-        if(!zh){ console.warn('⚠️ 未知球队：' + row.team.name); return null; }
+        if (!zh) { console.warn('⚠️ 未知球队：' + row.team.name); return null; }
         return {
             rank: row.position, team: zh,
             played: row.playedGames, won: row.won, drawn: row.draw, lost: row.lost,
@@ -53,55 +134,148 @@ async function fetchFromApi(token){
         };
     }).filter(Boolean);
 
-    if (standings.length !== 20) {
-        console.warn(`⚠️ 积分榜返回 ${standings.length} 队（预期 20），可能有球队名未映射`);
-    }
-
     const mRes = await fetch(base + '/matches', { headers });
-    if(!mRes.ok) throw new Error(`Matches API ${mRes.status}：${await mRes.text()}`);
+    if (!mRes.ok) throw new Error(`Matches API ${mRes.status}`);
     const mData = await mRes.json();
+    if (!Array.isArray(mData.matches)) throw new Error('Matches 返回格式异常');
 
-    if (!Array.isArray(mData.matches)) {
-        throw new Error('Matches 返回格式异常：缺少 matches 数组');
-    }
-
-    // fixtures: 数组，index 0 = 第 1 轮
     const fixtures = [];
     for (let i = 0; i < 38; i++) fixtures.push([]);
-
-    // results: 对象 { "1": { "阿森纳|利兹联": [3,0] }, ... }
     const results = {};
 
-    let skipped = 0;
     mData.matches.forEach(m => {
         const h = toChinese(m.homeTeam.name);
         const a = toChinese(m.awayTeam.name);
-        if(!h || !a){ skipped++; return; }
+        if (!h || !a) return;
         const md = m.matchday;
         if (md >= 1 && md <= 38) {
             fixtures[md - 1].push({ home: h, away: a });
         }
-        if(m.status === 'FINISHED' && m.score && m.score.fullTime){
+        if (m.status === 'FINISHED' && m.score && m.score.fullTime) {
             if (!results[md]) results[md] = {};
             results[md][`${h}|${a}`] = [m.score.fullTime.home, m.score.fullTime.away];
         }
     });
 
-    if (skipped > 0) console.warn(`⚠️ 跳过 ${skipped} 场（球队名未映射）`);
-
-    const filledRounds = fixtures.filter(f => f.length).length;
-    if (filledRounds < 38) {
-        console.warn(`⚠️ 只有 ${filledRounds}/38 轮有赛程，可能赛季尚未完全排期`);
-    }
-
     return { standings, results, fixtures };
 }
 
+// ─────────────────────────────────────────────
+// TheSportsDB 球员照片拉取（断点续传 + 限速保护）
+// ─────────────────────────────────────────────
+async function fetchPlayerPhotos(){
+    // 1. 读取现有缓存（断点续传）
+    let existingPhotos = {};
+    try {
+        const oldRaw = fs.readFileSync(DATA_FILE, 'utf8');
+        const oldData = JSON.parse(oldRaw);
+        if (oldData.playerPhotos && typeof oldData.playerPhotos === 'object') {
+            existingPhotos = oldData.playerPhotos;
+        }
+    } catch (e) { /* 首次运行，无旧文件 */ }
+
+    const photos = { ...existingPhotos };
+    const allEntries = Object.entries(PLAYER_NAME_MAP);
+    const missing = allEntries.filter(([zh]) => !photos[zh]);
+
+    console.log(`📸 已有 ${Object.keys(existingPhotos).length} 张，待拉取 ${missing.length} 张`);
+
+    if (missing.length === 0) {
+        console.log('✅ 所有球员照片已缓存，跳过拉取');
+        return photos;
+    }
+
+    // 2. 单次最多拉 15 个（避免连续触发 429）
+    const BATCH_LIMIT = 15;
+    const batch = missing.slice(0, BATCH_LIMIT);
+    if (missing.length > BATCH_LIMIT) {
+        console.log(`⚠️ 本次只拉 ${BATCH_LIMIT} 个（剩 ${missing.length - BATCH_LIMIT} 个下次再拉）`);
+    }
+
+    let okCount = 0, missCount = 0, errCount = 0;
+
+    for (const [zhName, enName] of batch) {
+        let success = false;
+        let attempts = 0;
+
+        while (attempts < 3) {
+            attempts++;
+            try {
+                const url = `https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}/searchplayers.php?p=${encodeURIComponent(enName)}`;
+                const res = await fetch(url, {
+                    headers: { 'User-Agent': 'PL-Prediction-Engine/1.0' }
+                });
+
+                // 429：等待 30 秒后重试
+                if (res.status === 429) {
+                    console.log(`  ⏸ ${zhName} 被限速，等待 30 秒…`);
+                    await new Promise(r => setTimeout(r, 30000));
+                    continue;
+                }
+
+                if (!res.ok) {
+                    console.warn(`  ⚠️ ${zhName} HTTP ${res.status}`);
+                    errCount++;
+                    success = true; // 不重试非 429 错误
+                    break;
+                }
+
+                const data = await res.json();
+                if (data.player && data.player.length > 0) {
+                    const p = data.player[0];
+                    const photoUrl = p.strCutout || p.strRender || p.strThumb || null;
+                    if (photoUrl) {
+                        photos[zhName] = photoUrl;
+                        console.log(`  ✅ ${zhName}`);
+                        okCount++;
+                    } else {
+                        console.log(`  ⚠️ ${zhName} 无照片字段`);
+                        missCount++;
+                    }
+                } else {
+                    console.log(`  ⚠️ ${zhName} 未找到`);
+                    missCount++;
+                }
+                success = true;
+                break;
+            } catch (e) {
+                console.warn(`  ⚠️ ${zhName} 请求失败：${e.message}`);
+                await new Promise(r => setTimeout(r, 5000));
+            }
+        }
+
+        if (!success) {
+            console.warn(`  ❌ ${zhName} 重试 3 次仍失败，跳过`);
+            errCount++;
+        }
+
+        // 每请求间隔 2 秒
+        await new Promise(r => setTimeout(r, 2000));
+    }
+
+    console.log('');
+    console.log(`📸 本次汇总：成功 ${okCount} · 未找到 ${missCount} · 错误 ${errCount}`);
+    console.log(`📸 累计已有 ${Object.keys(photos).length} / ${allEntries.length} 张`);
+
+    if (Object.keys(photos).length < allEntries.length) {
+        console.log(`💡 还有 ${allEntries.length - Object.keys(photos).length} 张未拉取，再跑一次 node update.js 继续`);
+    } else {
+        console.log('🎉 全部球员照片已拉齐');
+    }
+
+    return photos;
+}
+
+// ─────────────────────────────────────────────
+// 主流程
+// ─────────────────────────────────────────────
 async function main(){
     const token = process.env.FD_TOKEN;
-    if(!token){
+    if (!token) {
         console.error('❌ 请设置 FD_TOKEN 环境变量');
-        console.error('   Windows: set FD_TOKEN=你的密钥 && node update.js');
+        console.error('   PowerShell: $env:FD_TOKEN="你的密钥"');
+        console.error('   CMD:        set FD_TOKEN=你的密钥');
+        console.error('   然后运行:   node update.js');
         process.exit(1);
     }
 
@@ -120,19 +294,29 @@ async function main(){
         process.exit(1);
     }
 
+    // 拉取球员照片
+    let playerPhotos = {};
+    try {
+        playerPhotos = await fetchPlayerPhotos();
+    } catch (e) {
+        console.warn('⚠️ 球员照片整体失败，跳过：', e.message);
+    }
+
     const payload = {
         updatedAt: new Date().toISOString(),
         fixtures,
         results,
-        standings
+        standings,
+        playerPhotos
     };
 
     fs.writeFileSync(DATA_FILE, JSON.stringify(payload, null, 2), 'utf8');
     console.log('');
     console.log('🎉 已写入 data.json');
+    console.log(`   球员照片：${Object.keys(playerPhotos).length} 张`);
     console.log('下一步：');
-    console.log('  git add data.json');
-    console.log('  git commit -m "Update PL data"');
+    console.log('  git add data.json update.js');
+    console.log('  git commit -m "Update PL data + player photos"');
     console.log('  git push origin main');
 }
 
