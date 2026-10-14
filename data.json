@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-13T13:16:33.818Z",
+  "updatedAt": "2026-10-14T01:42:55.121Z",
   "fixtures": [
     [
       {
@@ -2093,5 +2093,36 @@
       "gd": -4,
       "points": 2
     }
-  ]
+  ],
+  "playerPhotos": {
+    "萨卡": "https://r2.thesportsdb.com/images/media/player/cutout/7np7651788606735.png",
+    "厄德高": "https://r2.thesportsdb.com/images/media/player/cutout/0dp1xj1788606745.png",
+    "热苏斯": "https://r2.thesportsdb.com/images/media/player/cutout/jcifyz1789725894.png",
+    "哈兰德": "https://r2.thesportsdb.com/images/media/player/cutout/e8cart1789115621.png",
+    "谢尔基": "https://r2.thesportsdb.com/images/media/player/cutout/wqaxi41789117883.png",
+    "罗德里": "https://r2.thesportsdb.com/images/media/player/cutout/0ml2zi1761148957.png",
+    "萨拉赫": "https://r2.thesportsdb.com/images/media/player/cutout/3blc581757088735.png",
+    "伊萨克": "https://r2.thesportsdb.com/images/media/player/cutout/x5czue1788551058.png",
+    "加克波": "https://r2.thesportsdb.com/images/media/player/cutout/lnikpg1788551025.png",
+    "摩根·罗杰斯": "https://r2.thesportsdb.com/images/media/player/cutout/rlyedx1787689763.png",
+    "帕尔默": "https://r2.thesportsdb.com/images/media/player/cutout/q6nnho1787689956.png",
+    "麦迪逊": "https://r2.thesportsdb.com/images/media/player/cutout/sktr381789397763.png",
+    "B费": "https://r2.thesportsdb.com/images/media/player/cutout/utrk0y1789119923.png",
+    "拉什福德": "https://r2.thesportsdb.com/images/media/player/cutout/ucqzx51789120947.png",
+    "吉马良斯": "https://r2.thesportsdb.com/images/media/player/cutout/trty041786916932.png",
+    "沃特金斯": "https://r2.thesportsdb.com/images/media/player/cutout/w6dir11756987347.png",
+    "麦金": "https://r2.thesportsdb.com/images/media/player/cutout/gu319m1788604952.png",
+    "三笘薰": "https://r2.thesportsdb.com/images/media/player/cutout/8pkc4q1788700732.png",
+    "维尔贝克": "https://r2.thesportsdb.com/images/media/player/cutout/mjo6g31787690678.png",
+    "卡尔弗特-勒温": "https://r2.thesportsdb.com/images/media/player/cutout/8gyavf1757076856.png",
+    "蒂耶尔诺·巴里": "https://r2.thesportsdb.com/images/media/player/cutout/c1glkq1788878856.png",
+    "塔科夫斯基": "https://r2.thesportsdb.com/images/media/player/cutout/j8fybx1788879404.png",
+    "希门尼斯": "https://r2.thesportsdb.com/images/media/player/cutout/lhn8dr1789124730.png",
+    "埃泽": "https://r2.thesportsdb.com/images/media/player/cutout/15phjf1788606753.png",
+    "马特塔": "https://r2.thesportsdb.com/images/media/player/cutout/jjeh0t1788797012.png",
+    "姆贝乌莫": "https://r2.thesportsdb.com/images/media/player/cutout/ajz1961789120176.png",
+    "维萨": "https://r2.thesportsdb.com/images/media/player/cutout/y82eiw1789128342.png",
+    "索兰克": "https://r2.thesportsdb.com/images/media/player/cutout/0rhuef1789397465.png",
+    "塞梅尼奥": "https://r2.thesportsdb.com/images/media/player/cutout/cx612n1789117038.png"
+  }
 }
