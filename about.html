@@ -21,6 +21,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
+        @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
         :root{
             --bg:#08090d;--bg-2:#0d1016;
             --surface:rgba(18,22,32,.7);--surface-2:rgba(12,15,22,.85);--surface-hi:rgba(24,30,44,.8);
@@ -36,19 +37,36 @@
             --ease:cubic-bezier(.16,1,.3,1);
             --ease-spring:cubic-bezier(.2,1.6,.4,1);
         }
+        body[data-theme="ocean"]{
+            --amber:#22d3ee;--amber-soft:rgba(34,211,238,.14);--amber-glow:rgba(34,211,238,.35);
+            --cyan:#a78bfa;
+        }
+        body[data-theme="aurora"]{
+            --amber:#34d399;--amber-soft:rgba(52,211,153,.14);--amber-glow:rgba(52,211,153,.35);
+            --cyan:#fbbf24;
+        }
         *{box-sizing:border-box;margin:0;padding:0}
         html{background:var(--bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-        body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+        body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.7;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;transition:background .5s var(--ease)}
         body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1200px 700px at 50% -10%,rgba(255,159,67,.1),transparent 55%),radial-gradient(900px 500px at 50% 110%,rgba(34,211,238,.06),transparent 55%)}
         body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");mix-blend-mode:overlay}
 
-        .back-btn{position:fixed;top:24px;left:24px;padding:10px 18px;
-            background:var(--surface);border:1px solid var(--border-hi);border-radius:var(--r-full);
-            color:var(--text);text-decoration:none;font-size:13px;font-weight:500;
-            backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:50;
-            transition:all .25s var(--ease);display:inline-flex;align-items:center;gap:6px}
-        .back-btn:hover{border-color:rgba(255,159,67,.5);color:var(--amber);transform:translateX(-2px);box-shadow:0 0 20px -4px var(--amber-glow)}
-        @media(max-width:640px){.back-btn{top:16px;left:16px;padding:8px 14px;font-size:12px}}
+        /* 顶栏（含主题/音效按钮）*/
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-6)}
+        @media(max-width:640px){.topbar{padding:0 var(--sp-4);height:56px}}
+        .topbar-left{display:flex;align-items:center;gap:var(--sp-3);font-size:13px;font-weight:600;letter-spacing:.02em}
+        .topbar-left .logo{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.5),0 0 20px -4px var(--amber-glow);animation:spinSlow 20s linear infinite;flex-shrink:0}
+        @keyframes spinSlow{to{transform:rotate(360deg)}}
+        .topbar-left .title{font-family:var(--font-serif);font-weight:500;font-size:16px;letter-spacing:-.01em;color:var(--text)}
+        .topbar-left .title em{font-style:italic;background:linear-gradient(135deg,var(--amber),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+        @media(max-width:640px){.topbar-left .title{display:none}}
+        .topbar-right{display:flex;align-items:center;gap:var(--sp-2)}
+        .topbar .nav-link{color:var(--text-3);text-decoration:none;font-size:12px;font-weight:500;padding:8px 12px;border-radius:var(--r-sm);transition:all .2s var(--ease)}
+        .topbar .nav-link:hover{color:var(--amber);background:var(--amber-soft)}
+        .topbar .nav-link.on{color:var(--amber);background:var(--amber-soft)}
+        .topbar .icon-btn{width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s var(--ease);font-size:14px}
+        .topbar .icon-btn:hover{color:var(--amber);border-color:rgba(255,159,67,.5);background:var(--amber-soft);transform:translateY(-1px)}
+        .topbar .icon-btn.off{color:var(--text-4);opacity:.6}
 
         .wrap{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:100px var(--sp-6) 120px}
         @media(max-width:640px){.wrap{padding:80px var(--sp-4) 100px}}
@@ -60,7 +78,8 @@
         .hero h1 .char{display:inline-block;opacity:0;transform:translateY(30px) rotateX(-90deg);transform-origin:50% 100%;animation:charIn .9s var(--ease) forwards;backface-visibility:hidden}
         .hero h1 em .char{background:inherit;-webkit-background-clip:inherit;background-clip:inherit;-webkit-text-fill-color:inherit}
         @keyframes charIn{0%{opacity:0;transform:translateY(40px) rotateX(-90deg)}60%{opacity:1;transform:translateY(0) rotateX(8deg)}100%{opacity:1;transform:translateY(0) rotateX(0)}}
-        .hero .lead{font-size:17px;color:var(--text-2);max-width:640px;line-height:1.7}
+        .hero .lead{font-size:17px;color:var(--text-2);max-width:640px;line-height:1.7;opacity:0;animation:fadeUp .9s var(--ease) .8s forwards}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
         section{margin-bottom:var(--sp-12);opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
         section.visible{opacity:1;transform:none}
@@ -72,13 +91,17 @@
         section a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,159,67,.3);transition:border-color .2s var(--ease)}
         section a:hover{border-bottom-color:var(--amber)}
 
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);margin-bottom:var(--sp-4);transition:border-color .3s var(--ease),transform .3s var(--ease)}
-        .card:hover{border-color:var(--border-hi)}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);margin-bottom:var(--sp-4);transition:border-color .3s var(--ease),transform .3s var(--ease);position:relative;overflow:hidden}
+        .card::before{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--angle,0deg),transparent 0deg,var(--amber) 60deg,transparent 120deg);opacity:0;transition:opacity .4s;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;pointer-events:none}
+        .card:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+        .card:hover::before{opacity:.6;animation:borderRotate 3s linear infinite}
+        @keyframes borderRotate{to{--angle:360deg}}
         .card .lbl{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-2)}
         .card .num{font-family:var(--font-serif);font-weight:500;font-size:32px;color:var(--amber);letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
 
         .layers{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp-3);margin:var(--sp-5) 0}
-        .layer{background:linear-gradient(160deg,rgba(255,159,67,.06),rgba(34,211,238,.03));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-4);position:relative}
+        .layer{background:linear-gradient(160deg,rgba(255,159,67,.06),rgba(34,211,238,.03));border:1px solid var(--border-hi);border-radius:var(--r-md);padding:var(--sp-4);position:relative;transition:all .35s var(--ease)}
+        .layer:hover{transform:translateY(-3px);border-color:rgba(255,159,67,.4);box-shadow:0 12px 32px -10px var(--amber-glow)}
         .layer .n{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--amber);margin-bottom:var(--sp-2);letter-spacing:.1em}
         .layer .t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:var(--sp-2)}
         .layer .d{font-size:12px;color:var(--text-3);line-height:1.6}
@@ -98,7 +121,10 @@
         .tl-item{position:relative;padding:var(--sp-2) 0 var(--sp-3);font-size:13.5px;color:var(--text-2);line-height:1.6}
         .tl-item::before{content:"";position:absolute;left:-22px;top:14px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--amber);box-shadow:0 0 10px var(--amber-glow)}
         .tl-item.done::before{background:var(--emerald);border-color:var(--emerald);box-shadow:0 0 10px rgba(52,211,153,.4)}
+        .tl-item.new::before{background:var(--amber);border-color:var(--amber);box-shadow:0 0 12px var(--amber-glow);animation:pulse 2s ease-in-out infinite}
+        @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.3);opacity:.7}}
         .tl-item strong{color:var(--text);font-weight:600;display:inline-block;min-width:26px}
+        .tl-item.new strong{color:var(--amber)}
 
         .legal-box{border:1px solid rgba(239,68,68,.3);background:linear-gradient(135deg,rgba(239,68,68,.06),rgba(239,68,68,.02));border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-6);margin:var(--sp-5) 0}
         .legal-box h3{color:var(--rose);margin-top:0}
@@ -111,6 +137,14 @@
         .src-table td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
         .src-table tr:last-child td{border-bottom:0}
 
+        /* v12.0 新增亮点卡片 */
+        .highlights{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--sp-3);margin:var(--sp-5) 0}
+        .highlight{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:var(--sp-4);position:relative;overflow:hidden;transition:all .35s var(--ease)}
+        .highlight:hover{transform:translateY(-4px);border-color:rgba(255,159,67,.4);box-shadow:0 16px 40px -10px var(--amber-glow)}
+        .highlight .ico{font-size:24px;margin-bottom:var(--sp-2);display:block;filter:drop-shadow(0 4px 12px var(--amber-glow))}
+        .highlight .t{font-size:13px;font-weight:600;color:var(--text);margin-bottom:var(--sp-1)}
+        .highlight .d{font-size:11.5px;color:var(--text-3);line-height:1.6}
+
         footer{margin-top:var(--sp-12);padding-top:var(--sp-6);border-top:1px solid var(--border);text-align:center;font-size:11px;color:var(--text-4);line-height:1.9}
         footer a{color:var(--text-3);text-decoration:none;margin:0 8px;transition:color .2s var(--ease)}
         footer a:hover{color:var(--amber)}
@@ -119,12 +153,23 @@
         @media(prefers-reduced-motion:reduce){
             *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
             section{opacity:1!important;transform:none!important}
+            .hero .lead{opacity:1!important}
         }
     </style>
 </head>
 <body>
 
-<a href="index.html" class="back-btn">← 返回预测</a>
+<header class="topbar">
+    <div class="topbar-left">
+        <div class="logo"></div>
+        <div class="title">英超 <em>预测</em></div>
+    </div>
+    <div class="topbar-right">
+        <button class="icon-btn" id="themeBtn" onclick="cycleTheme()" title="切换主题" aria-label="切换主题">🎨</button>
+        <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="音效开关" aria-label="音效开关">🔇</button>
+        <a href="index.html" class="nav-link">返回预测</a>
+    </div>
+</header>
 
 <div class="wrap">
 
@@ -193,6 +238,40 @@
             <li><strong>批量预测</strong> — 一轮 10 场并发跑，每场可选跑 1/3/5 次取众数</li>
             <li><strong>沉浸体验</strong> — 光标光晕、漂浮粒子、3D 倾斜、命令面板、快捷键</li>
         </ul>
+
+        <h3>v12.0 天工视觉升级</h3>
+        <div class="highlights">
+            <div class="highlight">
+                <span class="ico">🧠</span>
+                <div class="t">AI 推理可视化</div>
+                <div class="d">5 步战术板动画：读规则 → 注数据 → 析交锋 → 算概率 → 出 JSON</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">📡</span>
+                <div class="t">4 维实力雷达</div>
+                <div class="d">近期状态 / 硬实力 / 攻击力 / 交锋战绩，双色叠加对比</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">🔥</span>
+                <div class="t">今日焦点战</div>
+                <div class="d">按德比、前 4 互撞、竞争度自动排序的横滑卡片</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">🎨</span>
+                <div class="t">3 套主题皮肤</div>
+                <div class="d">暗夜金 / 深海蓝 / 极光绿，一键切换，全局同步</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">🌊</span>
+                <div class="t">命中率热力图</div>
+                <div class="d">GitHub 风格 80 格色块，一眼看清趋势</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">🔊</span>
+                <div class="t">Web Audio 音效</div>
+                <div class="d">无音频文件，纯代码合成点击 / 命中 / 精确进球音</div>
+            </div>
+        </div>
 
         <h3>数据从哪来</h3>
         <table class="src-table">
@@ -268,7 +347,7 @@
     <!-- ═══════════ ④ 成长历程 ═══════════ -->
     <section id="journey">
         <h2>成长历程</h2>
-        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 22 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
+        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 25 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
 
         <div class="timeline">
             <div class="tl-item done"><strong>01</strong> 理解并改写 <code>skill.md</code> 提示词工程</div>
@@ -293,6 +372,9 @@
             <div class="tl-item done"><strong>20</strong> 双源球员照片 1539 张（Bzzoiro + TheSportsDB）</div>
             <div class="tl-item done"><strong>21</strong> 预测去重 + 中英球员映射 + 移动端优化</div>
             <div class="tl-item done"><strong>22</strong> A11y 无障碍 + ETag 性能优化 + 赛季总览</div>
+            <div class="tl-item done"><strong>23</strong> 修复 <code>@keyframes fadeUp</code> 缺失 + 中文字体方块</div>
+            <div class="tl-item done"><strong>24</strong> AI 推理可视化 + 4 维雷达 + 命中率热力图</div>
+            <div class="tl-item new"><strong>25</strong> v12.0 天工视觉：3 套主题 + 音效 + 磁吸 + 焦点战卡片</div>
         </div>
     </section>
 
@@ -304,11 +386,79 @@
             <span style="color:var(--text-4)">·</span>
             <a href="#legal">免责声明</a>
         </div>
-        <div class="ver">Premier League Prediction Engine · v11.0</div>
+        <div class="ver">Premier League Prediction Engine · v12.0</div>
     </footer>
 </div>
 
 <script>
+    /* ══ 音效（与 index.html 同源）══ */
+    const Sound = (() => {
+        let enabled = false;
+        let ctx = null;
+        function ensure(){ if (!ctx) try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} return ctx; }
+        function tone(freq, dur=0.12, type='sine', vol=0.08){
+            if (!enabled) return;
+            const c = ensure(); if (!c) return;
+            const o = c.createOscillator(); const g = c.createGain();
+            o.type = type; o.frequency.value = freq;
+            g.gain.setValueAtTime(0, c.currentTime);
+            g.gain.linearRampToValueAtTime(vol, c.currentTime + 0.01);
+            g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+            o.connect(g); g.connect(c.destination);
+            o.start(); o.stop(c.currentTime + dur);
+        }
+        return {
+            toggle(){ enabled = !enabled; if (enabled) tone(660, .1); return enabled; },
+            isOn(){ return enabled; },
+            click(){ tone(520, .05, 'triangle', 0.04); },
+            success(){ tone(880, .15); setTimeout(() => tone(1174, .2), 100); }
+        };
+    })();
+
+    /* ══ 主题（与 index.html 完全同步）══ */
+    const THEMES = ['default', 'ocean', 'aurora'];
+    const THEME_NAMES = { default: '暗夜金', ocean: '深海蓝', aurora: '极光绿' };
+    function applyTheme(name){
+        if (name === 'default') document.body.removeAttribute('data-theme');
+        else document.body.setAttribute('data-theme', name);
+    }
+    function cycleTheme(){
+        const cur = localStorage.getItem('pl_theme') || document.body.getAttribute('data-theme') || 'default';
+        const next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+        localStorage.setItem('pl_theme', next);
+        applyTheme(next);
+        Sound.click();
+        toast('主题：' + (THEME_NAMES[next] || next));
+    }
+
+    /* ══ 音效开关 ══ */
+    function toggleSound(){
+        const on = Sound.toggle();
+        const btn = document.getElementById('soundBtn');
+        btn.textContent = on ? '🔊' : '🔇';
+        btn.classList.toggle('off', !on);
+        localStorage.setItem('pl_sound', on ? '1' : '0');
+        toast(on ? '音效已开启' : '音效已关闭');
+    }
+
+    /* ══ 轻量 toast ══ */
+    function toast(msg){
+        let wrap = document.getElementById('toastWrap');
+        if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.id = 'toastWrap';
+            wrap.style.cssText = 'position:fixed;top:calc(64px + 16px);left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:calc(100vw - 32px)';
+            document.body.appendChild(wrap);
+        }
+        const el = document.createElement('div');
+        el.textContent = msg;
+        el.style.cssText = 'background:linear-gradient(180deg,#131820,#0d1118);border:1px solid rgba(255,255,255,.12);color:#f1f5f9;padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;box-shadow:0 16px 40px -8px rgba(0,0,0,.6);pointer-events:auto;cursor:pointer;animation:fadeUp .4s cubic-bezier(.2,1.6,.4,1)';
+        el.onclick = () => el.remove();
+        wrap.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+    }
+
+    /* ══ Hero 标题动画 ══ */
     (function splitHeroTitle(){
         const h1 = document.getElementById('aboutTitle');
         if (!h1) return;
@@ -334,6 +484,7 @@
         walk(h1);
     })();
 
+    /* ══ 滚动 reveal ══ */
     (function setupReveal(){
         if (window.matchMedia('(prefers-reduced-motion:reduce)').matches ||
             !('IntersectionObserver' in window)) {
@@ -346,6 +497,36 @@
             });
         }, { threshold: .12, rootMargin: '0px 0px -60px 0px' });
         document.querySelectorAll('section').forEach(el => io.observe(el));
+    })();
+
+    /* ══ 启动：恢复主题 + 音效状态 ══ */
+    (function boot(){
+        const savedTheme = localStorage.getItem('pl_theme');
+        if (savedTheme && savedTheme !== 'default') applyTheme(savedTheme);
+
+        const savedSound = localStorage.getItem('pl_sound') === '1';
+        const btn = document.getElementById('soundBtn');
+        if (savedSound) {
+            Sound.toggle();
+            btn.textContent = '🔊';
+            btn.classList.remove('off');
+        } else {
+            btn.textContent = '🔇';
+            btn.classList.add('off');
+        }
+
+        // 跨标签页同步主题
+        window.addEventListener('storage', e => {
+            if (e.key === 'pl_theme') applyTheme(e.newValue || 'default');
+            if (e.key === 'pl_sound') {
+                const on = e.newValue === '1';
+                if (on !== Sound.isOn()) {
+                    Sound.toggle();
+                    btn.textContent = on ? '🔊' : '🔇';
+                    btn.classList.toggle('off', !on);
+                }
+            }
+        });
     })();
 </script>
 </body>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>OG Source · 英超预测引擎</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        html,body{background:#000;width:1200px;height:630px;overflow:hidden;margin:0}
+        .og{
+            width:1200px;height:630px;position:relative;overflow:hidden;
+            background:#08090d;
+            color:#f1f5f9;
+            font-family:"Inter","Noto Sans SC",-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+            isolation:isolate;
+        }
+        /* 背景层：径向光晕 */
+        .og::before{
+            content:"";position:absolute;inset:0;z-index:0;
+            background:
+                    radial-gradient(900px 480px at 50% -10%, rgba(255,159,67,.24) 0%, transparent 55%),
+                    radial-gradient(700px 420px at 50% 115%, rgba(34,211,238,.16) 0%, transparent 55%),
+                    radial-gradient(500px 300px at 12% 50%, rgba(52,211,153,.06) 0%, transparent 60%),
+                    linear-gradient(180deg,#0b0e15 0%, #08090d 100%);
+        }
+        /* 网格层：球场线 */
+        .grid{
+            position:absolute;inset:0;z-index:1;pointer-events:none;
+            background-image:
+                    linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+            background-size:200px 105px;
+            mask-image:radial-gradient(ellipse 900px 500px at 50% 50%, black 30%, transparent 85%);
+            -webkit-mask-image:radial-gradient(ellipse 900px 500px at 50% 50%, black 30%, transparent 85%);
+        }
+        /* 噪点层 */
+        .noise{
+            position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+            background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        }
+        /* 斜向装饰线 */
+        .diag{
+            position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;
+        }
+        .diag::before,.diag::after{
+            content:"";position:absolute;height:1px;background:linear-gradient(90deg,transparent 0%, rgba(255,159,67,.35) 50%, transparent 100%);
+            width:60%;
+        }
+        .diag::before{top:130px;right:-8%;transform:rotate(-8deg);opacity:.5}
+        .diag::after{bottom:110px;left:-8%;transform:rotate(-8deg);opacity:.35;background:linear-gradient(90deg,transparent 0%, rgba(34,211,238,.35) 50%, transparent 100%)}
+
+        /* 内容容器 */
+        .content{position:relative;z-index:10;padding:74px 80px 62px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+
+        /* 顶部品牌 */
+        .kicker{font-size:13px;font-weight:600;letter-spacing:.34em;color:#ff9f43;text-transform:uppercase}
+        .kicker-bar{width:340px;height:2px;margin-top:14px;background:linear-gradient(90deg,#ff9f43 0%, rgba(255,159,67,.4) 70%, transparent 100%);border-radius:2px}
+
+        /* 主标题 */
+        .title{margin-top:38px;font-family:"Playfair Display","Noto Serif SC","Songti SC","STSong",serif;font-weight:500;font-size:108px;line-height:.98;letter-spacing:-.035em}
+        .title .row{display:block}
+        .title .row-cn{color:#f1f5f9}
+        .title .row-accent{
+            font-style:italic;font-weight:500;
+            background:linear-gradient(90deg,#ff9f43 0%, #ffb968 45%, #22d3ee 100%);
+            -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+            padding-right:8px;
+        }
+
+        /* 副标题 */
+        .subtitle{margin-top:26px;font-size:22px;font-weight:400;color:#a8b5cc;letter-spacing:.02em}
+        .subtitle .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#ff9f43;margin:0 14px;vertical-align:middle;box-shadow:0 0 10px rgba(255,159,67,.6)}
+        .subtitle .dot.c{background:#22d3ee;box-shadow:0 0 10px rgba(34,211,238,.6)}
+        .subtitle .dot.e{background:#34d399;box-shadow:0 0 10px rgba(52,211,153,.6)}
+
+        /* 底部数据条 */
+        .footer{border-top:1px solid rgba(255,255,255,.08);padding-top:26px;display:flex;justify-content:space-between;align-items:flex-end;gap:60px}
+        .stats{display:grid;grid-template-columns:repeat(3,auto);gap:88px}
+        .stat .label{font-size:12px;font-weight:700;letter-spacing:.24em;margin-bottom:8px}
+        .stat.a .label{color:#ff9f43}
+        .stat.b .label{color:#22d3ee}
+        .stat.c .label{color:#34d399}
+        .stat .val{font-size:14px;color:#8a97a8;font-weight:400}
+        .badge{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:8px 16px;border-radius:999px;
+            background:rgba(255,159,67,.1);border:1px solid rgba(255,159,67,.35);
+            color:#ffc48a;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+            font-family:Inter,"Noto Sans SC",sans-serif;
+        }
+        .badge .dot-live{width:6px;height:6px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399}
+
+        /* 右侧足球装饰 */
+        .ball-stage{position:absolute;right:-40px;top:120px;width:520px;height:520px;z-index:3;pointer-events:none}
+        .ball-stage svg{width:100%;height:100%;display:block}
+    </style>
+</head>
+<body>
+
+<div class="og" id="og">
+    <div class="diag"></div>
+    <div class="grid"></div>
+    <div class="noise"></div>
+
+    <!-- 右侧装饰球 -->
+    <div class="ball-stage">
+        <svg viewBox="-260 -260 520 520">
+            <defs>
+                <radialGradient id="ballFill" cx="35%" cy="30%">
+                    <stop offset="0%" stop-color="#1e2738"/>
+                    <stop offset="100%" stop-color="#0a0d13"/>
+                </radialGradient>
+                <radialGradient id="ballGlow" cx="50%" cy="50%">
+                    <stop offset="0%" stop-color="#ff9f43" stop-opacity=".35"/>
+                    <stop offset="100%" stop-color="#ff9f43" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ff9f43" stop-opacity=".7"/>
+                    <stop offset="50%" stop-color="#ffb968" stop-opacity=".35"/>
+                    <stop offset="100%" stop-color="#22d3ee" stop-opacity=".55"/>
+                </linearGradient>
+            </defs>
+
+            <!-- 外发光 -->
+            <circle r="230" fill="url(#ballGlow)"/>
+            <!-- 外圈装饰环 -->
+            <circle r="180" fill="none" stroke="url(#ringGrad)" stroke-width="1" opacity=".7"/>
+            <circle r="200" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1" stroke-dasharray="3 9"/>
+            <!-- 球体 -->
+            <circle r="140" fill="url(#ballFill)" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+            <circle r="140" fill="none" stroke="rgba(255,159,67,.35)" stroke-width="1.5"/>
+            <circle r="116" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            <!-- 中心五边形 -->
+            <path d="M 0,-48 L 45,-16 L 28,36 L -28,36 L -45,-16 Z" fill="#0a0d13" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
+            <path d="M 0,-48 L 0,-116 M 45,-16 L 106,-35 M 28,36 L 68,94 M -28,36 L -68,94 M -45,-16 L -106,-35"
+                  stroke="rgba(255,255,255,.14)" stroke-width="2" fill="none"/>
+            <!-- 内部细纹 -->
+            <path d="M 0,-48 L 0,-116 M 45,-16 L 106,-35 M 28,36 L 68,94 M -28,36 L -68,94 M -45,-16 L -106,-35"
+                  stroke="rgba(255,159,67,.1)" stroke-width="6" fill="none" filter="blur(4px)"/>
+        </svg>
+    </div>
+
+    <div class="content">
+        <div>
+            <div class="kicker">Premier League 2026/27</div>
+            <div class="kicker-bar"></div>
+            <div class="title">
+                <span class="row row-cn">英超预测</span>
+                <span class="row row-accent">引擎</span>
+            </div>
+            <div class="subtitle">
+                规则工程<span class="dot"></span>前端工程<span class="dot c"></span>自动化
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="stats">
+                <div class="stat a">
+                    <div class="label">GROQ API</div>
+                    <div class="val">免费 · 每天 1000 次</div>
+                </div>
+                <div class="stat b">
+                    <div class="label">DATA</div>
+                    <div class="val">football-data.org 实时同步</div>
+                </div>
+                <div class="stat c">
+                    <div class="label">OPEN SOURCE</div>
+                    <div class="val">GitHub · 可自由 Fork</div>
+                </div>
+            </div>
+            <div class="badge"><span class="dot-live"></span>v12.0</div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
