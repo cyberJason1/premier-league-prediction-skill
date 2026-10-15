@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v10.0</title>
+    <title>英超预测引擎 v11.0</title>
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
@@ -22,7 +22,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         /* ═══════════════════════════════════════════════════════════════
-           v10.0 · 天工设计系统
+           v11.0 · 天工设计系统
            ═══════════════════════════════════════════════════════════════ */
         :root{
             --bg:#06080c;--bg-2:#0a0e15;
@@ -42,7 +42,6 @@
             --font-mono:"SF Mono","JetBrains Mono",Consolas,monospace;
             --ease:cubic-bezier(.16,1,.3,1);
             --ease-spring:cubic-bezier(.2,1.6,.4,1);
-            /* IDE 变量 */
             --mx:-50%;--my:-50%;
         }
         *{box-sizing:border-box;margin:0;padding:0}
@@ -51,13 +50,11 @@
         body.no-scroll{overflow:hidden}
         button,a,[onclick],.mrow,.cmd-item{touch-action:manipulation}
 
-        /* ═══════════════ 加载条 ═══════════════ */
         #loadingBar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--amber),#ffb968,var(--cyan),var(--emerald));background-size:300% 100%;z-index:500;opacity:0;box-shadow:0 0 16px var(--amber-glow),0 0 32px var(--amber-glow);transition:width .3s var(--ease),opacity .3s var(--ease);animation:loadingShimmer 2s linear infinite}
         #loadingBar.active{opacity:1}
         #loadingBar.done{opacity:0;transition:opacity .5s .3s}
         @keyframes loadingShimmer{to{background-position:300% 0}}
 
-        /* ═══════════════ 光标/粒子 ═══════════════ */
         #ambientCursor{position:fixed;width:640px;height:640px;left:0;top:0;border-radius:50%;background:radial-gradient(circle,rgba(255,159,67,.18) 0%,rgba(255,159,67,.08) 40%,transparent 70%);pointer-events:none;z-index:2;transform:translate3d(-1000px,-1000px,0);mix-blend-mode:screen;will-change:transform;transition:opacity .4s var(--ease)}
         body.ambient-off #ambientCursor{opacity:0}
         @media(hover:none),(max-width:768px){#ambientCursor{display:none}}
@@ -68,7 +65,6 @@
         .particle.violet{background:var(--violet);box-shadow:0 0 12px var(--violet),0 0 4px var(--violet)}
         @keyframes floatParticle{0%{transform:translateY(100vh) translateX(0) scale(.6);opacity:0}15%{opacity:.9;transform:translateY(85vh) translateX(10px) scale(1)}50%{opacity:.7;transform:translateY(50vh) translateX(-15px) scale(1.1)}85%{opacity:.9;transform:translateY(15vh) translateX(25px) scale(1)}100%{transform:translateY(-100px) translateX(40px) scale(.6);opacity:0}}
 
-        /* ═══════════════ 背景球场光效 ═══════════════ */
         body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:
                 radial-gradient(1400px 800px at 50% -20%,rgba(255,159,67,.14),transparent 55%),
                 radial-gradient(1000px 600px at 50% 120%,rgba(34,211,238,.08),transparent 55%),
@@ -78,17 +74,10 @@
         body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.075;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>"),linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:200px 200px,64px 64px,64px 64px;mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);-webkit-mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);mix-blend-mode:overlay}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.fade-in,.reveal{opacity:1!important;transform:none!important}#ambientCursor,#particleLayer{display:none!important}body::before{animation:none!important}}
 
-        /* ═══════════════ 主容器 ═══════════════ */
         .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:88px var(--sp-6) 140px}
         @media(max-width:640px){.wrap{padding:76px var(--sp-4) 120px}input,select,textarea{font-size:16px!important}}
 
-        /* ═══════════════ 顶栏 · 记分牌风格 ═══════════════ */
-        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;
-            background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));
-            backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);
-            border-bottom:1px solid var(--border);
-            display:flex;align-items:center;justify-content:space-between;
-            padding:0 var(--sp-6)}
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-6)}
         @media(max-width:640px){.topbar{padding:0 var(--sp-4);height:56px}}
         .topbar-left{display:flex;align-items:center;gap:var(--sp-3);font-size:13px;font-weight:600;letter-spacing:.02em}
         .topbar-left .logo{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.5),0 0 20px -4px var(--amber-glow);animation:spinSlow 20s linear infinite;flex-shrink:0}
@@ -109,7 +98,6 @@
         .topbar .icon-btn:hover{color:var(--amber);border-color:var(--border-focus);background:var(--amber-soft);transform:translateY(-1px)}
         .topbar .icon-btn.off{color:var(--text-4);opacity:.6}
 
-        /* ═══════════════ Hero ═══════════════ */
         .hero{position:relative;padding:var(--sp-10) 0 var(--sp-12);text-align:center}
         .hero.matchday::before{content:"";position:absolute;inset:-60px -40px 0 -40px;background:radial-gradient(ellipse at 50% 0%,rgba(255,159,67,.18) 0%,transparent 60%);pointer-events:none;z-index:-1;animation:matchPulse 3.2s ease-in-out infinite}
         @keyframes matchPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
@@ -124,7 +112,6 @@
         .hero .tag-line{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);flex-wrap:wrap;font-size:12px;color:var(--text-3);opacity:0;animation:fadeUp .9s var(--ease) 1s forwards}
         .hero kbd{font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--border-hi);color:var(--text-2);margin:0 1px}
 
-        /* ═══════════════ Dashboard · Bento ═══════════════ */
         .dash{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;grid-template-rows:auto;gap:var(--sp-3);margin-bottom:var(--sp-8)}
         @media(max-width:900px){.dash{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:560px){.dash{grid-template-columns:1fr;gap:var(--sp-2)}}
@@ -141,27 +128,22 @@
         .cell.primary{grid-row:span 1}
         .cell.primary .val{font-size:clamp(40px,6vw,60px)}
 
-        /* ═══════════════ 赛季总览条 ═══════════════ */
         .season-summary{text-align:center;font-size:12px;color:var(--text-3);margin:-16px 0 32px;letter-spacing:.02em;font-variant-numeric:tabular-nums;line-height:1.8}
         .season-summary .sep{color:var(--text-4);margin:0 6px}
         .season-summary b{color:var(--amber);font-weight:700}
 
-        /* ═══════════════ 警告条 ═══════════════ */
         .warn-banner{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.35);color:var(--gold);padding:14px 18px;border-radius:var(--r-md);font-size:13px;line-height:1.6;margin-bottom:var(--sp-5);display:none}
         .warn-banner.show{display:block}
         .warn-banner code{background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px;font-family:var(--font-mono);font-size:11px}
 
-        /* ═══════════════ 主网格 ═══════════════ */
         .grid{display:grid;grid-template-columns:minmax(340px,420px) 1fr;gap:var(--sp-5);align-items:start}
         @media(max-width:1020px){.grid{grid-template-columns:1fr}}
 
-        /* ═══════════════ 卡片 ═══════════════ */
         .card{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:var(--sp-6);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);transition:border-color .3s var(--ease),transform .5s var(--ease),box-shadow .5s var(--ease);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 16px 40px -16px rgba(0,0,0,.5);transform-style:preserve-3d;will-change:transform}
         .card:hover{border-color:var(--border-hi);box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 60px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.08)}
         .card h3{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-4);display:flex;align-items:center;gap:var(--sp-2)}
         .card h3::before{content:"";width:3px;height:12px;background:linear-gradient(180deg,var(--amber),var(--cyan));border-radius:2px;box-shadow:0 0 8px var(--amber-glow)}
 
-        /* ═══════════════ 表单 ═══════════════ */
         .field{margin-bottom:var(--sp-4)}
         .field label{display:block;font-size:11px;font-weight:500;color:var(--text-2);margin-bottom:var(--sp-2);letter-spacing:.02em}
         select,input,textarea{width:100%;background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);border-radius:var(--r-md);padding:12px 14px;font-size:14px;font-family:inherit;font-weight:500;outline:none;transition:border-color .2s var(--ease),background .2s var(--ease),box-shadow .25s var(--ease);-webkit-appearance:none;appearance:none}
@@ -176,7 +158,6 @@
         .char-count.warn{color:var(--gold)}
         .char-count.over{color:var(--rose);font-weight:600}
 
-        /* ═══════════════ 按钮 ═══════════════ */
         .btn{position:relative;width:100%;padding:14px;border:0;border-radius:var(--r-md);background:linear-gradient(135deg,var(--amber) 0%,#ffb968 100%);color:#1a0d02;font-family:inherit;font-weight:700;font-size:14px;letter-spacing:.03em;cursor:pointer;transition:transform .2s var(--ease),box-shadow .3s var(--ease),filter .2s var(--ease);overflow:hidden;box-shadow:0 1px 0 rgba(255,255,255,.3) inset,0 4px 12px -2px var(--amber-glow)}
         .btn::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,transparent 0%,rgba(255,255,255,.25) 50%,transparent 100%);transform:translateX(-100%);transition:transform .7s var(--ease)}
         .btn:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 8px 24px -4px var(--amber-glow)}
@@ -194,7 +175,6 @@
         .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);opacity:.6;animation:ripple .6s cubic-bezier(.16,1,.3,1) forwards;pointer-events:none}
         @keyframes ripple{to{transform:scale(4);opacity:0}}
 
-        /* ═══════════════ 空态/加载 ═══════════════ */
         .empty{color:var(--text-3);text-align:center;padding:60px var(--sp-4);font-size:14px;line-height:1.7}
         .empty .empty-ball{width:64px;height:64px;margin:0 auto var(--sp-5);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.4),0 0 60px -8px var(--amber-glow);animation:spinSlow 10s linear infinite}
         .empty .hint{margin-top:var(--sp-2);font-size:12px;color:var(--text-4)}
@@ -205,7 +185,6 @@
         .loader .msg .dots::after{content:"";animation:dots 1.5s steps(4,end) infinite}
         @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}100%{content:""}}
 
-        /* ═══════════════ 比分牌 ═══════════════ */
         .scoreboard{text-align:center;padding:var(--sp-6) 0;border-bottom:1px solid var(--border);margin-bottom:var(--sp-6);position:relative;background:linear-gradient(180deg,rgba(255,159,67,.04),transparent 60%);border-radius:var(--r-lg) var(--r-lg) 0 0}
         .teams{display:flex;align-items:center;justify-content:center;gap:var(--sp-6);flex-wrap:nowrap}
         .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-3);min-width:0}
@@ -226,7 +205,6 @@
         .multi-runs{font-size:11px;color:var(--text-3);margin-top:10px;text-align:center;font-variant-numeric:tabular-nums}
         .multi-runs b{color:var(--cyan);font-weight:600}
 
-        /* ═══════════════ 对比/环形 ═══════════════ */
         .compare-actual{display:flex;justify-content:center;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);margin-top:var(--sp-3);background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px}
         .compare-actual .col{text-align:center;flex:1;min-width:0}
         .compare-actual .col .lbl2{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-1)}
@@ -267,7 +245,6 @@
         .compare .seg.a{background:linear-gradient(90deg,#0891b2,var(--cyan))}
         @media(max-width:480px){.compare .seg{font-size:0}}
 
-        /* ═══════════════ Section ═══════════════ */
         .sect{margin-top:var(--sp-6);padding-top:var(--sp-5);border-top:1px solid var(--border)}
         .sect .ttl{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-4);display:flex;align-items:center;gap:var(--sp-2)}
         .sect .ttl::before{content:"";width:3px;height:12px;background:linear-gradient(180deg,var(--amber),var(--cyan));border-radius:2px;box-shadow:0 0 8px var(--amber-glow)}
@@ -283,18 +260,17 @@
         .conf.中{background:rgba(251,191,36,.14);color:var(--gold);border:1px solid rgba(251,191,36,.3)}
         .conf.低{background:var(--rose-soft);color:var(--rose);border:1px solid rgba(239,68,68,.3)}
 
-        /* ═══════════════ H2H ═══════════════ */
         .h2h{border:1px solid rgba(167,139,250,.3);background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(167,139,250,.02));border-radius:var(--r-lg);padding:var(--sp-5);position:relative;padding-top:22px}
         .h2h .tag{position:absolute;top:-10px;left:16px;font-size:10px;font-weight:700;letter-spacing:.08em;padding:3px 10px;border-radius:var(--r-full)}
         .h2h .tag.估算{background:#241d0e;color:var(--gold);border:1px solid rgba(251,191,36,.5)}
         .h2h .tag.资料库{background:#0a1f17;color:var(--emerald);border:1px solid rgba(52,211,153,.5)}
+        .h2h .tag.真实数据{background:#0a1f17;color:var(--emerald);border:1px solid rgba(52,211,153,.6);box-shadow:0 0 12px -2px rgba(52,211,153,.4)}
         .h2h .tag.今日情报{background:#0a1e24;color:var(--cyan);border:1px solid rgba(34,211,238,.5)}
         .h2h .sum{font-size:14px;margin-bottom:var(--sp-3);color:var(--text);font-weight:500}
         .h2h ul{list-style:none;font-size:13px;color:var(--text-2);display:flex;flex-direction:column;gap:6px}
         .h2h li{display:flex;align-items:center;gap:var(--sp-2)}
         .h2h li::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--violet);flex-shrink:0;box-shadow:0 0 6px var(--violet)}
 
-        /* ═══════════════ 球员卡 · FIFA 风格 ═══════════════ */
         .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--sp-3)}
         .pcard{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:var(--sp-4);transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .4s var(--ease);position:relative;overflow:hidden;display:flex;gap:var(--sp-3);align-items:flex-start}
         .pcard::before{content:"";position:absolute;top:-50%;right:-50%;width:200%;height:200%;background:radial-gradient(circle at 80% 20%,rgba(255,159,67,.15),transparent 50%);pointer-events:none;opacity:0;transition:opacity .4s var(--ease)}
@@ -325,7 +301,6 @@
         .pcard-chance-label b{color:var(--amber);font-weight:700}
         .pcard-reason{font-size:11px;color:var(--text-2);margin-top:8px;padding:6px 8px;background:rgba(34,211,238,.05);border-left:2px solid var(--cyan);border-radius:3px;line-height:1.5}
 
-        /* ═══════════════ 推荐得分球员 ═══════════════ */
         .scorer-list{display:flex;flex-direction:column;gap:var(--sp-2)}
         .scorer-item{background:linear-gradient(135deg,rgba(255,159,67,.06),rgba(255,159,67,.02));border:1px solid rgba(255,159,67,.2);border-radius:var(--r-md);padding:10px 14px;transition:transform .25s var(--ease),border-color .25s var(--ease);display:flex;gap:var(--sp-3);align-items:center}
         .scorer-item:hover{transform:translateX(3px);border-color:rgba(255,159,67,.4)}
@@ -341,7 +316,6 @@
         .scorer-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:3px;box-shadow:0 0 10px var(--amber-glow);transition:width .9s var(--ease)}
         .scorer-reason{font-size:11px;color:var(--text-2);line-height:1.5;font-style:italic;padding-left:8px;border-left:2px solid rgba(255,159,67,.4)}
 
-        /* ═══════════════ 积分榜 ═══════════════ */
         .standings{font-size:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 calc(-1 * var(--sp-6));padding:0 var(--sp-6)}
         @media(max-width:640px){.standings{margin:0 calc(-1 * var(--sp-4));padding:0 var(--sp-4)}}
         .standings table{width:100%;border-collapse:collapse;min-width:680px}
@@ -366,7 +340,6 @@
         .last5 .l5-cell.L{background:linear-gradient(135deg,#ef4444,#dc2626);box-shadow:0 0 8px rgba(239,68,68,.25)}
         .last5 .l5-none{color:var(--text-4);font-size:11px}
 
-        /* ═══════════════ FAB · 天工级 ═══════════════ */
         .fab{position:fixed;right:var(--sp-6);width:52px;height:52px;border-radius:var(--r-full);border:1px solid var(--border-hi);cursor:pointer;display:flex;align-items:center;justify-content:center;background:rgba(18,22,32,.75);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 32px -8px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.25);transition:transform .35s var(--ease-spring),box-shadow .35s var(--ease),border-color .3s var(--ease),filter .3s var(--ease);z-index:60;overflow:visible;-webkit-tap-highlight-color:transparent}
         @media(max-width:480px){.fab{right:var(--sp-4);width:48px;height:48px}}
         .fab::before{content:"";position:absolute;inset:-2px;border-radius:inherit;background:radial-gradient(circle at 50% 50%,currentColor,transparent 65%);opacity:0;transition:opacity .35s var(--ease);pointer-events:none;z-index:-1}
@@ -391,7 +364,6 @@
         .fab .badge-n{position:absolute;top:-5px;right:-5px;background:linear-gradient(135deg,var(--rose),#f87171);color:#fff;font-size:10px;font-weight:800;min-width:20px;height:20px;border-radius:10px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);box-shadow:0 0 0 1px var(--rose),0 0 16px var(--rose),0 0 0 0 rgba(239,68,68,.6);animation:badgePulse 2.4s ease-in-out infinite;z-index:3;font-family:var(--font-sans);letter-spacing:0;line-height:1}
         @keyframes badgePulse{0%,100%{box-shadow:0 0 0 1px var(--rose),0 0 16px var(--rose),0 0 0 0 rgba(239,68,68,.6)}50%{box-shadow:0 0 0 1px var(--rose),0 0 24px var(--rose),0 0 0 8px rgba(239,68,68,0)}}
 
-        /* ═══════════════ 模态框 ═══════════════ */
         .mask{position:fixed;inset:0;background:rgba(4,5,8,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:var(--sp-12) var(--sp-4);overflow-y:auto;-webkit-overflow-scrolling:touch}
         .mask.show{display:flex;animation:fadeIn .3s var(--ease)}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -402,7 +374,6 @@
         .modal .close{position:absolute;top:var(--sp-4);right:var(--sp-4);background:transparent;border:0;color:var(--text-3);font-size:22px;cursor:pointer;line-height:1;padding:6px 10px;border-radius:var(--r-sm);transition:all .25s var(--ease)}
         .modal .close:hover{background:rgba(255,255,255,.06);color:var(--text);transform:rotate(90deg)}
 
-        /* ═══════════════ 统计卡 ═══════════════ */
         .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2);margin-bottom:var(--sp-5)}
         @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(1){order:3}.stat:nth-child(2){order:4}.stat:nth-child(3){order:1}.stat:nth-child(4){order:2}}
         .stat{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);text-align:center;opacity:0;transform:translateY(10px);animation:fadeUp .5s var(--ease) forwards}
@@ -413,13 +384,11 @@
         .stat .n{font-family:var(--font-serif);font-weight:500;font-size:28px;letter-spacing:-.02em;color:var(--amber);font-variant-numeric:tabular-nums;line-height:1.2;text-shadow:0 0 20px var(--amber-glow)}
         .stat .l{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-top:var(--sp-1)}
 
-        /* ═══════════════ 过滤器 ═══════════════ */
         .filters{display:flex;gap:var(--sp-1);margin-bottom:var(--sp-5);flex-wrap:wrap}
         .filter-btn{padding:7px 14px;border-radius:var(--r-full);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s var(--ease)}
         .filter-btn:hover{color:var(--amber);border-color:var(--border-focus);transform:translateY(-1px)}
         .filter-btn.on{background:var(--amber-soft);color:var(--amber);border-color:rgba(255,159,67,.4);box-shadow:0 0 16px -4px var(--amber-glow)}
 
-        /* ═══════════════ 历史列表 ═══════════════ */
         .hlist{max-height:min(460px,55vh);overflow-y:auto;margin-top:var(--sp-2)}
         .hitem{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-2);transition:border-color .25s var(--ease),background .25s var(--ease),transform .25s var(--ease)}
         .hitem:hover{border-color:var(--border-hi);background:rgba(255,255,255,.03);transform:translateX(2px)}
@@ -456,7 +425,6 @@
         .da-badge.hit{background:var(--emerald-soft);color:var(--emerald);border:1px solid rgba(52,211,153,.35)}
         .da-badge.miss{background:var(--rose-soft);color:var(--rose);border:1px solid rgba(239,68,68,.35)}
 
-        /* ═══════════════ 深度分析 ═══════════════ */
         .deep-analysis{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-4);overflow:hidden}
         .da-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;user-select:none;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2);transition:background .2s var(--ease)}
         .da-head:hover{background:rgba(255,255,255,.03)}
@@ -508,7 +476,6 @@
         .da-calib-ref{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
         .live-dot-inline{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);margin-right:6px;animation:pulse 2s ease-in-out infinite}
 
-        /* ═══════════════ 批量 ═══════════════ */
         .batch-opts{display:flex;gap:var(--sp-2);margin:var(--sp-4) 0}
         .batch-opts button{flex:1;padding:12px;border-radius:var(--r-md);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .25s var(--ease)}
         .batch-opts button:hover{border-color:var(--border-focus);color:var(--amber);transform:translateY(-1px)}
@@ -521,7 +488,6 @@
         .progress.show{display:block}
         .progress .bar{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);width:0;transition:width .4s var(--ease);box-shadow:0 0 12px var(--amber-glow)}
 
-        /* ═══════════════ 命令面板 ═══════════════ */
         .cmd-mask{position:fixed;inset:0;background:rgba(4,5,8,.75);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:90;display:none;align-items:flex-start;justify-content:center;padding:14vh var(--sp-4) var(--sp-4)}
         .cmd-mask.show{display:flex;animation:fadeIn .15s var(--ease)}
         .cmd-panel{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-lg);max-width:560px;width:100%;box-shadow:0 40px 80px -20px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06),0 0 0 1px rgba(255,159,67,.08);animation:cmdIn .25s var(--ease-spring);overflow:hidden}
@@ -536,7 +502,6 @@
         .cmd-item .kbd{font-family:var(--font-mono);font-size:10px;color:var(--text-3);padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
         .cmd-item:hover .kbd,.cmd-item.on .kbd{color:var(--amber);border-color:var(--border-focus)}
 
-        /* ═══════════════ 快捷键 ═══════════════ */
         .shortcut-mask{position:fixed;inset:0;background:rgba(4,5,8,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:85;display:none;align-items:center;justify-content:center;padding:var(--sp-4)}
         .shortcut-mask.show{display:flex;animation:fadeIn .2s var(--ease)}
         .shortcut-panel{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-xl);max-width:520px;width:100%;padding:var(--sp-6);box-shadow:0 40px 80px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05);animation:modalIn .35s var(--ease-spring);position:relative}
@@ -547,7 +512,6 @@
         .shortcut-row .keys{display:flex;gap:4px}
         .shortcut-row kbd{font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--border-hi);color:var(--text)}
 
-        /* ═══════════════ Tooltip ═══════════════ */
         [data-tip]{position:relative}
         [data-tip]::after{content:attr(data-tip);position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%) translateY(-4px);background:#0f1219;border:1px solid var(--border-hi);color:var(--text);font-size:11px;font-weight:500;letter-spacing:.01em;padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;box-shadow:0 8px 20px -6px rgba(0,0,0,.6);opacity:0;pointer-events:none;z-index:100;transition:opacity .2s var(--ease),transform .2s var(--ease)}
         [data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -555,7 +519,6 @@
         .fab[data-tip]::after{top:auto;bottom:calc(100% + 8px);transform:translateX(-50%) translateY(4px)}
         .fab[data-tip]:hover::after{transform:translateX(-50%) translateY(0)}
 
-        /* ═══════════════ Toast ═══════════════ */
         .toast-wrap{position:fixed;top:calc(64px + var(--sp-4));left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:var(--sp-2);pointer-events:none;max-width:calc(100vw - 32px)}
         .toast{background:linear-gradient(180deg,#131820,#0d1118);border:1px solid var(--border-hi);color:var(--text);padding:13px 20px;border-radius:var(--r-md);font-size:13px;font-weight:500;box-shadow:0 16px 40px -8px rgba(0,0,0,.6);animation:toastIn .5s var(--ease-spring);pointer-events:auto;cursor:pointer;max-width:440px;line-height:1.5;transition:transform .25s var(--ease),box-shadow .3s var(--ease)}
         .toast:hover{transform:translateY(-2px) scale(1.02)}
@@ -586,7 +549,6 @@
         ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px;border:3px solid var(--bg)}
         ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.16)}
 
-        /* ═══════════════ MatchPicker ═══════════════ */
         .match-picker{position:relative;width:100%}
         .match-picker .trigger{width:100%;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--r-md);color:var(--text);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);transition:border-color .2s var(--ease),background .2s var(--ease),box-shadow .25s var(--ease)}
         .match-picker .trigger:hover{border-color:rgba(255,255,255,.18)}
@@ -634,7 +596,6 @@
         .team-select-wrap{display:none;margin-bottom:var(--sp-3)}
         .team-select-wrap.show{display:block}
 
-        /* ═══════════════ Team Modal ═══════════════ */
         .team-modal .team-head{display:flex;align-items:center;gap:var(--sp-4);margin-bottom:var(--sp-5);padding-bottom:var(--sp-4);border-bottom:1px solid var(--border)}
         .team-modal .team-head .badge-big{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
         .team-modal .team-head .info{flex:1;min-width:0}
@@ -661,7 +622,6 @@
         .team-modal .recent-item .res.L{color:var(--rose);background:rgba(239,68,68,.12)}
         .team-modal .recent-item .score{font-family:var(--font-serif);font-weight:600;color:var(--text);padding:0 8px}
 
-        /* ═══════════════ Trend Chart ═══════════════ */
         .trend-chart{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);margin-bottom:var(--sp-4)}
         .trend-chart .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-3);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
         .trend-chart .head .v{font-family:var(--font-serif);font-size:18px;color:var(--amber);letter-spacing:-.01em;text-transform:none}
@@ -679,7 +639,6 @@
 <div id="particleLayer"></div>
 <div id="srAnnounce" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"></div>
 
-<!-- ═══════════════ 顶栏 ═══════════════ -->
 <header class="topbar">
     <div class="topbar-left">
         <div class="logo"></div>
@@ -700,7 +659,6 @@
 </header>
 
 <div class="wrap">
-    <!-- ═══════════════ Hero ═══════════════ -->
     <section class="hero fade-in" id="hero">
         <div class="kick">
             <span id="matchdayDot" style="display:none;width:6px;height:6px;border-radius:50%;background:var(--rose);box-shadow:0 0 12px var(--rose);animation:pulse 1.8s ease-in-out infinite"></span>
@@ -717,7 +675,6 @@
         </div>
     </section>
 
-    <!-- ═══════════════ Dashboard · Bento ═══════════════ -->
     <section class="dash fade-in d2">
         <div class="cell primary">
             <div class="lbl">🏆 当前轮次</div>
@@ -747,7 +704,6 @@
         ⚠️ <b>data.json 加载失败</b>，当前显示的是循环赛算法生成的<b>临时赛程</b>（对阵正确但轮次顺序不一定准确）。请运行 <code>update.bat</code> 或等待 GitHub Actions 自动更新。
     </div>
 
-    <!-- ═══════════════ 主网格 ═══════════════ -->
     <div class="grid">
         <div class="card fade-in d3" data-tilt>
             <h3>Groq API Key</h3>
@@ -806,7 +762,6 @@
         </div>
     </div>
 
-    <!-- ═══════════════ 积分榜 ═══════════════ -->
     <div class="card fade-in d5 reveal" style="margin-top:var(--sp-6)">
         <h3>积分榜</h3>
         <div class="standings" id="standings">
@@ -829,11 +784,10 @@
         <div class="legal">
             ⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。
         </div>
-        <div class="ver">Premier League Prediction Engine · v10.0</div>
+        <div class="ver">Premier League Prediction Engine · v11.0</div>
     </footer>
 </div>
 
-<!-- ═══════════════ FAB ═══════════════ -->
 <button class="fab hist" id="histFab" onclick="openHistory()" aria-label="历史记录" data-tip="历史记录 · Ctrl+H">
     <svg class="fab-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
     <span class="badge-n" id="histBadge" style="display:none">0</span>
@@ -849,7 +803,6 @@
     <svg class="fab-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
 </button>
 
-<!-- ═══════════════ 历史弹窗 ═══════════════ -->
 <div class="mask" id="histMask" role="dialog" aria-modal="true">
     <div class="modal" tabindex="-1">
         <button class="close" onclick="closeHistory()" aria-label="关闭">✕</button>
@@ -892,7 +845,6 @@
     </div>
 </div>
 
-<!-- ═══════════════ 批量弹窗 ═══════════════ -->
 <div class="mask" id="batchMask" role="dialog" aria-modal="true">
     <div class="modal" tabindex="-1">
         <button class="close" onclick="closeBatch()" aria-label="关闭">✕</button>
@@ -912,7 +864,6 @@
     </div>
 </div>
 
-<!-- ═══════════════ 球队弹窗 ═══════════════ -->
 <div class="mask" id="teamMask" role="dialog" aria-modal="true">
     <div class="modal team-modal" tabindex="-1">
         <button class="close" onclick="closeTeamModal()" aria-label="关闭">✕</button>
@@ -920,7 +871,6 @@
     </div>
 </div>
 
-<!-- ═══════════════ 命令面板 ═══════════════ -->
 <div class="cmd-mask" id="cmdMask">
     <div class="cmd-panel" role="dialog" aria-modal="true">
         <input type="text" class="cmd-input" id="cmdInput" placeholder="输入命令或搜索…" autocomplete="off">
@@ -928,7 +878,6 @@
     </div>
 </div>
 
-<!-- ═══════════════ 快捷键 ═══════════════ -->
 <div class="shortcut-mask" id="shortcutMask">
     <div class="shortcut-panel" role="dialog" aria-modal="true">
         <button class="close" onclick="closeShortcuts()" aria-label="关闭" style="position:absolute;top:16px;right:16px;background:transparent;border:0;color:var(--text-3);font-size:22px;cursor:pointer;padding:6px 10px;border-radius:var(--r-sm)">✕</button>
@@ -947,7 +896,7 @@
 
 <script>
     /* ═══════════════════════════════════════════════════════════════
-       v10.0 · 逻辑层（与 v9.2 功能完全一致）
+       v11.0 · 逻辑层
        ═══════════════════════════════════════════════════════════════ */
     const Ambient = (() => {
         let enabled = true;
@@ -1194,6 +1143,7 @@
     let _last5Cache = null;
     let _usingFallback = false;
     let PLAYER_PHOTOS = {};
+    let HISTORICAL_RESULTS = {};
     let _teamAtkCache = null;
     let _lastStandingsStr = '';
     let _lastDataUpdatedAt = null;
@@ -1349,6 +1299,46 @@
             }
         }
         throw new Error('Groq 重试耗尽');
+    }
+
+    function parseScoreArr(sc){
+        if (Array.isArray(sc)) return [+sc[0], +sc[1]];
+        if (typeof sc === 'string') { const p = sc.split(/[-:]/); return [+p[0], +p[1]]; }
+        if (sc && typeof sc === 'object') return [+(sc.home ?? sc[0]), +(sc.away ?? sc[1])];
+        return null;
+    }
+
+    function computeH2H(home, away){
+        const matches = [];
+        const key1 = `${home}|${away}`;
+        const key2 = `${away}|${home}`;
+        for (const rk of Object.keys(RESULTS)) {
+            const ro = RESULTS[rk];
+            if (!ro || typeof ro !== 'object') continue;
+            if (ro[key1]) {
+                const p = parseScoreArr(ro[key1]);
+                if (p) matches.push({ season: '2026-27', round: +rk, home, away, hg: p[0], ag: p[1] });
+            }
+            if (ro[key2]) {
+                const p = parseScoreArr(ro[key2]);
+                if (p) matches.push({ season: '2026-27', round: +rk, home: away, away: home, hg: p[0], ag: p[1] });
+            }
+        }
+        const seasonLabel = y => `${y}-${String(+y + 1).slice(2)}`;
+        const years = Object.keys(HISTORICAL_RESULTS).sort().reverse();
+        for (const y of years) {
+            const seasonData = HISTORICAL_RESULTS[y];
+            if (!seasonData || typeof seasonData !== 'object') continue;
+            if (seasonData[key1]) {
+                const p = parseScoreArr(seasonData[key1]);
+                if (p) matches.push({ season: seasonLabel(y), home, away, hg: p[0], ag: p[1] });
+            }
+            if (seasonData[key2]) {
+                const p = parseScoreArr(seasonData[key2]);
+                if (p) matches.push({ season: seasonLabel(y), home: away, away: home, hg: p[0], ag: p[1] });
+            }
+        }
+        return matches;
     }
 
     function espnUrl(name){ const zh = toChineseTeam(name); const id = ESPN_IDS[zh]; return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null; }
@@ -1841,15 +1831,43 @@ ${playerPhoto(name)}
   <div class="num" data-target="${pct}">0%</div>
 </div>`;
         };
-        const h2h = d.headToHead && d.headToHead.summary ? `
+        const h2hRealMatches = computeH2H(home, away);
+        let h2h = '';
+        if (h2hRealMatches.length > 0) {
+            const recent = h2hRealMatches.slice(0, 5);
+            let hw = 0, aw = 0, drc = 0;
+            for (const m of recent) {
+                if (m.hg > m.ag) { (m.home === home ? hw++ : aw++); }
+                else if (m.hg < m.ag) { (m.home === home ? aw++ : hw++); }
+                else drc++;
+            }
+            const summary = `近 ${recent.length} 次交锋，${home} ${hw} 胜 ${drc} 平 ${aw} 负`;
+            const listHtml = recent.map(m => {
+                const tag = m.round ? `${m.season} · 第${m.round}轮` : m.season;
+                return `<li>${escapeHtml(tag)} · ${escapeHtml(m.home)} ${m.hg}-${m.ag} ${escapeHtml(m.away)}</li>`;
+            }).join('');
+            h2h = `
 <div class="sect">
   <div class="ttl">历史交锋</div>
   <div class="h2h">
-    <div class="tag ${escapeHtml(d.headToHead.note || '估算')}">${escapeHtml(d.headToHead.note || '估算')}</div>
+    <div class="tag 真实数据">真实数据</div>
+    <div class="sum">${escapeHtml(summary)}</div>
+    <ul>${listHtml}</ul>
+    <div style="font-size:10px;color:var(--text-4);margin-top:8px;font-style:italic">✅ 数据来源：football-data.org</div>
+  </div>
+</div>`;
+        } else if (d.headToHead && d.headToHead.summary) {
+            h2h = `
+<div class="sect">
+  <div class="ttl">历史交锋</div>
+  <div class="h2h">
+    <div class="tag 估算">估算</div>
     <div class="sum">${escapeHtml(d.headToHead.summary)}</div>
     ${Array.isArray(d.headToHead.lastMatches) && d.headToHead.lastMatches.length ? '<ul>' + d.headToHead.lastMatches.map(m=>`<li>${escapeHtml(m)}</li>`).join('') + '</ul>' : ''}
+    <div style="font-size:10px;color:var(--gold);margin-top:8px;font-style:italic">⚠️ 以下为 AI 估算数据，可能不包含最新赛季</div>
   </div>
-</div>` : '';
+</div>`;
+        }
         const homePlayers = d.homeKeyPlayers || d.homePlayers || [];
         const awayPlayers = d.awayKeyPlayers || d.awayPlayers || [];
         const players = [...homePlayers, ...awayPlayers];
@@ -2024,7 +2042,6 @@ ${playersHtml}
         ctx.closePath();
     }
 
-    /* ═══════════════ 积分榜 ═══════════════ */
     function buildLast5Cache(){
         _last5Cache = {};
         if (!RESULTS || typeof RESULTS !== 'object') return;
@@ -2147,7 +2164,6 @@ ${playersHtml}
         }
     }
 
-    /* ═══════════════ 历史记录 ═══════════════ */
     const HIST_KEY = 'pl_history_v2';
     let histFilter = 'all';
     let _histMemCache = null;
@@ -2429,7 +2445,6 @@ ${playersHtml}
         if (el.classList.contains('open')) renderDeepAnalysis();
     }
 
-    /* ═══════════════ 实时同步 ═══════════════ */
     function findActualScore(home, away){
         const key = `${home}|${away}`;
         for (const rk of Object.keys(RESULTS)) {
@@ -2475,6 +2490,7 @@ ${playersHtml}
             if (Array.isArray(data.standings) && data.standings.length) STATIC_STANDINGS = data.standings;
             if (Array.isArray(data.fixtures) && data.fixtures.length) { FIXTURES.length = 0; FIXTURES.push(...data.fixtures); }
             if (data.playerPhotos && typeof data.playerPhotos === 'object') PLAYER_PHOTOS = data.playerPhotos;
+            if (data.historicalResults && typeof data.historicalResults === 'object') HISTORICAL_RESULTS = data.historicalResults;
             const n = syncActualsToHistory(true);
             const standingsStr = JSON.stringify(STATIC_STANDINGS);
             if (standingsStr !== _lastStandingsStr) { _lastStandingsStr = standingsStr; renderStandings(STATIC_STANDINGS); }
@@ -2617,7 +2633,6 @@ ${playersHtml}
         inp.click();
     }
 
-    /* ═══════════════ 球队弹窗 ═══════════════ */
     function openTeamModal(team){
         const content = document.getElementById('teamModalContent');
         const url = espnUrl(team);
@@ -2715,7 +2730,6 @@ ${attackHtml}
     }
     function closeTeamModal(){ closeModal('teamMask'); }
 
-    /* ═══════════════ 模态框 ═══════════════ */
     let _focusBefore = null;
     function openModal(id){
         _focusBefore = document.activeElement;
@@ -2747,7 +2761,6 @@ ${attackHtml}
         }
     });
 
-    /* ═══════════════ 批量预测 ═══════════════ */
     let batchN = 1;
     function updateQuota(){
         const calls = 10 * batchN;
@@ -2872,7 +2885,6 @@ ${attackHtml}
         }
     }
 
-    /* ═══════════════ 命令面板 ═══════════════ */
     const CommandPalette = (() => {
         let items = [];
         let selected = 0;
@@ -2947,7 +2959,6 @@ ${attackHtml}
         if (ring) { const C = 2 * Math.PI * 21; ring.style.strokeDashoffset = C * (1 - progress); }
     });
 
-    /* ═══════════════ data.json 加载 ═══════════════ */
     async function loadExternalData(){
         const banner = document.getElementById('fallbackBanner');
         const loadingEl = document.getElementById('dashRound');
@@ -2967,6 +2978,7 @@ ${attackHtml}
             if (data.results && typeof data.results === 'object') { Object.keys(RESULTS).forEach(k => delete RESULTS[k]); Object.assign(RESULTS, data.results); _last5Cache = null; invalidateTeamAtkCache(); }
             if (Array.isArray(data.standings) && data.standings.length) STATIC_STANDINGS = data.standings;
             if (data.playerPhotos && typeof data.playerPhotos === 'object') PLAYER_PHOTOS = data.playerPhotos;
+            if (data.historicalResults && typeof data.historicalResults === 'object') HISTORICAL_RESULTS = data.historicalResults;
             _usingFallback = !hasRealFixtures;
             banner.classList.toggle('show', _usingFallback);
             initSelectors();
@@ -2984,7 +2996,6 @@ ${attackHtml}
         }
     }
 
-    /* ═══════════════ Boot ═══════════════ */
     (async function boot(){
         Ambient.init();
         LoadingBar.start();
