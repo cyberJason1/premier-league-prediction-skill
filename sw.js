@@ -2,7 +2,7 @@
 // 英超预测引擎 Service Worker
 // 版本号：改这个数字会触发更新（重要）
 // ============================================================
-const CACHE_VERSION = 'v11.0.0';
+const CACHE_VERSION = 'v11.1.0';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存
@@ -61,7 +61,25 @@ self.addEventListener('fetch', event => {
         return; // 走默认网络请求
     }
 
-    // 2. 队徽 CDN：stale-while-revalidate（先给缓存，同时后台更新）
+    // 2. Google Fonts：cache-first（字体文件不变，命中率极高）
+    //    离线时直接从缓存返回，避免中文回退成方块
+    if (url.hostname.includes('fonts.googleapis.com') ||
+        url.hostname.includes('fonts.gstatic.com')) {
+        event.respondWith(
+            caches.open(CACHE_NAME).then(cache =>
+                cache.match(req).then(cached => {
+                    if (cached) return cached;
+                    return fetch(req).then(res => {
+                        if (res && res.status === 200) cache.put(req, res.clone());
+                        return res;
+                    }).catch(() => cached);
+                })
+            )
+        );
+        return;
+    }
+
+    // 3. 队徽/球员照片 CDN：stale-while-revalidate
     if (url.hostname.includes('espncdn.com') ||
         url.hostname.includes('thesportsdb.com') ||
         url.hostname.includes('bzzoiro.com')) {
@@ -81,7 +99,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 3. 同源静态文件（index.html、skill.md、data.json）：network-first
+    // 4. 同源静态文件（index.html、skill.md、data.json）：network-first
     //    同时清理同路径带 ?v= 的旧缓存，避免无限增长
     if (url.origin === self.location.origin) {
         event.respondWith(
@@ -115,5 +133,5 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 4. 其他请求：走默认
+    // 5. 其他请求：走默认
 });
