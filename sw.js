@@ -2,7 +2,7 @@
 // 英超预测引擎 Service Worker
 // 版本号：改这个数字会触发更新（重要）
 // ============================================================
-const CACHE_VERSION = 'v12.0.0';
+const CACHE_VERSION = 'v13.0.0';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存
