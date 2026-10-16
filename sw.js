@@ -1,5 +1,5 @@
 // ============================================================
-// 英超预测引擎 Service Worker · v13.2.0
+// 英超预测引擎 Service Worker · v13.3.0
 // ============================================================
 // 缓存策略总览：
 //   1. Groq / football-data API    → 完全不缓存（每次实时）
@@ -8,7 +8,7 @@
 //   4. 同源静态文件（HTML/JSON/MD）  → network-first + 缓存回退
 // ============================================================
 
-const CACHE_VERSION = 'v13.2.0';
+const CACHE_VERSION = 'v13.3.0';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存

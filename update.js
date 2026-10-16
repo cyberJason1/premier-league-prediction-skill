@@ -7,7 +7,8 @@
  * 最后更新：2026-10-16
  * 特性：断点续传 + 429 自动等待 + 单次批量限制 + 历史赛季拉取 + .env 读取
  * v13.2：fixtures 新增 kickoff（ISO 时间）+ status 字段
- * v13.2.1：TheSportsDB 名字规范化 + 精确匹配，修复"若昂·佩德罗 无照片字段"
+ * v13.2.1：TheSportsDB 名字规范化 + 精确匹配
+ * v13.2.2：删除 FALLBACK_PHOTOS、TEAM_MAP 去重、playerPhotos 仅保留中文 key
  */
 
 const fs = require('fs');
@@ -35,13 +36,13 @@ const SPORTSDB_KEY = '3';
 const TEAM_MAP = {
     'Arsenal':'阿森纳','Manchester City':'曼城','Liverpool':'利物浦','Chelsea':'切尔西',
     'Tottenham Hotspur':'热刺','Aston Villa':'阿斯顿维拉','Newcastle United':'纽卡斯尔联',
-    'Manchester United':'曼联','Brighton & Hove Albion':'布莱顿','Crystal Palace':'水晶宫',
+    'Manchester United':'曼联','Brighton':'布莱顿','Crystal Palace':'水晶宫',
     'Everton':'埃弗顿','Fulham':'富勒姆','Brentford':'布伦特福德',
-    'Nottingham Forest':'诺丁汉森林','AFC Bournemouth':'伯恩茅斯','Bournemouth':'伯恩茅斯',
+    'Nottingham Forest':'诺丁汉森林','Bournemouth':'伯恩茅斯',
     'Leeds United':'利兹联','Sunderland':'桑德兰',
-    'Coventry City FC':'考文垂城','Coventry City':'考文垂城',
-    'Hull City AFC':'赫尔城','Hull City':'赫尔城',
-    'Ipswich Town FC':'伊普斯维奇镇','Ipswich Town':'伊普斯维奇镇'
+    'Coventry City':'考文垂城',
+    'Hull City':'赫尔城',
+    'Ipswich Town':'伊普斯维奇镇'
 };
 
 const PLAYER_NAME_MAP = {
@@ -64,8 +65,6 @@ const PLAYER_NAME_MAP = {
     '贝卢米': 'Mohamed Belloumi', 'Tzolakis': 'Konstantinos Tzolakis',
     '杰克·克拉克': 'Jack Clarke'
 };
-
-const FALLBACK_PHOTOS = {};
 
 function toChinese(name){
     if (!name) return null;
@@ -222,21 +221,24 @@ async function fetchBzzoiroPhotos(apiKey){
             if (!pRes.ok) { console.warn(`  ⚠️ ${team.name} HTTP ${pRes.status}`); continue; }
             const pData = await pRes.json();
             const players = pData.results || [];
+            let matched = 0;
             players.forEach(p => {
                 if (p.name && p.id) {
                     let zhName = null;
                     for (const [zh, en] of Object.entries(PLAYER_NAME_MAP)) {
                         if (normalizeName(en) === normalizeName(p.name)) { zhName = zh; break; }
                     }
-                    if (!zhName) zhName = p.name;
+                    // ★ 不在定义名单里的，直接跳过，不写进 data.json
+                    if (!zhName) return;
                     photos[zhName] = `https://sports.bzzoiro.com/img/player/${p.id}/?sor=true&bg=transparent`;
+                    matched++;
                 }
             });
-            console.log(`  ✅ ${team.name} (${players.length} 人)`);
+            console.log(`  ✅ ${team.name} (${players.length} 人，命中 ${matched})`);
         } catch(e) { console.warn(`  ⚠️ ${team.name} 拉取失败：${e.message}`); }
         await new Promise(r => setTimeout(r, 500));
     }
-    console.log(`📸 Bzzoiro 共获取 ${Object.keys(photos).length} 位球员照片`);
+    console.log(`📸 Bzzoiro 共获取 ${Object.keys(photos).length} 位球员照片（仅保留中文明单球员）`);
     return photos;
 }
 
@@ -337,7 +339,6 @@ async function main(){
     let playerPhotos = {};
     try { playerPhotos = await fetchBzzoiroPhotos(bzKey); } catch(e) { console.warn('⚠️ Bzzoiro 失败：', e.message); }
     try { playerPhotos = await fetchTheSportsDBPhotos(playerPhotos); } catch(e) { console.warn('⚠️ TheSportsDB 失败：', e.message); }
-    Object.assign(playerPhotos, FALLBACK_PHOTOS);
 
     const payload = {
         updatedAt: new Date().toISOString(),

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v13.2</title>
+    <title>英超预测引擎 v13.3</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
@@ -154,7 +154,7 @@
         .tag-sm.hot{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.4)}
         .tag-sm.top{background:var(--violet-soft);color:var(--violet);border:1px solid rgba(167,139,250,.4)}
 
-        /* ══ 焦点战卡片：队徽 + 队名 + 比分 一体对齐 ══ */
+        /* ══ 焦点战卡片：队徽 + 队名 + 状态点 + 比分 ══ */
         .fmatch .frow{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:8px}
         .fmatch .fbadge{width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
         .fmatch .fbadge-fb{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700;flex-shrink:0}
@@ -167,6 +167,18 @@
         .fmatch .fmeta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--border);font-size:10px;color:var(--text-3)}
         .fmatch .fmeta .ftime{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
         .fmatch .fmeta .ftime.live{color:var(--rose);animation:pulse 2s ease-in-out infinite}
+
+        /* ══ v13.3 新增：状态圆点 + H2H ══ */
+        .fmatch .fform{display:inline-flex;gap:2px;flex-shrink:0;margin-right:2px}
+        .fmatch .fform .fc{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .fmatch .fform .fc.W{background:#22c55e;box-shadow:0 0 5px rgba(34,197,94,.7)}
+        .fmatch .fform .fc.D{background:#64748b}
+        .fmatch .fform .fc.L{background:#ef4444;box-shadow:0 0 5px rgba(239,68,68,.6)}
+        .fmatch .fh2h{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08);font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:5px;overflow:hidden}
+        .fmatch .fh2h .fh2h-lbl{color:var(--violet);font-weight:700;flex-shrink:0;font-size:11px}
+        .fmatch .fh2h .fh2h-team{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2);font-weight:500}
+        .fmatch .fh2h .fh2h-sc{color:var(--amber);font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+        .fmatch .fh2h .fh2h-date{color:var(--text-4);margin-left:auto;flex-shrink:0;font-size:9px;font-family:var(--font-mono)}
 
         .focus-empty{color:var(--text-4);font-size:12px;text-align:center;padding:20px;flex:0 0 100%}
 
@@ -922,7 +934,7 @@
             <a href="about.html#legal">免责声明</a>
         </div>
         <div class="legal">⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。</div>
-        <div class="ver">Premier League Prediction Engine · v13.2</div>
+        <div class="ver">Premier League Prediction Engine · v13.3</div>
     </footer>
 </div>
 
@@ -1062,7 +1074,8 @@
 
 <script>
     /* ══════════════════════════════════════════════════════════════
-   v13.2 · 逻辑层
+   v13.3 · 逻辑层
+   新增：焦点战德比名徽章 + 历史交锋 H2H + 近期状态圆点
    ══════════════════════════════════════════════════════════════ */
 
     /* ── Sound ── */
@@ -1632,6 +1645,17 @@
         }
         Sound.exact();
     }
+    function feedbackFloat(text, color){
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const el = document.createElement('div');
+        el.className = 'feedback-float';
+        el.textContent = text;
+        el.style.left = (window.innerWidth / 2) + 'px';
+        el.style.top = (window.innerHeight * 0.6) + 'px';
+        if (color) el.style.color = color;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 2400);
+    }
     function toggleKeyVisibility(){ const inp = document.getElementById('apiKey'); inp.type = inp.type === 'password' ? 'text' : 'password'; }
     function saveKey(){ const k = document.getElementById('apiKey').value.trim(); if (!k) return toast('请输入 API Key','warn'); localStorage.setItem('groq_key', k); toast('已保存'); }
     function clearKey(){ localStorage.removeItem('groq_key'); document.getElementById('apiKey').value=''; toast('已清除','warn'); }
@@ -1810,7 +1834,7 @@
     function invalidateHistCache(){ _histCache = null; _histCacheRound = -1; }
     function invalidateTeamAtkCache(){ _teamAtkCache = null; }
 
-    /* ★ 新增：开赛时间格式化（返回纯文本，样式交给 .ftime） */
+    /* ★ 开赛时间格式化（返回纯文本，样式交给 .ftime） */
     function formatKickoff(utcIso, st){
         if (st.status === 'finished') return '已完赛';
         if (!utcIso) return '待开赛';
@@ -1838,6 +1862,39 @@
         } catch(e) {
             return '待开赛';
         }
+    }
+
+    /* ══ v13.3 新增：德比 / 状态圆点 / H2H ══ */
+    const DERBY_NAMES = [
+        { teams: ['曼联','利物浦'], name: '双红会' },
+        { teams: ['曼城','曼联'], name: '曼市德比' },
+        { teams: ['阿森纳','热刺'], name: '北伦敦德比' },
+        { teams: ['利物浦','埃弗顿'], name: '默西塞德德比' },
+        { teams: ['切尔西','热刺'], name: '伦敦德比' },
+        { teams: ['阿森纳','切尔西'], name: '伦敦德比' },
+        { teams: ['纽卡斯尔联','桑德兰'], name: '泰恩-威尔德比' },
+        { teams: ['曼城','利物浦'], name: '红蓝大战' },
+        { teams: ['阿森纳','曼联'], name: '经典对决' },
+        { teams: ['切尔西','曼联'], name: '红蓝大战' }
+    ];
+    function getDerbyName(h, a){
+        for (const d of DERBY_NAMES) {
+            const [x, y] = d.teams;
+            if ((h === x && a === y) || (h === y && a === x)) return d.name;
+        }
+        return null;
+    }
+    function isDerby(h, a){ return !!getDerbyName(h, a); }
+    function formDots(team){
+        const form = getForm(team, 5);
+        if (!form.length) return '';
+        return `<span class="fform">${form.map(r => `<span class="fc ${r}"></span>`).join('')}</span>`;
+    }
+    function focusH2H(home, away){
+        const matches = computeH2H(home, away);
+        if (!matches.length) return '';
+        const last = matches[0];
+        return `<div class="fh2h"><span class="fh2h-lbl">⚔️</span><span class="fh2h-team">${escapeHtml(last.home)}</span><span class="fh2h-sc">${last.hg}-${last.ag}</span><span class="fh2h-team">${escapeHtml(last.away)}</span><span class="fh2h-date">${escapeHtml(last.season)}</span></div>`;
     }
 
     const MatchPicker = (() => {
@@ -2311,7 +2368,8 @@
         }).join('')}</div></div>` : '';
         const playersHtml = players.length ? `<div class="sect"><div class="ttl">🎯 本场焦点球员</div><div class="players">${players.map(playerCard).join('')}</div></div>` : '';
         const multiRunsHtml = d._runs && d._runs.length > 1 ? `<div class="multi-runs">⚡ ${d._runs.length} 次运行：${d._runs.map(escapeHtml).join(' / ')} · 取众数 <b>${escapeHtml(d.score)}</b></div>` : '';
-        const derbyHtml = isDerby(home, away) ? `<div style="text-align:center"><span class="derby-badge">⚔️ 德比大战</span></div>` : '';
+        const derbyName = getDerbyName(home, away);
+        const derbyHtml = derbyName ? `<div style="text-align:center"><span class="derby-badge">⚔️ ${escapeHtml(derbyName)}</span></div>` : '';
         const fingerprintHtml = `<div class="fingerprint"><canvas id="fpCanvas" title="本场预测指纹"></canvas></div>`;
         const multiverseHtml = d._runs && d._runs.length > 1 ? renderMultiverse(d._runs) : '';
         card.innerHTML = `
@@ -2355,10 +2413,6 @@
             if (segs[2]) { segs[2].style.width = a + '%'; segs[2].textContent = a + '%'; }
             setTimeout(() => { card.querySelectorAll('.ring').forEach(r => releaseRingParticles(r)); }, 900);
         }));
-    }
-    function isDerby(h, a){
-        const DERBIES = [['曼城','曼联'],['阿森纳','热刺'],['利物浦','埃弗顿'],['切尔西','热刺'],['纽卡斯尔联','桑德兰'],['曼城','利物浦'],['阿森纳','切尔西']];
-        return DERBIES.some(([x,y]) => (h===x&&a===y)||(h===y&&a===x));
     }
     function copyResult(){
         if (!_lastResult) return;
@@ -2491,7 +2545,7 @@
         }).sort((a, b) => b.score - a.score).slice(0, 8);
         scroll.innerHTML = scored.map(m => {
             const st = getMatchStatus(m.home, m.away, r);
-            const isD = isDerby(m.home, m.away);
+            const derbyName = getDerbyName(m.home, m.away);
             const hr = getRank(m.home), ar = getRank(m.away);
             const isFinished = st.status === 'finished';
             let hs = null, as = null, hCls = '', aCls = '';
@@ -2502,7 +2556,7 @@
                 else { hCls = 'draw'; aCls = 'draw'; }
             }
             const tags = [];
-            if (isD) tags.push('<span class="tag-sm derby">⚔️ 德比</span>');
+            if (derbyName) tags.push(`<span class="tag-sm derby">🔥 ${escapeHtml(derbyName)}</span>`);
             if (hr && ar && hr <= 4 && ar <= 4) tags.push('<span class="tag-sm top">TOP4</span>');
             if (!isFinished) tags.push('<span class="tag-sm hot">待预测</span>');
             const hUrl = espnUrl(m.home), aUrl = espnUrl(m.away);
@@ -2518,9 +2572,10 @@
             })();
             return `<div class="fmatch" data-home="${escapeHtml(m.home)}" data-away="${escapeHtml(m.away)}" data-round="${r}">
                 ${tags.length ? `<div class="tagline">${tags.join('')}</div>` : ''}
-                <div class="frow${hCls === 'lose' ? ' dim' : ''}">${hImg}<span class="fname">${escapeHtml(m.home)}</span>${isFinished ? `<span class="fscore ${hCls}">${hs}</span>` : ''}</div>
-                <div class="frow${aCls === 'lose' ? ' dim' : ''}">${aImg}<span class="fname">${escapeHtml(m.away)}</span>${isFinished ? `<span class="fscore ${aCls}">${as}</span>` : ''}</div>
+                <div class="frow${hCls === 'lose' ? ' dim' : ''}">${hImg}<span class="fname">${escapeHtml(m.home)}</span>${formDots(m.home)}${isFinished ? `<span class="fscore ${hCls}">${hs}</span>` : ''}</div>
+                <div class="frow${aCls === 'lose' ? ' dim' : ''}">${aImg}<span class="fname">${escapeHtml(m.away)}</span>${formDots(m.away)}${isFinished ? `<span class="fscore ${aCls}">${as}</span>` : ''}</div>
                 <div class="fmeta"><span>第 ${r+1} 轮</span><span class="ftime${isLive ? ' live' : ''}">${formatKickoff(m.kickoff, st)}</span></div>
+                ${focusH2H(m.home, m.away)}
             </div>`;
         }).join('');
         scroll.querySelectorAll('.fmatch').forEach(el => {
@@ -3266,7 +3321,7 @@
         Ambient.init();
         LoadingBar.start();
         if (!localStorage.getItem('pl_welcomed')) {
-            setTimeout(() => { toast('👋 欢迎使用 v13.2 · 先填 Groq API Key', 'ok', 6500); }, 2200);
+            setTimeout(() => { toast('👋 欢迎使用 v13.3 · 先填 Groq API Key', 'ok', 6500); }, 2200);
             localStorage.setItem('pl_welcomed', '1');
         }
         setTimeout(() => LoadingBar.done(), 1800);

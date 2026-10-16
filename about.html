@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>关于 · 英超预测引擎 v13.2</title>
+    <title>关于 · 英超预测引擎 v13.3</title>
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
@@ -51,7 +51,6 @@
         body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1200px 700px at 50% -10%,rgba(255,159,67,.1),transparent 55%),radial-gradient(900px 500px at 50% 110%,rgba(34,211,238,.06),transparent 55%)}
         body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.06;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>");mix-blend-mode:overlay}
 
-        /* 顶栏（含主题/音效按钮）*/
         .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-6)}
         @media(max-width:640px){.topbar{padding:0 var(--sp-4);height:56px}}
         .topbar-left{display:flex;align-items:center;gap:var(--sp-3);font-size:13px;font-weight:600;letter-spacing:.02em}
@@ -137,7 +136,6 @@
         .src-table td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
         .src-table tr:last-child td{border-bottom:0}
 
-        /* v13.2 新增亮点卡片 */
         .highlights{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--sp-3);margin:var(--sp-5) 0}
         .highlight{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:var(--sp-4);position:relative;overflow:hidden;transition:all .35s var(--ease)}
         .highlight:hover{transform:translateY(-4px);border-color:rgba(255,159,67,.4);box-shadow:0 16px 40px -10px var(--amber-glow)}
@@ -176,7 +174,7 @@
 <div class="wrap">
 
     <div class="hero">
-        <div class="kick">About · 关于此项目 · v13.2</div>
+        <div class="kick">About · 关于此项目 · v13.3</div>
         <h1 id="aboutTitle">英超 <em>预测</em> 引擎</h1>
         <p class="lead">一个完全开源、零成本、可持续运营的 AI 足球预测引擎。它不训练模型，不依赖 GPU，只用「提示词工程 + 真实数据 + 前端工程」三件事，让任何拥有浏览器的人都能做英超比分预测。</p>
     </div>
@@ -241,7 +239,31 @@
             <li><strong>沉浸体验</strong> — 光标光晕、漂浮粒子、3D 倾斜、命令面板、快捷键</li>
         </ul>
 
-        <h3>v13.2 焦点战升级 <span class="badge-new">NEW</span></h3>
+        <h3>v13.3 焦点战深度升级 <span class="badge-new">NEW</span></h3>
+        <div class="highlights">
+            <div class="highlight">
+                <span class="ico">🔥</span>
+                <div class="t">德比名徽章</div>
+                <div class="d">自动识别双红会 / 曼市德比 / 北伦敦德比 / 默西塞德德比 / 泰恩-威尔德比等 10 组经典对决</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">⚔️</span>
+                <div class="t">H2H 历史交锋</div>
+                <div class="d">焦点战卡片底部显示最近一次交手比分与赛季，数据来自过去 2 个赛季真实战报</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">🟢</span>
+                <div class="t">近期状态圆点</div>
+                <div class="d">队名旁显示最近 5 场 W/D/L 彩色圆点（绿胜 / 灰平 / 红负），一眼看出状态冷热</div>
+            </div>
+            <div class="highlight">
+                <span class="ico">🎯</span>
+                <div class="t">结果页德比标识</div>
+                <div class="d">预测结果顶部显示具体德比名，让每场对决都有故事</div>
+            </div>
+        </div>
+
+        <h3>v13.2 焦点战升级</h3>
         <div class="highlights">
             <div class="highlight">
                 <span class="ico">⏰</span>
@@ -259,9 +281,9 @@
                 <div class="d">比赛进行中红色脉冲提示，赛果一更新自动切换状态</div>
             </div>
             <div class="highlight">
-                <span class="ico">🎯</span>
-                <div class="t">焦点战初始归零</div>
-                <div class="d">首屏与切换轮次时自动回到最左，不再被浏览器记忆滚动位置</div>
+                <span class="ico">🧹</span>
+                <div class="t">数据瘦身</div>
+                <div class="d">球员照片仅保留中文明单，data.json 体积从 300KB 降到 50KB</div>
             </div>
         </div>
 
@@ -278,11 +300,6 @@
                 <div class="d">近期状态 / 硬实力 / 攻击力 / 交锋战绩，双色叠加对比</div>
             </div>
             <div class="highlight">
-                <span class="ico">🔥</span>
-                <div class="t">今日焦点战</div>
-                <div class="d">按德比、前 4 互撞、竞争度自动排序的横滑卡片</div>
-            </div>
-            <div class="highlight">
                 <span class="ico">🎨</span>
                 <div class="t">3 套主题皮肤</div>
                 <div class="d">暗夜金 / 深海蓝 / 极光绿，一键切换，全局同步</div>
@@ -297,6 +314,11 @@
                 <div class="t">Web Audio 音效</div>
                 <div class="d">无音频文件，纯代码合成点击 / 命中 / 精确进球音</div>
             </div>
+            <div class="highlight">
+                <span class="ico">🖱️</span>
+                <div class="t">沉浸体验</div>
+                <div class="d">光标光晕 + 漂浮粒子 + 3D 倾斜 + 磁吸按钮</div>
+            </div>
         </div>
 
         <h3>数据从哪来</h3>
@@ -308,7 +330,7 @@
             <tr>
                 <td>比赛数据</td>
                 <td><a href="https://www.football-data.org/" target="_blank" rel="noopener">football-data.org</a></td>
-                <td>积分榜、赛程、完赛比分、开赛时间</td>
+                <td>积分榜、赛程、完赛比分、开赛时间、历史赛季</td>
             </tr>
             <tr>
                 <td>球队队徽</td>
@@ -318,7 +340,7 @@
             <tr>
                 <td>球员照片</td>
                 <td><a href="https://sports.bzzoiro.com/" target="_blank" rel="noopener">Bzzoiro Sports Data</a> + TheSportsDB</td>
-                <td>1539 张全队球员照片（双源合并）</td>
+                <td>球员照片（双源合并）</td>
             </tr>
             <tr>
                 <td>AI 推理</td>
@@ -373,7 +395,7 @@
     <!-- ═══════════ ④ 成长历程 ═══════════ -->
     <section id="journey">
         <h2>成长历程</h2>
-        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 27 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
+        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 29 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
 
         <div class="timeline">
             <div class="tl-item done"><strong>01</strong> 理解并改写 <code>skill.md</code> 提示词工程</div>
@@ -402,7 +424,9 @@
             <div class="tl-item done"><strong>24</strong> AI 推理可视化 + 4 维雷达 + 命中率热力图</div>
             <div class="tl-item done"><strong>25</strong> v12.0 天工视觉：3 套主题 + 音效 + 磁吸 + 焦点战卡片</div>
             <div class="tl-item done"><strong>26</strong> 修复焦点战滚动位置 + 分差偏差符号笔误</div>
-            <div class="tl-item new"><strong>27</strong> v13.2：开赛时间显示 + 比分右对齐 + 焦点战初始归零</div>
+            <div class="tl-item done"><strong>27</strong> v13.2：开赛时间显示 + 比分右对齐 + 焦点战初始归零</div>
+            <div class="tl-item done"><strong>28</strong> v13.2.2：清理冗余 + 球员照片瘦身</div>
+            <div class="tl-item new"><strong>29</strong> v13.3：德比名徽章 + H2H 历史交锋 + 近期状态圆点</div>
         </div>
     </section>
 
@@ -414,7 +438,7 @@
             <span style="color:var(--text-4)">·</span>
             <a href="#legal">免责声明</a>
         </div>
-        <div class="ver">Premier League Prediction Engine · v13.2</div>
+        <div class="ver">Premier League Prediction Engine · v13.3</div>
     </footer>
 </div>
 
@@ -543,7 +567,6 @@
             btn.classList.add('off');
         }
 
-        // 跨标签页同步主题
         window.addEventListener('storage', e => {
             if (e.key === 'pl_theme') applyTheme(e.newValue || 'default');
             if (e.key === 'pl_sound') {
