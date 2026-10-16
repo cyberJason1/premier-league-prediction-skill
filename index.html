@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v13.1</title>
+    <title>英超预测引擎 v13.2</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
@@ -153,10 +153,21 @@
         .tag-sm.derby{background:rgba(239,68,68,.15);color:#ff7a7a;border:1px solid rgba(239,68,68,.4)}
         .tag-sm.hot{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.4)}
         .tag-sm.top{background:var(--violet-soft);color:var(--violet);border:1px solid rgba(167,139,250,.4)}
-        .fmatch .frow{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:6px}
+
+        /* ══ 焦点战卡片：队徽 + 队名 + 比分 一体对齐 ══ */
+        .fmatch .frow{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:8px}
         .fmatch .fbadge{width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
-        .fmatch .fname{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .fmatch .fbadge-fb{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700;flex-shrink:0}
+        .fmatch .fname{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .25s var(--ease)}
+        .fmatch .fscore{font-family:var(--font-serif);font-size:24px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;min-width:22px;text-align:right;flex-shrink:0;letter-spacing:-.02em}
+        .fmatch .fscore.win{color:var(--amber);text-shadow:0 0 14px var(--amber-glow)}
+        .fmatch .fscore.lose{color:var(--text-3)}
+        .fmatch .fscore.draw{color:var(--text-2)}
+        .fmatch .frow.dim .fname{color:var(--text-3)}
         .fmatch .fmeta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--border);font-size:10px;color:var(--text-3)}
+        .fmatch .fmeta .ftime{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
+        .fmatch .fmeta .ftime.live{color:var(--rose);animation:pulse 2s ease-in-out infinite}
+
         .focus-empty{color:var(--text-4);font-size:12px;text-align:center;padding:20px;flex:0 0 100%}
 
         /* ══ Dash ══ */
@@ -708,8 +719,8 @@
         .mrow-team .side.away{background:rgba(148,163,184,.12);color:var(--text-3)}
         .mrow-meta{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--text-3);padding-left:28px}
         .mrow-meta .status.finished{color:var(--text-2)}
-        .mrow-meta .status.upcoming{color:var(--amber)}
-        .mrow-meta .score{font-family:var(--font-serif);font-size:14px;font-weight:600;color:var(--text);padding:0 6px}
+        .mrow-meta .status.upcoming{color:var(--amber);font-weight:600}
+        .mrow-meta .score{font-family:var(--font-serif);font-size:15px;font-weight:700;color:var(--amber);padding:0 8px;font-variant-numeric:tabular-nums;text-shadow:0 0 10px var(--amber-glow)}
         .match-picker .empty-list{padding:30px 14px;text-align:center;font-size:12px;color:var(--text-4)}
         .picker-mode{display:flex;gap:6px;margin-bottom:var(--sp-3)}
         .picker-mode button{flex:1;padding:9px 8px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-3);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s var(--ease)}
@@ -911,7 +922,7 @@
             <a href="about.html#legal">免责声明</a>
         </div>
         <div class="legal">⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。</div>
-        <div class="ver">Premier League Prediction Engine · v13.1</div>
+        <div class="ver">Premier League Prediction Engine · v13.2</div>
     </footer>
 </div>
 
@@ -1051,7 +1062,7 @@
 
 <script>
     /* ══════════════════════════════════════════════════════════════
-   v13.1 · 逻辑层
+   v13.2 · 逻辑层
    ══════════════════════════════════════════════════════════════ */
 
     /* ── Sound ── */
@@ -1759,7 +1770,7 @@
             for (let m = 0; m < round.length; m++) {
                 const match = round[m];
                 if (match.home === teamName || match.away === teamName) {
-                    result.push({ round: r, home: match.home, away: match.away, isHome: match.home === teamName, opponent: match.home === teamName ? match.away : match.home, matchIdx: m });
+                    result.push({ round: r, home: match.home, away: match.away, isHome: match.home === teamName, opponent: match.home === teamName ? match.away : match.home, matchIdx: m, kickoff: match.kickoff || null });
                 }
             }
         }
@@ -1799,6 +1810,36 @@
     function invalidateHistCache(){ _histCache = null; _histCacheRound = -1; }
     function invalidateTeamAtkCache(){ _teamAtkCache = null; }
 
+    /* ★ 新增：开赛时间格式化（返回纯文本，样式交给 .ftime） */
+    function formatKickoff(utcIso, st){
+        if (st.status === 'finished') return '已完赛';
+        if (!utcIso) return '待开赛';
+        try {
+            const d = new Date(utcIso);
+            if (isNaN(d.getTime())) return '待开赛';
+            const now = new Date();
+            const diffH = (d - now) / 3600000;
+            if (diffH < 0 && diffH > -2.5) return '🔴 进行中';
+            if (diffH < -2.5) return '待更新';
+            const hh = String(d.getHours()).padStart(2, '0');
+            const mm = String(d.getMinutes()).padStart(2, '0');
+            const timeStr = `${hh}:${mm}`;
+            if (diffH < 1) {
+                const mins = Math.round(diffH * 60);
+                return mins <= 0 ? '即将开始' : `${mins} 分钟后`;
+            }
+            if (diffH < 24) return `今天 ${timeStr}`;
+            const weekdays = ['日','一','二','三','四','五','六'];
+            const dayDiff = Math.floor(diffH / 24);
+            if (dayDiff < 7) return `周${weekdays[d.getDay()]} ${timeStr}`;
+            const M = String(d.getMonth() + 1).padStart(2, '0');
+            const D = String(d.getDate()).padStart(2, '0');
+            return `${M}-${D} ${timeStr}`;
+        } catch(e) {
+            return '待开赛';
+        }
+    }
+
     const MatchPicker = (() => {
         let selectedIdx = 0, currentRound = 0, isOpen = false, focusIdx = 0, filtered = [];
         function open(){
@@ -1830,7 +1871,9 @@
                     const isSelected = m.idx === _teamSelectedIdx;
                     const cls = ['mrow', isSelected?'selected':'', isPredicted?'predicted':''].filter(Boolean).join(' ');
                     const sideTag = m.isHome ? '<span class="side home">主</span>' : '<span class="side away">客</span>';
-                    const statusHtml = st.status === 'finished' ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>` : `<span class="status upcoming">未开赛</span>`;
+                    const statusHtml = st.status === 'finished'
+                        ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>`
+                        : `<span class="status upcoming">${formatKickoff(m.kickoff, st)}</span>`;
                     return `<div class="${cls}" data-midx="${m.idx}"><div class="mrow-team"><span style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text-3);padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.04)">第${m.round+1}轮</span>${sideTag}${teamBadgeMini(m.opponent)}<span class="name">${escapeHtml(m.opponent)}</span>${rankChip(m.opponent)}${formBlocks(m.opponent)}</div><div class="mrow-meta">${statusHtml}</div></div>`;
                 }).join('');
             } else {
@@ -1844,7 +1887,9 @@
                     const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
                     const isSelected = m.idx === selectedIdx;
                     const cls = ['mrow', isSelected?'selected':'', isPredicted?'predicted':''].filter(Boolean).join(' ');
-                    const statusHtml = st.status === 'finished' ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>` : `<span class="status upcoming">第 ${currentRound+1} 轮 · 未开赛</span>`;
+                    const statusHtml = st.status === 'finished'
+                        ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>`
+                        : `<span class="status upcoming">${formatKickoff(m.kickoff, st)}</span>`;
                     return `<div class="${cls}" data-midx="${m.idx}"><div class="mrow-team">${teamBadgeMini(m.home)}<span class="side home">主</span><span class="name">${escapeHtml(m.home)}</span>${rankChip(m.home)}${formBlocks(m.home)}</div><div class="mrow-team">${teamBadgeMini(m.away)}<span class="side away">客</span><span class="name">${escapeHtml(m.away)}</span>${rankChip(m.away)}${formBlocks(m.away)}</div><div class="mrow-meta">${statusHtml}</div></div>`;
                 }).join('');
             }
@@ -2448,14 +2493,35 @@
             const st = getMatchStatus(m.home, m.away, r);
             const isD = isDerby(m.home, m.away);
             const hr = getRank(m.home), ar = getRank(m.away);
+            const isFinished = st.status === 'finished';
+            let hs = null, as = null, hCls = '', aCls = '';
+            if (isFinished) {
+                [hs, as] = st.score.split('-').map(Number);
+                if (hs > as) { hCls = 'win'; aCls = 'lose'; }
+                else if (hs < as) { hCls = 'lose'; aCls = 'win'; }
+                else { hCls = 'draw'; aCls = 'draw'; }
+            }
             const tags = [];
             if (isD) tags.push('<span class="tag-sm derby">⚔️ 德比</span>');
             if (hr && ar && hr <= 4 && ar <= 4) tags.push('<span class="tag-sm top">TOP4</span>');
-            if (st.status === 'upcoming') tags.push('<span class="tag-sm hot">待预测</span>');
+            if (!isFinished) tags.push('<span class="tag-sm hot">待预测</span>');
             const hUrl = espnUrl(m.home), aUrl = espnUrl(m.away);
-            const hImg = hUrl ? `<img class="fbadge" src="${hUrl}" alt="" loading="lazy">` : `<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700">${ABBR[m.home] || m.home.slice(0,3)}</div>`;
-            const aImg = aUrl ? `<img class="fbadge" src="${aUrl}" alt="" loading="lazy">` : `<div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700">${ABBR[m.away] || m.away.slice(0,3)}</div>`;
-            return `<div class="fmatch" data-home="${escapeHtml(m.home)}" data-away="${escapeHtml(m.away)}" data-round="${r}">${tags.length ? `<div class="tagline">${tags.join('')}</div>` : ''}<div class="frow">${hImg}<span class="fname">${escapeHtml(m.home)}</span></div><div class="frow">${aImg}<span class="fname">${escapeHtml(m.away)}</span></div><div class="fmeta"><span>第 ${r+1} 轮</span><span style="font-family:var(--font-mono);font-size:10px">${st.status === 'finished' ? st.score : '未开赛'}</span></div></div>`;
+            const hImg = hUrl
+                ? `<img class="fbadge" src="${hUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')"><div class="fbadge-fb" style="display:none">${ABBR[m.home] || m.home.slice(0,3)}</div>`
+                : `<div class="fbadge-fb">${ABBR[m.home] || m.home.slice(0,3)}</div>`;
+            const aImg = aUrl
+                ? `<img class="fbadge" src="${aUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')"><div class="fbadge-fb" style="display:none">${ABBR[m.away] || m.away.slice(0,3)}</div>`
+                : `<div class="fbadge-fb">${ABBR[m.away] || m.away.slice(0,3)}</div>`;
+            const isLive = !isFinished && m.kickoff && (() => {
+                const diffH = (new Date(m.kickoff) - Date.now()) / 3600000;
+                return diffH < 0 && diffH > -2.5;
+            })();
+            return `<div class="fmatch" data-home="${escapeHtml(m.home)}" data-away="${escapeHtml(m.away)}" data-round="${r}">
+                ${tags.length ? `<div class="tagline">${tags.join('')}</div>` : ''}
+                <div class="frow${hCls === 'lose' ? ' dim' : ''}">${hImg}<span class="fname">${escapeHtml(m.home)}</span>${isFinished ? `<span class="fscore ${hCls}">${hs}</span>` : ''}</div>
+                <div class="frow${aCls === 'lose' ? ' dim' : ''}">${aImg}<span class="fname">${escapeHtml(m.away)}</span>${isFinished ? `<span class="fscore ${aCls}">${as}</span>` : ''}</div>
+                <div class="fmeta"><span>第 ${r+1} 轮</span><span class="ftime${isLive ? ' live' : ''}">${formatKickoff(m.kickoff, st)}</span></div>
+            </div>`;
         }).join('');
         scroll.querySelectorAll('.fmatch').forEach(el => {
             el.addEventListener('click', () => {
@@ -2534,6 +2600,14 @@
         if (_focusResizeHandler) window.removeEventListener('resize', _focusResizeHandler);
         _focusResizeHandler = updateState;
         window.addEventListener('resize', _focusResizeHandler);
+
+        // ★ 首次进入 或 轮次变化 → 强制回到最左
+        const curRound = +document.getElementById('roundSel').value || 0;
+        if (scroll._lastRound !== curRound) {
+            scroll.scrollLeft = 0;
+            scroll._lastRound = curRound;
+        }
+
         requestAnimationFrame(updateState);
     }
 
@@ -2597,7 +2671,7 @@
             if (diffAway !== 0) deviations.push({ type: diffAway > 0 ? 'neutral' : 'info', text: `📊 客队${diffAway > 0 ? '高估' : '低估'} ${Math.abs(diffAway)} 球` });
             if (!hitOU25) deviations.push({ type: 'neutral', text: `⚽ 大小球 2.5 猜错（预测${ou25.pred === 'over' ? '大' : '小'}，实际${ou25.actual === 'over' ? '大' : '小'}）` });
             if (!hitBTTS) deviations.push({ type: 'neutral', text: `🥅 BTTS 猜错（预测${pBTTS ? '双方进球' : '有零封'}）` });
-            if (!hitMargin) deviations.push({ type: 'neutral', text: `⚖️ 分差偏差 ${diffMargin => 0 ? '+' : ''}${pMargin - aMargin} 球` });
+            if (!hitMargin) deviations.push({ type: 'neutral', text: `⚖️ 分差偏差 ${(pMargin - aMargin) >= 0 ? '+' : ''}${pMargin - aMargin} 球` });
         }
         return { verdict, hitExact, hitWdl, hitOU25, hitOU15, hitOU35, hitBTTS, hitMargin, hitHomeGoals, hitAwayGoals, predicted: { h: ph, a: pa, wdl: pWdl, total: pTotal }, actual: { h: ah, a: aa, wdl: aWdl, total: aTotal }, diffHome, diffAway, diffTotal, deviations };
     }
@@ -3182,6 +3256,7 @@
     }
 
     (async function boot(){
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         setImmersion(_immersion);
         const savedTheme = localStorage.getItem('pl_theme');
         if (savedTheme && savedTheme !== 'default') document.body.setAttribute('data-theme', savedTheme);
@@ -3191,7 +3266,7 @@
         Ambient.init();
         LoadingBar.start();
         if (!localStorage.getItem('pl_welcomed')) {
-            setTimeout(() => { toast('👋 欢迎使用 v13.1 · 先填 Groq API Key', 'ok', 6500); }, 2200);
+            setTimeout(() => { toast('👋 欢迎使用 v13.2 · 先填 Groq API Key', 'ok', 6500); }, 2200);
             localStorage.setItem('pl_welcomed', '1');
         }
         setTimeout(() => LoadingBar.done(), 1800);

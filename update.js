@@ -2,14 +2,32 @@
 /**
  * 英超预测引擎 - 真实数据自动更新 + 球员照片拉取 + 历史交锋
  * 数据写入独立的 data.json
- * 用法：FD_TOKEN=你的密钥 BZZOIRO_KEY=你的密钥 node update.js
+ * 用法：在文件旁建一个 .env，写好 FD_TOKEN 和 BZZOIRO_KEY，然后 node update.js
  *
- * 最后更新：2026-10-15
- * 特性：断点续传 + 429 自动等待 + 单次批量限制 + 历史赛季拉取
+ * 最后更新：2026-10-16
+ * 特性：断点续传 + 429 自动等待 + 单次批量限制 + 历史赛季拉取 + .env 读取
+ * v13.2：fixtures 新增 kickoff（ISO 时间）+ status 字段
+ * v13.2.1：TheSportsDB 名字规范化 + 精确匹配，修复"若昂·佩德罗 无照片字段"
  */
 
 const fs = require('fs');
 const path = require('path');
+
+// ★ 从同目录 .env 读取 token（不用再手打 $env:FD_TOKEN=...）
+(function loadEnv(){
+    const envPath = path.join(__dirname, '.env');
+    if (!fs.existsSync(envPath)) return;
+    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
+    for (const line of lines) {
+        const t = line.trim();
+        if (!t || t.startsWith('#')) continue;
+        const i = t.indexOf('=');
+        if (i < 0) continue;
+        const k = t.slice(0, i).trim();
+        const v = t.slice(i + 1).trim().replace(/^["']|["']$/g, '');
+        if (!process.env[k]) process.env[k] = v;
+    }
+})();
 
 const DATA_FILE = path.join(__dirname, 'data.json');
 const SPORTSDB_KEY = '3';
@@ -30,7 +48,7 @@ const PLAYER_NAME_MAP = {
     '萨卡': 'Bukayo Saka', '厄德高': 'Martin Odegaard', '热苏斯': 'Gabriel Jesus',
     '哈兰德': 'Erling Haaland', '谢尔基': 'Rayan Cherki', '罗德里': 'Rodri',
     '萨拉赫': 'Mohamed Salah', '伊萨克': 'Alexander Isak', '加克波': 'Cody Gakpo',
-    '若昂·佩德罗': 'Joao Pedro', '摩根·罗杰斯': 'Morgan Rogers', '帕尔默': 'Cole Palmer',
+    '若昂·佩德罗': 'João Pedro', '摩根·罗杰斯': 'Morgan Rogers', '帕尔默': 'Cole Palmer',
     '麦迪逊': 'James Maddison', 'B费': 'Bruno Fernandes', '拉什福德': 'Marcus Rashford',
     '吉马良斯': 'Bruno Guimaraes', '沃特金斯': 'Ollie Watkins', '麦金': 'John McGinn',
     '三笘薰': 'Kaoru Mitoma', '维尔贝克': 'Danny Welbeck',
@@ -56,6 +74,15 @@ function toChinese(name){
         if (name.toLowerCase().includes(en.toLowerCase())) return zh;
     }
     return null;
+}
+
+// ★ 名字规范化：去音标 + 去符号 + 小写
+function normalizeName(s){
+    return String(s || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')   // ã→a, ç→c, é→e ...
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
 }
 
 // ─────────────────────────────────────────────
@@ -95,7 +122,14 @@ async function fetchFromApi(token){
         const a = toChinese(m.awayTeam.name);
         if (!h || !a) return;
         const md = m.matchday;
-        if (md >= 1 && md <= 38) fixtures[md - 1].push({ home: h, away: a });
+        if (md >= 1 && md <= 38) {
+            fixtures[md - 1].push({
+                home: h,
+                away: a,
+                kickoff: m.utcDate || null,
+                status: m.status || 'SCHEDULED'
+            });
+        }
         if (m.status === 'FINISHED' && m.score && m.score.fullTime) {
             if (!results[md]) results[md] = {};
             results[md][`${h}|${a}`] = [m.score.fullTime.home, m.score.fullTime.away];
@@ -192,7 +226,7 @@ async function fetchBzzoiroPhotos(apiKey){
                 if (p.name && p.id) {
                     let zhName = null;
                     for (const [zh, en] of Object.entries(PLAYER_NAME_MAP)) {
-                        if (en.toLowerCase() === p.name.toLowerCase()) { zhName = zh; break; }
+                        if (normalizeName(en) === normalizeName(p.name)) { zhName = zh; break; }
                     }
                     if (!zhName) zhName = p.name;
                     photos[zhName] = `https://sports.bzzoiro.com/img/player/${p.id}/?sor=true&bg=transparent`;
@@ -213,29 +247,63 @@ async function fetchTheSportsDBPhotos(existingPhotos){
     console.log(`📸 待补充 ${missing.length} 位`);
     if (!missing.length) { console.log('✅ 所有球员照片已齐，跳过 TheSportsDB'); return photos; }
 
-    const BATCH_LIMIT = 15;
-    const batch = missing.slice(0, BATCH_LIMIT);
     let okCount = 0, missCount = 0, errCount = 0;
 
-    for (const [zhName, enName] of batch) {
-        let success = false;
-        for (let attempt = 1; attempt <= 3; attempt++) {
-            try {
-                const url = `https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}/searchplayers.php?p=${encodeURIComponent(enName)}`;
-                const res = await fetch(url, { headers: { 'User-Agent': 'PL-Prediction-Engine/1.0' } });
-                if (res.status === 429) { console.log(`  ⏸ ${zhName} 被限速，等待 30 秒…`); await new Promise(r => setTimeout(r, 30000)); continue; }
-                if (!res.ok) { errCount++; success = true; break; }
-                const data = await res.json();
-                if (data.player && data.player.length > 0) {
-                    const p = data.player[0];
-                    const photoUrl = p.strCutout || p.strRender || p.strThumb || null;
-                    if (photoUrl) { photos[zhName] = photoUrl; okCount++; console.log(`  ✅ ${zhName}`); }
-                    else { missCount++; console.log(`  ⚠️ ${zhName} 无照片字段`); }
-                } else { missCount++; console.log(`  ⚠️ ${zhName} 未找到`); }
-                success = true; break;
-            } catch(e) { await new Promise(r => setTimeout(r, 5000)); }
+    for (const [zhName, enName] of missing) {
+        // ★ 生成多个候选搜索词
+        const candidates = [
+            enName,                                                    // 原名：João Pedro
+            enName.normalize('NFD').replace(/[\u0300-\u036f]/g, ''),   // 去音标：Joao Pedro
+            enName.replace(/-/g, ' ')                                  // 连字符换空格：Calvert Lewin
+        ];
+        const uniq = [...new Set(candidates)];
+
+        let found = false;
+        for (const cand of uniq) {
+            if (found) break;
+            for (let attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    const url = `https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}/searchplayers.php?p=${encodeURIComponent(cand)}`;
+                    const res = await fetch(url, { headers: { 'User-Agent': 'PL-Prediction-Engine/1.0' } });
+                    if (res.status === 429) {
+                        console.log(`  ⏸ ${zhName} 被限速，等待 30 秒…`);
+                        await new Promise(r => setTimeout(r, 30000));
+                        continue;
+                    }
+                    if (!res.ok) { errCount++; found = true; break; }
+
+                    const data = await res.json();
+                    const list = data.player || [];
+
+                    // ★ 优先精确匹配（规范化后对比）
+                    const want = normalizeName(cand);
+                    let best = list.find(p => normalizeName(p.strPlayer) === want);
+                    // 退而求其次：前缀匹配
+                    if (!best) best = list.find(p => normalizeName(p.strPlayer).startsWith(want));
+                    // 最后兜底：第一个
+                    if (!best && list.length) best = list[0];
+
+                    if (best) {
+                        const photoUrl = best.strCutout || best.strRender || best.strThumb || null;
+                        if (photoUrl) {
+                            photos[zhName] = photoUrl;
+                            okCount++;
+                            console.log(`  ✅ ${zhName} ← "${best.strPlayer}"（搜"${cand}"）`);
+                        } else {
+                            missCount++;
+                            console.log(`  ⚠️ ${zhName}（匹配到"${best.strPlayer}"但无照片字段）`);
+                        }
+                    } else {
+                        missCount++;
+                        console.log(`  ⚠️ ${zhName} 未找到（搜"${cand}"）`);
+                    }
+                    found = true;
+                    break;
+                } catch(e) {
+                    await new Promise(r => setTimeout(r, 5000));
+                }
+            }
         }
-        if (!success) errCount++;
         await new Promise(r => setTimeout(r, 2000));
     }
     console.log(`📸 TheSportsDB 补充：成功 ${okCount} · 未找到 ${missCount} · 错误 ${errCount}`);
@@ -248,8 +316,8 @@ async function fetchTheSportsDBPhotos(existingPhotos){
 async function main(){
     const fdToken = process.env.FD_TOKEN;
     const bzKey = process.env.BZZOIRO_KEY;
-    if (!fdToken) { console.error('❌ 请设置 FD_TOKEN'); process.exit(1); }
-    if (!bzKey) { console.error('❌ 请设置 BZZOIRO_KEY'); process.exit(1); }
+    if (!fdToken) { console.error('❌ 请设置 FD_TOKEN（在 .env 里写 FD_TOKEN=xxx）'); process.exit(1); }
+    if (!bzKey) { console.error('❌ 请设置 BZZOIRO_KEY（在 .env 里写 BZZOIRO_KEY=xxx）'); process.exit(1); }
 
     console.log('📡 从 football-data.org 拉取当前赛季…');
     const { standings, results, fixtures } = await fetchFromApi(fdToken);
