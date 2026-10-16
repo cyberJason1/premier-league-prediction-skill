@@ -285,7 +285,6 @@
         .ring.a .num{color:var(--cyan)}
         @media(max-width:480px){.ring .num{font-size:20px}.ring .lbl2{font-size:9px;letter-spacing:.1em}}
 
-        /* 雷达图 */
         .radar-wrap{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5);margin-bottom:var(--sp-4)}
         .radar-wrap .ttl{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-4);display:flex;align-items:center;gap:var(--sp-2);justify-content:center}
         .radar-wrap .ttl::before{content:"📡";font-size:12px}
@@ -436,7 +435,6 @@
         .stat .n{font-family:var(--font-serif);font-weight:500;font-size:28px;letter-spacing:-.02em;color:var(--amber);font-variant-numeric:tabular-nums;line-height:1.2;text-shadow:0 0 20px var(--amber-glow)}
         .stat .l{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-top:var(--sp-1)}
 
-        /* 热力图 */
         .heatmap{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);margin-bottom:var(--sp-4)}
         .heatmap .hm-ttl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3)}
         .heatmap-grid{display:flex;flex-wrap:wrap;gap:3px}
@@ -748,7 +746,6 @@
         </div>
     </section>
 
-    <!-- 焦点战卡片 -->
     <section class="focus-strip" id="focusStrip">
         <h4>今日焦点战</h4>
         <div class="focus-scroll" id="focusScroll">
@@ -876,7 +873,6 @@
     <svg class="fab-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
 </button>
 
-<!-- 历史记录 -->
 <div class="mask" id="histMask" role="dialog" aria-modal="true">
     <div class="modal" tabindex="-1">
         <button class="close" onclick="closeHistory()" aria-label="关闭">✕</button>
@@ -928,7 +924,6 @@
     </div>
 </div>
 
-<!-- 批量预测 -->
 <div class="mask" id="batchMask" role="dialog" aria-modal="true">
     <div class="modal" tabindex="-1">
         <button class="close" onclick="closeBatch()" aria-label="关闭">✕</button>
@@ -948,7 +943,6 @@
     </div>
 </div>
 
-<!-- 球队详情 -->
 <div class="mask" id="teamMask" role="dialog" aria-modal="true">
     <div class="modal team-modal" tabindex="-1">
         <button class="close" onclick="closeTeamModal()" aria-label="关闭">✕</button>
@@ -956,7 +950,6 @@
     </div>
 </div>
 
-<!-- 命令面板 -->
 <div class="cmd-mask" id="cmdMask">
     <div class="cmd-panel" role="dialog" aria-modal="true">
         <input type="text" class="cmd-input" id="cmdInput" placeholder="输入命令或搜索…" autocomplete="off">
@@ -964,7 +957,6 @@
     </div>
 </div>
 
-<!-- 快捷键 -->
 <div class="shortcut-mask" id="shortcutMask">
     <div class="shortcut-panel" role="dialog" aria-modal="true">
         <button class="close" onclick="closeShortcuts()" aria-label="关闭" style="position:absolute;top:16px;right:16px;background:transparent;border:0;color:var(--text-3);font-size:22px;cursor:pointer;padding:6px 10px;border-radius:var(--r-sm)">✕</button>
@@ -1018,6 +1010,7 @@
         const btn = document.getElementById('soundBtn');
         btn.textContent = on ? '🔊' : '🔇';
         btn.classList.toggle('off', !on);
+        localStorage.setItem('pl_sound', on ? '1' : '0');
         toast(on ? '音效已开启' : '音效已关闭', 'ok', 2000);
     }
 
@@ -1080,7 +1073,7 @@
         }
         function spawnParticles(){
             if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-            if (window.matchMedia('(max-width:768px)').matches) return; // 移动端关闭
+            if (window.matchMedia('(max-width:768px)').matches) return;
             const layer = document.getElementById('particleLayer');
             if (!layer) return;
             clearParticles();
@@ -1120,7 +1113,6 @@
                 });
             });
         }
-        /* 磁吸效果 */
         function enableMagnet(){
             if (window.matchMedia('(hover:none)').matches) return;
             if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
@@ -1250,7 +1242,6 @@
             setTimeout(() => dot.remove(), 1000);
         }
     }
-    /* 冲击波（比分命中时） */
     function shockwave(x, y){
         if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
         const el = document.createElement('div');
@@ -2420,7 +2411,6 @@
         const r = +document.getElementById('roundSel').value || 0;
         const round = FIXTURES[r] || [];
         if (!round.length) { scroll.innerHTML = '<div class="focus-empty">本轮无赛程</div>'; return; }
-        // 优先显示：德比 > 前4互撞 > 其它
         const scored = round.map(m => {
             let score = 0;
             const hr = getRank(m.home) || 20, ar = getRank(m.away) || 20;
@@ -2453,11 +2443,9 @@
       </div>
     </div>`;
         }).join('');
-        // 绑定点击
         scroll.querySelectorAll('.fmatch').forEach(el => {
             el.addEventListener('click', () => {
                 const h = el.dataset.home, a = el.dataset.away, rr = +el.dataset.round;
-                // 找到对应对局并选中
                 const round = FIXTURES[rr] || [];
                 const idx = round.findIndex(m => m.home === h && m.away === a);
                 if (idx >= 0) {
@@ -2600,7 +2588,6 @@
             const aBTTS = rec.actual.split('-').map(Number).every(x => x > 0);
             if (pBTTS === aBTTS) S.btts++;
             S.hitSequence.push(a.hitWdl);
-            S.byPredWdl[a.pTotal > a.aTotal ? 'H' : a.pTotal < a.aTotal ? 'A' : 'D'];
             const pw = (() => { const [ph,pa] = rec.score.split('-').map(Number); return ph>pa?'H':ph<pa?'A':'D'; })();
             S.byPredWdl[pw].total++;
             if (a.hitWdl) S.byPredWdl[pw].hit++;
@@ -3113,7 +3100,10 @@
     (async function boot(){
         // 主题恢复
         const savedTheme = localStorage.getItem('pl_theme');
-        if (savedTheme && savedTheme !== 'default') setThemeSilent(savedTheme);
+        if (savedTheme && savedTheme !== 'default') {
+            if (savedTheme === 'default') document.body.removeAttribute('data-theme');
+            else document.body.setAttribute('data-theme', savedTheme);
+        }
         // 音效状态
         const savedSound = localStorage.getItem('pl_sound') === '1';
         if (savedSound) {
@@ -3227,18 +3217,6 @@
         if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2000 });
         else setTimeout(preload, 1200);
     })();
-
-    function setThemeSilent(name){
-        if (name === 'default') document.body.removeAttribute('data-theme');
-        else document.body.setAttribute('data-theme', name);
-    }
-    /* 覆盖 setTheme 加音效保存 */
-    const _origSetTheme = setTheme;
-    setTheme = function(name){
-        _origSetTheme(name);
-        localStorage.setItem('pl_theme', name);
-        Sound.click();
-    };
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
