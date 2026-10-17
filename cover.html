@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>天工级 OG Cover - v16.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* 画布：严格 1280 x 640 */
+        .canvas {
+            width: 1280px; height: 640px; position: relative; overflow: hidden;
+            background: #040508;
+            box-shadow: 0 40px 100px rgba(0,0,0,1);
+        }
+
+        /* 1. 噪点与网格底层（极客质感） */
+        .canvas::before {
+            content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background-image:
+                    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            mask-image: radial-gradient(circle at 30% 50%, black 20%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle at 30% 50%, black 20%, transparent 70%);
+        }
+
+        /* 2. 环境光线：左上熔金，右下幽冥，中心深渊 */
+        .light-map {
+            position: absolute; inset: 0; z-index: 0;
+            background:
+                    radial-gradient(circle at 15% 10%, rgba(255, 159, 67, 0.15) 0%, transparent 50%),
+                    radial-gradient(circle at 85% 90%, rgba(34, 211, 238, 0.12) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(15, 18, 25, 1) 0%, #040508 100%);
+        }
+
+        /* 3. 极光扫光特效 */
+        .aurora {
+            position: absolute; top: -50%; left: -20%; width: 150%; height: 200%;
+            background: conic-gradient(from 180deg at 50% 50%, transparent 0deg, rgba(255, 159, 67, 0.03) 120deg, transparent 240deg);
+            z-index: 2; pointer-events: none; mix-blend-mode: screen;
+        }
+
+        /* 安全区：距离边缘 80px */
+        .safe-area {
+            position: absolute; inset: 80px; z-index: 10;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        /* ================= 左侧内容区 ================= */
+        .left-content { max-width: 720px; }
+
+        /* 顶部标识 */
+        .header-tag {
+            display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+        }
+        .header-tag .line { width: 40px; height: 2px; background: #ff9f43; box-shadow: 0 0 10px #ff9f43; }
+        .header-tag .text {
+            font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700;
+            letter-spacing: 6px; color: #ff9f43; text-transform: uppercase;
+        }
+
+        /* 主标题排版 */
+        .title-wrapper { position: relative; }
+        .title-cn {
+            font-family: 'Noto Serif SC', "SimSun", serif; font-size: 84px; font-weight: 900;
+            line-height: 1.1; letter-spacing: 4px; color: #fff;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+        }
+        .title-en {
+            font-family: 'JetBrains Mono', monospace; font-size: 86px; font-weight: 700;
+            line-height: 1.1; letter-spacing: -2px; font-style: italic; margin-top: 8px;
+            color: #ff9f43;
+            text-shadow: 0 0 30px rgba(255, 159, 67, 0.6), 0 0 80px rgba(255, 159, 67, 0.2);
+        }
+
+        /* 卖点标签 */
+        .features {
+            display: flex; gap: 16px; margin-top: 40px;
+        }
+        .feature-item {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px 18px; border-radius: 4px; font-size: 15px; font-weight: 600;
+            color: #b0bccd; display: flex; align-items: center; gap: 10px;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .feature-item::before {
+            content: ''; width: 6px; height: 6px; border-radius: 50%; background: #34d399;
+            box-shadow: 0 0 10px #34d399;
+        }
+        .feature-item:nth-child(2)::before { background: #22d3ee; box-shadow: 0 0 10px #22d3ee; }
+
+        /* 底部数据（专业面板感） */
+        .footer-data {
+            display: flex; gap: 50px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .data-box h4 {
+            font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+            letter-spacing: 2px; color: #6b7a8f; margin-bottom: 8px;
+        }
+        .data-box p { font-size: 16px; font-weight: 600; color: #fff; }
+        .data-box span { color: #ff9f43; }
+
+        /* ================= 右侧全息视觉区 ================= */
+        .right-visual {
+            position: absolute; right: -40px; top: 50%; transform: translateY(-50%);
+            width: 600px; height: 600px; z-index: 5;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* 全息光环体系 */
+        .holo-ring {
+            position: absolute; border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .hr-1 { width: 280px; height: 280px; border: 1px dashed rgba(255, 159, 67, 0.4); animation: spin 20s linear infinite; }
+        .hr-2 { width: 400px; height: 400px; border: 1px solid rgba(34, 211, 238, 0.2); box-shadow: inset 0 0 40px rgba(34, 211, 238, 0.05); }
+        .hr-3 { width: 520px; height: 520px; border: 1px dashed rgba(255, 255, 255, 0.08); animation: spin-reverse 30s linear infinite; }
+        .hr-4 { width: 640px; height: 640px; border: 1px solid rgba(255, 159, 67, 0.1); }
+
+        /* 动态光弧 */
+        .arc {
+            position: absolute; width: 460px; height: 460px; border-radius: 50%;
+            border: 2px solid transparent; border-top-color: #ff9f43; border-left-color: rgba(255, 159, 67, 0.2);
+            filter: drop-shadow(0 0 10px #ff9f43); transform: rotate(45deg);
+        }
+
+        /* 核心足球（用纯 SVG 矢量重构的赛事级足球） */
+        .core-ball {
+            width: 200px; height: 200px; z-index: 10;
+            filter: drop-shadow(0 0 40px rgba(255, 159, 67, 0.4));
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* 右上角胶囊 */
+        .version-pill {
+            position: absolute; right: 80px; top: 80px; z-index: 20;
+            background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.4);
+            padding: 8px 20px; border-radius: 40px; font-family: 'JetBrains Mono', monospace;
+            font-size: 13px; font-weight: 700; color: #34d399;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 0 20px rgba(52, 211, 153, 0.2), inset 0 0 10px rgba(52, 211, 153, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .version-pill .dot {
+            width: 8px; height: 8px; border-radius: 50%; background: #34d399;
+            box-shadow: 0 0 12px #34d399; animation: pulse 2s infinite;
+        }
+
+        /* 动画 */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    </style>
+</head>
+<body>
+
+<div class="canvas">
+    <div class="light-map"></div>
+    <div class="aurora"></div>
+
+    <!-- 右上角：版本号 -->
+    <div class="version-pill">
+        <div class="dot"></div> V16.0 旗舰定案版
+    </div>
+
+    <!-- 右侧：全息投影视觉 -->
+    <div class="right-visual">
+        <div class="holo-ring hr-4"></div>
+        <div class="holo-ring hr-3"></div>
+        <div class="holo-ring hr-2"></div>
+        <div class="holo-ring hr-1"></div>
+        <div class="arc"></div>
+
+        <!-- 极致几何足球 -->
+        <svg class="core-ball" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 内圈五边形（赛博填充） -->
+            <polygon points="50,25 72,41 64,67 36,67 28,41" fill="rgba(255,159,67,0.15)" stroke="#ff9f43" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- 放射状连接线 -->
+            <line x1="50" y1="25" x2="50" y2="5" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <line x1="72" y1="41" x2="92" y2="30" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <line x1="64" y1="67" x2="80" y2="88" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <line x1="36" y1="67" x2="20" y2="88" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <line x1="28" y1="41" x2="8" y2="30" stroke="#fff" stroke-width="1" opacity="0.6"/>
+            <!-- 外围六边形轮廓 -->
+            <path d="M50,5 L92,30 L80,88 L20,88 L8,30 Z" stroke="#22d3ee" stroke-width="1" opacity="0.4" stroke-linejoin="round"/>
+            <!-- 交叉辅助线 -->
+            <line x1="50" y1="5" x2="80" y2="88" stroke="#22d3ee" stroke-width="0.5" opacity="0.2"/>
+            <line x1="50" y1="5" x2="20" y2="88" stroke="#22d3ee" stroke-width="0.5" opacity="0.2"/>
+            <line x1="92" y1="30" x2="8" y2="30" stroke="#22d3ee" stroke-width="0.5" opacity="0.2"/>
+            <!-- 核心高光 -->
+            <circle cx="50" cy="41" r="3" fill="#fff" filter="drop-shadow(0 0 8px #fff)"/>
+        </svg>
+    </div>
+
+    <!-- 左侧：核心信息安全区（绝对不被裁切） -->
+    <div class="safe-area">
+        <div class="left-content">
+            <!-- 顶部 -->
+            <div class="header-tag">
+                <div class="line"></div>
+                <div class="text">Premier League 2026/27</div>
+            </div>
+
+            <!-- 标题 -->
+            <div class="title-wrapper">
+                <div class="title-cn">英超预测</div>
+                <div class="title-en">ENGINE</div>
+            </div>
+
+            <!-- 标签 -->
+            <div class="features">
+                <div class="feature-item">18维深度分析</div>
+                <div class="feature-item">防作弊唯一基准</div>
+                <div class="feature-item">实时数据注入</div>
+            </div>
+        </div>
+
+        <!-- 底部数据 -->
+        <div class="footer-data">
+            <div class="data-box">
+                <h4>REASONING</h4>
+                <p>Groq <span>极速推演</span></p>
+            </div>
+            <div class="data-box">
+                <h4>DATA SYNC</h4>
+                <p>官方战报 <span>自动同步</span></p>
+            </div>
+            <div class="data-box">
+                <h4>OPEN SOURCE</h4>
+                <p>1539 张照片 <span>全开源</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
