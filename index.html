@@ -7406,8 +7406,11 @@ async function startPredict(retryCount = 0) {
     const intel = document.getElementById('intel').value.trim();
     if (intel.length > INTEL_MAX) return toast(`今日情报超长（${intel.length}/${INTEL_MAX}）`, 'warn');
     if (!getKey()) return toast('请先填 Groq API Key', 'warn');
+
     btn.disabled = true;
     btn.classList.add('loading');
+    btn.title = "AI 正在深度推演中，请稍候...";
+
     setBreath('fast');
     const card = document.getElementById('resultCard');
     card.innerHTML = renderReasoning();
@@ -7459,7 +7462,8 @@ async function startPredict(retryCount = 0) {
         toast(err.message.slice(0, 80), 'err')
     } finally {
         btn.disabled = false;
-        btn.classList.remove('loading')
+        btn.classList.remove('loading');
+        btn.title = "Ctrl + Enter";
     }
 }
 
@@ -8015,7 +8019,7 @@ function getHistoryCopy() {
 }
 
 function setHistory(list) {
-    const slim = list.slice(-800).map(h => {
+    let slim = list.slice(-800).map(h => {
         const o = {
             _id: h._id,
             round: h.round,
@@ -8031,7 +8035,15 @@ function setHistory(list) {
         if (h.actual) o.actual = h.actual;
         return o
     });
-    localStorage.setItem(HIST_KEY, JSON.stringify(slim));
+
+    try {
+        localStorage.setItem(HIST_KEY, JSON.stringify(slim));
+    } catch (e) {
+        console.warn('本地存储已满，正在自动清理旧数据...');
+        slim = slim.slice(-400);
+        try { localStorage.setItem(HIST_KEY, JSON.stringify(slim)); } catch(e2) { localStorage.removeItem(HIST_KEY); }
+    }
+
     _histMemCache = slim;
     invalidateHistCache();
     invalidateTeamAtkCache()
@@ -9146,6 +9158,7 @@ async function loadFPL() {
         document.getElementById('fplCost').textContent = `£${sq.totalCost.toFixed(1)}m`;
         const f = sq.formation;
         document.getElementById('fplFormation').textContent = `${f[2]}-${f[3]}-${f[4]}`;
+
         const makePlayer = (p) => {
             const isCap = sq.captain.id === p.id;
             const isVice = sq.vice.id === p.id;
@@ -9153,41 +9166,35 @@ async function loadFPL() {
             // ============ 绝对防御：提取纯文件名 ============
             let rawPhoto = p.photo || '';
             let filename = '';
-
             if (rawPhoto) {
-                // 1. 如果它是个完整网址（哪怕包含 http 或者 110x140），只取最后一个斜杠后面的部分
-                if (rawPhoto.includes('/')) {
-                    filename = rawPhoto.split('/').pop();
-                } else {
-                    filename = rawPhoto;
-                }
+                filename = rawPhoto.includes('/') ? rawPhoto.split('/').pop() : rawPhoto;
             } else {
-                // 2. 如果连 photo 都没有，强行用官方 ID 兜底
                 filename = `${p.code || p.id || 0}.png`;
             }
-
-            // 3. 官方强制要求：文件名必须以 'p' 开头
-            if (!filename.startsWith('p')) {
-                filename = 'p' + filename;
-            }
+            if (!filename.startsWith('p')) filename = 'p' + filename;
 
             // ============ 拼接与破缓存 ============
-            // 统一强制使用 250x250 高清大图，并附带时间戳打破所有浏览器缓存
             const ts = data.updatedAt ? new Date(data.updatedAt).getTime() : Date.now();
             const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/250x250/${filename}?v=${ts}`;
 
-            // ============ 终极兜底：无图则显示文字 ============
-            // 单行写法，绝不换行。png 挂掉换 jpg，jpg 挂掉换 png，全挂显示首字母。
-            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.includes('.png')){this.src=this.src.replace('.png','.jpg');}else if(this.src.includes('.jpg')){this.src=this.src.replace('.jpg','.png');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
+            // ============ 终极兜底：250挂换110，png挂换jpg，全挂显字 ============
+            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.includes('250x250')){this.src=this.src.replace('250x250','110x140');}else if(this.src.includes('.png')){this.src=this.src.replace('.png','.jpg');}else if(this.src.includes('.jpg')){this.src=this.src.replace('.jpg','.png');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
 
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar">${imgHtml}<span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
         };
+
+        // 替补席自动排序（门将->后卫->中场->前锋）
+        const sortedBench = [...sq.bench].sort((a, b) => a.position - b.position || b.xPts - a.xPts);
+
         const gk = sq.starters.filter(p => p.position === 1);
         const def = sq.starters.filter(p => p.position === 2);
         const mid = sq.starters.filter(p => p.position === 3);
         const fwd = sq.starters.filter(p => p.position === 4);
         document.getElementById('fplPitch').innerHTML = `<div class="fpl-row">${fwd.map(makePlayer).join('')}</div><div class="fpl-row">${mid.map(makePlayer).join('')}</div><div class="fpl-row">${def.map(makePlayer).join('')}</div><div class="fpl-row">${gk.map(makePlayer).join('')}</div>`;
-        document.getElementById('fplBench').innerHTML = sq.bench.map(makePlayer).join('');
+
+        // 渲染排序后的替补席
+        document.getElementById('fplBench').innerHTML = sortedBench.map(makePlayer).join('');
+
         loading.style.display = 'none';
         content.style.display = 'block'
     } catch (e) {
@@ -9213,7 +9220,7 @@ async function loadFPL() {
     LoadingBar.start();
     if (!localStorage.getItem('pl_welcomed')) {
         setTimeout(() => {
-            toast('👋 欢迎使用 v14.2 · 先填 Groq API Key', 'ok', 6500)
+            toast('👋 欢迎使用 v15.0 · 先填 Groq API Key', 'ok', 6500)
         }, 2200);
         localStorage.setItem('pl_welcomed', '1')
     }
