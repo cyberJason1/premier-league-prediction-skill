@@ -1,5 +1,5 @@
 // ============================================================
-// 英超预测引擎 Service Worker · v13.3.0
+// 英超预测引擎 Service Worker · v14.2
 // ============================================================
 // 缓存策略总览：
 //   1. Groq / football-data API    → 完全不缓存（每次实时）
@@ -8,7 +8,7 @@
 //   4. 同源静态文件（HTML/JSON/MD）  → network-first + 缓存回退
 // ============================================================
 
-const CACHE_VERSION = 'v13.3.0';
+const CACHE_VERSION = 'v14.2';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存
@@ -17,6 +17,7 @@ const APP_SHELL = [
     './index.html',
     './skill.md',
     './data.json',
+    './fpl.json',     // ★ 新增：把 FPL 数据加进来
     './about.html'
 ];
 
@@ -116,7 +117,7 @@ self.addEventListener('fetch', event => {
     }
 
     // ============================================================
-    // 4. 同源静态文件（index.html、about.html、skill.md、data.json）
+    // 4. 同源静态文件（index.html、about.html、skill.md、data.json、fpl.json）
     //    network-first：优先拿最新，失败才用缓存
     //    同时清理同路径带 ?v= 的旧缓存，避免无限增长
     // ============================================================
