@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v15.1';
+const CACHE_VERSION = 'v16.0';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -26,7 +26,7 @@ self.addEventListener('fetch', event => {
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
 
-    // 1. 接口和图片：完全不拦截，直接走网络
+    // 1. 接口和图片：完全不拦截，直接走网络保证最新鲜
     if (url.hostname.includes('groq.com') ||
         url.hostname.includes('football-data.org') ||
         url.hostname.includes('premierleague.com') ||
@@ -35,7 +35,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // 2. 同源静态资源：网络优先，缓存兜底（缓存 key 去 query，避免 ?v= 无限堆积）
+    // 2. 同源静态资源：网络优先，缓存兜底（缓存 key 去 query）
     if (url.origin === self.location.origin) {
         const cacheKey = new Request(url.origin + url.pathname);
         event.respondWith(
