@@ -1,3 +1,5 @@
+markdown
+
 <div align="center">
 
 # ⚽ 英超预测引擎 v16.0
@@ -47,3 +49,15 @@
 1. 克隆本仓库到本地：
    ```bash
    git clone https://github.com/cyberJason1/premier-league-prediction-skill.git
+
+    直接双击打开 index.html，或在本地运行任意静态服务器：
+    bash
+
+    npx serve
+
+    输入你的 Groq API Key（仅保存在浏览器本地），即可开始预测！
+
+⚠️ 免责声明
+
+本页所有预测结果由 AI 模型生成，仅供娱乐与学习参考，不构成任何投注、博彩或财务建议。请遵守你所在国家/地区的法律法规，理性观赛。
+<div align="center"> <sub>Built with ❤️ by CyberJason. Give a ⭐️ if this project helped you!</sub> </div> ```
