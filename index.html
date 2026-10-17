@@ -5,15 +5,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v14.0</title>
+    <title>英超预测引擎 v13.3</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
     <meta property="og:image" content="https://cyberJason1.github.io/premier-league-prediction-skill/og.png">
     <meta property="og:url" content="https://cyberJason1.github.io/premier-league-prediction-skill/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="英超预测引擎 · 2026/27">
+    <meta name="twitter:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
+    <meta name="twitter:image" content="https://cyberJason1.github.io/premier-league-prediction-skill/og.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         @property --angle{syntax:'<angle>';initial-value:0deg;inherits:false}
         @property --breath-speed{syntax:'<time>';initial-value:14s;inherits:true}
@@ -30,7 +34,6 @@
             --font-serif:"Playfair Display","Noto Serif SC",Georgia,"Times New Roman","Songti SC","STSong","SimSun",serif;
             --font-mono:"SF Mono","JetBrains Mono",Consolas,monospace;
             --ease:cubic-bezier(.16,1,.3,1);--ease-spring:cubic-bezier(.2,1.6,.4,1);--mx:-50%;--my:-50%;
-            --dock-h:76px;
         }
         body[data-theme="ocean"]{--amber:#22d3ee;--amber-soft:rgba(34,211,238,.14);--amber-glow:rgba(34,211,238,.35);--cyan:#a78bfa;--cyan-soft:rgba(167,139,250,.14);--border-focus:rgba(34,211,238,.5)}
         body[data-theme="aurora"]{--amber:#34d399;--amber-soft:rgba(52,211,153,.14);--amber-glow:rgba(52,211,153,.35);--cyan:#fbbf24;--cyan-soft:rgba(251,191,36,.14);--border-focus:rgba(52,211,153,.5)}
@@ -56,6 +59,7 @@
         .particle.cyan{background:var(--cyan);box-shadow:0 0 12px var(--cyan),0 0 4px var(--cyan)}
         .particle.violet{background:var(--violet);box-shadow:0 0 12px var(--violet),0 0 4px var(--violet)}
         @keyframes floatParticle{0%{transform:translateY(100vh) translateX(0) scale(.6);opacity:0}15%{opacity:.9;transform:translateY(85vh) translateX(10px) scale(1)}50%{opacity:.7;transform:translateY(50vh) translateX(-15px) scale(1.1)}85%{opacity:.9;transform:translateY(15vh) translateX(25px) scale(1)}100%{transform:translateY(-100px) translateX(40px) scale(.6);opacity:0}}
+
         body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1400px 800px at 50% -20%,rgba(255,159,67,.14),transparent 55%),radial-gradient(1000px 600px at 50% 120%,rgba(34,211,238,.08),transparent 55%),radial-gradient(800px 500px at 20% 50%,rgba(52,211,153,.05),transparent 60%);animation:breathe var(--breath-speed,14s) ease-in-out infinite;will-change:transform,opacity;transition:--breath-speed 1.2s ease}
         @keyframes breathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.65}}
         body.breath-fast{--breath-speed:3.5s}
@@ -65,88 +69,58 @@
         body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.075;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>"),linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:200px 200px,64px 64px,64px 64px;mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);-webkit-mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);mix-blend-mode:overlay}
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.fade-in,.reveal{opacity:1!important;transform:none!important}#ambientCursor,#particleLayer{display:none!important}body::before{animation:none!important}}
 
-        /* ══ 顶部导航（极简）══ */
-        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.55));backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-6)}
+        .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:88px var(--sp-6) 140px}
+        @media(max-width:640px){.wrap{padding:76px var(--sp-4) 120px}input,select,textarea{font-size:16px!important}}
+
+        /* ══ Topbar ══ */
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 var(--sp-6)}
         @media(max-width:640px){.topbar{padding:0 var(--sp-4);height:56px}}
-        .topbar-left{display:flex;align-items:center;gap:var(--sp-3);font-size:13px;font-weight:600;letter-spacing:.02em;cursor:pointer}
+        .topbar-left{display:flex;align-items:center;gap:var(--sp-3);font-size:13px;font-weight:600;letter-spacing:.02em}
         .topbar-left .logo{width:32px;height:32px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.5),0 0 20px -4px var(--amber-glow);animation:spinSlow 20s linear infinite;flex-shrink:0}
         @keyframes spinSlow{to{transform:rotate(360deg)}}
         .topbar-left .title{font-family:var(--font-serif);font-weight:500;font-size:16px;letter-spacing:-.01em}
         .topbar-left .title em{font-style:italic;background:linear-gradient(135deg,var(--amber),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
         @media(max-width:640px){.topbar-left .title{display:none}}
-        .topbar-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:var(--sp-2);font-family:var(--font-mono);font-size:11px;color:var(--text-3);letter-spacing:.08em;padding:6px 14px;border-radius:var(--r-full);background:rgba(0,0,0,.3);border:1px solid var(--border);backdrop-filter:blur(8px)}
+        .topbar-center{display:flex;align-items:center;gap:var(--sp-2);font-family:var(--font-mono);font-size:11px;color:var(--text-3);letter-spacing:.08em}
         .topbar-center .live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:pulse 2s ease-in-out infinite}
         .topbar-center .live-dot.off{background:var(--text-4);box-shadow:none;animation:none}
-        @media(max-width:880px){.topbar-center{display:none}}
+        @media(max-width:480px){.topbar-center{display:none}}
         .topbar-right{display:flex;align-items:center;gap:var(--sp-2)}
         .topbar .nav-link{color:var(--text-3);text-decoration:none;font-size:12px;font-weight:500;padding:8px 12px;border-radius:var(--r-sm);transition:all .2s var(--ease)}
         .topbar .nav-link:hover{color:var(--amber);background:var(--amber-soft)}
         .topbar .clock{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text-2);padding:6px 10px;border-radius:var(--r-sm);background:rgba(255,255,255,.03);border:1px solid var(--border);font-variant-numeric:tabular-nums}
-        @media(max-width:480px){.topbar .clock{display:none}}
         .topbar .icon-btn{width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s var(--ease);font-size:14px}
         .topbar .icon-btn:hover{color:var(--amber);border-color:var(--border-focus);background:var(--amber-soft);transform:translateY(-1px)}
         .topbar .icon-btn.off{color:var(--text-4);opacity:.6}
-        @media(max-width:480px){.topbar .icon-btn.hide-sm{display:none}}
 
-        /* ══ 主容器 ══ */
-        .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:80px var(--sp-6) calc(var(--dock-h) + 40px)}
-        @media(max-width:640px){.wrap{padding:70px var(--sp-4) calc(var(--dock-h) + 32px)}input,select,textarea{font-size:16px!important}}
-        @media(min-width:1024px){.wrap{padding-bottom:80px}}
+        /* ══ Hero ══ */
+        .hero{position:relative;padding:var(--sp-10) 0 var(--sp-8);text-align:center}
+        .hero.matchday::before{content:"";position:absolute;inset:-60px -40px 0 -40px;background:radial-gradient(ellipse at 50% 0%,rgba(255,159,67,.18) 0%,transparent 60%);pointer-events:none;z-index:-1;animation:matchPulse 3.2s ease-in-out infinite}
+        @keyframes matchPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+        .hero .kick{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:11px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-5);padding:8px 16px;border:1px solid rgba(255,159,67,.3);border-radius:var(--r-full);background:var(--amber-soft)}
+        .hero h1{position:relative;font-family:var(--font-serif);font-size:clamp(48px,9vw,96px);font-weight:500;line-height:1;letter-spacing:-.04em;margin-bottom:var(--sp-5);perspective:1200px}
+        .hero h1::before{content:"";position:absolute;inset:0;background:radial-gradient(circle 200px at var(--hx,50%) var(--hy,50%),rgba(255,159,67,.35),transparent 70%);pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .3s var(--ease);z-index:-1;filter:blur(20px)}
+        .hero h1:hover::before{opacity:1}
+        .hero h1 .char{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-90deg) scale(.9);transform-origin:50% 100%;animation:charIn 1s var(--ease-spring) forwards;backface-visibility:hidden}
+        .hero h1 em{font-style:italic;font-weight:400;background:linear-gradient(135deg,var(--amber) 0%,#ffb968 40%,var(--cyan) 80%,var(--emerald) 120%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:titleShine 6s ease-in-out infinite;padding:0 .18em .06em .04em;margin:0 -.18em -.06em -.04em}
+        @keyframes titleShine{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+        .hero h1 em .char{background:inherit;-webkit-background-clip:inherit;background-clip:inherit;-webkit-text-fill-color:inherit}
+        @keyframes charIn{0%{opacity:0;transform:translateY(60px) rotateX(-90deg) scale(.85)}60%{opacity:1;transform:translateY(0) rotateX(8deg) scale(1.02)}100%{opacity:1;transform:translateY(0) rotateX(0) scale(1)}}
+        .hero .lead{color:var(--text-2);font-size:clamp(14px,1.6vw,17px);line-height:1.7;max-width:560px;margin:0 auto var(--sp-6);opacity:0;animation:fadeUp .9s var(--ease) .8s forwards}
+        .hero .tag-line{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);flex-wrap:wrap;font-size:12px;color:var(--text-3);opacity:0;animation:fadeUp .9s var(--ease) 1s forwards}
+        .hero kbd{font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--border-hi);color:var(--text-2);margin:0 1px}
 
-        /* ═══════════════════════════════════════════════
-           🎬 顶部动态舞台（HERO 2.0）
-           状态 1：倒数日 → 显示下一场比赛
-           状态 2：比赛日 → 脉冲
-           状态 3：赛后 → 回顾
-           ═══════════════════════════════════════════════ */
-        .stage{position:relative;margin-bottom:var(--sp-8);border-radius:var(--r-2xl);overflow:hidden;background:linear-gradient(135deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);padding:var(--sp-8) var(--sp-6) var(--sp-6);min-height:280px;isolation:isolate}
-        .stage::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 300px at var(--hx,50%) var(--hy,50%),rgba(255,159,67,.2),transparent 60%);pointer-events:none;z-index:-1;transition:opacity .4s}
-        .stage::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:-2;mask-image:radial-gradient(ellipse at top,black,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at top,black,transparent 70%)}
-        .stage.matchday::after{animation:matchGrid 4s linear infinite}
-        @keyframes matchGrid{to{background-position:32px 32px}}
-        .stage-kicker{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-4);padding:6px 14px;border-radius:var(--r-full);background:var(--amber-soft);border:1px solid rgba(255,159,67,.3)}
-        .stage-kicker .dot{width:6px;height:6px;border-radius:50%;background:var(--rose);box-shadow:0 0 10px var(--rose);animation:pulse 1.8s ease-in-out infinite}
-        .stage-title{font-family:var(--font-serif);font-size:clamp(28px,4.5vw,44px);font-weight:500;line-height:1.1;letter-spacing:-.03em;margin-bottom:var(--sp-3);max-width:720px}
-        .stage-title em{font-style:italic;background:linear-gradient(135deg,var(--amber),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-        .stage-sub{font-size:13px;color:var(--text-2);margin-bottom:var(--sp-6);max-width:560px}
-        .stage-teams{display:flex;align-items:center;gap:var(--sp-5);margin-bottom:var(--sp-6);flex-wrap:wrap}
-        .stage-team{display:flex;align-items:center;gap:var(--sp-3);font-size:18px;font-weight:600}
-        .stage-team img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
-        .stage-vs{font-family:var(--font-serif);font-style:italic;font-size:22px;color:var(--amber);font-weight:500}
-        .stage-actions{display:flex;gap:var(--sp-3);flex-wrap:wrap;align-items:center}
-        .stage-actions .btn{width:auto;padding:12px 24px;font-size:14px}
-        .stage-countdown{display:flex;gap:var(--sp-3);margin-bottom:var(--sp-6);flex-wrap:wrap}
-        .cd-block{display:flex;flex-direction:column;align-items:center;min-width:72px;padding:var(--sp-3);background:rgba(0,0,0,.35);border:1px solid var(--border-hi);border-radius:var(--r-lg);backdrop-filter:blur(12px)}
-        .cd-num{font-family:var(--font-serif);font-size:32px;font-weight:600;line-height:1;color:var(--amber);font-variant-numeric:tabular-nums;text-shadow:0 0 20px var(--amber-glow)}
-        .cd-lbl{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3);margin-top:6px}
-        @media(max-width:640px){.stage{padding:var(--sp-6) var(--sp-4) var(--sp-4);min-height:auto}.stage-teams{gap:var(--sp-3)}.stage-team{font-size:15px}.stage-team img{width:36px;height:36px}.cd-block{min-width:60px;padding:var(--sp-2)}.cd-num{font-size:24px}}
+        /* ══ 球场线 ══ */
+        .field-bg{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);opacity:.09;pointer-events:none;z-index:-1}
+        .field-bg path,.field-bg circle{fill:none;stroke:var(--amber);stroke-width:1;stroke-dasharray:2000;stroke-dashoffset:2000;animation:drawLine 8s var(--ease) infinite alternate}
+        .field-bg .cyan{stroke:var(--cyan);animation-delay:1s}
+        .field-bg .violet{stroke:var(--violet);animation-delay:2s}
+        @keyframes drawLine{to{stroke-dashoffset:0}}
 
-        /* ═══════════════════════════════════════════════
-           🎞️ 横向轮次滑轨（Instagram Stories 式）
-           ═══════════════════════════════════════════════ */
-        .rail{position:relative;margin-bottom:var(--sp-6)}
-        .rail-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--sp-3);padding:0 var(--sp-1)}
-        .rail-head h4{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--text-3)}
-        .rail-head .rail-progress{font-family:var(--font-mono);font-size:11px;color:var(--text-3);font-variant-numeric:tabular-nums}
-        .rail-scroll{display:flex;gap:var(--sp-2);overflow-x:auto;padding:6px var(--sp-1) 12px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab;scroll-behavior:smooth}
-        .rail-scroll::-webkit-scrollbar{display:none}
-        .rail-scroll.dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
-        .rail-item{flex:0 0 auto;scroll-snap-align:center;position:relative;min-width:64px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--border);cursor:pointer;text-align:center;transition:all .25s var(--ease);overflow:hidden}
-        .rail-item:hover{background:rgba(255,255,255,.06);border-color:var(--border-hi);transform:translateY(-2px)}
-        .rail-item.on{background:linear-gradient(135deg,var(--amber-soft),rgba(34,211,238,.08));border-color:var(--amber);box-shadow:0 0 20px -4px var(--amber-glow)}
-        .rail-item.past{opacity:.55}
-        .rail-item.future{opacity:.7}
-        .rail-item .rn{font-family:var(--font-serif);font-size:18px;font-weight:600;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
-        .rail-item.on .rn{color:var(--amber);text-shadow:0 0 12px var(--amber-glow)}
-        .rail-item .rl{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--text-4);text-transform:uppercase;margin-top:4px}
-        .rail-item.on .rl{color:var(--amber)}
-        .rail-item .badge-n{position:absolute;top:2px;right:2px;font-size:8px;font-weight:800;padding:1px 5px;border-radius:var(--r-full);background:var(--rose);color:#fff;box-shadow:0 0 8px rgba(239,68,68,.7)}
-
-        /* ═══════════════════════════════════════════════
-           🎴 焦点战卡片（重新设计）
-           ═══════════════════════════════════════════════ */
-        .focus-strip{position:relative;margin:0 0 var(--sp-8)}
-        .focus-strip h4{font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2)}
+        /* ══ 焦点战 ══ */
+        .focus-strip{position:relative;margin:0 auto var(--sp-8);max-width:1240px;padding:0 var(--sp-6)}
+        @media(max-width:640px){.focus-strip{padding:0 var(--sp-4)}}
+        .focus-strip h4{font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2);opacity:0;animation:fadeUp .8s var(--ease) 1.2s forwards}
         .focus-strip h4::before{content:"🔥";font-size:12px}
         .focus-scroll-wrap{position:relative}
         .focus-scroll-wrap::before,.focus-scroll-wrap::after{content:"";position:absolute;top:0;bottom:16px;width:60px;pointer-events:none;z-index:2;transition:opacity .3s var(--ease)}
@@ -167,16 +141,20 @@
         .focus-dots{display:flex;justify-content:center;gap:6px;margin-top:8px}
         .focus-dots .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s var(--ease)}
         .focus-dots .dot.on{background:var(--amber);width:20px;border-radius:3px;box-shadow:0 0 8px var(--amber-glow)}
-        .fmatch{flex:0 0 260px;scroll-snap-align:start;position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-4);cursor:pointer;transition:all .35s var(--ease);overflow:hidden;backdrop-filter:blur(20px);text-align:left;opacity:0;transform:translateY(40px) scale(.92)}
+        .fmatch{flex:0 0 240px;scroll-snap-align:start;position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-4);cursor:pointer;transition:all .35s var(--ease);overflow:hidden;backdrop-filter:blur(20px);text-align:left;opacity:0;transform:translateY(40px) scale(.92)}
         .fmatch.in-view{animation:cardSlideIn .7s var(--ease-spring) forwards}
         @keyframes cardSlideIn{to{opacity:1;transform:translateY(0) scale(1)}}
-        .fmatch:hover{transform:translateY(-4px);border-color:var(--border-hi);box-shadow:0 16px 40px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.15)}
+        .fmatch::before{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--angle,0deg),transparent 0deg,var(--amber) 60deg,transparent 120deg);opacity:0;transition:opacity .4s;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;pointer-events:none}
+        .fmatch:hover{transform:translateY(-4px);border-color:var(--border-hi);box-shadow:0 16px 40px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.1)}
+        .fmatch:hover::before{opacity:.7;animation:borderRotate 3s linear infinite}
+        @keyframes borderRotate{to{--angle:360deg}}
         .fmatch .tagline{display:flex;gap:4px;margin-bottom:var(--sp-3);flex-wrap:wrap}
         .fmatch .tag-sm{font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:var(--r-full);text-transform:uppercase}
         .tag-sm.derby{background:rgba(239,68,68,.15);color:#ff7a7a;border:1px solid rgba(239,68,68,.4)}
         .tag-sm.hot{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.4)}
         .tag-sm.top{background:var(--violet-soft);color:var(--violet);border:1px solid rgba(167,139,250,.4)}
-        .tag-sm.live{background:rgba(239,68,68,.2);color:#fff;border:1px solid rgba(239,68,68,.6);animation:pulse 1.6s ease-in-out infinite}
+
+        /* ══ 焦点战卡片：队徽 + 队名 + 状态点 + 比分 ══ */
         .fmatch .frow{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:8px}
         .fmatch .fbadge{width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
         .fmatch .fbadge-fb{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700;flex-shrink:0}
@@ -189,6 +167,8 @@
         .fmatch .fmeta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--border);font-size:10px;color:var(--text-3)}
         .fmatch .fmeta .ftime{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
         .fmatch .fmeta .ftime.live{color:var(--rose);animation:pulse 2s ease-in-out infinite}
+
+        /* ══ v13.3 新增：状态圆点 + H2H ══ */
         .fmatch .fform{display:inline-flex;gap:2px;flex-shrink:0;margin-right:2px}
         .fmatch .fform .fc{width:8px;height:8px;border-radius:50%;flex-shrink:0}
         .fmatch .fform .fc.W{background:#22c55e;box-shadow:0 0 5px rgba(34,197,94,.7)}
@@ -199,10 +179,11 @@
         .fmatch .fh2h .fh2h-team{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2);font-weight:500}
         .fmatch .fh2h .fh2h-sc{color:var(--amber);font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
         .fmatch .fh2h .fh2h-date{color:var(--text-4);margin-left:auto;flex-shrink:0;font-size:9px;font-family:var(--font-mono)}
+
         .focus-empty{color:var(--text-4);font-size:12px;text-align:center;padding:20px;flex:0 0 100%}
 
         /* ══ Dash ══ */
-        .dash{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-6)}
+        .dash{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-8)}
         @media(max-width:900px){.dash{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:560px){.dash{grid-template-columns:1fr;gap:var(--sp-2)}}
         .cell{position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:var(--sp-5) var(--sp-6);backdrop-filter:blur(24px);transition:border-color .3s var(--ease),transform .4s var(--ease),box-shadow .3s var(--ease);overflow:hidden;min-height:110px}
@@ -217,12 +198,9 @@
         .cell .sub{position:relative;font-size:11px;color:var(--text-4);margin-top:var(--sp-2)}
         .cell.primary .val{font-size:clamp(40px,6vw,60px)}
 
-        /* ══ 赛季进度条（新增）══ */
-        .season-bar{position:relative;margin-bottom:var(--sp-6);padding:var(--sp-3) var(--sp-5);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);backdrop-filter:blur(20px);display:flex;align-items:center;gap:var(--sp-4);flex-wrap:wrap}
-        .season-bar .sb-track{flex:1;min-width:200px;height:6px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;position:relative}
-        .season-bar .sb-fill{height:100%;width:0;background:linear-gradient(90deg,var(--amber),#ffb968,var(--cyan));background-size:200% 100%;border-radius:3px;box-shadow:0 0 12px var(--amber-glow);transition:width 1.2s var(--ease);animation:loadingShimmer 3s linear infinite}
-        .season-bar .sb-lbl{font-size:11px;color:var(--text-3);font-weight:500;font-variant-numeric:tabular-nums;display:flex;gap:var(--sp-2);align-items:center}
-        .season-bar .sb-lbl b{color:var(--amber);font-family:var(--font-serif);font-size:14px;font-weight:600}
+        .season-summary{text-align:center;font-size:12px;color:var(--text-3);margin:-16px 0 32px;font-variant-numeric:tabular-nums;line-height:1.8}
+        .season-summary .sep{color:var(--text-4);margin:0 6px}
+        .season-summary b{color:var(--amber);font-weight:700}
 
         .warn-banner{background:linear-gradient(135deg,rgba(251,191,36,.12),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.35);color:var(--gold);padding:14px 18px;border-radius:var(--r-md);font-size:13px;line-height:1.6;margin-bottom:var(--sp-5);display:none}
         .warn-banner.show{display:block}
@@ -264,26 +242,7 @@
         .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.35);transform:scale(0);opacity:.6;animation:ripple .6s var(--ease) forwards;pointer-events:none}
         @keyframes ripple{to{transform:scale(4);opacity:0}}
 
-        /* ═══════════════════════════════════════════════
-           ⚓ 底部操作坞（新增，固定底部）
-           ═══════════════════════════════════════════════ */
-        .dock{position:fixed;left:0;right:0;bottom:0;z-index:45;background:linear-gradient(180deg,transparent,rgba(8,9,13,.95) 40%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:var(--sp-3) var(--sp-4) calc(var(--sp-3) + env(safe-area-inset-bottom,0px));border-top:1px solid var(--border);transition:transform .35s var(--ease)}
-        .dock.hidden{transform:translateY(calc(100% + 8px))}
-        .dock-inner{max-width:1240px;margin:0 auto;display:flex;gap:var(--sp-3);align-items:center}
-        .dock-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-        .dock-info .d-match{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .dock-info .d-meta{font-size:10px;color:var(--text-3);display:flex;gap:var(--sp-2);align-items:center;font-variant-numeric:tabular-nums}
-        .dock-info .d-meta .derby-tag{color:#ff7a7a;font-weight:700}
-        .dock-actions{display:flex;gap:var(--sp-2);flex-shrink:0}
-        .dock-actions .btn{width:auto;padding:11px 20px;font-size:13px;white-space:nowrap}
-        @media(max-width:480px){.dock-info .d-meta{display:none}}
-        @media(min-width:1024px){.dock{display:none}}
-        @media(prefers-reduced-motion:reduce){.dock{transition:none}}
-
-        /* ═══════════════════════════════════════════════
-           以下为兼容旧组件（推理动画 / 结果页 / 历史 / 弹窗）
-           样式保留原样
-           ═══════════════════════════════════════════════ */
+        /* ══ AI 推理 + 神经网络 ══ */
         .reasoning{padding:var(--sp-6) var(--sp-4) var(--sp-8);display:flex;flex-direction:column;align-items:center;gap:var(--sp-5)}
         .reasoning-head{display:flex;flex-direction:column;align-items:center;gap:var(--sp-3)}
         .reasoning-ball{width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 12px 32px rgba(0,0,0,.6),0 0 0 2px rgba(255,255,255,.06),0 0 60px -8px var(--amber-glow);animation:bounce .9s cubic-bezier(.2,.6,.4,1) infinite alternate,spin 1.8s linear infinite}
@@ -308,9 +267,13 @@
         .nn-node.active{fill:var(--amber);filter:drop-shadow(0 0 8px var(--amber-glow))}
         .nn-link{stroke:rgba(255,255,255,.08);stroke-width:1;transition:stroke .5s}
         .nn-link.active{stroke:var(--amber);filter:drop-shadow(0 0 4px var(--amber-glow))}
+
+        /* ══ Empty ══ */
         .empty{color:var(--text-3);text-align:center;padding:60px var(--sp-4);font-size:14px;line-height:1.7}
         .empty .empty-ball{width:64px;height:64px;margin:0 auto var(--sp-5);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 8px 24px rgba(0,0,0,.4),0 0 60px -8px var(--amber-glow);animation:spinSlow 10s linear infinite}
         .empty .hint{margin-top:var(--sp-2);font-size:12px;color:var(--text-4)}
+
+        /* ══ Scoreboard ══ */
         .scoreboard{text-align:center;padding:var(--sp-6) 0;border-bottom:1px solid var(--border);margin-bottom:var(--sp-6);position:relative;background:linear-gradient(180deg,rgba(255,159,67,.04),transparent 60%);border-radius:var(--r-lg) var(--r-lg) 0 0}
         .teams{display:flex;align-items:center;justify-content:center;gap:var(--sp-6);flex-wrap:nowrap;position:relative}
         .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-3);min-width:0}
@@ -340,6 +303,7 @@
         .mv-card .mv-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
         .mv-card .mv-score{font-family:var(--font-serif);font-size:22px;font-weight:500;color:var(--amber);line-height:1}
         .mv-card .mv-pct{font-size:10px;color:var(--text-4);margin-top:2px}
+
         .compare-actual,.vs-row{display:flex;justify-content:center;align-items:center;gap:var(--sp-4);padding:var(--sp-3) var(--sp-4);margin-top:var(--sp-3);background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);font-size:12px}
         .compare-actual .col,.vs-side{text-align:center;flex:1;min-width:0}
         .compare-actual .lbl2,.vs-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-1)}
@@ -367,6 +331,8 @@
         .da-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:6px}
         .da-badge.hit{background:var(--emerald-soft);color:var(--emerald);border:1px solid rgba(52,211,153,.35)}
         .da-badge.miss{background:var(--rose-soft);color:var(--rose);border:1px solid rgba(239,68,68,.35)}
+
+        /* ══ Rings + Radar ══ */
         .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-3);margin-bottom:var(--sp-4)}
         .ring{position:relative;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5) var(--sp-3);text-align:center;transition:all .4s var(--ease);overflow:hidden}
         .ring:hover{border-color:var(--border-hi);transform:translateY(-3px);box-shadow:0 16px 40px -12px rgba(0,0,0,.5)}
@@ -383,6 +349,7 @@
         .ring.h .num{color:var(--amber)}
         .ring.d .num{color:var(--text-2)}
         .ring.a .num{color:var(--cyan)}
+
         .radar-wrap{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-5);margin-bottom:var(--sp-4)}
         .radar-wrap .ttl{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-4);display:flex;align-items:center;gap:var(--sp-2);justify-content:center}
         .radar-wrap .ttl::before{content:"📡";font-size:12px}
@@ -398,11 +365,13 @@
         .radar-legend .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 8px currentColor}
         .radar-legend .item.home .dot{background:var(--amber);color:var(--amber)}
         .radar-legend .item.away .dot{background:var(--cyan);color:var(--cyan)}
+
         .compare{display:flex;height:20px;background:var(--surface-2);border-radius:var(--r-full);overflow:hidden;border:1px solid var(--border);margin-bottom:var(--sp-5)}
         .compare .seg{height:100%;transition:width 1.3s var(--ease);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000}
         .compare .seg.h{background:linear-gradient(90deg,var(--amber),#ffb968)}
         .compare .seg.d{background:linear-gradient(90deg,#64748b,#94a3b8);color:#fff}
         .compare .seg.a{background:linear-gradient(90deg,#0891b2,var(--cyan))}
+
         .sect{margin-top:var(--sp-6);padding-top:var(--sp-5);border-top:1px solid var(--border)}
         .sect .ttl{font-size:10px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-4);display:flex;align-items:center;gap:var(--sp-2)}
         .sect .ttl::before{content:"";width:3px;height:12px;background:linear-gradient(180deg,var(--amber),var(--cyan));border-radius:2px;box-shadow:0 0 8px var(--amber-glow)}
@@ -419,6 +388,7 @@
         .conf.中高{background:var(--cyan-soft);color:var(--cyan);border:1px solid rgba(34,211,238,.3)}
         .conf.中{background:rgba(251,191,36,.14);color:var(--gold);border:1px solid rgba(251,191,36,.3)}
         .conf.低{background:var(--rose-soft);color:var(--rose);border:1px solid rgba(239,68,68,.3)}
+
         .h2h{border:1px solid rgba(167,139,250,.3);background:linear-gradient(135deg,rgba(167,139,250,.06),rgba(167,139,250,.02));border-radius:var(--r-lg);padding:var(--sp-5);position:relative;padding-top:22px}
         .h2h .tag{position:absolute;top:-10px;left:16px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:var(--r-full)}
         .h2h .tag.估算{background:#241d0e;color:var(--gold);border:1px solid rgba(251,191,36,.5)}
@@ -427,9 +397,13 @@
         .h2h ul{list-style:none;font-size:13px;color:var(--text-2);display:flex;flex-direction:column;gap:6px}
         .h2h li{display:flex;align-items:center;gap:var(--sp-2)}
         .h2h li::before{content:"";width:4px;height:4px;border-radius:50%;background:var(--violet);flex-shrink:0;box-shadow:0 0 6px var(--violet)}
+
+        /* ══ 球员卡片（全息镭射）══ */
         .players{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:var(--sp-3)}
         .pcard{background:linear-gradient(160deg,rgba(255,159,67,.08),rgba(34,211,238,.04));border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:var(--sp-4);transition:transform .3s var(--ease),border-color .3s var(--ease),box-shadow .4s var(--ease);position:relative;overflow:hidden;display:flex;gap:var(--sp-3);align-items:flex-start}
+        .pcard::after{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--angle,0deg),#ff9f43,#22d3ee,#a78bfa,#34d399,#ff9f43);mix-blend-mode:overlay;opacity:0;pointer-events:none;transition:opacity .4s}
         .pcard:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(255,159,67,.35);box-shadow:0 20px 40px -10px rgba(255,159,67,.3)}
+        .pcard:hover::after{opacity:.35;animation:borderRotate 4s linear infinite}
         .pcard.is-focal{border-color:rgba(255,159,67,.5);background:linear-gradient(160deg,rgba(255,159,67,.14),rgba(34,211,238,.05))}
         .pcard.is-focal::before{content:"★ FOCAL";position:absolute;top:0;right:0;font-size:9px;font-weight:800;padding:3px 8px;background:linear-gradient(135deg,var(--amber),#ffb968);color:#1a0d02;border-radius:0 var(--r-lg) 0 var(--r-md);z-index:3}
         .pcard .photo-wrap{position:relative;width:56px;height:56px;flex-shrink:0;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#1a2233,#0d1420);border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;z-index:2}
@@ -453,6 +427,7 @@
         .pcard-chance-label{font-size:10px;color:var(--text-3)}
         .pcard-chance-label b{color:var(--amber);font-weight:700}
         .pcard-reason{font-size:11px;color:var(--text-2);margin-top:8px;padding:6px 8px;background:rgba(34,211,238,.05);border-left:2px solid var(--cyan);border-radius:3px;line-height:1.5}
+
         .scorer-list{display:flex;flex-direction:column;gap:var(--sp-2)}
         .scorer-item{background:linear-gradient(135deg,rgba(255,159,67,.06),rgba(255,159,67,.02));border:1px solid rgba(255,159,67,.2);border-radius:var(--r-md);padding:10px 14px;transition:all .25s var(--ease);display:flex;gap:var(--sp-3);align-items:center}
         .scorer-item:hover{transform:translateX(3px);border-color:rgba(255,159,67,.4)}
@@ -467,6 +442,8 @@
         .scorer-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:6px}
         .scorer-bar-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:3px;box-shadow:0 0 10px var(--amber-glow);transition:width .9s var(--ease)}
         .scorer-reason{font-size:11px;color:var(--text-2);line-height:1.5;font-style:italic;padding-left:8px;border-left:2px solid rgba(255,159,67,.4)}
+
+        /* ══ Standings ══ */
         .standings{font-size:13px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 calc(-1 * var(--sp-6));padding:0 var(--sp-6)}
         @media(max-width:640px){.standings{margin:0 calc(-1 * var(--sp-4));padding:0 var(--sp-4)}}
         .standings table{width:100%;border-collapse:collapse;min-width:680px}
@@ -489,8 +466,12 @@
         .last5 .l5-cell.D{background:linear-gradient(135deg,#64748b,#475569)}
         .last5 .l5-cell.L{background:linear-gradient(135deg,#ef4444,#dc2626)}
         .last5 .l5-none{color:var(--text-4);font-size:11px}
+
+        /* ═══════════════════════════════════════════════
+   🎨 天工 FAB · 足球指挥中心
+   ═══════════════════════════════════════════════ */
         .fab-hub{position:fixed;right:32px;bottom:calc(32px + env(safe-area-inset-bottom,0px));z-index:60;width:64px;height:64px}
-        @media(max-width:1023px){.fab-hub{display:none}}
+        @media(max-width:480px){.fab-hub{right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));width:56px;height:56px}}
         .fab-backdrop{position:fixed;inset:0;z-index:-1;background:radial-gradient(circle at calc(100% - 64px) calc(100% - 64px),rgba(0,0,0,.35) 0%,rgba(0,0,0,.6) 100%);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
         .fab-hub.open .fab-backdrop{opacity:1;pointer-events:auto}
         .fab-core{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;border:1px solid rgba(255,159,67,.5);background:radial-gradient(circle at 35% 30%,#1e2738 0%,#0a0d13 100%);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 12px 40px -6px rgba(0,0,0,.8),0 0 0 1px rgba(255,159,67,.2);transition:transform .5s var(--ease-spring);z-index:3;overflow:visible}
@@ -523,6 +504,13 @@
         .sat-progress-bar{transition:stroke-dashoffset .1s linear;filter:drop-shadow(0 0 4px currentColor)}
         .fab-satellite .badge-n{position:absolute;top:-3px;right:-3px;background:linear-gradient(135deg,#ef4444,#f87171);color:#fff;font-size:9px;font-weight:800;min-width:18px;height:18px;border-radius:9px;padding:0 5px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);box-shadow:0 0 0 1px rgba(239,68,68,.6),0 0 12px rgba(239,68,68,.7);animation:badgePulse 2.4s ease-in-out infinite;font-family:var(--font-sans);line-height:1;z-index:3}
         @keyframes badgePulse{0%,100%{box-shadow:0 0 0 1px rgba(239,68,68,.6),0 0 12px rgba(239,68,68,.6),0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 1px rgba(239,68,68,.6),0 0 20px rgba(239,68,68,.9),0 0 0 10px rgba(239,68,68,0)}}
+        #topBtn,#histFab,#batchFab{display:none!important}
+        @media(max-width:480px){
+            .fab-satellite[data-angle="0"],.fab-satellite[data-angle="-60"],.fab-satellite[data-angle="-120"]{--sat-radius:88px}
+            .fab-satellite{width:44px;height:44px;margin:-22px 0 0 -22px}
+        }
+
+        /* ══ Modal ══ */
         .mask{position:fixed;inset:0;background:rgba(4,5,8,.85);backdrop-filter:blur(10px);z-index:80;display:none;align-items:flex-start;justify-content:center;padding:var(--sp-12) var(--sp-4);overflow-y:auto;-webkit-overflow-scrolling:touch}
         .mask.show{display:flex;animation:fadeIn .3s var(--ease)}
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -532,12 +520,17 @@
         .modal .sub{color:var(--text-2);font-size:13px;margin-bottom:var(--sp-5)}
         .modal .close{position:absolute;top:var(--sp-4);right:var(--sp-4);background:transparent;border:0;color:var(--text-3);font-size:22px;cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);transition:all .25s var(--ease)}
         .modal .close:hover{background:rgba(255,255,255,.06);color:var(--text);transform:rotate(90deg)}
+
         .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-2);margin-bottom:var(--sp-5)}
-        @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:480px){.stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(1){order:3}.stat:nth-child(2){order:4}.stat:nth-child(3){order:1}.stat:nth-child(4){order:2}}
         .stat{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);text-align:center;opacity:0;transform:translateY(10px);animation:fadeUp .5s var(--ease) forwards}
-        .stat:nth-child(1){animation-delay:.15s}.stat:nth-child(2){animation-delay:.22s}.stat:nth-child(3){animation-delay:.29s}.stat:nth-child(4){animation-delay:.36s}
+        .stat:nth-child(1){animation-delay:.15s}
+        .stat:nth-child(2){animation-delay:.22s}
+        .stat:nth-child(3){animation-delay:.29s}
+        .stat:nth-child(4){animation-delay:.36s}
         .stat .n{font-family:var(--font-serif);font-weight:500;font-size:28px;color:var(--amber);font-variant-numeric:tabular-nums;line-height:1.2;text-shadow:0 0 20px var(--amber-glow)}
         .stat .l{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3);margin-top:var(--sp-1)}
+
         .heatmap{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);margin-bottom:var(--sp-4)}
         .heatmap .hm-ttl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3)}
         .heatmap-grid{display:flex;flex-wrap:wrap;gap:3px}
@@ -553,10 +546,12 @@
         .heatmap-legend .hl-hit::before{background:linear-gradient(135deg,#22c55e,#16a34a)}
         .heatmap-legend .hl-partial::before{background:linear-gradient(135deg,#fbbf24,#f59e0b)}
         .heatmap-legend .hl-miss::before{background:linear-gradient(135deg,#ef4444,#dc2626)}
+
         .filters{display:flex;gap:var(--sp-1);margin-bottom:var(--sp-5);flex-wrap:wrap}
         .filter-btn{padding:7px 14px;border-radius:var(--r-full);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;transition:all .25s var(--ease)}
         .filter-btn:hover{color:var(--amber);border-color:var(--border-focus)}
         .filter-btn.on{background:var(--amber-soft);color:var(--amber);border-color:rgba(255,159,67,.4);box-shadow:0 0 16px -4px var(--amber-glow)}
+
         .hlist{max-height:min(460px,55vh);overflow-y:auto;margin-top:var(--sp-2)}
         .hitem{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-3) var(--sp-4);margin-bottom:var(--sp-2);transition:all .25s var(--ease)}
         .hitem:hover{border-color:var(--border-hi);transform:translateX(2px)}
@@ -572,6 +567,7 @@
         .hitem input{flex:1;padding:8px 12px;font-size:13px;text-align:center;font-weight:600}
         .hitem button{padding:8px 14px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-size:12px;cursor:pointer;transition:all .25s var(--ease)}
         .hitem button:hover{border-color:rgba(239,68,68,.5);color:var(--rose);background:var(--rose-soft)}
+
         .achievements{margin-top:var(--sp-4);padding-top:var(--sp-4);border-top:1px solid var(--border)}
         .achievements .ttl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3)}
         .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:var(--sp-2)}
@@ -581,6 +577,7 @@
         .ach.unlocked .a-icon{filter:none}
         .ach .a-name{font-size:10px;font-weight:600;color:var(--text-2)}
         .ach .a-progress{font-size:9px;color:var(--text-4);margin-top:2px}
+
         .deep-analysis{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);margin-bottom:var(--sp-4);overflow:hidden}
         .da-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;cursor:pointer;user-select:none;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
         .da-head .da-arrow{transition:transform .3s var(--ease);font-size:10px;color:var(--text-3)}
@@ -629,6 +626,7 @@
         .da-calib-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);border-radius:4px}
         .da-calib-ref{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
         .live-dot-inline{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);margin-right:6px;animation:pulse 2s ease-in-out infinite}
+
         .batch-opts{display:flex;gap:var(--sp-2);margin:var(--sp-4) 0}
         .batch-opts button{flex:1;padding:12px;border-radius:var(--r-md);border:1px solid var(--border-hi);background:transparent;color:var(--text-2);font-family:inherit;font-weight:600;font-size:13px;cursor:pointer;transition:all .25s var(--ease)}
         .batch-opts button.on{background:var(--amber-soft);color:var(--amber);border-color:rgba(255,159,67,.4)}
@@ -639,6 +637,7 @@
         .progress{height:4px;background:rgba(255,255,255,.06);border-radius:var(--r-full);overflow:hidden;margin-top:var(--sp-3);display:none}
         .progress.show{display:block}
         .progress .bar{height:100%;background:linear-gradient(90deg,var(--amber),#ffb968);width:0;transition:width .4s var(--ease)}
+
         .cmd-mask{position:fixed;inset:0;background:rgba(4,5,8,.75);backdrop-filter:blur(10px);z-index:90;display:none;align-items:flex-start;justify-content:center;padding:14vh var(--sp-4) var(--sp-4)}
         .cmd-mask.show{display:flex;animation:fadeIn .15s var(--ease)}
         .cmd-panel{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-lg);max-width:560px;width:100%;animation:cmdIn .25s var(--ease-spring);overflow:hidden}
@@ -650,6 +649,7 @@
         .cmd-item .icon{font-size:16px;width:22px;text-align:center}
         .cmd-item .label{flex:1;font-weight:500}
         .cmd-item .kbd{font-family:var(--font-mono);font-size:10px;color:var(--text-3);padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid var(--border)}
+
         .shortcut-mask{position:fixed;inset:0;background:rgba(4,5,8,.85);backdrop-filter:blur(10px);z-index:85;display:none;align-items:center;justify-content:center;padding:var(--sp-4)}
         .shortcut-mask.show{display:flex;animation:fadeIn .2s var(--ease)}
         .shortcut-panel{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-xl);max-width:520px;width:100%;padding:var(--sp-6);animation:modalIn .35s var(--ease-spring);position:relative}
@@ -659,10 +659,12 @@
         .shortcut-row .desc{color:var(--text-2)}
         .shortcut-row .keys{display:flex;gap:4px}
         .shortcut-row kbd{font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;background:var(--surface);border:1px solid var(--border-hi);color:var(--text)}
+
         [data-tip]{position:relative}
         [data-tip]::after{content:attr(data-tip);position:absolute;left:50%;top:calc(100% + 8px);transform:translateX(-50%) translateY(-4px);background:#0f1219;border:1px solid var(--border-hi);color:var(--text);font-size:11px;padding:6px 10px;border-radius:var(--r-sm);white-space:nowrap;opacity:0;pointer-events:none;z-index:100;transition:opacity .2s var(--ease),transform .2s var(--ease)}
         [data-tip]:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
         @media(hover:none){[data-tip]::after{display:none}}
+
         .toast-wrap{position:fixed;top:calc(64px + var(--sp-4));left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:var(--sp-2);pointer-events:none;max-width:calc(100vw - 32px)}
         .toast{background:linear-gradient(180deg,#131820,#0d1118);border:1px solid var(--border-hi);color:var(--text);padding:13px 20px;border-radius:var(--r-md);font-size:13px;font-weight:500;box-shadow:0 16px 40px -8px rgba(0,0,0,.6);animation:toastIn .5s var(--ease-spring);pointer-events:auto;cursor:pointer;max-width:440px;line-height:1.5}
         .toast.ok{border-color:rgba(52,211,153,.4)}
@@ -672,6 +674,7 @@
         .toast.err{border-color:rgba(239,68,68,.4)}
         .toast.err::before{content:"❌";margin-right:8px}
         @keyframes toastIn{0%{opacity:0;transform:translateY(-30px) scale(.8)}60%{opacity:1;transform:translateY(4px) scale(1.03)}100%{opacity:1;transform:translateY(0) scale(1)}}
+
         .verbar{position:fixed;top:64px;left:0;right:0;z-index:300;background:linear-gradient(90deg,var(--gold),#f59e0b);color:#000;padding:10px 16px;font-size:13px;font-weight:600;text-align:center}
         .confetti{position:fixed;top:-10px;width:8px;height:14px;z-index:150;pointer-events:none;border-radius:2px;animation:fall linear forwards}
         @keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
@@ -682,15 +685,19 @@
         @keyframes screenShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
         @keyframes soundRippleAnim{0%{transform:scale(0);opacity:1}100%{transform:scale(8);opacity:0}}
         .streak{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:var(--r-full);background:linear-gradient(135deg,rgba(255,159,67,.15),rgba(251,191,36,.15));border:1px solid rgba(251,191,36,.4);color:var(--gold);font-size:11px;font-weight:700;margin-left:var(--sp-2)}
+
         footer.site-footer{margin-top:60px;padding-top:32px;border-top:1px solid var(--border);font-size:11px;color:var(--text-4);text-align:center;line-height:1.9}
         footer.site-footer a{color:var(--text-3);text-decoration:none;margin:0 8px;transition:color .2s var(--ease)}
         footer.site-footer a:hover{color:var(--amber)}
         footer.site-footer .legal{max-width:640px;margin:0 auto}
         footer.site-footer .legal b{color:var(--text-3)}
         footer.site-footer .ver{margin-top:12px;color:var(--text-4);font-size:10px;font-family:var(--font-mono)}
+
         *:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:var(--r-sm);box-shadow:0 0 0 4px var(--amber-soft)}
         ::-webkit-scrollbar{width:10px;height:10px}
         ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:10px;border:3px solid var(--bg)}
+
+        /* ══ Match Picker ══ */
         .match-picker{position:relative;width:100%}
         .match-picker .trigger{width:100%;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border-hi);border-radius:var(--r-md);color:var(--text);font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;text-align:left;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);transition:all .2s var(--ease)}
         .match-picker.open .trigger{border-color:var(--border-focus);box-shadow:0 0 0 3px var(--amber-soft)}
@@ -732,6 +739,7 @@
         .picker-mode button.on{background:var(--amber-soft);color:var(--amber);border-color:rgba(255,159,67,.4)}
         .team-select-wrap{display:none;margin-bottom:var(--sp-3)}
         .team-select-wrap.show{display:block}
+
         .team-modal .team-head{display:flex;align-items:center;gap:var(--sp-4);margin-bottom:var(--sp-5);padding-bottom:var(--sp-4);border-bottom:1px solid var(--border)}
         .team-modal .team-head .badge-big{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 6px 20px rgba(0,0,0,.5))}
         .team-modal .team-head .info{flex:1;min-width:0}
@@ -755,6 +763,7 @@
         .team-modal .recent-item .res.D{color:var(--text-3);background:rgba(148,163,184,.1)}
         .team-modal .recent-item .res.L{color:var(--rose);background:rgba(239,68,68,.12)}
         .team-modal .recent-item .score{font-family:var(--font-serif);font-weight:600;color:var(--text);padding:0 8px}
+
         .trend-chart{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--sp-4);margin-bottom:var(--sp-4)}
         .trend-chart .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-3);font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3)}
         .trend-chart .head .v{font-family:var(--font-serif);font-size:18px;color:var(--amber);text-transform:none}
@@ -763,68 +772,14 @@
         .trend-chart svg path.area{fill:url(#trendGrad)}
         .trend-chart svg line.grid{stroke:rgba(255,255,255,.05);stroke-width:1}
         .trend-chart svg circle.dot{fill:var(--amber);stroke:var(--bg);stroke-width:2}
+
         .skeleton{background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.03) 100%);background-size:200% 100%;animation:skeletonShimmer 1.5s ease-in-out infinite}
         @keyframes skeletonShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
         body.mood-cold::before{filter:hue-rotate(-30deg) saturate(.8)}
         body.mood-hot::before{filter:hue-rotate(20deg) saturate(1.2) brightness(1.1)}
         body.mood-gold::before{filter:hue-rotate(0deg) saturate(1.4) brightness(1.15)}
         body.team-bleed::before{background:radial-gradient(1400px 800px at 50% -20%,hsla(var(--bleed-hue),80%,60%,.18),transparent 55%),radial-gradient(1000px 600px at 50% 120%,hsla(calc(var(--bleed-hue) + 60),80%,60%,.1),transparent 55%)!important}
-
-        /* ══ 快速预测弹窗（v13.3.1 + v13.3.2 人机对战）══ */
-        .qp-modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(4,5,8,.78);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-        .qp-modal.show{display:flex;animation:fadeIn .25s var(--ease)}
-        .qp-card{background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-xl);max-width:440px;width:100%;padding:var(--sp-5);box-shadow:0 30px 60px -20px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05);animation:modalIn .35s var(--ease-spring)}
-        .qp-head{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2)}
-        .qp-head::before{content:"⚡";font-size:12px;color:var(--amber)}
-        .qp-teams{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);margin-bottom:var(--sp-4)}
-        .qp-team{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);min-width:0}
-        .qp-team img{width:48px;height:48px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,.5))}
-        .qp-team .fb-fb{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-3)}
-        .qp-team .nm{font-size:13px;font-weight:600;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-        .qp-vs{font-family:var(--font-serif);font-size:20px;font-weight:500;color:var(--amber);flex-shrink:0;font-style:italic}
-        .qp-info{text-align:center;font-size:11px;color:var(--text-3);margin-bottom:var(--sp-4);line-height:1.6}
-        .qp-info .derby-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:var(--r-full);background:rgba(239,68,68,.15);color:#ff7a7a;border:1px solid rgba(239,68,68,.4);margin-bottom:6px}
-        .qp-guess{margin-bottom:var(--sp-4);padding:var(--sp-3);background:rgba(167,139,250,.06);border:1px dashed rgba(167,139,250,.35);border-radius:var(--r-md);text-align:center}
-        .qp-guess-lbl{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--violet);margin-bottom:var(--sp-2)}
-        .qp-guess-inputs{display:flex;align-items:center;justify-content:center;gap:var(--sp-2)}
-        .qp-guess-inputs input{width:56px;height:56px;text-align:center;font-family:var(--font-serif);font-size:24px;font-weight:600;color:var(--violet);background:rgba(0,0,0,.3);border:1px solid var(--border-hi);border-radius:var(--r-md);outline:none;padding:0;transition:all .2s var(--ease);-webkit-appearance:none;appearance:textfield}
-        .qp-guess-inputs input::-webkit-outer-spin-button,.qp-guess-inputs input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-        .qp-guess-inputs input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(167,139,250,.2),0 0 20px -4px rgba(167,139,250,.4)}
-        .qp-guess-inputs .gdash{font-family:var(--font-serif);font-size:24px;font-weight:500;color:var(--text-4)}
-        .qp-guess-hint{font-size:10px;color:var(--text-4);margin-top:6px}
-        .qp-actions{display:flex;gap:var(--sp-2)}
-        .qp-actions .btn{flex:1;padding:12px;font-size:13px}
-        .uva-box{margin-top:var(--sp-3);padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);background:linear-gradient(135deg,rgba(167,139,250,.08),rgba(255,159,67,.06));border:1px solid rgba(167,139,250,.25);display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
-        .uva-col{flex:1;text-align:center;min-width:0}
-        .uva-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px}
-        .uva-val{font-family:var(--font-serif);font-size:26px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
-        .uva-col.you .uva-val{color:var(--violet);text-shadow:0 0 14px rgba(167,139,250,.35)}
-        .uva-col.ai .uva-val{color:var(--amber);text-shadow:0 0 14px var(--amber-glow)}
-        .uva-vs{font-family:var(--font-serif);font-size:16px;font-weight:500;color:var(--text-4);font-style:italic;flex-shrink:0}
-        .uva-verdict{text-align:center;font-size:11px;color:var(--text-3);margin-top:6px;font-weight:500}
-        .uva-verdict .win{color:var(--emerald);font-weight:700}
-        .uva-verdict .lose{color:var(--rose);font-weight:700}
-        .uva-verdict .tie{color:var(--gold);font-weight:700}
-        .hitem .uva-mini{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:var(--r-full);background:rgba(167,139,250,.12);color:var(--violet);border:1px solid rgba(167,139,250,.3);margin-left:6px}
-
-        /* ══ 首次引导（Onboarding）══ */
-        .onboard-mask{position:fixed;inset:0;z-index:200;background:rgba(4,5,8,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;padding:var(--sp-4)}
-        .onboard-mask.show{display:flex;animation:fadeIn .35s var(--ease)}
-        .onboard-card{max-width:480px;width:100%;background:linear-gradient(180deg,#0f1219,#0a0d13);border:1px solid var(--border-hi);border-radius:var(--r-2xl);padding:var(--sp-8) var(--sp-6) var(--sp-6);text-align:center;box-shadow:0 40px 80px -20px rgba(0,0,0,.8);animation:modalIn .45s var(--ease-spring);position:relative;overflow:hidden}
-        .onboard-card::before{content:"";position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:300px;height:200px;background:radial-gradient(ellipse,rgba(255,159,67,.3),transparent 60%);pointer-events:none}
-        .onboard-step{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-4);position:relative}
-        .onboard-icon{font-size:56px;margin-bottom:var(--sp-4);display:block;position:relative;animation:onboardPop .6s var(--ease-spring) both}
-        @keyframes onboardPop{0%{opacity:0;transform:scale(.5) rotate(-12deg)}60%{transform:scale(1.15) rotate(6deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-        .onboard-title{font-family:var(--font-serif);font-size:26px;font-weight:500;line-height:1.2;letter-spacing:-.02em;margin-bottom:var(--sp-3);position:relative}
-        .onboard-desc{color:var(--text-2);font-size:14px;line-height:1.7;margin-bottom:var(--sp-5);position:relative}
-        .onboard-desc a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,159,67,.3)}
-        .onboard-dots{display:flex;justify-content:center;gap:6px;margin-bottom:var(--sp-5);position:relative}
-        .onboard-dots .od{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s var(--ease)}
-        .onboard-dots .od.on{background:var(--amber);width:20px;border-radius:3px;box-shadow:0 0 8px var(--amber-glow)}
-        .onboard-actions{display:flex;gap:var(--sp-2);position:relative}
-        .onboard-actions .btn{flex:1;padding:13px;font-size:13px}
-        .onboard-skip{position:absolute;top:var(--sp-4);right:var(--sp-4);background:transparent;border:0;color:var(--text-4);font-size:11px;cursor:pointer;padding:6px 10px;border-radius:var(--r-sm);transition:color .2s var(--ease)}
-        .onboard-skip:hover{color:var(--text-2)}
     </style>
 </head>
 <body>
@@ -834,9 +789,8 @@
 <div id="particleLayer"></div>
 <div id="srAnnounce" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)"></div>
 
-<!-- ══ 顶栏 ══ -->
 <header class="topbar">
-    <div class="topbar-left" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <div class="topbar-left">
         <div class="logo"></div>
         <div class="title">英超 <em>预测</em></div>
     </div>
@@ -846,60 +800,39 @@
     </div>
     <div class="topbar-right">
         <span class="clock" id="liveClock">--:--</span>
-        <button class="icon-btn hide-sm" id="themeBtn" onclick="cycleTheme()" title="切换主题" aria-label="切换主题">🎨</button>
-        <button class="icon-btn hide-sm" id="soundBtn" onclick="toggleSound()" title="音效" aria-label="音效">🔊</button>
-        <button class="icon-btn hide-sm" onclick="cycleImmersion()" id="immersionBtn" title="沉浸模式">✨</button>
-        <button class="icon-btn hide-sm" onclick="manualReload()" title="刷新数据" aria-label="刷新数据">
+        <button class="icon-btn" id="themeBtn" onclick="cycleTheme()" title="切换主题" aria-label="切换主题">🎨</button>
+        <button class="icon-btn" id="soundBtn" onclick="toggleSound()" title="音效开关" aria-label="音效开关">🔊</button>
+        <button class="icon-btn" onclick="cycleImmersion()" id="immersionBtn" title="沉浸模式" aria-label="沉浸模式">✨</button>
+        <button class="icon-btn" onclick="manualReload()" title="刷新数据" aria-label="刷新数据">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
         </button>
-        <button class="icon-btn hide-sm" id="ambientToggle" onclick="toggleAmbient()" title="氛围开关" aria-label="氛围开关">✦</button>
+        <button class="icon-btn" id="ambientToggle" onclick="toggleAmbient()" title="氛围开关" aria-label="氛围开关">✦</button>
         <a href="about.html" class="nav-link">关于</a>
     </div>
 </header>
 
 <div class="wrap">
-
-    <!-- ═══════════════════════════════════════════════════
-         🎬 顶部动态舞台
-         ═══════════════════════════════════════════════════ -->
-    <section class="stage" id="hero" data-state="countdown">
-        <div class="stage-kicker">
-            <span class="dot" id="matchdayDot" style="display:none"></span>
+    <section class="hero fade-in" id="hero">
+        <svg class="field-bg" viewBox="0 0 800 400" preserveAspectRatio="none">
+            <path d="M 0,200 Q 400,180 800,200"/>
+            <path class="cyan" d="M 400,0 Q 380,200 400,400"/>
+            <circle class="violet" cx="400" cy="200" r="80"/>
+        </svg>
+        <div class="kick">
+            <span id="matchdayDot" style="display:none;width:6px;height:6px;border-radius:50%;background:var(--rose);box-shadow:0 0 12px var(--rose);animation:pulse 1.8s ease-in-out infinite"></span>
             <span id="matchdayLine">Premier League 2026/27</span>
         </div>
-        <h1 class="stage-title" id="heroTitle">英超 <em>预测</em> 引擎</h1>
-        <p class="stage-sub" id="stageSub">18 维深度分析 · 1539 张球员照片 · 全自动云端更新</p>
-
-        <!-- 动态内容（下一场比赛 / 倒计时 / 快速入口）由 JS 注入 -->
-        <div id="stageContent"></div>
-
-        <div class="stage-actions">
-            <button class="btn" id="stagePrimaryBtn" onclick="stagePrimaryAction()">⚡ 快速预测下一场</button>
-            <button class="btn ghost" onclick="openHistory()">📊 战绩</button>
+        <h1 id="heroTitle">英超 <em>预测</em> 引擎</h1>
+        <p class="lead">基于 skill.md 约束文档的 AI 比分预测引擎 · 18 维深度分析 · 1539 张球员照片 · 全自动云端更新</p>
+        <div class="tag-line">
+            <span><kbd>Ctrl</kbd><kbd>K</kbd> 命令面板</span>
+            <span style="color:var(--text-4)">·</span>
+            <span><kbd>Ctrl</kbd><kbd>↵</kbd> 开始预测</span>
+            <span style="color:var(--text-4)">·</span>
+            <span><kbd>Ctrl</kbd><kbd>I</kbd> 沉浸模式</span>
         </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════════════
-         🎞️ 横向轮次滑轨
-         ═══════════════════════════════════════════════════ -->
-    <div class="rail">
-        <div class="rail-head">
-            <h4>赛程轨道</h4>
-            <span class="rail-progress" id="railProgress">第 1 / 38 轮</span>
-        </div>
-        <div class="rail-scroll" id="railScroll"></div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════════════
-         📊 赛季进度条
-         ═══════════════════════════════════════════════════ -->
-    <div class="season-bar">
-        <div class="sb-lbl">赛季进度</div>
-        <div class="sb-track"><div class="sb-fill" id="seasonBarFill"></div></div>
-        <div class="sb-lbl" id="seasonBarLbl">已完赛 <b>0</b> / 380 场</div>
-    </div>
-
-    <!-- ═══ 焦点战（保留原结构）═══ -->
     <section class="focus-strip" id="focusStrip">
         <h4>今日焦点战</h4>
         <div class="focus-scroll-wrap" id="focusWrap">
@@ -914,7 +847,6 @@
         <div class="focus-dots" id="focusDots"></div>
     </section>
 
-    <!-- ═══ Dashboard ═══ -->
     <section class="dash fade-in">
         <div class="cell primary"><div class="lbl">🏆 当前轮次</div><div class="val orange" id="dashRound">—</div><div class="sub" id="dashRoundSub">2026-27 赛季</div></div>
         <div class="cell"><div class="lbl">⚽ 已完赛</div><div class="val" id="dashPlayed">—</div><div class="sub">场次已录入</div></div>
@@ -926,7 +858,6 @@
 
     <div class="warn-banner" id="fallbackBanner">⚠️ <b>data.json 加载失败</b>，当前显示循环赛算法生成的<b>临时赛程</b>。请运行 <code>update.bat</code> 或等待 GitHub Actions 自动更新。</div>
 
-    <!-- ═══ 主工作区 ═══ -->
     <div class="grid">
         <div class="card fade-in" data-tilt>
             <h3>Groq API Key</h3>
@@ -983,7 +914,6 @@
         </div>
     </div>
 
-    <!-- ═══ 积分榜 ═══ -->
     <div class="card fade-in reveal" style="margin-top:var(--sp-6)">
         <h3>积分榜</h3>
         <div class="standings" id="standings">
@@ -1004,44 +934,11 @@
             <a href="about.html#legal">免责声明</a>
         </div>
         <div class="legal">⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。</div>
-        <div class="ver">Premier League Prediction Engine · v14.0</div>
+        <div class="ver">Premier League Prediction Engine · v13.3</div>
     </footer>
 </div>
 
-<!-- ═══════════════════════════════════════════════════
-     📱 底部操作坞（仅移动端显示）
-     ═══════════════════════════════════════════════════ -->
-<div class="dock" id="dock">
-    <div class="dock-inner">
-        <div class="dock-info">
-            <div class="d-match" id="dockMatch">选择一场比赛…</div>
-            <div class="d-meta" id="dockMeta"></div>
-        </div>
-        <div class="dock-actions">
-            <button class="btn" id="dockPredict" onclick="dockPredict()">⚡ 预测</button>
-        </div>
-    </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════
-     🎉 首次引导（Onboarding）
-     ═══════════════════════════════════════════════════ -->
-<div class="onboard-mask" id="onboardMask">
-    <div class="onboard-card">
-        <button class="onboard-skip" id="onboardSkip" onclick="closeOnboarding()">跳过</button>
-        <div class="onboard-step" id="onboardStep">STEP 1 / 3</div>
-        <div class="onboard-icon" id="onboardIcon">🔑</div>
-        <div class="onboard-title" id="onboardTitle">先获取 Groq API Key</div>
-        <div class="onboard-desc" id="onboardDesc">完全免费，去 <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> 注册并生成一个 Key，粘贴回主页即可。</div>
-        <div class="onboard-dots" id="onboardDots"><span class="od on"></span><span class="od"></span><span class="od"></span></div>
-        <div class="onboard-actions">
-            <button class="btn ghost" id="onboardPrev" onclick="onboardingPrev()" style="flex:0 0 90px;display:none">上一步</button>
-            <button class="btn" id="onboardNext" onclick="onboardingNext()">下一步 →</button>
-        </div>
-    </div>
-</div>
-
-<!-- ══ FAB 足球指挥中心（桌面）══ -->
+<!-- ══ FAB 足球指挥中心 ══ -->
 <div class="fab-hub" id="fabHub">
     <div class="fab-backdrop" id="fabBackdrop"></div>
     <div class="fab-orbit">
@@ -1075,11 +972,6 @@
             <div class="stat"><div class="n" id="sDone">0</div><div class="l">已录入</div></div>
             <div class="stat"><div class="n" id="sWdl">0%</div><div class="l">胜平负</div></div>
             <div class="stat"><div class="n" id="sExact">0%</div><div class="l">精确比分</div></div>
-        </div>
-        <div class="stats" style="grid-template-columns:repeat(3,1fr)" id="uvaStats">
-            <div class="stat"><div class="n" id="sUserTotal" style="color:var(--violet)">0</div><div class="l">你猜的次数</div></div>
-            <div class="stat"><div class="n" id="sUserWdl" style="color:var(--violet)">0%</div><div class="l">你的命中率</div></div>
-            <div class="stat"><div class="n" id="sAiWdl">0%</div><div class="l">AI 命中率（同场）</div></div>
         </div>
         <div class="heatmap" id="heatmap">
             <div class="hm-ttl">命中率热力图 · 时间粒子</div>
@@ -1153,32 +1045,6 @@
     </div>
 </div>
 
-<!-- ══ 快速预测确认弹窗 ══ -->
-<div class="qp-modal" id="qpModal" role="dialog" aria-modal="true">
-    <div class="qp-card">
-        <div class="qp-head">快速预测确认</div>
-        <div class="qp-teams">
-            <div class="qp-team" id="qpHome"><div class="fb-fb">—</div><div class="nm">—</div></div>
-            <div class="qp-vs">vs</div>
-            <div class="qp-team" id="qpAway"><div class="fb-fb">—</div><div class="nm">—</div></div>
-        </div>
-        <div class="qp-info" id="qpInfo"></div>
-        <div class="qp-guess">
-            <div class="qp-guess-lbl">✍️ 你的预测（可选）</div>
-            <div class="qp-guess-inputs">
-                <input type="number" id="qpUserHome" min="0" max="15" placeholder="0" inputmode="numeric">
-                <span class="gdash">-</span>
-                <input type="number" id="qpUserAway" min="0" max="15" placeholder="0" inputmode="numeric">
-            </div>
-            <div class="qp-guess-hint">留空则只看 AI 预测 · 提交后不可修改</div>
-        </div>
-        <div class="qp-actions">
-            <button class="btn ghost" onclick="closeQuickPredict()">取消</button>
-            <button class="btn" onclick="confirmQuickPredict()">⚡ 开始预测</button>
-        </div>
-    </div>
-</div>
-
 <!-- ══ 命令面板 ══ -->
 <div class="cmd-mask" id="cmdMask">
     <div class="cmd-panel" role="dialog" aria-modal="true">
@@ -1197,10 +1063,10 @@
         <div class="shortcut-row"><span class="desc">历史记录</span><span class="keys"><kbd>Ctrl</kbd><kbd>H</kbd></span></div>
         <div class="shortcut-row"><span class="desc">批量预测</span><span class="keys"><kbd>Ctrl</kbd><kbd>B</kbd></span></div>
         <div class="shortcut-row"><span class="desc">切换主题</span><span class="keys"><kbd>Ctrl</kbd><kbd>T</kbd></span></div>
-        <div class="shortcut-row"><span class="desc">上一轮 / 下一轮</span><span class="keys"><kbd>←</kbd><kbd>→</kbd></span></div>
         <div class="shortcut-row"><span class="desc">切换沉浸模式</span><span class="keys"><kbd>Ctrl</kbd><kbd>I</kbd></span></div>
         <div class="shortcut-row"><span class="desc">显示快捷键</span><span class="keys"><kbd>?</kbd></span></div>
         <div class="shortcut-row"><span class="desc">关闭弹窗</span><span class="keys"><kbd>Esc</kbd></span></div>
+        <div class="shortcut-row"><span class="desc">氛围开关</span><span class="keys"><kbd>Ctrl</kbd><kbd>.</kbd></span></div>
     </div>
 </div>
 
@@ -1208,10 +1074,9 @@
 
 <script>
     /* ══════════════════════════════════════════════════════════════
-v14.0 · 逻辑层
-新增：动态舞台 / 轮次轨道 / 赛季进度 / 底部坞 / 首次引导 / ←→键
-保留：v13.3.2 全部功能（德比 + H2H + 状态点 + 人机对战）
-══════════════════════════════════════════════════════════════ */
+   v13.3 · 逻辑层
+   新增：焦点战德比名徽章 + 历史交锋 H2H + 近期状态圆点
+   ══════════════════════════════════════════════════════════════ */
 
     /* ── Sound ── */
     const Sound = (() => {
@@ -1273,6 +1138,7 @@ v14.0 · 逻辑层
         Sound.click();
     }
 
+    /* ── M1 Breath ── */
     function setBreath(mode){
         document.body.classList.remove('breath-fast');
         if (mode === 'fast') document.body.classList.add('breath-fast');
@@ -1378,18 +1244,43 @@ v14.0 · 逻辑层
                 });
             });
         }
+        function enableMagneticField(){
+            if (window.matchMedia('(hover:none)').matches) return;
+            if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+            let raf = null;
+            document.addEventListener('mousemove', e => {
+                if (raf) return;
+                raf = requestAnimationFrame(() => {
+                    raf = null;
+                    document.querySelectorAll('.btn:not(.small)').forEach(el => {
+                        const r = el.getBoundingClientRect();
+                        const cx = r.left + r.width/2, cy = r.top + r.height/2;
+                        const dx = e.clientX - cx, dy = e.clientY - cy;
+                        const dist = Math.hypot(dx, dy);
+                        if (dist < 120) {
+                            const force = (1 - dist/120) * 0.2;
+                            el.style.setProperty('--magnet-x', (dx*force).toFixed(1) + 'px');
+                            el.style.setProperty('--magnet-y', (dy*force).toFixed(1) + 'px');
+                        } else {
+                            el.style.setProperty('--magnet-x', '0px');
+                            el.style.setProperty('--magnet-y', '0px');
+                        }
+                    });
+                });
+            });
+        }
         function enableHeadlineSpotlight(){
-            const stage = document.getElementById('hero');
-            if (!stage) return;
-            stage.addEventListener('pointermove', e => {
-                const r = stage.getBoundingClientRect();
-                stage.style.setProperty('--hx', ((e.clientX - r.left) / r.width * 100) + '%');
-                stage.style.setProperty('--hy', ((e.clientY - r.top) / r.height * 100) + '%');
+            const h1 = document.getElementById('heroTitle');
+            if (!h1) return;
+            h1.addEventListener('pointermove', e => {
+                const r = h1.getBoundingClientRect();
+                h1.style.setProperty('--hx', ((e.clientX - r.left) / r.width * 100) + '%');
+                h1.style.setProperty('--hy', ((e.clientY - r.top) / r.height * 100) + '%');
             });
         }
         function init(){
             setEnabled(_immersion !== 'off');
-            enableTilt(); enableCellGlow(); enableHeadlineSpotlight();
+            enableTilt(); enableCellGlow(); enableMagneticField(); enableHeadlineSpotlight();
         }
         return { init, setEnabled, isEnabled: () => enabled, spawnParticles };
     })();
@@ -1410,6 +1301,40 @@ v14.0 · 逻辑层
         setTimeout(() => {
             parts.forEach(p => { p.style.transform = ''; p.style.opacity = ''; p.style.transition = ''; });
         }, 850);
+    }
+
+    /* ── Hero title split ── */
+    function splitHeroTitle(){
+        const h1 = document.getElementById('heroTitle');
+        if (!h1) return;
+        let charIndex = 0;
+        const walk = (node) => {
+            [...node.childNodes].forEach(child => {
+                if (child.nodeType === 3) {
+                    const text = child.textContent;
+                    const frag = document.createDocumentFragment();
+                    [...text].forEach(ch => {
+                        if (ch === ' ' || ch === '\n') { frag.appendChild(document.createTextNode(ch)); return; }
+                        const span = document.createElement('span');
+                        span.className = 'char';
+                        span.textContent = ch;
+                        span.style.animationDelay = (0.15 + charIndex * 0.05) + 's';
+                        charIndex++;
+                        frag.appendChild(span);
+                    });
+                    node.replaceChild(frag, child);
+                } else if (child.nodeType === 1) { walk(child); }
+            });
+        };
+        walk(h1);
+    }
+    function setupReveal(){
+        if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) { document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')); return; }
+        if (!('IntersectionObserver' in window)) { document.querySelectorAll('.reveal').forEach(el => el.classList.add('visible')); return; }
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+        }, { threshold: .12, rootMargin: '0px 0px -60px 0px' });
+        document.querySelectorAll('.reveal').forEach(el => io.observe(el));
     }
 
     /* ── Loading / Clock / Ripple ── */
@@ -1449,7 +1374,7 @@ v14.0 · 逻辑层
         });
     }
 
-    /* ── 比分揭晓 / 冲击波 / 粒子 ── */
+    /* ── T2 比分揭晓 ── */
     let _revealRaf = null;
     function revealScore(el, targetStr, cb){
         if (_revealRaf) cancelAnimationFrame(_revealRaf);
@@ -1512,6 +1437,8 @@ v14.0 · 逻辑层
             setTimeout(() => dot.remove(), 1000);
         }
     }
+
+    /* ── T3 打字机 ── */
     let _typewriteTimer = null;
     function typewrite(el, text, speed = 22){
         if (_typewriteTimer) { clearInterval(_typewriteTimer); _typewriteTimer = null; }
@@ -1550,6 +1477,8 @@ v14.0 · 逻辑层
         }, { threshold: .15 });
         document.querySelectorAll('.fmatch').forEach((el, i) => { el.dataset.idx = i; io.observe(el); });
     }
+
+    /* ── M2 指纹 ── */
     function genFingerprint(seed){
         let h = 0;
         for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
@@ -1871,6 +1800,41 @@ v14.0 · 逻辑层
         }
         return result;
     }
+
+    let _filterMode = 'round', _currentTeam = '', _teamFixtures = [], _teamSelectedIdx = 0;
+    function setFilterMode(mode){
+        _filterMode = mode;
+        document.querySelectorAll('#pickerMode button').forEach(b => { b.classList.toggle('on', b.dataset.mode === mode); });
+        document.getElementById('roundSelectWrap').style.display = mode === 'round' ? '' : 'none';
+        document.getElementById('teamSelectWrap').classList.toggle('show', mode === 'team');
+        if (mode === 'team') {
+            const savedTeam = localStorage.getItem('last_team');
+            _currentTeam = (savedTeam && TEAMS.includes(savedTeam)) ? savedTeam : TEAMS[0];
+            document.getElementById('teamSel').value = _currentTeam;
+            loadTeamFixtures();
+        } else {
+            MatchPicker.setRound(+document.getElementById('roundSel').value || 0);
+        }
+        refreshDashboard();
+    }
+    function loadTeamFixtures(){
+        _teamFixtures = getTeamFixtures(_currentTeam);
+        const savedMatch = localStorage.getItem('last_team_match_' + _currentTeam);
+        _teamSelectedIdx = savedMatch !== null && _teamFixtures[+savedMatch] ? +savedMatch : 0;
+        if (_filterMode === 'team') {
+            const fix = _teamFixtures[_teamSelectedIdx];
+            if (fix) { document.getElementById('roundSel').value = fix.round; localStorage.setItem('last_round', fix.round); }
+            MatchPicker.setRound(_teamFixtures[_teamSelectedIdx]?.round || 0);
+        }
+        MatchPicker.updateLabel();
+        updateURL();
+    }
+    let _histCache = null, _histCacheRound = -1;
+    function getHistoryForRound(r){ if (_histCache && _histCacheRound === r) return _histCache; _histCache = getHistory(); _histCacheRound = r; return _histCache; }
+    function invalidateHistCache(){ _histCache = null; _histCacheRound = -1; }
+    function invalidateTeamAtkCache(){ _teamAtkCache = null; }
+
+    /* ★ 开赛时间格式化（返回纯文本，样式交给 .ftime） */
     function formatKickoff(utcIso, st){
         if (st.status === 'finished') return '已完赛';
         if (!utcIso) return '待开赛';
@@ -1895,10 +1859,12 @@ v14.0 · 逻辑层
             const M = String(d.getMonth() + 1).padStart(2, '0');
             const D = String(d.getDate()).padStart(2, '0');
             return `${M}-${D} ${timeStr}`;
-        } catch(e) { return '待开赛'; }
+        } catch(e) {
+            return '待开赛';
+        }
     }
 
-    /* ══ 德比 / 状态圆点 / H2H ══ */
+    /* ══ v13.3 新增：德比 / 状态圆点 / H2H ══ */
     const DERBY_NAMES = [
         { teams: ['曼联','利物浦'], name: '双红会' },
         { teams: ['曼城','曼联'], name: '曼市德比' },
@@ -1930,306 +1896,6 @@ v14.0 · 逻辑层
         const last = matches[0];
         return `<div class="fh2h"><span class="fh2h-lbl">⚔️</span><span class="fh2h-team">${escapeHtml(last.home)}</span><span class="fh2h-sc">${last.hg}-${last.ag}</span><span class="fh2h-team">${escapeHtml(last.away)}</span><span class="fh2h-date">${escapeHtml(last.season)}</span></div>`;
     }
-
-    /* ═══════════════════════════════════════════════════
-       🎞️ v14.0 横向轮次轨道
-       ═══════════════════════════════════════════════════ */
-    function renderRail(){
-        const rail = document.getElementById('railScroll');
-        if (!rail) return;
-        const cur = +document.getElementById('roundSel').value || 0;
-        rail.innerHTML = FIXTURES.map((round, i) => {
-            const isPast = i < cur, isFuture = i > cur, isOn = i === cur;
-            const cls = ['rail-item', isOn?'on':'', isPast?'past':'', isFuture?'future':''].filter(Boolean).join(' ');
-            return `<div class="${cls}" data-round="${i}"><div class="rn">${i+1}</div><div class="rl">轮次</div></div>`;
-        }).join('');
-        document.getElementById('railProgress').textContent = `第 ${cur+1} / ${FIXTURES.length} 轮`;
-        rail.querySelectorAll('.rail-item').forEach(el => {
-            el.addEventListener('click', () => {
-                const r = +el.dataset.round;
-                if (r === cur) return;
-                document.getElementById('roundSel').value = r;
-                localStorage.setItem('last_round', r);
-                fillMatches();
-                renderRail();
-                updateURL();
-                Sound.click();
-                el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            });
-        });
-        const onEl = rail.querySelector('.rail-item.on');
-        if (onEl) requestAnimationFrame(() => onEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' }));
-        // 拖拽 + 滚轮（仅绑定一次）
-        if (rail._dragBound) return;
-        rail._dragBound = true;
-        let isDown = false, startX = 0, startLeft = 0, moved = false;
-        rail.addEventListener('pointerdown', e => {
-            if (e.pointerType !== 'mouse') return;
-            isDown = true; moved = false;
-            startX = e.clientX; startLeft = rail.scrollLeft;
-            rail.classList.add('dragging');
-        });
-        window.addEventListener('pointermove', e => {
-            if (!isDown) return;
-            const dx = e.clientX - startX;
-            if (Math.abs(dx) > 5) moved = true;
-            rail.scrollLeft = startLeft - dx;
-        });
-        window.addEventListener('pointerup', () => {
-            if (!isDown) return;
-            isDown = false;
-            rail.classList.remove('dragging');
-        });
-        rail.addEventListener('click', e => {
-            if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; }
-        }, true);
-        rail.addEventListener('wheel', e => {
-            if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-                e.preventDefault();
-                rail.scrollLeft += e.deltaY;
-            }
-        }, { passive: false });
-    }
-
-    /* ═══════════════════════════════════════════════════
-       🎬 v14.0 顶部动态舞台
-       ═══════════════════════════════════════════════════ */
-    function findNextUpcomingMatch(){
-        // 从当前轮往后找第一场未开赛的比赛
-        const now = Date.now();
-        const cur = +document.getElementById('roundSel').value || 0;
-        for (let r = cur; r < FIXTURES.length; r++) {
-            const round = FIXTURES[r] || [];
-            for (const m of round) {
-                const st = getMatchStatus(m.home, m.away, r);
-                if (st.status === 'finished') continue;
-                if (m.kickoff) {
-                    const k = new Date(m.kickoff).getTime();
-                    if (k > now - 2.5*3600*1000) return { ...m, round: r };
-                } else return { ...m, round: r };
-            }
-        }
-        return null;
-    }
-    function renderStage(){
-        const stage = document.getElementById('hero');
-        const content = document.getElementById('stageContent');
-        const sub = document.getElementById('stageSub');
-        if (!content) return;
-        const next = findNextUpcomingMatch();
-        if (!next) {
-            stage.dataset.state = 'offseason';
-            content.innerHTML = '';
-            sub.textContent = '赛季已全部结束 · 回顾历史战绩';
-            document.getElementById('stagePrimaryBtn').textContent = '📊 查看战绩';
-            return;
-        }
-        const st = getMatchStatus(next.home, next.away, next.round);
-        const derby = getDerbyName(next.home, next.away);
-        const kickoff = next.kickoff ? new Date(next.kickoff) : null;
-        const now = new Date();
-        const diffMs = kickoff ? kickoff.getTime() - now.getTime() : Infinity;
-        const diffH = diffMs / 3600000;
-        let state = 'countdown';
-        if (diffH < 0 && diffH > -2.5) state = 'live';
-        else if (diffH < 24 && diffH > 0) state = 'today';
-        stage.dataset.state = state;
-        const hUrl = espnUrl(next.home), aUrl = espnUrl(next.away);
-        const hImg = hUrl ? `<img src="${hUrl}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : '';
-        const aImg = aUrl ? `<img src="${aUrl}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : '';
-        const derbyTag = derby ? `<span style="display:inline-block;font-size:10px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(239,68,68,.15);color:#ff7a7a;border:1px solid rgba(239,68,68,.4);margin-bottom:12px">🔥 ${escapeHtml(derby)}</span>` : '';
-        let timeHtml = '';
-        if (state === 'live') {
-            timeHtml = `<div style="font-family:var(--font-serif);font-size:22px;color:var(--rose);font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:50%;background:var(--rose);box-shadow:0 0 12px var(--rose);animation:pulse 1.6s ease-in-out infinite"></span>正在进行中</div>`;
-        } else if (kickoff && diffMs > 0) {
-            const days = Math.floor(diffMs / 86400000);
-            const hours = Math.floor((diffMs % 86400000) / 3600000);
-            const mins = Math.floor((diffMs % 3600000) / 60000);
-            const secs = Math.floor((diffMs % 60000) / 1000);
-            timeHtml = `<div class="stage-countdown" data-kickoff="${next.kickoff}">
-                ${days > 0 ? `<div class="cd-block"><div class="cd-num" data-cd="d">${days}</div><div class="cd-lbl">天</div></div>` : ''}
-                <div class="cd-block"><div class="cd-num" data-cd="h">${String(hours).padStart(2,'0')}</div><div class="cd-lbl">小时</div></div>
-                <div class="cd-block"><div class="cd-num" data-cd="m">${String(mins).padStart(2,'0')}</div><div class="cd-lbl">分钟</div></div>
-                <div class="cd-block"><div class="cd-num" data-cd="s">${String(secs).padStart(2,'0')}</div><div class="cd-lbl">秒</div></div>
-            </div>`;
-        }
-        content.innerHTML = `${derbyTag}
-            <div class="stage-teams">
-                <div class="stage-team">${hImg}<span>${escapeHtml(next.home)}</span></div>
-                <div class="stage-vs">vs</div>
-                <div class="stage-team">${aImg}<span>${escapeHtml(next.away)}</span></div>
-            </div>
-            ${timeHtml}`;
-        sub.textContent = `第 ${next.round+1} 轮 · ${formatKickoff(next.kickoff, st)}`;
-        document.getElementById('stagePrimaryBtn').textContent = state === 'live' ? '⚡ 立即预测' : '⚡ 快速预测这场';
-        // 保存下一场，供快速预测按钮用
-        stage.dataset.nextHome = next.home;
-        stage.dataset.nextAway = next.away;
-        stage.dataset.nextRound = next.round;
-    }
-    let _stageTick = null;
-    function startStageTick(){
-        if (_stageTick) clearInterval(_stageTick);
-        _stageTick = setInterval(() => {
-            const el = document.querySelector('.stage-countdown');
-            if (!el) return;
-            const kickoff = el.dataset.kickoff;
-            if (!kickoff) return;
-            const diffMs = new Date(kickoff).getTime() - Date.now();
-            if (diffMs <= 0) { renderStage(); return; }
-            const days = Math.floor(diffMs / 86400000);
-            const hours = Math.floor((diffMs % 86400000) / 3600000);
-            const mins = Math.floor((diffMs % 3600000) / 60000);
-            const secs = Math.floor((diffMs % 60000) / 1000);
-            const dEl = el.querySelector('[data-cd="d"]'); if (dEl) dEl.textContent = days;
-            const hEl = el.querySelector('[data-cd="h"]'); if (hEl) hEl.textContent = String(hours).padStart(2,'0');
-            const mEl = el.querySelector('[data-cd="m"]'); if (mEl) mEl.textContent = String(mins).padStart(2,'0');
-            const sEl = el.querySelector('[data-cd="s"]'); if (sEl) sEl.textContent = String(secs).padStart(2,'0');
-        }, 1000);
-    }
-    function stagePrimaryAction(){
-        const stage = document.getElementById('hero');
-        const h = stage.dataset.nextHome, a = stage.dataset.nextAway, r = +stage.dataset.nextRound;
-        if (!h || !a) return openHistory();
-        const round = FIXTURES[r] || [];
-        const idx = round.findIndex(m => m.home === h && m.away === a);
-        if (idx < 0) return toast('找不到这场比赛','warn');
-        document.getElementById('roundSel').value = r;
-        MatchPicker.setRound(r);
-        MatchPicker.selectMatch(idx);
-        renderRail();
-        openQuickPredict(h, a, r);
-        Sound.click();
-    }
-
-    /* ═══════════════════════════════════════════════════
-       📊 v14.0 赛季进度条
-       ═══════════════════════════════════════════════════ */
-    function renderSeasonBar(){
-        const fill = document.getElementById('seasonBarFill');
-        const lbl = document.getElementById('seasonBarLbl');
-        if (!fill || !lbl) return;
-        let total = 0, done = 0;
-        for (const rk of Object.keys(RESULTS)) {
-            const ro = RESULTS[rk];
-            if (!ro || typeof ro !== 'object') continue;
-            for (const k of Object.keys(ro)) {
-                total++;
-                if (ro[k]) done++;
-            }
-        }
-        const matchTotal = (FIXTURES.length || 38) * 10;
-        const pct = matchTotal ? Math.min(100, Math.round(total / matchTotal * 100)) : 0;
-        fill.style.width = pct + '%';
-        lbl.innerHTML = `已完赛 <b>${total}</b> / ${matchTotal} 场`;
-    }
-
-    /* ═══════════════════════════════════════════════════
-       📱 v14.0 底部操作坞
-       ═══════════════════════════════════════════════════ */
-    function renderDock(){
-        const m = currentMatch();
-        const dm = document.getElementById('dockMatch');
-        const meta = document.getElementById('dockMeta');
-        if (!dm || !meta) return;
-        if (!m.home || !m.away) {
-            dm.textContent = '选择一场比赛…';
-            meta.innerHTML = '';
-            return;
-        }
-        dm.textContent = `${m.home} vs ${m.away}`;
-        const derby = getDerbyName(m.home, m.away);
-        const st = getMatchStatus(m.home, m.away, m.round);
-        const rd = FIXTURES[m.round] || [];
-        const match = rd.find(x => x.home === m.home && x.away === m.away) || {};
-        const derbyHtml = derby ? `<span class="derby-tag">🔥 ${escapeHtml(derby)}</span>` : '';
-        meta.innerHTML = `${derbyHtml}<span>第 ${m.round+1} 轮 · ${escapeHtml(formatKickoff(match.kickoff, st))}</span>`;
-    }
-    function dockPredict(){
-        if (!getKey()) return toast('请先填 Groq API Key','warn');
-        const m = currentMatch();
-        if (!m.home || !m.away) return toast('未选择比赛','warn');
-        const btn = document.getElementById('predictBtn');
-        if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => { if (!btn.disabled) startPredict(); }, 260);
-    }
-
-    /* ═══════════════════════════════════════════════════
-       🎉 v14.0 首次引导
-       ═══════════════════════════════════════════════════ */
-    const ONBOARD_STEPS = [
-        { icon: '🔑', title: '先获取 Groq API Key', desc: '完全免费，去 <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> 注册并生成一个 Key，粘贴回主页即可。' },
-        { icon: '⚽', title: '选一场焦点战', desc: '点顶部舞台的「快速预测」，或在下方焦点战卡片里点任意一场。' },
-        { icon: '🤖', title: '你和 AI 一起猜', desc: '写下你的预测比分（可选），点击「开始预测」，AI 会生成完整推演。赛后填实际比分，看看谁更准。' }
-    ];
-    let _onboardIdx = 0;
-    function openOnboarding(){
-        _onboardIdx = 0;
-        renderOnboarding();
-        document.getElementById('onboardMask').classList.add('show');
-        document.body.classList.add('no-scroll');
-    }
-    function closeOnboarding(){
-        document.getElementById('onboardMask').classList.remove('show');
-        document.body.classList.remove('no-scroll');
-        localStorage.setItem('pl_onboarded', '1');
-    }
-    function renderOnboarding(){
-        const step = ONBOARD_STEPS[_onboardIdx];
-        document.getElementById('onboardStep').textContent = `STEP ${_onboardIdx+1} / ${ONBOARD_STEPS.length}`;
-        document.getElementById('onboardIcon').textContent = step.icon;
-        document.getElementById('onboardTitle').textContent = step.title;
-        document.getElementById('onboardDesc').innerHTML = step.desc;
-        const dots = document.querySelectorAll('#onboardDots .od');
-        dots.forEach((d, i) => d.classList.toggle('on', i === _onboardIdx));
-        document.getElementById('onboardPrev').style.display = _onboardIdx > 0 ? 'block' : 'none';
-        document.getElementById('onboardNext').textContent = _onboardIdx === ONBOARD_STEPS.length - 1 ? '🎉 开始吧' : '下一步 →';
-    }
-    function onboardingNext(){
-        if (_onboardIdx < ONBOARD_STEPS.length - 1) { _onboardIdx++; renderOnboarding(); Sound.click(); }
-        else closeOnboarding();
-    }
-    function onboardingPrev(){
-        if (_onboardIdx > 0) { _onboardIdx--; renderOnboarding(); Sound.click(); }
-    }
-
-    /* ═══════════════════════════════════════════════════
-       Match Picker（保留原样）
-       ═══════════════════════════════════════════════════ */
-    let _filterMode = 'round', _currentTeam = '', _teamFixtures = [], _teamSelectedIdx = 0;
-    function setFilterMode(mode){
-        _filterMode = mode;
-        document.querySelectorAll('#pickerMode button').forEach(b => { b.classList.toggle('on', b.dataset.mode === mode); });
-        document.getElementById('roundSelectWrap').style.display = mode === 'round' ? '' : 'none';
-        document.getElementById('teamSelectWrap').classList.toggle('show', mode === 'team');
-        if (mode === 'team') {
-            const savedTeam = localStorage.getItem('last_team');
-            _currentTeam = (savedTeam && TEAMS.includes(savedTeam)) ? savedTeam : TEAMS[0];
-            document.getElementById('teamSel').value = _currentTeam;
-            loadTeamFixtures();
-        } else {
-            MatchPicker.setRound(+document.getElementById('roundSel').value || 0);
-        }
-        refreshDashboard();
-        renderDock();
-    }
-    function loadTeamFixtures(){
-        _teamFixtures = getTeamFixtures(_currentTeam);
-        const savedMatch = localStorage.getItem('last_team_match_' + _currentTeam);
-        _teamSelectedIdx = savedMatch !== null && _teamFixtures[+savedMatch] ? +savedMatch : 0;
-        if (_filterMode === 'team') {
-            const fix = _teamFixtures[_teamSelectedIdx];
-            if (fix) { document.getElementById('roundSel').value = fix.round; localStorage.setItem('last_round', fix.round); }
-            MatchPicker.setRound(_teamFixtures[_teamSelectedIdx]?.round || 0);
-        }
-        MatchPicker.updateLabel();
-        updateURL();
-        renderDock();
-    }
-    let _histCache = null, _histCacheRound = -1;
-    function getHistoryForRound(r){ if (_histCache && _histCacheRound === r) return _histCache; _histCache = getHistory(); _histCacheRound = r; return _histCache; }
-    function invalidateHistCache(){ _histCache = null; _histCacheRound = -1; }
-    function invalidateTeamAtkCache(){ _teamAtkCache = null; }
 
     const MatchPicker = (() => {
         let selectedIdx = 0, currentRound = 0, isOpen = false, focusIdx = 0, filtered = [];
@@ -2298,7 +1964,7 @@ v14.0 · 逻辑层
                 const fix = _teamFixtures[idx];
                 if (fix) { document.getElementById('roundSel').value = fix.round; MatchPicker.setRound(fix.round); }
             } else { selectedIdx = idx; localStorage.setItem('last_match_'+currentRound, idx); }
-            updateLabel(); refreshDashboard(); updateURL(); renderDock();
+            updateLabel(); refreshDashboard(); updateURL();
         }
         function updateLabel(){
             const label = document.getElementById('matchLabel');
@@ -2347,9 +2013,6 @@ v14.0 · 逻辑层
         MatchPicker.setRound(r);
         if (document.getElementById('matchPicker').classList.contains('open')) MatchPicker.renderList(document.getElementById('matchSearch').value);
         refreshDashboard();
-        renderDock();
-        renderRail();
-        renderStage();
     }
     function currentMatch(){
         if (_filterMode === 'team' && _teamFixtures.length) {
@@ -2436,7 +2099,7 @@ v14.0 · 逻辑层
         return result;
     }
 
-    /* ══ AI 推理动画 ══ */
+    /* ══ AI 推理 ══ */
     const REASONING_STEPS = [
         { icon: '📖', text: '读取 skill.md 约束文档' },
         { icon: '📊', text: '注入实时攻防数据' },
@@ -2520,7 +2183,6 @@ v14.0 · 逻辑层
     }
 
     /* ══ 主流程 ══ */
-    let _pendingUserGuess = null;
     async function startPredict(retryCount = 0){
         const btn = document.getElementById('predictBtn');
         const { round, home, away } = currentMatch();
@@ -2557,15 +2219,13 @@ v14.0 · 逻辑层
                 card.innerHTML = `<div class="empty">❌ 校验失败<button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
                 Sound.error(); setBreath('slow'); return toast('预测校验失败','err');
             }
-            const captured = _pendingUserGuess;
-            addHistory({ round, home, away, ...v.data, ts: Date.now(), userGuess: captured });
-            renderResult(v.data, { round, home, away, intel, userGuess: captured });
-            _pendingUserGuess = null;
+            addHistory({ round, home, away, ...v.data, ts: Date.now() });
+            renderResult(v.data, { round, home, away, intel });
             Sound.success();
             revealBreath();
             setBreath('slow');
             toast('预测完成');
-            setTimeout(() => feedbackFloat('AI 已生成推演', '#34d399'), 1200);
+            setTimeout(() => feedbackFloat('AI 已生成推演 · 命中率模拟 +' + (Math.random() * 2).toFixed(1) + '%', '#34d399'), 1200);
         } catch(err){
             finishAnim();
             card.innerHTML = `<div class="empty">❌ ${escapeHtml(err.message)}<button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
@@ -2615,15 +2275,6 @@ v14.0 · 逻辑层
         function tick(now){ const t = Math.min(1, (now-start)/dur); const eased = 1 - Math.pow(1-t, 3); el.textContent = Math.round(target*eased) + suffix; if (t < 1) requestAnimationFrame(tick); }
         requestAnimationFrame(tick);
     }
-    function renderUserVsAI(userGuess, aiScore){
-        if (!userGuess) return '';
-        return `<div class="uva-box">
-            <div class="uva-col you"><div class="uva-lbl">✍️ 你猜</div><div class="uva-val">${escapeHtml(userGuess)}</div></div>
-            <div class="uva-vs">vs</div>
-            <div class="uva-col ai"><div class="uva-lbl">🤖 AI 猜</div><div class="uva-val">${escapeHtml(aiScore)}</div></div>
-        </div>
-        <div class="uva-verdict">录入实际比分后自动判定胜负</div>`;
-    }
     function renderCompareActual(home, away, round, predictedScore){
         const hist = getHistory();
         const rec = hist.find(h => h.round === round && h.home === home && h.away === away && h.actual);
@@ -2664,6 +2315,20 @@ v14.0 · 逻辑层
         const awayPoly = `<polygon class="poly-away" points="${valuePath(aVals)}"/>`;
         return `<div class="radar-wrap"><div class="ttl">实力雷达</div><div class="radar-box"><svg class="radar-svg" viewBox="${VBX} ${VBY} ${VBW} ${VBH}">${grids}${axes}${homePoly}${awayPoly}${labelsEl}</svg><div class="radar-legend"><div class="item home"><span class="dot"></span><span>${escapeHtml(home)}</span></div><div class="item away"><span class="dot"></span><span>${escapeHtml(away)}</span></div></div></div></div>`;
     }
+    function computeMultiverse(runs){
+        if (!runs || runs.length < 2) return null;
+        const m = new Map();
+        runs.forEach(x => m.set(x, (m.get(x) || 0) + 1));
+        const total = runs.length;
+        const sorted = [...m.entries()].sort((a, b) => b[1] - a[1]);
+        return sorted.map(([score, count], i) => ({ score, weight: Math.round(count / total * 100), main: i === 0 }));
+    }
+    function renderMultiverse(runs){
+        const mv = computeMultiverse(runs);
+        if (!mv || mv.length < 2) return '';
+        const labels = ['世界 A', '世界 B', '世界 C', '世界 D', '世界 E'];
+        return `<div class="sect"><div class="ttl">🔮 平行宇宙</div><div class="multiverse">${mv.slice(0, 3).map((m, i) => `<div class="mv-card${m.main ? ' main' : ''}"><div class="mv-label">${labels[i] || '世界 ' + i}</div><div class="mv-score">${escapeHtml(m.score)}</div><div class="mv-pct">${m.weight}% 权重</div></div>`).join('')}</div></div>`;
+    }
 
     function renderResult(d, ctx){
         _lastResult = { d, ctx };
@@ -2702,9 +2367,11 @@ v14.0 · 逻辑层
             return `<div class="scorer-item">${photoHtml}<div class="scorer-body"><div class="scorer-head"><span class="scorer-name">${escapeHtml(sname)}</span><span class="scorer-team">${escapeHtml(steam)}</span><span class="scorer-pct">${pctVal}%</span></div><div class="scorer-bar"><div class="scorer-bar-fill" style="width:${pctVal}%"></div></div>${sreason ? `<div class="scorer-reason">${escapeHtml(sreason)}</div>` : ''}</div></div>`;
         }).join('')}</div></div>` : '';
         const playersHtml = players.length ? `<div class="sect"><div class="ttl">🎯 本场焦点球员</div><div class="players">${players.map(playerCard).join('')}</div></div>` : '';
+        const multiRunsHtml = d._runs && d._runs.length > 1 ? `<div class="multi-runs">⚡ ${d._runs.length} 次运行：${d._runs.map(escapeHtml).join(' / ')} · 取众数 <b>${escapeHtml(d.score)}</b></div>` : '';
         const derbyName = getDerbyName(home, away);
         const derbyHtml = derbyName ? `<div style="text-align:center"><span class="derby-badge">⚔️ ${escapeHtml(derbyName)}</span></div>` : '';
         const fingerprintHtml = `<div class="fingerprint"><canvas id="fpCanvas" title="本场预测指纹"></canvas></div>`;
+        const multiverseHtml = d._runs && d._runs.length > 1 ? renderMultiverse(d._runs) : '';
         card.innerHTML = `
     <div class="scoreboard">
       <div class="teams">
@@ -2714,8 +2381,8 @@ v14.0 · 逻辑层
       </div>
       ${derbyHtml}
       <div style="margin-top:18px"><span class="conf ${confClass(d.confidence)}">置信度 ${escapeHtml(d.confidence)}</span></div>
-      ${renderUserVsAI(ctx.userGuess, d.score)}
       ${renderCompareActual(home, away, ctx.round, d.score)}
+      ${multiRunsHtml}
       <div class="result-actions">
         <button class="btn ghost small" onclick="copyResult()">📋 复制</button>
         <button class="btn ghost small" onclick="generateShareCard()">📷 分享图</button>
@@ -2727,6 +2394,7 @@ v14.0 · 逻辑层
     <div class="rings">${ring(h,'h')}${ring(dr,'d')}${ring(a,'a')}</div>
     <div class="compare"><div class="seg h"></div><div class="seg d"></div><div class="seg a"></div></div>
     ${renderRadar(home, away)}
+    ${multiverseHtml}
     ${h2h}
     <div class="sect"><div class="ttl">关键因素</div><div class="factors">${(d.keyFactors||[]).map(f=>`<span class="chip">${escapeHtml(f)}</span>`).join('')}</div><div class="kv" id="analysisKv"></div></div>
     ${scorerHtml}${playersHtml}`;
@@ -2749,8 +2417,7 @@ v14.0 · 逻辑层
     function copyResult(){
         if (!_lastResult) return;
         const { d, ctx } = _lastResult;
-        const guess = ctx.userGuess ? `\n我的预测：${ctx.userGuess}` : '';
-        const text = `【第${ctx.round+1}轮预测】${ctx.home} vs ${ctx.away}\nAI 比分：${d.score}${guess}\n概率：主胜 ${d.homeWin}% / 平局 ${d.draw}% / 客胜 ${d.awayWin}%\n置信度：${d.confidence}\n关键因素：${(d.keyFactors||[]).join('、')}\n分析：${d.analysis}\n—— 英超预测引擎`;
+        const text = `【第${ctx.round+1}轮预测】${ctx.home} vs ${ctx.away}\n比分：${d.score}\n概率：主胜 ${d.homeWin}% / 平局 ${d.draw}% / 客胜 ${d.awayWin}%\n置信度：${d.confidence}\n关键因素：${(d.keyFactors||[]).join('、')}\n分析：${d.analysis}\n—— 英超预测引擎`;
         navigator.clipboard.writeText(text).then(() => toast('预测已复制')).catch(() => toast('复制失败','err'));
     }
     function copyLink(){ navigator.clipboard.writeText(location.href).then(() => toast('链接已复制')).catch(() => toast('复制失败','err')); }
@@ -2804,19 +2471,15 @@ v14.0 · 逻辑层
         const toRecord = hist.filter(h => !h.actual).length;
         document.getElementById('dashRecord').textContent = toRecord;
         const badge = document.getElementById('histBadge');
-        if (badge) { if (toRecord > 0) { badge.style.display = 'flex'; badge.textContent = toRecord; } else badge.style.display = 'none'; }
+        if (toRecord > 0) { badge.style.display = 'flex'; badge.textContent = toRecord; } else badge.style.display = 'none';
         const done = hist.filter(h => h.actual);
         let streak = 0;
         for (let i = done.length - 1; i >= 0; i--) { const j = judge(done[i]); if (j === 'exact' || j === 'wdl') streak++; else break; }
         const subEl = document.getElementById('histSub');
-        if (subEl) {
-            if (streak >= 3) subEl.innerHTML = `录入实际赛果，自动判定命中 <span class="streak">🔥 ${streak} 连胜</span>`;
-            else subEl.textContent = '录入实际赛果，自动判定命中';
-        }
+        if (streak >= 3) subEl.innerHTML = `录入实际赛果，自动判定命中 <span class="streak">🔥 ${streak} 连胜</span>`;
+        else subEl.textContent = '录入实际赛果，自动判定命中';
         updateSeasonSummary();
         renderFocusMatches();
-        renderSeasonBar();
-        renderDock();
         updateMood(hist);
     }
     function updateSeasonSummary(){
@@ -2851,22 +2514,21 @@ v14.0 · 逻辑层
         const el = document.getElementById('matchdayLine');
         const dot = document.getElementById('matchdayDot');
         const topbarDot = document.getElementById('liveDot');
-        const stage = document.getElementById('hero');
+        const hero = document.getElementById('hero');
         const d = new Date();
         const day = d.getDay();
         if (day === 0 || day === 6) {
-            el.textContent = '🔴 比赛日';
-            if (dot) dot.style.display = 'inline-block';
+            el.textContent = '🔴 比赛日 · 记得录入上一轮实际赛果';
+            dot.style.display = 'inline-block';
             topbarDot.classList.remove('off');
-            stage.classList.add('matchday');
+            hero.classList.add('matchday');
         } else {
             el.textContent = `距下个比赛日还有 ${(6 - day + 7) % 7 || 7} 天`;
-            if (dot) dot.style.display = 'none';
+            dot.style.display = 'none';
             topbarDot.classList.add('off');
-            stage.classList.remove('matchday');
+            hero.classList.remove('matchday');
         }
     }
-
     function renderFocusMatches(){
         const scroll = document.getElementById('focusScroll');
         if (!scroll) return;
@@ -2925,8 +2587,7 @@ v14.0 · 逻辑层
                     document.getElementById('roundSel').value = rr;
                     MatchPicker.setRound(rr);
                     MatchPicker.selectMatch(idx);
-                    renderRail();
-                    openQuickPredict(h, a, rr);
+                    document.getElementById('predictBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
                     Sound.click();
                 }
             });
@@ -2994,11 +2655,14 @@ v14.0 · 逻辑层
         if (_focusResizeHandler) window.removeEventListener('resize', _focusResizeHandler);
         _focusResizeHandler = updateState;
         window.addEventListener('resize', _focusResizeHandler);
+
+        // ★ 首次进入 或 轮次变化 → 强制回到最左
         const curRound = +document.getElementById('roundSel').value || 0;
         if (scroll._lastRound !== curRound) {
             scroll.scrollLeft = 0;
             scroll._lastRound = curRound;
         }
+
         requestAnimationFrame(updateState);
     }
 
@@ -3011,7 +2675,6 @@ v14.0 · 逻辑层
         const slim = list.slice(-800).map(h => {
             const o = { _id:h._id, round:h.round, home:h.home, away:h.away, homeWin:h.homeWin, draw:h.draw, awayWin:h.awayWin, score:h.score, confidence:h.confidence, ts:h.ts };
             if (h.actual) o.actual = h.actual;
-            if (h.userGuess) o.userGuess = h.userGuess;
             return o;
         });
         localStorage.setItem(HIST_KEY, JSON.stringify(slim));
@@ -3061,21 +2724,13 @@ v14.0 · 逻辑层
             deviations.push({ type: hitWdl ? 'ok' : 'bad', text: hitWdl ? `✅ 方向命中（${WDL_NAMES[aWdl]}）` : `❌ 方向反了（预测${WDL_NAMES[pWdl]}，实际${WDL_NAMES[aWdl]}）` });
             if (diffHome !== 0) deviations.push({ type: diffHome > 0 ? 'neutral' : 'info', text: `📊 主队${diffHome > 0 ? '高估' : '低估'} ${Math.abs(diffHome)} 球` });
             if (diffAway !== 0) deviations.push({ type: diffAway > 0 ? 'neutral' : 'info', text: `📊 客队${diffAway > 0 ? '高估' : '低估'} ${Math.abs(diffAway)} 球` });
+            if (!hitOU25) deviations.push({ type: 'neutral', text: `⚽ 大小球 2.5 猜错（预测${ou25.pred === 'over' ? '大' : '小'}，实际${ou25.actual === 'over' ? '大' : '小'}）` });
+            if (!hitBTTS) deviations.push({ type: 'neutral', text: `🥅 BTTS 猜错（预测${pBTTS ? '双方进球' : '有零封'}）` });
+            if (!hitMargin) deviations.push({ type: 'neutral', text: `⚖️ 分差偏差 ${(pMargin - aMargin) >= 0 ? '+' : ''}${pMargin - aMargin} 球` });
         }
         return { verdict, hitExact, hitWdl, hitOU25, hitOU15, hitOU35, hitBTTS, hitMargin, hitHomeGoals, hitAwayGoals, predicted: { h: ph, a: pa, wdl: pWdl, total: pTotal }, actual: { h: ah, a: aa, wdl: aWdl, total: aTotal }, diffHome, diffAway, diffTotal, deviations };
     }
     function judge(rec){ return analyzeRecord(rec).verdict; }
-    function analyzeUserGuess(rec){
-        if (!rec.userGuess || !rec.actual) return null;
-        if (!/^\d+-\d+$/.test(rec.userGuess) || !/^\d+-\d+$/.test(rec.actual)) return null;
-        const [uh, ua] = rec.userGuess.split('-').map(Number);
-        const [ah, aa] = rec.actual.split('-').map(Number);
-        const hitExact = uh === ah && ua === aa;
-        const uWdl = uh > ua ? 'H' : uh < ua ? 'A' : 'D';
-        const aWdl = ah > aa ? 'H' : ah < aa ? 'A' : 'D';
-        const hitWdl = uWdl === aWdl;
-        return { verdict: hitExact ? 'exact' : hitWdl ? 'wdl' : 'miss', hitExact, hitWdl };
-    }
     function renderHeatmap(){
         const grid = document.getElementById('heatmapGrid');
         if (!grid) return;
@@ -3127,6 +2782,12 @@ v14.0 · 逻辑层
         };
         const confOrder = ['高','中高','中','低'];
         const confRow = (c) => { const b = S.byConf[c]; if (!b) return ''; const r = b.hit / b.total; return `<div class="da-row ${r >= 0.7 ? 'good' : r <= 0.4 ? 'bad' : ''}"><span>置信度 ${c}</span><span class="da-num">${pct(r)} <span style="color:var(--text-4);font-weight:400">(${b.hit}/${b.total})</span></span></div>`; };
+        const histCol = (pred, real, max, label) => {
+            const ph = max ? Math.max(2, (pred / max) * 100) : 0;
+            const rh = max ? Math.max(2, (real / max) * 100) : 0;
+            return `<div class="da-hist-col"><div class="da-hist-bar" style="height:${ph}%"></div><div class="da-hist-bar real" style="height:${rh}%"></div><div class="da-hist-lbl">${label}</div></div>`;
+        };
+        const maxDist = Math.max(...S.predTotalDist, ...S.realTotalDist, 1);
         let html = '';
         const lowSample = S.total < 5;
         const valCls = lowSample ? ' style="opacity:.5"' : '';
@@ -3141,20 +2802,59 @@ v14.0 · 逻辑层
     <div class="da-card mini"><div class="da-lbl">大 3.5</div><div class="da-val"${valCls}>${pct(S.ou35/S.total)}</div></div>
     <div class="da-card mini"><div class="da-lbl">BTTS</div><div class="da-val"${valCls}>${pct(S.btts/S.total)}</div></div>
   </div></div>`;
+        html += `<div class="da-section"><div class="da-ttl">分差 / 单队进球</div><div class="da-grid-3">
+    <div class="da-card mini"><div class="da-lbl">分差命中</div><div class="da-val"${valCls}>${pct(S.margin/S.total)}</div></div>
+    <div class="da-card mini"><div class="da-lbl">主队进球数</div><div class="da-val"${valCls}>${pct(S.homeGoals/S.total)}</div></div>
+    <div class="da-card mini"><div class="da-lbl">客队进球数</div><div class="da-val"${valCls}>${pct(S.awayGoals/S.total)}</div></div>
+  </div></div>`;
         html += `<div class="da-section"><div class="da-ttl">进球偏差</div>
     <div class="da-row"><span>平均预测总进球</span><span class="da-num">${S.avgPredTotal.toFixed(2)}</span></div>
     <div class="da-row"><span>平均实际总进球</span><span class="da-num">${S.avgActualTotal.toFixed(2)}</span></div>
     <div class="da-row ${Math.abs(S.avgDiffTotal) >= 0.5 ? 'warn' : Math.abs(S.avgDiffTotal) <= 0.15 ? 'good' : ''}"><span>系统性偏差</span><span class="da-num">${(S.avgDiffTotal > 0 ? '+' : '') + S.avgDiffTotal.toFixed(2)} 球/场</span></div>
+    <div class="da-hint">正数 = AI 高估进球，负数 = AI 低估</div>
   </div>`;
+        html += `<div class="da-section"><div class="da-ttl">主客偏差</div>
+    <div class="da-row ${Math.abs(S.avgDiffHome) >= 0.5 ? 'warn' : ''}"><span>主队平均偏差</span><span class="da-num">${(S.avgDiffHome > 0 ? '+' : '') + S.avgDiffHome.toFixed(2)} 球/场</span></div>
+    <div class="da-row ${Math.abs(S.avgDiffAway) >= 0.5 ? 'warn' : ''}"><span>客队平均偏差</span><span class="da-num">${(S.avgDiffAway > 0 ? '+' : '') + S.avgDiffAway.toFixed(2)} 球/场</span></div>
+  </div>`;
+        html += `<div class="da-section"><div class="da-ttl">进球数分布（预测 vs 实际）</div>
+    <div class="da-hist">${S.predTotalDist.map((_, i) => histCol(S.predTotalDist[i], S.realTotalDist[i], maxDist, i === 7 ? '7+' : i)).join('')}</div>
+    <div class="da-hist-legend"><span class="l-pred">AI 预测</span><span class="l-real">实际</span></div>
+  </div>`;
+        html += `<div class="da-section"><div class="da-ttl">按预测方向</div>${barRow('H', '主胜')}${barRow('D', '平局')}${barRow('A', '客胜')}</div>`;
         const confRows = confOrder.map(confRow).filter(Boolean).join('');
         if (confRows) html += `<div class="da-section"><div class="da-ttl">按置信度</div>${confRows}</div>`;
+        html += `<div class="da-section"><div class="da-ttl">概率校准</div>`;
+        const calibKeys = ['0-20','20-40','40-60','60-80','80-100'];
+        for (const k of calibKeys) {
+            const b = S.calibBins[k];
+            if (!b.pred) continue;
+            const r = b.hit / b.pred;
+            const mid = parseInt(k.split('-')[0]) + 10;
+            html += `<div class="da-calib-row"><span>${k}%</span><div class="da-calib-bar"><div class="da-calib-fill" style="width:${r*100}%"></div><div class="da-calib-ref" style="left:${mid}%"></div></div><span>${pct(r)} (${b.hit}/${b.pred})</span></div>`;
+        }
+        html += `</div>`;
+        html += `<div class="da-section"><div class="da-ttl">连续记录</div>
+    <div class="da-row good"><span>🔥 最长连胜</span><span class="da-num">${S.maxWin} 场</span></div>
+    <div class="da-row bad"><span>❄️ 最长连败</span><span class="da-num">${S.maxLose} 场</span></div>
+    <div class="da-row"><span>近 5 场命中率</span><span class="da-num ${S.recent5Rate >= 0.6 ? 'good' : S.recent5Rate <= 0.4 ? 'bad' : ''}">${pct(S.recent5Rate)}</span></div>
+  </div>`;
+        const teamAtk = computeTeamAttackStats();
+        if (teamAtk.length) {
+            html += `<div class="da-section"><div class="da-ttl">球队攻防数据（本赛季累计）</div>
+    <div style="overflow-x:auto;margin:0 -8px"><table style="width:100%;border-collapse:collapse;font-size:11.5px;min-width:520px">
+    <thead><tr style="border-bottom:1px solid var(--border)"><th style="text-align:left;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">球队</th><th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">场均进</th><th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">场均失</th><th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">零封</th><th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">大2.5</th><th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">BTTS</th><th style="text-align:right;padding:6px 8px;color:var(--text-3);font-weight:600;font-size:9px">场次</th></tr></thead><tbody>
+    ${teamAtk.map(t => `<tr style="border-bottom:1px solid rgba(255,255,255,.03)"><td style="padding:6px 8px;color:var(--text);font-weight:500">${escapeHtml(t.team)}</td><td style="padding:6px 8px;text-align:right;color:var(--amber);font-family:var(--font-mono)">${t.avgGF.toFixed(2)}</td><td style="padding:6px 8px;text-align:right;color:var(--rose);font-family:var(--font-mono)">${t.avgGA.toFixed(2)}</td><td style="padding:6px 8px;text-align:right;color:var(--emerald);font-family:var(--font-mono)">${t.cleanSheets}</td><td style="padding:6px 8px;text-align:right;font-family:var(--font-mono)">${t.over25Rate}%</td><td style="padding:6px 8px;text-align:right;font-family:var(--font-mono)">${t.bttsRate}%</td><td style="padding:6px 8px;text-align:right;color:var(--text-4);font-family:var(--font-mono)">${t.played}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+        }
         box.innerHTML = html;
     }
     function computeDeepStats(records){
         const done = records.filter(r => r.actual && /^\d+-\d+$/.test(r.actual));
         if (!done.length) return null;
-        const S = { total: done.length, exact: 0, wdl: 0, miss: 0, ou25: 0, ou15: 0, ou35: 0, btts: 0, byPredWdl: { H:{total:0,hit:0}, D:{total:0,hit:0}, A:{total:0,hit:0} }, byConf: {}, sumDiffHome: 0, sumDiffAway: 0, sumDiffTotal: 0, sumPredTotal: 0, sumActualTotal: 0 };
-        for (const rec of done) {
+        const S = { total: done.length, exact: 0, wdl: 0, miss: 0, ou25: 0, ou15: 0, ou35: 0, btts: 0, margin: 0, homeGoals: 0, awayGoals: 0, byPredWdl: { H:{total:0,hit:0}, D:{total:0,hit:0}, A:{total:0,hit:0} }, byConf: {}, predTotalDist: [0,0,0,0,0,0,0,0], realTotalDist: [0,0,0,0,0,0,0,0], calibBins: { '0-20':{pred:0,hit:0}, '20-40':{pred:0,hit:0}, '40-60':{pred:0,hit:0}, '60-80':{pred:0,hit:0}, '80-100':{pred:0,hit:0} }, sumDiffHome: 0, sumDiffAway: 0, sumDiffTotal: 0, sumPredTotal: 0, sumActualTotal: 0, hitSequence: [], maxWin: 0, maxLose: 0, recent5Rate: 0 };
+        const sorted = [...done].sort((a, b) => (a.ts || 0) - (b.ts || 0));
+        for (const rec of sorted) {
             const a = analyzeRecord(rec);
             if (a.verdict === 'pending') continue;
             if (a.verdict === 'exact') S.exact++;
@@ -3164,6 +2864,10 @@ v14.0 · 逻辑层
             if (a.hitOU15) S.ou15++;
             if (a.hitOU35) S.ou35++;
             if (a.hitBTTS) S.btts++;
+            if (a.hitMargin) S.margin++;
+            if (a.hitHomeGoals) S.homeGoals++;
+            if (a.hitAwayGoals) S.awayGoals++;
+            S.hitSequence.push(a.hitWdl);
             const pw = a.predicted.wdl;
             S.byPredWdl[pw].total++;
             if (a.hitWdl) S.byPredWdl[pw].hit++;
@@ -3173,9 +2877,20 @@ v14.0 · 逻辑层
             if (a.hitWdl) S.byConf[c].hit++;
             S.sumDiffHome += a.diffHome; S.sumDiffAway += a.diffAway; S.sumDiffTotal += a.diffTotal;
             S.sumPredTotal += a.predicted.total; S.sumActualTotal += a.actual.total;
+            S.predTotalDist[Math.min(a.predicted.total, 7)]++;
+            S.realTotalDist[Math.min(a.actual.total, 7)]++;
+            const mainProb = Math.max(rec.homeWin || 0, rec.draw || 0, rec.awayWin || 0);
+            const binKey = mainProb < 20 ? '0-20' : mainProb < 40 ? '20-40' : mainProb < 60 ? '40-60' : mainProb < 80 ? '60-80' : '80-100';
+            S.calibBins[binKey].pred++;
+            const maxDir = (rec.homeWin >= rec.draw && rec.homeWin >= rec.awayWin) ? 'H' : (rec.draw >= rec.awayWin) ? 'D' : 'A';
+            if (maxDir === a.actual.wdl) S.calibBins[binKey].hit++;
         }
         S.avgDiffHome = S.sumDiffHome / S.total; S.avgDiffAway = S.sumDiffAway / S.total; S.avgDiffTotal = S.sumDiffTotal / S.total;
         S.avgPredTotal = S.sumPredTotal / S.total; S.avgActualTotal = S.sumActualTotal / S.total;
+        let cw = 0, cl = 0;
+        for (const h of S.hitSequence) { if (h) { cw++; cl = 0; S.maxWin = Math.max(S.maxWin, cw); } else { cl++; cw = 0; S.maxLose = Math.max(S.maxLose, cl); } }
+        const recent5 = S.hitSequence.slice(-5);
+        S.recent5Rate = recent5.length ? recent5.filter(Boolean).length / recent5.length : 0;
         return S;
     }
     function toggleDeepAnalysis(){
@@ -3226,8 +2941,6 @@ v14.0 · 逻辑层
             const standingsStr = JSON.stringify(STATIC_STANDINGS);
             if (standingsStr !== _lastStandingsStr) { _lastStandingsStr = standingsStr; renderStandings(STATIC_STANDINGS); }
             refreshDashboard();
-            renderStage();
-            renderRail();
             if (n > 0) toast(`🔄 自动同步 ${n} 场`, 'ok', 4000);
         } catch(e){}
     }
@@ -3254,9 +2967,7 @@ v14.0 · 逻辑层
                     const cls = a.verdict === 'exact' ? 'hit' : a.verdict === 'miss' ? 'miss' : '';
                     vsHtml = `<div class="vs-row"><div class="vs-side pred"><div class="vs-lbl">AI</div><div class="vs-score">${escapeHtml(h.score)}</div></div><div class="vs-arrow">→</div><div class="vs-side real ${cls}"><div class="vs-lbl">实际</div><div class="vs-score">${escapeHtml(h.actual)}</div></div></div>`;
                 }
-                const ua = analyzeUserGuess(h);
-                const uTag = h.userGuess ? `<span class="uva-mini">✍️ 你猜 ${escapeHtml(h.userGuess)}${ua ? (ua.verdict === 'exact' ? ' ✅' : ua.verdict === 'wdl' ? ' 🟡' : ' ❌') : ''}</span>` : '';
-                return `<div class="hitem"><div class="top"><div class="teams2">${escapeHtml(h.home)} vs ${escapeHtml(h.away)}${uTag}</div><div class="res-badge ${j}">${labels[j]}</div></div>${vsHtml}<div class="meta">概率 ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div><div class="row2"><input placeholder="实际比分 如 2-1" value="${escapeHtml(h.actual || '')}" onchange="setActual('${id}', this.value)"><button onclick="delHistory('${id}')">删除</button></div></div>`;
+                return `<div class="hitem"><div class="top"><div class="teams2">${escapeHtml(h.home)} vs ${escapeHtml(h.away)}</div><div class="res-badge ${j}">${labels[j]}</div></div>${vsHtml}<div class="meta">概率 ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round+1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div><div class="row2"><input placeholder="实际比分 如 2-1" value="${escapeHtml(h.actual || '')}" onchange="setActual('${id}', this.value)"><button onclick="delHistory('${id}')">删除</button></div></div>`;
             }).join('');
         }
         const done = judged.filter(x => x.h.actual).length;
@@ -3266,19 +2977,6 @@ v14.0 · 逻辑层
         document.getElementById('sDone').textContent = done;
         document.getElementById('sWdl').textContent = done ? Math.round(wdl/done*100)+'%' : '0%';
         document.getElementById('sExact').textContent = done ? Math.round(exact/done*100)+'%' : '0%';
-        // 人机对战统计
-        const withGuess = raw.filter(h => h.userGuess && h.actual);
-        const uTotal = raw.filter(h => h.userGuess).length;
-        let uHit = 0, aiHitSame = 0;
-        for (const h of withGuess) {
-            const ua2 = analyzeUserGuess(h);
-            if (ua2 && (ua2.verdict === 'exact' || ua2.verdict === 'wdl')) uHit++;
-            const ai = analyzeRecord(h);
-            if (ai && (ai.verdict === 'exact' || ai.verdict === 'wdl')) aiHitSame++;
-        }
-        const sUT = document.getElementById('sUserTotal'); if (sUT) sUT.textContent = uTotal;
-        const sUW = document.getElementById('sUserWdl'); if (sUW) sUW.textContent = withGuess.length ? Math.round(uHit/withGuess.length*100)+'%' : '0%';
-        const sAW = document.getElementById('sAiWdl'); if (sAW) sAW.textContent = withGuess.length ? Math.round(aiHitSame/withGuess.length*100)+'%' : '0%';
         requestAnimationFrame(() => { if (hlist) hlist.scrollTop = scrollTop; });
     }
     function renderTrendChart(){
@@ -3286,7 +2984,7 @@ v14.0 · 逻辑层
         const valEl = document.getElementById('trendValue');
         if (!svg) return;
         const hist = getHistoryCopy().filter(h => h.actual);
-        if (hist.length < 2) { svg.innerHTML = ''; if (valEl) valEl.textContent = '数据不足'; return; }
+        if (hist.length < 2) { svg.innerHTML = ''; valEl.textContent = '数据不足'; return; }
         const recent = hist.slice(-20);
         const points = [];
         let hits = 0;
@@ -3300,7 +2998,7 @@ v14.0 · 逻辑层
         const gridLines = [0.25, 0.5, 0.75].map(p => { const y = H - P - p * (H - P*2); return `<line class="grid" x1="${P}" x2="${W-P}" y1="${y}" y2="${y}"/>`; }).join('');
         const dots = coords.map(c => `<circle class="dot" cx="${c.x}" cy="${c.y}" r="2.5"/>`).join('');
         svg.innerHTML = gridLines + `<path class="area" d="${areaPath}"/><path class="line" d="${linePath}"/>` + dots;
-        if (valEl) valEl.textContent = Math.round(points[points.length - 1] * 100) + '%';
+        valEl.textContent = Math.round(points[points.length - 1] * 100) + '%';
     }
     function setActual(idOrIdx, val){
         const list = getHistory();
@@ -3317,6 +3015,7 @@ v14.0 · 逻辑层
             confetti();
             feedbackFloat('精确命中！', '#34d399');
         }
+        if (val) setTimeout(() => feedbackFloat('已学习本场 · AI 校准 +0.8%', '#a78bfa'), 1500);
     }
     function delHistory(idOrIdx){
         const list = getHistory();
@@ -3340,63 +3039,7 @@ v14.0 · 逻辑层
         inp.click();
     }
 
-    /* ══ 快速预测弹窗（含人机对战）══ */
-    let _qpPending = null;
-    function parseUserGuess(){
-        const uh = document.getElementById('qpUserHome')?.value.trim();
-        const ua = document.getElementById('qpUserAway')?.value.trim();
-        if (!uh || !ua) return null;
-        const h = parseInt(uh, 10), a = parseInt(ua, 10);
-        if (!Number.isInteger(h) || !Number.isInteger(a)) return null;
-        if (h < 0 || h > 15 || a < 0 || a > 15) return null;
-        return `${h}-${a}`;
-    }
-    function openQuickPredict(home, away, round){
-        _qpPending = { home, away, round };
-        const modal = document.getElementById('qpModal');
-        if (!modal) return;
-        const setTeam = (id, team) => {
-            const box = document.getElementById(id);
-            const url = espnUrl(team);
-            const abbr = ABBR[team] || team.slice(0,3);
-            if (url) {
-                box.innerHTML = `<img src="${url}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=&quot;fb-fb&quot;>${escapeHtml(abbr)}</div>'"><div class="nm">${escapeHtml(team)}</div>`;
-            } else {
-                box.innerHTML = `<div class="fb-fb">${escapeHtml(abbr)}</div><div class="nm">${escapeHtml(team)}</div>`;
-            }
-        };
-        setTeam('qpHome', home);
-        setTeam('qpAway', away);
-        const derbyName = getDerbyName(home, away);
-        const m = (FIXTURES[round] || []).find(x => x.home === home && x.away === away) || {};
-        const st = getMatchStatus(home, away, round);
-        const derbyTag = derbyName ? `<div class="derby-tag">🔥 ${escapeHtml(derbyName)}</div>` : '';
-        const timeStr = formatKickoff(m.kickoff, st);
-        document.getElementById('qpInfo').innerHTML = `${derbyTag}<div>第 ${round+1} 轮 · ${escapeHtml(timeStr)}</div><div style="margin-top:4px;color:var(--text-4)">点击「⚡ 开始预测」将调用 AI 生成比分推演</div>`;
-        const uhEl = document.getElementById('qpUserHome');
-        const uaEl = document.getElementById('qpUserAway');
-        if (uhEl) uhEl.value = '';
-        if (uaEl) uaEl.value = '';
-        modal.classList.add('show');
-        document.body.classList.add('no-scroll');
-        setTimeout(() => uhEl?.focus(), 300);
-    }
-    function closeQuickPredict(){
-        const modal = document.getElementById('qpModal');
-        if (modal) modal.classList.remove('show');
-        document.body.classList.remove('no-scroll');
-        _qpPending = null;
-    }
-    function confirmQuickPredict(){
-        if (!_qpPending) return;
-        _pendingUserGuess = parseUserGuess();
-        const btn = document.getElementById('predictBtn');
-        closeQuickPredict();
-        if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => { if (!btn.disabled) startPredict(); }, 260);
-    }
-
-    /* ══ 球队弹窗 ══ */
+    /* Team Modal */
     function openTeamModal(team){
         const content = document.getElementById('teamModalContent');
         const url = espnUrl(team);
@@ -3450,7 +3093,7 @@ v14.0 · 逻辑层
     function closeBatch(){ closeModal('batchMask'); }
     document.querySelectorAll('.mask').forEach(m => { m.addEventListener('click', e => { if (e.target === m) closeModal(m.id); }); });
 
-    /* ══ 批量预测 ══ */
+    /* Batch */
     let batchN = 1;
     function updateQuota(){ const calls = 10 * batchN; const el = document.getElementById('batchQuota'); el.className = 'quota ' + (calls <= 20 ? 'ok' : calls <= 50 ? 'warn' : 'bad'); el.textContent = `预计消耗 ${calls} 次调用`; }
     document.getElementById('batchOpts').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; batchN = +b.dataset.n; document.querySelectorAll('#batchOpts button').forEach(x => x.classList.toggle('on', x === b)); updateQuota(); });
@@ -3501,7 +3144,7 @@ v14.0 · 逻辑层
         }
     }
 
-    /* ══ 命令面板 ══ */
+    /* Command Palette */
     const CommandPalette = (() => {
         let items = [], selected = 0;
         const commands = [
@@ -3510,13 +3153,15 @@ v14.0 · 逻辑层
             { icon:'🚀', label:'批量预测', shortcut:'Ctrl+B', action: () => { closeCmd(); openBatch(); } },
             { icon:'🎨', label:'切换主题', shortcut:'Ctrl+T', action: () => { cycleTheme(); closeCmd(); } },
             { icon:'✨', label:'切换沉浸模式', shortcut:'Ctrl+I', action: () => { cycleImmersion(); closeCmd(); } },
-            { icon:'←', label:'上一轮', shortcut:'←', action: () => { closeCmd(); gotoRound(-1); } },
-            { icon:'→', label:'下一轮', shortcut:'→', action: () => { closeCmd(); gotoRound(1); } },
             { icon:'🔊', label:'音效开关', action: () => { toggleSound(); closeCmd(); } },
             { icon:'🌌', label:'氛围开关', action: () => { toggleAmbient(); closeCmd(); } },
             { icon:'📋', label:'复制预测', action: () => { copyResult(); closeCmd(); } },
+            { icon:'🔗', label:'复制链接', action: () => { copyLink(); closeCmd(); } },
             { icon:'🔄', label:'同步数据', action: () => { manualSync(); closeCmd(); } },
-            { icon:'📖', label:'重新看引导', action: () => { closeCmd(); openOnboarding(); } },
+            { icon:'🎯', label:'切换筛选模式', action: () => { setFilterMode(_filterMode === 'round' ? 'team' : 'round'); closeCmd(); } },
+            { icon:'🔑', label:'保存 API Key', action: () => { saveKey(); closeCmd(); } },
+            { icon:'🗑️', label:'清除 API Key', action: () => { clearKey(); closeCmd(); } },
+            { icon:'📤', label:'导出历史', action: () => { exportHistory(); closeCmd(); } },
             { icon:'❓', label:'快捷键帮助', shortcut:'?', action: () => { closeCmd(); openShortcuts(); } },
             { icon:'ℹ️', label:'关于此项目', action: () => { location.href = 'about.html'; } }
         ];
@@ -3551,22 +3196,6 @@ v14.0 · 逻辑层
     function closeCmd(){ CommandPalette.close(); }
     function openShortcuts(){ openModal('shortcutMask'); }
     function closeShortcuts(){ closeModal('shortcutMask'); }
-
-    /* ══ 轮次快捷切换 ══ */
-    function gotoRound(delta){
-        const rs = document.getElementById('roundSel');
-        const cur = +rs.value || 0;
-        const next = Math.max(0, Math.min(FIXTURES.length - 1, cur + delta));
-        if (next === cur) return;
-        rs.value = next;
-        localStorage.setItem('last_round', next);
-        fillMatches();
-        updateURL();
-        renderRail();
-        Sound.click();
-    }
-
-    /* ══ 键盘快捷键 ══ */
     window.addEventListener('keydown', e => {
         const ctrl = e.ctrlKey || e.metaKey;
         const inInput = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName);
@@ -3577,15 +3206,11 @@ v14.0 · 逻辑层
         if (ctrl && e.key.toLowerCase() === 't') { e.preventDefault(); cycleTheme(); return; }
         if (ctrl && e.key.toLowerCase() === 'i') { e.preventDefault(); cycleImmersion(); return; }
         if (ctrl && e.key === '.') { e.preventDefault(); toggleAmbient(); return; }
-        if (!inInput && !ctrl) {
-            if (e.key === 'ArrowLeft') { e.preventDefault(); gotoRound(-1); return; }
-            if (e.key === 'ArrowRight') { e.preventDefault(); gotoRound(1); return; }
-        }
         if (e.key === '?' && !inInput) { e.preventDefault(); openShortcuts(); return; }
-        if (e.key === 'Escape') { closeHistory(); closeBatch(); closeShortcuts(); closeCmd(); closeTeamModal(); closeQuickPredict(); closeOnboarding(); }
+        if (e.key === 'Escape') { closeHistory(); closeBatch(); closeShortcuts(); closeCmd(); closeTeamModal(); }
     });
 
-    /* ══ FAB 足球指挥中心 ══ */
+    /* FAB 足球指挥中心 */
     (function setupFabHub(){
         const hub = document.getElementById('fabHub');
         const core = document.getElementById('fabCore');
@@ -3609,6 +3234,7 @@ v14.0 · 逻辑层
             });
         });
         document.addEventListener('click', e => { if (hub.classList.contains('open') && !hub.contains(e.target)) close(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && hub.classList.contains('open')) close(); });
         function burstParticles(){
             if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
             const rect = core.getBoundingClientRect();
@@ -3644,17 +3270,15 @@ v14.0 · 逻辑层
             }
         }
         const topBar = document.getElementById('topProgressBar');
-        if (topBar) {
-            const CIRC = 2 * Math.PI * 19;
-            window.addEventListener('scroll', () => {
-                const max = document.documentElement.scrollHeight - window.innerHeight;
-                const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
-                topBar.style.strokeDashoffset = CIRC * (1 - p);
-            }, { passive: true });
-        }
+        const CIRC = 2 * Math.PI * 19;
+        window.addEventListener('scroll', () => {
+            if (!topBar) return;
+            const max = document.documentElement.scrollHeight - window.innerHeight;
+            const p = max > 0 ? Math.min(1, window.scrollY / max) : 0;
+            topBar.style.strokeDashoffset = CIRC * (1 - p);
+        }, { passive: true });
     })();
 
-    /* ══ 加载数据 ══ */
     async function loadExternalData(){
         const banner = document.getElementById('fallbackBanner');
         const loadingEl = document.getElementById('dashRound');
@@ -3678,8 +3302,6 @@ v14.0 · 逻辑层
             _lastStandingsStr = JSON.stringify(STATIC_STANDINGS);
             renderStandings(STATIC_STANDINGS);
             refreshDashboard();
-            renderRail();
-            renderStage();
             _lastDataUpdatedAt = data.updatedAt || 'unknown';
         } catch(e){
             _usingFallback = true;
@@ -3688,7 +3310,6 @@ v14.0 · 逻辑层
         }
     }
 
-    /* ══ 启动 ══ */
     (async function boot(){
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         setImmersion(_immersion);
@@ -3699,7 +3320,12 @@ v14.0 · 逻辑层
         else { document.getElementById('soundBtn').classList.add('off'); }
         Ambient.init();
         LoadingBar.start();
+        if (!localStorage.getItem('pl_welcomed')) {
+            setTimeout(() => { toast('👋 欢迎使用 v13.3 · 先填 Groq API Key', 'ok', 6500); }, 2200);
+            localStorage.setItem('pl_welcomed', '1');
+        }
         setTimeout(() => LoadingBar.done(), 1800);
+        splitHeroTitle();
         startClock();
         setupReveal();
         attachRipple();
@@ -3719,38 +3345,22 @@ v14.0 · 逻辑层
         intelEl.addEventListener('input', updateIntelCount);
         updateIntelCount();
         document.getElementById('standings').addEventListener('click', e => { const tr = e.target.closest('tr[data-team]'); if (tr) openTeamModal(tr.dataset.team); });
-        // 快速预测弹窗遮罩点击关闭
-        document.getElementById('qpModal').addEventListener('click', e => { if (e.target.id === 'qpModal') closeQuickPredict(); });
-        // 首次引导
-        document.getElementById('onboardMask').addEventListener('click', e => { if (e.target.id === 'onboardMask') closeOnboarding(); });
         initSelectors();
         _lastStandingsStr = JSON.stringify(STATIC_STANDINGS);
         renderStandings(STATIC_STANDINGS);
         refreshDashboard();
         updateMatchdayLine();
         await loadExternalData();
-        renderRail();
-        renderStage();
-        startStageTick();
         const n0 = syncActualsToHistory(true);
         if (n0 > 0) { renderStandings(STATIC_STANDINGS); refreshDashboard(); setTimeout(() => toast(`✅ 已同步 ${n0} 场`, 'ok', 4500), 2600); }
         setInterval(pollDataUpdate, 5 * 60 * 1000);
-        document.addEventListener('visibilitychange', () => { if (!document.hidden) { pollDataUpdate(); renderStage(); } });
-        // 处理 URL
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) pollDataUpdate(); });
         const urlState = readURL();
         if (urlState) {
             if (urlState.mode === 'team') { _currentTeam = urlState.team; document.getElementById('teamSel').value = _currentTeam; setFilterMode('team'); _teamSelectedIdx = urlState.match; loadTeamFixtures(); }
             else if (FIXTURES[urlState.round]?.[urlState.match] !== undefined) { document.getElementById('roundSel').value = urlState.round; MatchPicker.setRound(urlState.round); }
         }
         LoadingBar.done();
-        // 首次访问：引导
-        if (!localStorage.getItem('pl_onboarded') && !localStorage.getItem('groq_key')) {
-            setTimeout(() => openOnboarding(), 800);
-        } else if (!localStorage.getItem('pl_welcomed')) {
-            setTimeout(() => { toast('👋 欢迎回来 · v14.0 全新布局', 'ok', 6500); }, 2200);
-            localStorage.setItem('pl_welcomed', '1');
-        }
-        // 预热队徽
         const preload = () => { Object.values(ESPN_IDS).forEach(id => { const img = new Image(); img.referrerPolicy = 'no-referrer'; img.src = `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png`; }); };
         if ('requestIdleCallback' in window) requestIdleCallback(preload, { timeout: 2000 });
         else setTimeout(preload, 1200);

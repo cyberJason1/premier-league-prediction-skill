@@ -8,7 +8,7 @@
 //   4. 同源静态文件（HTML/JSON/MD）  → network-first + 缓存回退
 // ============================================================
 
-const CACHE_VERSION = 'v14.0.0';
+const CACHE_VERSION = 'v13.3.0';
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 // App Shell：首次安装时预缓存
