@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-17T02:05:14.914Z",
+  "updatedAt": "2026-10-17T02:09:38.003Z",
   "nextEvent": {
     "id": 7,
     "name": "Gameweek 7",
@@ -10398,7 +10398,7 @@
       "xA": 0.17,
       "xGI": 0.27,
       "minutes": 540,
-      "selectedBy": 11.3,
+      "selectedBy": 11.2,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -13854,7 +13854,7 @@
       "xA": 0.54,
       "xGI": 5.36,
       "minutes": 529,
-      "selectedBy": 76,
+      "selectedBy": 76.1,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -16797,7 +16797,7 @@
       "xA": 0.95,
       "xGI": 1.49,
       "minutes": 330,
-      "selectedBy": 0.9,
+      "selectedBy": 1,
       "status": "a",
       "chanceNext": 100,
       "news": "",
