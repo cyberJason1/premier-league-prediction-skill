@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { exec } = require('child_process'); // ★ 新增：用于自动打开文件夹
 
 // ★ 从同目录 .env 读取 token
 (function loadEnv(){
@@ -71,9 +72,6 @@ function normalizeName(s){
     return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 }
 
-// ═══════════════════════════════════════════════
-// 现有：足球数据（赛程、积分榜、历史）
-// ═══════════════════════════════════════════════
 async function fetchFromApi(token){
     const headers = { 'X-Auth-Token': token };
     const base = 'https://api.football-data.org/v4/competitions/PL';
@@ -141,11 +139,6 @@ async function fetchHistoricalSeasons(token){
     return historicalResults;
 }
 
-// ═══════════════════════════════════════════════
-// ★ v14.0 新增：FPL 官方数据 + 最佳阵容推荐
-// ═══════════════════════════════════════════════
-
-/** 从 FPL 官方 API 拉取全部数据 */
 async function fetchFPLData(){
     console.log('📸 从 FPL 官方 API 拉取球员数据…');
     const bootRes = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
@@ -197,7 +190,6 @@ async function fetchFPLData(){
     };
 }
 
-/** 预测球员下一轮得分（简化版） */
 function computeXPts(p){
     if (p.status !== 'a' && p.status !== 'd') return 0;
     let base = 0;
@@ -217,7 +209,6 @@ function computeXPts(p){
     return base * minutesFactor * fixtureFactor * mult;
 }
 
-/** 优化 15 人阵容 */
 function optimizeSquad(players, budget = 100){
     const pools = {
         1: players.filter(p => p.position === 1 && p.xPts > 0).sort((a,b) => b.xPts - a.xPts),
@@ -238,7 +229,6 @@ function optimizeSquad(players, budget = 100){
             added++;
         }
     }
-    // 局部交换优化
     let improved = true, iter = 0;
     while (improved && iter < 200) {
         improved = false; iter++;
@@ -260,7 +250,6 @@ function optimizeSquad(players, budget = 100){
             if (improved) break;
         }
     }
-    // 选首发 11 人（多阵型取最优）
     const byPos = { 1: [], 2: [], 3: [], 4: [] };
     squad.forEach(p => byPos[p.position].push(p));
     Object.keys(byPos).forEach(k => byPos[k].sort((a,b) => b.xPts - a.xPts));
@@ -300,9 +289,6 @@ function optimizeSquad(players, budget = 100){
     };
 }
 
-// ═══════════════════════════════════════════════
-// 球员照片（Bzzoiro + TheSportsDB）—— 保持不变
-// ═══════════════════════════════════════════════
 async function fetchBzzoiroPhotos(apiKey){
     console.log('📸 从 Bzzoiro Sports Data 拉取球员照片…');
     const photos = {};
@@ -373,9 +359,6 @@ async function fetchTheSportsDBPhotos(existingPhotos){
     return photos;
 }
 
-// ═══════════════════════════════════════════════
-// 主流程
-// ═══════════════════════════════════════════════
 async function main(){
     const fdToken = process.env.FD_TOKEN;
     const bzKey = process.env.BZZOIRO_KEY;
@@ -403,7 +386,6 @@ async function main(){
     fs.writeFileSync(DATA_FILE, JSON.stringify(payload, null, 2), 'utf8');
     console.log('🎉 已写入 data.json');
 
-    // ★ FPL 部分
     console.log('');
     console.log('═══════════════════════════════════');
     console.log('📸 FPL 梦幻英超数据');
@@ -432,6 +414,12 @@ async function main(){
             console.log('');
             console.log(`   队长：${squad.captain.name}（${squad.captain.team}） · 预测 ${squad.captain.xPts.toFixed(1)} 分`);
             console.log(`   副队长：${squad.vice.name}（${squad.vice.team}） · 预测 ${squad.vice.xPts.toFixed(1)} 分`);
+            
+            // ★ 核心改动：自动打开文件夹并选中文件
+            const fullPath = path.resolve(FPL_FILE);
+            console.log(`\n👉 文件路径: ${fullPath}`);
+            console.log(`🚀 正在为你打开文件夹...`);
+            exec(`explorer /select,"${fullPath.replace(/\//g, '\\')}"`);
         } else {
             console.warn('⚠️ 阵容优化失败');
         }
