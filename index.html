@@ -9150,20 +9150,35 @@ async function loadFPL() {
             const isCap = sq.captain.id === p.id;
             const isVice = sq.vice.id === p.id;
 
-            // 拿到官方图名或 code
-            let file = p.photo || `${p.code || p.id}.png`;
+            // ============ 绝对防御：提取纯文件名 ============
+            let rawPhoto = p.photo || '';
+            let filename = '';
 
-            // 核心修复：如果文件名没有 p 开头，强行给它加上 p！
-            if (!file.startsWith('p')) {
-                file = 'p' + file;
+            if (rawPhoto) {
+                // 1. 如果它是个完整网址（哪怕包含 http 或者 110x140），只取最后一个斜杠后面的部分
+                if (rawPhoto.includes('/')) {
+                    filename = rawPhoto.split('/').pop();
+                } else {
+                    filename = rawPhoto;
+                }
+            } else {
+                // 2. 如果连 photo 都没有，强行用官方 ID 兜底
+                filename = `${p.code || p.id || 0}.png`;
             }
 
-            // 组装 250x250 高清大图
-            const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/250x250/${file}`;
+            // 3. 官方强制要求：文件名必须以 'p' 开头
+            if (!filename.startsWith('p')) {
+                filename = 'p' + filename;
+            }
 
-            // 终极兜底：强制破缓存 + png失败换jpg + 隐藏显示文字
-            const bustCacheUrl = `${photoUrl}?v=${data.updatedAt ? new Date(data.updatedAt).getTime() : Date.now()}`;
-            const imgHtml = `<img src="${bustCacheUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.includes('.png')){this.src=this.src.replace('.png','.jpg');}else if(this.src.includes('.jpg')){this.src=this.src.replace('.jpg','.png');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
+            // ============ 拼接与破缓存 ============
+            // 统一强制使用 250x250 高清大图，并附带时间戳打破所有浏览器缓存
+            const ts = data.updatedAt ? new Date(data.updatedAt).getTime() : Date.now();
+            const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/250x250/${filename}?v=${ts}`;
+
+            // ============ 终极兜底：无图则显示文字 ============
+            // 单行写法，绝不换行。png 挂掉换 jpg，jpg 挂掉换 png，全挂显示首字母。
+            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.includes('.png')){this.src=this.src.replace('.png','.jpg');}else if(this.src.includes('.jpg')){this.src=this.src.replace('.jpg','.png');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
 
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar">${imgHtml}<span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
         };
