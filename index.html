@@ -9149,12 +9149,10 @@ async function loadFPL() {
         const makePlayer = (p) => {
             const isCap = sq.captain.id === p.id;
             const isVice = sq.vice.id === p.id;
+            const photoUrl = p.photo || `https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.code}.png`;
 
-            // 核心修复 1：优先使用 fpl.json 抓下来的 p.photo 字段！
-            const photoUrl = p.photo || `https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.id}.png`;
-
-            // 核心修复 2：onerror 必须单行写，不能有回车，否则解析报错！
-            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.endsWith('.png')){this.src=this.src.replace('.png','.jpg');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
+            // 如果加载失败，直接隐藏图片显示首字母
+            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">`;
 
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar">${imgHtml}<span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
         };

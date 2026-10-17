@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
  * 英超预测引擎 - 数据自动更新
- * v15.1：
- *   ★ 新增 FPL 官方高清球员半身像字段 (photo)
+ * v15.2：
+ *   ★ 修复 FPL 照片字段，保留官方原始文件名，不再强行替换后缀
+ *   ★ 新增 code 字段供前端兜底
  *   ★ 本地只写不推，CI 才推（根治 Git 冲突）
  *   ★ 所有请求带超时
  *   ★ 数据源失败自动沿用旧文件
@@ -208,10 +209,11 @@ async function fetchFPLData(){
 
     const players = boot.elements.map(p => ({
         id: p.id,
+        code: p.code,          // ★ 新增：FPL 唯一图片 ID
         name: p.web_name,
         fullName: `${p.first_name} ${p.second_name}`,
-        // ★★★ 新增：拼接 FPL 官方高清半身像 CDN 地址 ★★★
-        photo: p.photo ? `https://resources.premierleague.com/premierleague/photos/players/250x250/${p.photo.replace('.jpg', '.png')}` : null,
+        // ★ 修复：保留官方原始文件名（如 xxx.jpg），不替换后缀，让前端自己拼
+        photo: p.photo || null,
         team: teamMap[p.team],
         teamId: p.team,
         position: p.element_type,
