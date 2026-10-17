@@ -9150,19 +9150,19 @@ async function loadFPL() {
             const isCap = sq.captain.id === p.id;
             const isVice = sq.vice.id === p.id;
 
-            // 使用 250x250 高清大图（官方提供的最大尺寸）
-            let photoUrl = p.photo ? p.photo.replace('110x140', '250x250') : null;
+            // 拿到官方图名或 code
+            let file = p.photo || `${p.code || p.id}.png`;
 
-            // 终极兜底：如果没图片名，用 code 拼高清大图
-            if (!photoUrl) {
-                const code = p.code || p.id || 0;
-                photoUrl = `https://resources.premierleague.com/premierleague/photos/players/250x250/p${code}.png`;
+            // 核心修复：如果文件名没有 p 开头，强行给它加上 p！
+            if (!file.startsWith('p')) {
+                file = 'p' + file;
             }
 
-            // 强制破缓存：在图片链接后加 ?v=最新时间戳，让浏览器必须去官方拉最新的
-            const bustCacheUrl = `${photoUrl}?v=${data.updatedAt ? new Date(data.updatedAt).getTime() : Date.now()}`;
+            // 组装 250x250 高清大图
+            const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/250x250/${file}`;
 
-            // 终极兜底逻辑：png失败换jpg，jpg失败换png，全失败显示文字
+            // 终极兜底：强制破缓存 + png失败换jpg + 隐藏显示文字
+            const bustCacheUrl = `${photoUrl}?v=${data.updatedAt ? new Date(data.updatedAt).getTime() : Date.now()}`;
             const imgHtml = `<img src="${bustCacheUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.includes('.png')){this.src=this.src.replace('.png','.jpg');}else if(this.src.includes('.jpg')){this.src=this.src.replace('.jpg','.png');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
 
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar">${imgHtml}<span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
