@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#08090d">
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v15.0</title>
+    <title>英超预测引擎 v15.1</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
@@ -5558,7 +5558,7 @@
                 href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub</a><span
                 style="color:var(--text-4)">·</span><a href="about.html#legal">免责声明</a></div>
         <div class="legal">⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。</div>
-        <div class="ver">Premier League Prediction Engine · v15.0</div>
+        <div class="ver">Premier League Prediction Engine · v15.1</div>
     </footer>
 </div>
 <div class="fab-hub" id="fabHub">
@@ -9255,7 +9255,7 @@ async function loadFPL() {
     LoadingBar.start();
     if (!localStorage.getItem('pl_welcomed')) {
         setTimeout(() => {
-            toast('👋 欢迎使用 v15.0 · 先填 Groq API Key', 'ok', 6500)
+            toast('👋 欢迎使用 v15.1 · 先填 Groq API Key', 'ok', 6500)
         }, 2200);
         localStorage.setItem('pl_welcomed', '1')
     }
