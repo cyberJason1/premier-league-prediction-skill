@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-17T19:46:20.701Z",
+  "updatedAt": "2026-10-17T22:45:24.705Z",
   "meta": {
-    "updatedAt": "2026-10-17T19:46:20.701Z",
+    "updatedAt": "2026-10-17T22:45:24.705Z",
     "health": {
       "fpl": "ok"
     }
@@ -220,7 +220,7 @@
         "xA": 0.67,
         "xGI": 2.47,
         "minutes": 490,
-        "selectedBy": 39.9,
+        "selectedBy": 40,
         "status": "a",
         "chanceNext": null,
         "news": "",
@@ -274,9 +274,9 @@
         "totalPoints": 29,
         "ppg": 4.1,
         "ict": 34.2,
-        "xG": 0.7,
-        "xA": 2.36,
-        "xGI": 3.06,
+        "xG": 0.67,
+        "xA": 2.34,
+        "xGI": 3.01,
         "minutes": 584,
         "selectedBy": 0.8,
         "status": "a",
@@ -287,7 +287,7 @@
           "isHome": false,
           "difficulty": 2
         },
-        "xPts": 3.958708888888889
+        "xPts": 3.9437844444444443
       },
       {
         "id": 154,
@@ -365,7 +365,7 @@
         "xA": 1.05,
         "xGI": 3.07,
         "minutes": 540,
-        "selectedBy": 44.1,
+        "selectedBy": 44.2,
         "status": "a",
         "chanceNext": null,
         "news": "",
@@ -537,9 +537,9 @@
         "totalPoints": 18,
         "ppg": 2.6,
         "ict": 25.5,
-        "xG": 3.47,
-        "xA": 0.74,
-        "xGI": 4.21,
+        "xG": 3.46,
+        "xA": 0.73,
+        "xGI": 4.19,
         "minutes": 595,
         "selectedBy": 7.2,
         "status": "a",
@@ -550,7 +550,7 @@
           "isHome": false,
           "difficulty": 2
         },
-        "xPts": 2.578482083333333
+        "xPts": 2.5723998611111107
       }
     ],
     "captain": {
@@ -4322,7 +4322,7 @@
       "xA": 0.67,
       "xGI": 2.47,
       "minutes": 490,
-      "selectedBy": 39.9,
+      "selectedBy": 40,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -4583,7 +4583,7 @@
       "xA": 1.05,
       "xGI": 3.07,
       "minutes": 540,
-      "selectedBy": 44.1,
+      "selectedBy": 44.2,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -5337,7 +5337,7 @@
       "xA": 0.46,
       "xGI": 0.83,
       "minutes": 270,
-      "selectedBy": 0.8,
+      "selectedBy": 0.9,
       "status": "a",
       "chanceNext": 100,
       "news": "",
@@ -9364,9 +9364,9 @@
       "totalPoints": 29,
       "ppg": 4.1,
       "ict": 34.2,
-      "xG": 0.7,
-      "xA": 2.36,
-      "xGI": 3.06,
+      "xG": 0.67,
+      "xA": 2.34,
+      "xGI": 3.01,
       "minutes": 584,
       "selectedBy": 0.8,
       "status": "a",
@@ -9377,7 +9377,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 3.958708888888889
+      "xPts": 3.9437844444444443
     },
     {
       "id": 262,
@@ -9451,9 +9451,9 @@
       "totalPoints": 19,
       "ppg": 2.7,
       "ict": 26.3,
-      "xG": 1.31,
-      "xA": 1.33,
-      "xGI": 2.64,
+      "xG": 1.28,
+      "xA": 1.34,
+      "xGI": 2.62,
       "minutes": 495,
       "selectedBy": 0.3,
       "status": "a",
@@ -9464,7 +9464,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 2.0224187500000004
+      "xPts": 2.01735875
     },
     {
       "id": 265,
@@ -9481,8 +9481,8 @@
       "ppg": 2.6,
       "ict": 21,
       "xG": 0.29,
-      "xA": 0.47,
-      "xGI": 0.76,
+      "xA": 0.48,
+      "xGI": 0.77,
       "minutes": 529,
       "selectedBy": 0.3,
       "status": "a",
@@ -9493,7 +9493,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 1.695944611111111
+      "xPts": 1.6986483888888888
     },
     {
       "id": 266,
@@ -9510,8 +9510,8 @@
       "ppg": 1,
       "ict": 0,
       "xG": 0.03,
-      "xA": 0.01,
-      "xGI": 0.04,
+      "xA": 0,
+      "xGI": 0.03,
       "minutes": 12,
       "selectedBy": 0,
       "status": "a",
@@ -9522,7 +9522,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 0.006685333333333333
+      "xPts": 0.006624
     },
     {
       "id": 268,
@@ -9539,8 +9539,8 @@
       "ppg": 4,
       "ict": 39.1,
       "xG": 1.73,
-      "xA": 1.07,
-      "xGI": 2.8,
+      "xA": 1.06,
+      "xGI": 2.79,
       "minutes": 577,
       "selectedBy": 4.8,
       "status": "a",
@@ -9551,7 +9551,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 2.4444444722222216
+      "xPts": 2.4414953611111105
     },
     {
       "id": 269,
@@ -9571,7 +9571,7 @@
       "xA": 0.46,
       "xGI": 0.72,
       "minutes": 152,
-      "selectedBy": 0.4,
+      "selectedBy": 0.3,
       "status": "s",
       "chanceNext": 0,
       "news": "Suspended until 7 Nov",
@@ -9683,9 +9683,9 @@
       "totalPoints": 18,
       "ppg": 2.6,
       "ict": 25.5,
-      "xG": 3.47,
-      "xA": 0.74,
-      "xGI": 4.21,
+      "xG": 3.46,
+      "xA": 0.73,
+      "xGI": 4.19,
       "minutes": 595,
       "selectedBy": 7.2,
       "status": "a",
@@ -9696,7 +9696,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 2.578482083333333
+      "xPts": 2.5723998611111107
     },
     {
       "id": 570,
@@ -9742,8 +9742,8 @@
       "ppg": 2.7,
       "ict": 15.6,
       "xG": 0.16,
-      "xA": 0.41,
-      "xGI": 0.57,
+      "xA": 0.44,
+      "xGI": 0.6,
       "minutes": 463,
       "selectedBy": 0.1,
       "status": "a",
@@ -9754,7 +9754,7 @@
         "isHome": false,
         "difficulty": 2
       },
-      "xPts": 1.4411646666666662
+      "xPts": 1.448264
     },
     {
       "id": 610,
@@ -10209,7 +10209,7 @@
       "xA": 0.43,
       "xGI": 0.45,
       "minutes": 529,
-      "selectedBy": 3,
+      "selectedBy": 2.9,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -10321,9 +10321,9 @@
       "totalPoints": 39,
       "ppg": 5.6,
       "ict": 38.6,
-      "xG": 0.95,
-      "xA": 0.65,
-      "xGI": 1.6,
+      "xG": 0.96,
+      "xA": 0.61,
+      "xGI": 1.57,
       "minutes": 510,
       "selectedBy": 9,
       "status": "a",
@@ -10334,7 +10334,7 @@
         "isHome": true,
         "difficulty": 3
       },
-      "xPts": 2.5637700000000003
+      "xPts": 2.55629
     },
     {
       "id": 287,
@@ -13631,7 +13631,7 @@
       "xA": 1.06,
       "xGI": 2.58,
       "minutes": 471,
-      "selectedBy": 21.4,
+      "selectedBy": 21.3,
       "status": "i",
       "chanceNext": 0,
       "news": "Hamstring injury - Unknown return date",
@@ -14617,7 +14617,7 @@
       "xA": 1.7,
       "xGI": 3,
       "minutes": 392,
-      "selectedBy": 36.9,
+      "selectedBy": 37,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -15632,7 +15632,7 @@
       "xA": 1.46,
       "xGI": 4.04,
       "minutes": 540,
-      "selectedBy": 30.8,
+      "selectedBy": 30.7,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -16415,7 +16415,7 @@
       "xA": 0.87,
       "xGI": 2.11,
       "minutes": 630,
-      "selectedBy": 8,
+      "selectedBy": 7.9,
       "status": "a",
       "chanceNext": null,
       "news": "",
@@ -16705,7 +16705,7 @@
       "xA": 0.14,
       "xGI": 3.18,
       "minutes": 608,
-      "selectedBy": 15.4,
+      "selectedBy": 15.3,
       "status": "a",
       "chanceNext": null,
       "news": "",
