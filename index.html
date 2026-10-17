@@ -6529,8 +6529,33 @@ let _batchCancelled = false;
 STATIC_STANDINGS = TEAMS.map(t => ({team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0}));
 
 function validateAndNormalizePrediction(raw) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+        return {ok: false, errors: ['模型返回不是对象'], warnings: [], data: raw};
+    }
     const errors = [], warnings = [];
     const data = JSON.parse(JSON.stringify(raw));
+    if (typeof data.score !== 'string' || !/^\d+-\d+$/.test(data.score)) {
+        const p = parseScoreArr(data.score);
+        if (p && Number.isFinite(p[0]) && Number.isFinite(p[1])) {
+            data.score = `${p[0]}-${p[1]}`;
+        } else {
+            errors.push('score 格式错误');
+            return {ok: false, errors, warnings, data};
+        }
+    }
+    if (!Array.isArray(data.keyFactors)) {
+        if (typeof data.keyFactors === 'string') {
+            data.keyFactors = data.keyFactors.split(/[、,，;；\n]/).map(s => s.trim()).filter(Boolean);
+        } else {
+            data.keyFactors = [];
+        }
+    }
+    if (typeof data.analysis !== 'string') {
+        data.analysis = data.analysis == null ? '' : String(data.analysis);
+    }
+    for (const k of ['homeKeyPlayers', 'awayKeyPlayers', 'likelyScorers']) {
+        if (data[k] != null && !Array.isArray(data[k])) data[k] = [];
+    }
     const required = ['homeWin', 'draw', 'awayWin', 'score', 'confidence', 'keyFactors', 'analysis'];
     for (const k of required) {
         if (data[k] === undefined || data[k] === null) errors.push(`缺少字段：${k}`)
@@ -7305,7 +7330,7 @@ const REASONING_STEPS = [{icon: '📖', text: '读取 skill.md 约束文档'}, {
 }, {icon: '🎯', text: '计算三路概率分布'}, {icon: '📋', text: '生成结构化 JSON 输出'}];
 
 function renderReasoning() {
-    return `<div class="reasoning"><div class="reasoning-head"><div class="reasoning-ball"></div><div class="reasoning-title"><span class="shimmer">AI 战术板推演中</span></div></div><ul class="reasoning-steps" id="reasoningSteps">${REASONING_STEPS.map((s, i) => `<li data-step="${i}"><span class="r-icon">${s.icon}</span><span class="r-text">${s.text}</span><span class="r-check">✓</span></li>`).join('')}</ul><div class="reasoning-bar"><div class="reasoning-bar-fill" id="reasoningBar"></div></div><div class="nn-viz" id="nnViz"></div></div>`
+    return `<div class="reasoning"><div class="reasoning-head"><div class="reasoning-ball"></div><div class="reasoning-title"><span class="shimmer">AI 战术板推演中</span></div></div><ul class="reasoning-steps" id="reasoningSteps">${REASONING_STEPS.map((s, i) => `<li data-step="${i}"><span class="r-icon">${s.icon}</span><span class="r-text">${s.text}</span><span class="r-check">✓</span></li>`).join('')}</ul><div class="reasoning-bar"><div class="reasoning-bar-fill" id="reasoningBar"></div></div><div class="nn-viz" id="nnViz"><svg viewBox="0 0 340 90" preserveAspectRatio="xMidYMid meet"><g id="nnNodes"></g></svg></div></div>`
 }
 
 function renderNeuralNetwork() {
@@ -7437,6 +7462,7 @@ async function startPredict(retryCount = 0) {
         const v = validateAndNormalizePrediction(parsed);
         if (!v.ok) {
             if (v.hardFail && retryCount < 1) {
+                finishAnim();
                 btn.disabled = false;
                 btn.classList.remove('loading');
                 setBreath('slow');
@@ -7976,17 +8002,16 @@ function setupFocusScroll() {
         window.addEventListener('pointerup', () => {
             if (!isDown) return;
             isDown = false;
-            scroll.classList.remove('dragging')
+            scroll.classList.remove('dragging');
+            if (moved) setTimeout(() => { moved = false; }, 0);
         });
-        scroll.querySelectorAll('.fmatch').forEach(el => {
-            el.addEventListener('click', e => {
-                if (moved) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    moved = false
-                }
-            }, true)
-        });
+        scroll.addEventListener('click', e => {
+            if (moved) {
+                e.preventDefault();
+                e.stopPropagation();
+                moved = false;
+            }
+        }, true);
         scroll.addEventListener('scroll', updateState, {passive: true})
     }
     if (_focusResizeHandler) window.removeEventListener('resize', _focusResizeHandler);
@@ -8750,14 +8775,22 @@ async function runBatch() {
                 const i = cursor++;
                 const {home, away} = round[i];
                 try {
-                    const userPrompt = `【预测指令】\n请预测：第 ${r + 1} 轮 ${home} vs ${away}\n严格按 skill.md 输出 JSON。`;
-                    const raw = await callGroq(skill, userPrompt);
-                    const p = JSON.parse(raw);
-                    const v = validateAndNormalizePrediction(p);
-                    if (v.ok) {
-                        addHistory({round: r, home, away, ...v.data, ts: Date.now()});
-                        ok++
-                    } else fail++
+                    const runs = [];
+                    for (let k = 0; k < batchN; k++) {
+                        if (_batchCancelled) break;
+                        const userPrompt = `【预测指令】\n请预测：第 ${r + 1} 轮 ${home} vs ${away}\n严格按 skill.md 输出 JSON。`;
+                        const raw = await callGroq(skill, userPrompt);
+                        const p = JSON.parse(raw);
+                        const v = validateAndNormalizePrediction(p);
+                        if (v.ok) runs.push(v.data);
+                    }
+                    if (!runs.length) throw new Error('all runs failed');
+                    const scoreCount = {};
+                    runs.forEach(d => { scoreCount[d.score] = (scoreCount[d.score] || 0) + 1; });
+                    const bestScore = Object.entries(scoreCount).sort((a, b) => b[1] - a[1])[0][0];
+                    const main = runs.find(d => d.score === bestScore) || runs[0];
+                    addHistory({round: r, home, away, ...main, _runs: runs.map(d => d.score), ts: Date.now()});
+                    ok++
                 } catch (e) {
                     fail++
                 }
@@ -8766,6 +8799,7 @@ async function runBatch() {
                 document.getElementById('batchQuota').textContent = `进度 ${done}/${round.length} · 成功 ${ok} · 失败 ${fail}`
             }
         }
+
 
         await Promise.all(Array.from({length: Math.min(CONCURRENCY, round.length)}, worker));
         toast(`批量完成：成功 ${ok} · 失败 ${fail}`, fail ? 'warn' : 'ok');
@@ -9178,7 +9212,8 @@ async function loadFPL() {
             const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/250x250/${filename}?v=${ts}`;
 
             // ============ 终极兜底：250挂换110，png挂换jpg，全挂显字 ============
-            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.includes('250x250')){this.src=this.src.replace('250x250','110x140');}else if(this.src.includes('.png')){this.src=this.src.replace('.png','.jpg');}else if(this.src.includes('.jpg')){this.src=this.src.replace('.jpg','.png');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
+            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" data-fb="0"
+                onerror="var n=+this.dataset.fb||0;if(n===0){this.dataset.fb='1';this.src=this.src.replace('250x250','110x140');}else{this.onerror=null;this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='flex';}">`;
 
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar">${imgHtml}<span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
         };

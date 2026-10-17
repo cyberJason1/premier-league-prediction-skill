@@ -67,7 +67,7 @@ async function fetchFPLData() {
     });
     const players = boot.elements.map(p => ({
         id: p.id, code: p.code, name: p.web_name, fullName: `${p.first_name} ${p.second_name}`,
-        photo: p.photo ? `https://resources.premierleague.com/premierleague/photos/players/110x140/${p.photo}` : null, // 存完整链接
+        photo: p.photo ? `https://resources.premierleague.com/premierleague/photos/players/110x140/${p.photo}` : null,
         team: teamMap[p.team], teamId: p.team, position: p.element_type, cost: p.now_cost / 10,
         form: parseFloat(p.form) || 0, totalPoints: p.total_points || 0, ppg: parseFloat(p.points_per_game) || 0,
         ict: parseFloat(p.ict_index) || 0, xG: parseFloat(p.expected_goals) || 0, xA: parseFloat(p.expected_assists) || 0,
@@ -136,10 +136,33 @@ async function fetchTheSportsDBPhotos(existingPhotos) {
     return photos;
 }
 
+async function fetchHistoricalSeasons(token) {
+    const out = {}; const headers = { 'X-Auth-Token': token };
+    try {
+        const seasonsRes = await fetchJSON('https://api.football-data.org/v4/competitions/PL/seasons', { headers }, 15000);
+        const nowY = new Date().getFullYear();
+        const pastSeasons = (seasonsRes.seasons || []).map(s => s.startDate.slice(0, 4)).filter(y => +y >= nowY - 3 && +y < nowY).slice(-2);
+        for (const y of pastSeasons) {
+            try {
+                const mRes = await fetchJSON(`https://api.football-data.org/v4/competitions/PL/matches?season=${y}`, { headers }, 20000);
+                const bucket = {};
+                (mRes.matches || []).forEach(m => {
+                    if (m.status !== 'FINISHED' || !m.score?.fullTime) return;
+                    const h = toChinese(m.homeTeam.name), a = toChinese(m.awayTeam.name);
+                    if (!h || !a) return;
+                    bucket[`${h}|${a}`] = [m.score.fullTime.home, m.score.fullTime.away];
+                });
+                if (Object.keys(bucket).length) out[y] = bucket;
+            } catch (e) {}
+        }
+    } catch (e) {}
+    return out;
+}
+
 function pushDataFiles() {
     try {
         execSync('git add data.json fpl.json', { stdio: 'inherit' });
-        const status = execSync('git status --short').toString().trim();
+        const status = execSync('git status --short data.json fpl.json').toString().trim();
         if (!status) return;
         execSync(`git commit -m "auto: update data"`, { stdio: 'inherit' });
         execSync('git pull --rebase origin main', { stdio: 'inherit' });
@@ -152,7 +175,10 @@ function pushDataFiles() {
 
 async function main() {
     const fdToken = process.env.FD_TOKEN; const bzKey = process.env.BZZOIRO_KEY;
-    if (!fdToken) process.exit(1);
+    if (!fdToken) {
+        console.error('❌ 缺少 FD_TOKEN 环境变量，请在 .env 或 GitHub Secrets 中配置');
+        process.exit(1);
+    }
     const oldData = readIfExists(DATA_FILE) || {}; const oldFpl = readIfExists(FPL_FILE); const health = {};
     let apiData;
     try { apiData = await fetchFromApi(fdToken); health.pl = 'ok'; } catch (e) { health.pl = 'fail'; apiData = { standings: oldData.standings || [], results: oldData.results || {}, fixtures: oldData.fixtures || [] }; }
