@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-17T09:32:47.057Z",
+  "updatedAt": "2026-10-17T12:33:53.517Z",
   "meta": {
-    "updatedAt": "2026-10-17T09:32:47.061Z",
+    "updatedAt": "2026-10-17T12:33:53.517Z",
     "health": {
       "pl": "ok",
       "fpl": "ok"
@@ -385,7 +385,7 @@
         "home": "埃弗顿",
         "away": "切尔西",
         "kickoff": "2026-10-17T11:30:00Z",
-        "status": "TIMED"
+        "status": "IN_PLAY"
       },
       {
         "home": "富勒姆",
@@ -2658,6 +2658,30 @@
     },
     {
       "rank": 4,
+      "team": "埃弗顿",
+      "played": 7,
+      "won": 2,
+      "drawn": 5,
+      "lost": 0,
+      "gf": 8,
+      "ga": 5,
+      "gd": 3,
+      "points": 11
+    },
+    {
+      "rank": 5,
+      "team": "切尔西",
+      "played": 7,
+      "won": 3,
+      "drawn": 2,
+      "lost": 2,
+      "gf": 15,
+      "ga": 13,
+      "gd": 2,
+      "points": 11
+    },
+    {
+      "rank": 6,
       "team": "布伦特福德",
       "played": 6,
       "won": 2,
@@ -2666,30 +2690,6 @@
       "gf": 12,
       "ga": 6,
       "gd": 6,
-      "points": 10
-    },
-    {
-      "rank": 5,
-      "team": "埃弗顿",
-      "played": 6,
-      "won": 2,
-      "drawn": 4,
-      "lost": 0,
-      "gf": 8,
-      "ga": 5,
-      "gd": 3,
-      "points": 10
-    },
-    {
-      "rank": 6,
-      "team": "切尔西",
-      "played": 6,
-      "won": 3,
-      "drawn": 1,
-      "lost": 2,
-      "gf": 15,
-      "ga": 13,
-      "gd": 2,
       "points": 10
     },
     {
