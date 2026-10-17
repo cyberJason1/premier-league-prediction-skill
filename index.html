@@ -9149,7 +9149,7 @@ async function loadFPL() {
         const makePlayer = (p) => {
             const isCap = sq.captain.id === p.id;
             const isVice = sq.vice.id === p.id;
-            const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.id}.png`;
+            const photoUrl = p.photo || `https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.id}.png`;
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar"><img src="${photoUrl}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"><span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
         };
         const gk = sq.starters.filter(p => p.position === 1);
