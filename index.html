@@ -9149,10 +9149,12 @@ async function loadFPL() {
         const makePlayer = (p) => {
             const isCap = sq.captain.id === p.id;
             const isVice = sq.vice.id === p.id;
-            const photoUrl = p.photo; // 因为 update.js 已经存好了完整链接
 
-            // 失败显示文字
-            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">`;
+            // 强行拼接：优先用 p.code（如果没拿到就用 p.id），默认 png，失败自动切 jpg
+            const code = p.code || p.id || 0;
+            const photoUrl = `https://resources.premierleague.com/premierleague/photos/players/110x140/p${code}.png`;
+
+            const imgHtml = `<img src="${photoUrl}" referrerpolicy="no-referrer" loading="lazy" onerror="if(this.src.endsWith('.png')){this.src=this.src.replace('.png','.jpg');}else{this.style.display='none';this.nextElementSibling.style.display='block';}">`;
 
             return `<div class="fpl-player ${isCap ? 'captain' : ''} ${isVice ? 'vice' : ''}" title="${p.fullName} (${p.team}) · 预测 ${p.xPts.toFixed(1)} 分"><div class="fpl-avatar">${imgHtml}<span>${p.name.substring(0, 2).toUpperCase()}</span></div><div class="fpl-name">${p.name}</div><div class="fpl-pts">${p.xPts.toFixed(1)}</div></div>`
         };
