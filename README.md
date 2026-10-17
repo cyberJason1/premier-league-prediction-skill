@@ -1,6 +1,9 @@
 markdown
 
 <div align="center">
+  <img src="cover.gif" alt="Premier League Prediction Engine" width="100%">
+</div>
+<br />
 
 # ⚽ 英超预测引擎 v16.0
 **Premier League Prediction Engine**
