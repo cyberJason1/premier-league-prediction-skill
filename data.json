@@ -1,5 +1,15 @@
 {
-  "updatedAt": "2026-10-17T02:44:52.880Z",
+  "updatedAt": "2026-10-17T03:17:38.800Z",
+  "meta": {
+    "updatedAt": "2026-10-17T03:17:38.801Z",
+    "health": {
+      "pl": "ok",
+      "history": "ok",
+      "bzzoiro": "ok",
+      "sportsdb": "ok",
+      "fpl": "ok"
+    }
+  },
   "fixtures": [
     [
       {
