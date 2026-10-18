@@ -5739,11 +5739,10 @@
 <div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 <script>
     /* =====================================================================
-     *  v16.0 准确率修复版
-     *  三轮修复项：
-     *  [P0] 批量 prompt 与单场对齐 / 主客场拆分 / H2H 进 prompt / 概率后处理不扭曲
-     *  [P1] setHistory 保留分析字段 / 回退赛程特征守卫 / form 顺序 / 雷达 & 大小球 & 休息 & 对手调整进 prompt
-     *  [P2] H2H 时间排序 / calibBins 真校准 / HISTORICAL_RESULTS / stripFence / 排名守卫 / stale 状态
+     *  v16.0 最新整合版
+     *  - 自动过滤完赛 / 智能轮次追踪 / 伤病情报联动
+     *  - JSON 极致容错 (extractJSON) / 移除强制 response_format
+     *  - 历史记录保留全字段 / 修复老数据删除索引 bug
      * ===================================================================== */
 
     const Sound = (() => {
@@ -6352,7 +6351,7 @@
     }
 
     /* ================== 常量与状态 ================== */
-    const EXPECTED_SKILL_VERSION = '2.1.0';
+    const EXPECTED_SKILL_VERSION = '2.2.0'; // 同步更新
     const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
     const GROQ_MODEL = 'openai/gpt-oss-120b';
     const SKILL_CACHE_KEY = 'pl_skill_cache_v1';
@@ -6360,9 +6359,9 @@
     const REQUEST_TIMEOUT = 30000;
     const INTEL_MAX = 300;
 
-    let _standingsLoaded = false;      // 修复 #5：standings 未加载时 getRank 返回 null
-    let _season = '2026-27';           // 修复 #41：赛季标签从 data.json 读
-    let _skillVersionMismatch = false; // 修复 #7：skill 版本不匹配时降级 confidence
+    let _standingsLoaded = false;
+    let _season = '2026-27';
+    let _skillVersionMismatch = false;
 
     function escapeHtml(s) {
         if (s == null) return '';
@@ -6377,77 +6376,26 @@
     }
 
     const ABBR = {
-        '阿森纳': 'ARS',
-        '曼城': 'MCI',
-        '利物浦': 'LIV',
-        '切尔西': 'CHE',
-        '热刺': 'TOT',
-        '曼联': 'MUN',
-        '纽卡斯尔联': 'NEW',
-        '阿斯顿维拉': 'AVL',
-        '布莱顿': 'BHA',
-        '埃弗顿': 'EVE',
-        '富勒姆': 'FUL',
-        '水晶宫': 'CRY',
-        '布伦特福德': 'BRE',
-        '伯恩茅斯': 'BOU',
-        '诺丁汉森林': 'NFO',
-        '利兹联': 'LEE',
-        '桑德兰': 'SUN',
-        '考文垂城': 'COV',
-        '赫尔城': 'HUL',
-        '伊普斯维奇镇': 'IPS'
+        '阿森纳': 'ARS', '曼城': 'MCI', '利物浦': 'LIV', '切尔西': 'CHE', '热刺': 'TOT', '曼联': 'MUN',
+        '纽卡斯尔联': 'NEW', '阿斯顿维拉': 'AVL', '布莱顿': 'BHA', '埃弗顿': 'EVE', '富勒姆': 'FUL',
+        '水晶宫': 'CRY', '布伦特福德': 'BRE', '伯恩茅斯': 'BOU', '诺丁汉森林': 'NFO', '利兹联': 'LEE',
+        '桑德兰': 'SUN', '考文垂城': 'COV', '赫尔城': 'HUL', '伊普斯维奇镇': 'IPS'
     };
     const ESPN_IDS = {
-        '阿森纳': 359,
-        '曼城': 382,
-        '利物浦': 364,
-        '切尔西': 363,
-        '热刺': 367,
-        '曼联': 360,
-        '纽卡斯尔联': 361,
-        '阿斯顿维拉': 362,
-        '布莱顿': 331,
-        '埃弗顿': 368,
-        '富勒姆': 370,
-        '水晶宫': 384,
-        '布伦特福德': 337,
-        '伯恩茅斯': 349,
-        '诺丁汉森林': 393,
-        '利兹联': 357,
-        '桑德兰': 366,
-        '考文垂城': 388,
-        '赫尔城': 306,
-        '伊普斯维奇镇': 373
+        '阿森纳': 359, '曼城': 382, '利物浦': 364, '切尔西': 363, '热刺': 367, '曼联': 360,
+        '纽卡斯尔联': 361, '阿斯顿维拉': 362, '布莱顿': 331, '埃弗顿': 368, '富勒姆': 370,
+        '水晶宫': 384, '布伦特福德': 337, '伯恩茅斯': 349, '诺丁汉森林': 393, '利兹联': 357,
+        '桑德兰': 366, '考文垂城': 388, '赫尔城': 306, '伊普斯维奇镇': 373
     };
     const TEAMS = ['阿森纳', '曼城', '利物浦', '切尔西', '热刺', '曼联', '纽卡斯尔联', '阿斯顿维拉', '布莱顿', '埃弗顿', '富勒姆', '水晶宫', '布伦特福德', '伯恩茅斯', '诺丁汉森林', '利兹联', '桑德兰', '考文垂城', '赫尔城', '伊普斯维奇镇'];
     const TEAM_EN_MAP = {
-        'Arsenal': '阿森纳',
-        'Manchester City': '曼城',
-        'Liverpool': '利物浦',
-        'Chelsea': '切尔西',
-        'Tottenham': '热刺',
-        'Tottenham Hotspur': '热刺',
-        'Manchester United': '曼联',
-        'Newcastle United': '纽卡斯尔联',
-        'Aston Villa': '阿斯顿维拉',
-        'Brighton': '布莱顿',
-        'Brighton & Hove Albion': '布莱顿',
-        'Everton': '埃弗顿',
-        'Fulham': '富勒姆',
-        'Crystal Palace': '水晶宫',
-        'Brentford': '布伦特福德',
-        'Bournemouth': '伯恩茅斯',
-        'AFC Bournemouth': '伯恩茅斯',
-        'Nottingham Forest': '诺丁汉森林',
-        'Leeds United': '利兹联',
-        'Sunderland': '桑德兰',
-        'Coventry City': '考文垂城',
-        'Coventry City FC': '考文垂城',
-        'Hull City': '赫尔城',
-        'Hull City AFC': '赫尔城',
-        'Ipswich Town': '伊普斯维奇镇',
-        'Ipswich Town FC': '伊普斯维奇镇'
+        'Arsenal': '阿森纳', 'Manchester City': '曼城', 'Liverpool': '利物浦', 'Chelsea': '切尔西',
+        'Tottenham': '热刺', 'Tottenham Hotspur': '热刺', 'Manchester United': '曼联', 'Newcastle United': '纽卡斯尔联',
+        'Aston Villa': '阿斯顿维拉', 'Brighton': '布莱顿', 'Brighton & Hove Albion': '布莱顿', 'Everton': '埃弗顿',
+        'Fulham': '富勒姆', 'Crystal Palace': '水晶宫', 'Brentford': '布伦特福德', 'Bournemouth': '伯恩茅斯',
+        'AFC Bournemouth': '伯恩茅斯', 'Nottingham Forest': '诺丁汉森林', 'Leeds United': '利兹联', 'Sunderland': '桑德兰',
+        'Coventry City': '考文垂城', 'Coventry City FC': '考文垂城', 'Hull City': '赫尔城', 'Hull City AFC': '赫尔城',
+        'Ipswich Town': '伊普斯维奇镇', 'Ipswich Town FC': '伊普斯维奇镇'
     };
 
     function toChineseTeam(name) {
@@ -6460,49 +6408,17 @@
     }
 
     const PLAYER_ZH_MAP = {
-        'Bukayo Saka': '萨卡',
-        'Martin Odegaard': '厄德高',
-        'Gabriel Jesus': '热苏斯',
-        'Erling Haaland': '哈兰德',
-        'Rayan Cherki': '谢尔基',
-        'Rodri': '罗德里',
-        'Mohamed Salah': '萨拉赫',
-        'Alexander Isak': '伊萨克',
-        'Cody Gakpo': '加克波',
-        'Joao Pedro': '若昂·佩德罗',
-        'Morgan Rogers': '摩根·罗杰斯',
-        'Cole Palmer': '帕尔默',
-        'James Maddison': '麦迪逊',
-        'Bruno Fernandes': 'B费',
-        'Marcus Rashford': '拉什福德',
-        'Bruno Guimaraes': '吉马良斯',
-        'Ollie Watkins': '沃特金斯',
-        'John McGinn': '麦金',
-        'Kaoru Mitoma': '三笘薰',
-        'Danny Welbeck': '维尔贝克',
-        'Dominic Calvert-Lewin': '卡尔弗特-勒温',
-        'Thierno Barry': '蒂耶尔诺·巴里',
-        'James Tarkowski': '塔科夫斯基',
-        'Tarkowski': '塔科夫斯基',
-        'Jordan Pickford': '皮克福德',
-        'Raul Jimenez': '希门尼斯',
-        'Eberechi Eze': '埃泽',
-        'Jean-Philippe Mateta': '马特塔',
-        'Bryan Mbeumo': '姆贝乌莫',
-        'Yoane Wissa': '维萨',
-        'Dominic Solanke': '索兰克',
-        'Antoine Semenyo': '塞梅尼奥',
-        'Chris Wood': '伍德',
-        'Morgan Gibbs-White': '吉布斯-怀特',
-        'Joel Piroe': '皮罗',
-        'Wilfried Gnonto': '尼奥托',
-        'Brian Brobbey': '布罗比',
-        'Wilson Isidor': '伊西多',
-        'Haji Wright': '哈吉·赖特',
-        'Jack Rudoni': '杰克·鲁多尼',
-        'Mohamed Belloumi': '贝卢米',
-        'Konstantinos Tzolakis': 'Tzolakis',
-        'Jack Clarke': '杰克·克拉克'
+        'Bukayo Saka': '萨卡', 'Martin Odegaard': '厄德高', 'Gabriel Jesus': '热苏斯', 'Erling Haaland': '哈兰德',
+        'Rayan Cherki': '谢尔基', 'Rodri': '罗德里', 'Mohamed Salah': '萨拉赫', 'Alexander Isak': '伊萨克',
+        'Cody Gakpo': '加克波', 'Joao Pedro': '若昂·佩德罗', 'Morgan Rogers': '摩根·罗杰斯', 'Cole Palmer': '帕尔默',
+        'James Maddison': '麦迪逊', 'Bruno Fernandes': 'B费', 'Marcus Rashford': '拉什福德', 'Bruno Guimaraes': '吉马良斯',
+        'Ollie Watkins': '沃特金斯', 'John McGinn': '麦金', 'Kaoru Mitoma': '三笘薰', 'Danny Welbeck': '维尔贝克',
+        'Dominic Calvert-Lewin': '卡尔弗特-勒温', 'Thierno Barry': '蒂耶尔诺·巴里', 'James Tarkowski': '塔科夫斯基',
+        'Tarkowski': '塔科夫斯基', 'Jordan Pickford': '皮克福德', 'Raul Jimenez': '希门尼斯', 'Eberechi Eze': '埃泽',
+        'Jean-Philippe Mateta': '马特塔', 'Bryan Mbeumo': '姆贝乌莫', 'Yoane Wissa': '维萨', 'Dominic Solanke': '索兰克',
+        'Antoine Semenyo': '塞梅尼奥', 'Chris Wood': '伍德', 'Morgan Gibbs-White': '吉布斯-怀特', 'Joel Piroe': '皮罗',
+        'Wilfried Gnonto': '尼奥托', 'Brian Brobbey': '布罗比', 'Wilson Isidor': '伊西多', 'Haji Wright': '哈吉·赖特',
+        'Jack Rudoni': '杰克·鲁多尼', 'Mohamed Belloumi': '贝卢米', 'Konstantinos Tzolakis': 'Tzolakis', 'Jack Clarke': '杰克·克拉克'
     };
 
     function toChinesePlayer(name) {
@@ -6552,7 +6468,6 @@
     })();
     STATIC_STANDINGS = TEAMS.map(t => ({team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0}));
 
-    /* ============ 修复 #18：parseScoreArr 统一返回 null ============ */
     function parseScoreArr(sc) {
         if (sc == null) return null;
         if (Array.isArray(sc)) {
@@ -6572,18 +6487,29 @@
         return null
     }
 
-    /* ============ 修复 #4：strip markdown code fence ============ */
-    function stripFence(s) {
-        if (typeof s !== 'string') return s;
-        return s.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
+    // 强力提取 JSON：兼容 markdown 代码块、前后废话、截断补齐
+    function extractJSON(str) {
+        if (!str) return '';
+        let s = String(str).trim();
+        s = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+        const start = s.indexOf('{');
+        if (start === -1) return s;
+        let end = s.lastIndexOf('}');
+        if (end === -1) {
+            s = s.substring(start);
+            const leftBraces = (s.match(/\{/g) || []).length;
+            const rightBraces = (s.match(/\}/g) || []).length;
+            s += '}'.repeat(Math.max(0, leftBraces - rightBraces));
+        } else {
+            s = s.substring(start, end + 1);
+        }
+        return s;
     }
 
-    /* ============ 修复 #25：H2H 按时间降序返回，拆分主客 ============ */
     function computeH2H(home, away) {
         const matches = [];
         const key1 = `${home}|${away}`, key2 = `${away}|${home}`;
         const curSeasonKey = 9999;
-        // 当前赛季
         const curRoundKeys = Object.keys(RESULTS).sort((a, b) => Number(a) - Number(b));
         for (const rk of curRoundKeys) {
             const ro = RESULTS[rk];
@@ -6609,7 +6535,6 @@
                 })
             }
         }
-        // 历史赛季
         const years = Object.keys(HISTORICAL_RESULTS || {}).sort((a, b) => +b - +a);
         for (const y of years) {
             const sd = HISTORICAL_RESULTS[y];
@@ -6640,7 +6565,6 @@
         return matches
     }
 
-    /* ============ 修复 #3/#7/#27：显式排序 key，加入 HISTORICAL_RESULTS ============ */
     function computeTeamAttackStats() {
         if (_teamAtkCache) return _teamAtkCache;
         const map = {};
@@ -6681,10 +6605,8 @@
             }
         }
 
-        // 历史赛季先入（按年份升序）
         const histYears = Object.keys(HISTORICAL_RESULTS || {}).sort((a, b) => +a - +b);
         for (const y of histYears) feed(y, HISTORICAL_RESULTS[y], true);
-        // 当前赛季按轮次升序入
         const curRoundKeys = Object.keys(RESULTS).sort((a, b) => Number(a) - Number(b));
         for (const rk of curRoundKeys) feed(rk, RESULTS[rk], false);
 
@@ -6704,7 +6626,6 @@
         return result
     }
 
-    /* ============ 修复 #3：buildLast5Cache 显式排序 ============ */
     function buildLast5Cache() {
         _last5Cache = {};
         const histYears = Object.keys(HISTORICAL_RESULTS || {}).sort((a, b) => +a - +b);
@@ -6743,14 +6664,12 @@
         return (_last5Cache[team] || []).slice(-n)
     }
 
-    /* ============ 修复 #5：getRank 守卫 ============ */
     function getRank(team) {
         if (!_standingsLoaded) return null;
         const idx = STATIC_STANDINGS.findIndex(s => s.team === team);
         return idx >= 0 ? idx + 1 : null
     }
 
-    /* ============ 修复 #16/#40：getMatchStatus 支持 stale ============ */
     function getMatchStatus(home, away, round) {
         const key = `${home}|${away}`;
         for (const rk of Object.keys(RESULTS)) {
@@ -6815,6 +6734,13 @@
     }
 
     let _filterMode = 'round', _currentTeam = '', _teamFixtures = [], _teamSelectedIdx = 0;
+    let _pickerShowFinished = false;
+
+    window.togglePickerFinished = function() {
+        _pickerShowFinished = !_pickerShowFinished;
+        const query = document.getElementById('matchSearch').value;
+        MatchPicker.renderList(query);
+    };
 
     function setFilterMode(mode) {
         _filterMode = mode;
@@ -6834,7 +6760,6 @@
         refreshDashboard()
     }
 
-    /* ============ 修复 #35：持久化 key 用 round|home|away ============ */
     function loadTeamFixtures() {
         _teamFixtures = getTeamFixtures(_currentTeam);
         const savedKey = localStorage.getItem('last_team_match_' + _currentTeam);
@@ -6968,16 +6893,29 @@
         function renderList(query = '') {
             const list = document.getElementById('matchList');
             const q = query.trim().toLowerCase();
+
+            const headerHtml = `<div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 12px; border-bottom: 1px dashed var(--border); margin-bottom: 8px;">
+                <span style="font-size:11px; color:var(--text-4);">${_pickerShowFinished ? '含已完赛' : '仅未开赛'}</span>
+                <button type="button" class="btn ghost small" onclick="event.stopPropagation(); window.togglePickerFinished()" style="padding: 2px 8px; font-size: 11px; border-radius: 4px;">切换</button>
+            </div>`;
+
             if (_filterMode === 'team' && _teamFixtures.length) {
                 let items = _teamFixtures.map((m, i) => ({...m, idx: i}));
+                if (!_pickerShowFinished) {
+                    items = items.filter(m => {
+                        const st = getMatchStatus(m.home, m.away, m.round);
+                        return st.status !== 'finished' && st.status !== 'stale';
+                    });
+                }
                 if (q) items = items.filter(m => m.opponent.toLowerCase().includes(q));
+
                 if (!items.length) {
-                    list.innerHTML = '<div class="empty-list">无匹配比赛</div>';
-                    return
+                    list.innerHTML = headerHtml + `<div class="empty-list">当前条件下无比赛<br><br><button class="btn ghost small" onclick="event.stopPropagation(); window.togglePickerFinished()">查看全部</button><br><br><button class="btn ghost small" onclick="event.stopPropagation(); close(); openHistory();">📊 去战绩中心回顾</button></div>`;
+                    return;
                 }
                 const hist = getHistory();
                 const predictedKeys = new Set(hist.map(h => `${h.home}|${h.away}`));
-                list.innerHTML = items.map((m) => {
+                list.innerHTML = headerHtml + items.map((m) => {
                     const st = getMatchStatus(m.home, m.away, m.round);
                     const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
                     const isSelected = m.idx === _teamSelectedIdx;
@@ -6992,17 +6930,24 @@
                 }).join('')
             } else {
                 const round = FIXTURES[currentRound] || [];
-                filtered = round.map((m, i) => ({
-                    ...m,
-                    idx: i
-                })).filter(m => !q || m.home.toLowerCase().includes(q) || m.away.toLowerCase().includes(q));
-                if (!filtered.length) {
-                    list.innerHTML = '<div class="empty-list">无匹配比赛</div>';
-                    return
+                let items = round.map((m, i) => ({...m, idx: i}));
+
+                if (!_pickerShowFinished) {
+                    items = items.filter(m => {
+                        const st = getMatchStatus(m.home, m.away, currentRound);
+                        return st.status !== 'finished' && st.status !== 'stale';
+                    });
                 }
+                if (q) items = items.filter(m => m.home.toLowerCase().includes(q) || m.away.toLowerCase().includes(q));
+
+                if (!items.length) {
+                    list.innerHTML = headerHtml + `<div class="empty-list">本轮暂无未开赛比赛<br><br><button class="btn ghost small" onclick="event.stopPropagation(); window.togglePickerFinished()">查看已完赛</button><br><br><button class="btn ghost small" onclick="event.stopPropagation(); close(); openHistory();">📊 去战绩中心回顾</button></div>`;
+                    return;
+                }
+
                 const hist = getHistoryForRound(currentRound);
                 const predictedKeys = new Set(hist.filter(h => h.round === currentRound).map(h => `${h.home}|${h.away}`));
-                list.innerHTML = filtered.map((m) => {
+                list.innerHTML = headerHtml + items.map((m) => {
                     const st = getMatchStatus(m.home, m.away, currentRound);
                     const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
                     const isSelected = m.idx === selectedIdx;
@@ -7114,14 +7059,33 @@
 
         function setRound(r, keepSelection = false) {
             currentRound = r;
+            const round = FIXTURES[r] || [];
+            let defaultIdx = 0;
+
+            const firstUpcoming = round.findIndex(m => {
+                const st = getMatchStatus(m.home, m.away, r);
+                return st.status !== 'finished' && st.status !== 'stale';
+            });
+            if (firstUpcoming >= 0) defaultIdx = firstUpcoming;
+            else if (round.length > 0) defaultIdx = round.length - 1;
+
             if (!keepSelection) {
                 const saved = localStorage.getItem('last_match_' + r);
-                selectedIdx = saved !== null && FIXTURES[r]?.[+saved] ? +saved : 0
+                const parsedSaved = saved !== null && round[+saved] ? +saved : -1;
+                if (parsedSaved >= 0) {
+                    const st = getMatchStatus(round[parsedSaved].home, round[parsedSaved].away, r);
+                    if (_pickerShowFinished || (st.status !== 'finished' && st.status !== 'stale')) {
+                        selectedIdx = parsedSaved;
+                    } else {
+                        selectedIdx = defaultIdx;
+                    }
+                } else {
+                    selectedIdx = defaultIdx;
+                }
             } else {
-                const round = FIXTURES[r] || [];
-                if (selectedIdx >= round.length) selectedIdx = 0
+                if (selectedIdx >= round.length) selectedIdx = defaultIdx;
             }
-            updateLabel()
+            updateLabel();
         }
 
         function getSelected() {
@@ -7157,9 +7121,30 @@
             return
         }
         rs.innerHTML = FIXTURES.map((_, i) => `<option value="${i}">第 ${i + 1} 轮</option>`).join('');
-        const saved = oldVal || localStorage.getItem('last_round');
-        if (saved !== null && FIXTURES[+saved]) rs.value = saved;
-        MatchPicker.setRound(+rs.value || 0);
+
+        let saved = oldVal || localStorage.getItem('last_round');
+        let targetRound = saved !== null && FIXTURES[+saved] ? +saved : 0;
+
+        const hasUpcoming = (idx) => {
+            const r = FIXTURES[idx] || [];
+            return r.some(m => {
+                const st = getMatchStatus(m.home, m.away, idx);
+                return st.status !== 'finished' && st.status !== 'stale';
+            });
+        };
+
+        if (!hasUpcoming(targetRound)) {
+            for (let i = targetRound + 1; i < FIXTURES.length; i++) {
+                if (hasUpcoming(i)) {
+                    targetRound = i;
+                    break;
+                }
+            }
+        }
+
+        rs.value = targetRound;
+        MatchPicker.setRound(targetRound);
+
         const ts = document.getElementById('teamSel');
         ts.innerHTML = TEAMS.map(t => `<option value="${t}">${t}</option>`).join('')
     }
@@ -7204,7 +7189,6 @@
         return null
     }
 
-    /* ============ 修复 #9：对手强度调整 ============ */
     function opponentAdjustedGF(team, opp) {
         const teamStats = computeTeamAttackStats();
         const t = teamStats.find(x => x.team === team);
@@ -7215,7 +7199,6 @@
         return t.avgGF * (leagueAvgGA / o.avgGA)
     }
 
-    /* ============ 修复 #8：休息天数 ============ */
     function restDays(team, kickoff) {
         const now = kickoff ? new Date(kickoff) : new Date();
         const past = getTeamFixtures(team)
@@ -7224,7 +7207,6 @@
         return past.length ? Math.round((now - new Date(past[0].kickoff)) / 86400000) : null
     }
 
-    /* ============ 修复 #6/#10：雷达四维进 prompt 用 ============ */
     function computeRadarData(home, away) {
         const teamStats = computeTeamAttackStats();
         const homeStats = teamStats.find(t => t.team === home) || {};
@@ -7401,9 +7383,6 @@
         }
     }
 
-    /* ============================================================
-     * 修复核心：统一 prompt 构造器
-     * ============================================================ */
     function buildPredictionPrompt(home, away, round, intel, st, existing) {
         const teamStats = computeTeamAttackStats();
         const H = teamStats.find(t => t.team === home) || {};
@@ -7473,10 +7452,13 @@
             prompt += `本次如有新情报，请说明修正方向；如无实质变化，请保持或微调。\n\n`;
         }
 
-        if (intel) prompt += `【用户情报】\n${intel}\n\n`;
+        if (intel) {
+            prompt += `【今日情报（最高优先级）】\n${intel}\n`;
+            prompt += `注意：请仔细阅读上述情报。如果情报中提到核心球员受伤/停赛，必须在 keyFactors 和 analysis 中明确指出该情况对比赛走势的具体影响（如进攻削弱、防守漏洞）。\n\n`;
+        }
 
         prompt += `【指令】\n请结合所有数据，预测第 ${round + 1} 轮 ${home} vs ${away} 最终比分。\n`;
-        prompt += `严格按 skill.md 输出 JSON。硬约束：\n`;
+        prompt += `你必须严格以 JSON 格式输出结果，遵循 skill.md 的 Schema。硬约束：\n`;
         prompt += `1. homeWin + draw + awayWin 必须等于 100；\n`;
         prompt += `2. 比分方向（主胜/平/客胜）必须与概率最大的方向一致；\n`;
         prompt += `3. 比分不得超过 6-6，总和不得超过 9；\n`;
@@ -7486,7 +7468,6 @@
         return prompt
     }
 
-    /* ============ 修复 #8：真实概率校准（按方向分桶） ============ */
     function buildCalibrationHint() {
         const S = computeDeepStats(getHistoryCopy());
         if (!S || S.total < 10) return '';
@@ -7520,9 +7501,9 @@
                 messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],
                 temperature: temperature,
                 top_p: 0.9,
-                max_tokens: 900,
-                seed: seed,
-                response_format: {type: 'json_object'}
+                max_tokens: 1500,
+                seed: seed
+                // 移除了 response_format: {type: 'json_object'}
             }),
             signal: ctrl.signal
         }).then(async resp => {
@@ -7552,14 +7533,12 @@
         return Math.abs(h) % 2147483647
     }
 
-    /* ============ 修复 #12/#14/#17/#18/#37：validate 重写 ============ */
     function validateAndNormalizePrediction(raw, ctx) {
         ctx = ctx || {};
         if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {ok: false, errors: ['非对象'], data: raw};
         const errors = [], warnings = [];
         const data = JSON.parse(JSON.stringify(raw));
 
-        // score 归一
         if (typeof data.score !== 'string' || !/^\d+-\d+$/.test(data.score)) {
             const p = parseScoreArr(data.score);
             if (p) data.score = `${p[0]}-${p[1]}`; else {
@@ -7568,7 +7547,6 @@
             }
         }
 
-        // 比分合理性（#15）
         const [sh, sa] = data.score.split('-').map(Number);
         if (!Number.isFinite(sh) || !Number.isFinite(sa) || sh > 6 || sa > 6 || sh + sa > 9) {
             errors.push('比分不合理');
@@ -7607,7 +7585,6 @@
             data.awayWin = a
         }
 
-        // 方向一致性：不改概率，改为降置信度 + 尝试重试
         const scoreDir = sh > sa ? 'H' : sh < sa ? 'A' : 'D';
         const probDir = h >= d && h >= a ? 'H' : a >= d && a >= h ? 'A' : 'D';
         if (scoreDir !== probDir) {
@@ -7615,11 +7592,9 @@
             data._inconsistent = true
         }
 
-        // 内容质量（#13）
         if (!data.keyFactors || data.keyFactors.length < 2) warnings.push('keyFactors < 2');
         if (!data.analysis || data.analysis.length < 30) warnings.push('analysis < 30 字');
 
-        // confidence 别名 + 校验（#12/#14）
         const CONF_ALIAS = {
             '高': '高', '较高': '中高', '中高': '中高', '中等': '中', '中': '中',
             '低': '低', '较低': '低', 'High': '高', 'Medium': '中', 'Low': '低'
@@ -7631,21 +7606,17 @@
         if (maxP < 38 && confRank[data.confidence] >= 1) data.confidence = '低';
         if (maxP >= 60 && data.confidence === '低') data.confidence = '中';
 
-        // 样本不足时降级
         const H = ctx.H || {}, A = ctx.A || {};
         if ((!H.played || H.played < 3 || !A.played || A.played < 3) && data.confidence === '高') {
             data.confidence = '中'
         }
-        // skill 版本不匹配降级（#7）
         if (_skillVersionMismatch && data.confidence === '高') data.confidence = '中高';
 
-        // 方向矛盾时降一档
         if (data._inconsistent) {
             const order = ['高', '中高', '中', '低'];
             data.confidence = order[Math.min(order.length - 1, order.indexOf(data.confidence) + 1)]
         }
 
-        // 质量不达标降级
         if ((data.keyFactors || []).length < 2 || (data.analysis || '').length < 30) {
             if (data.confidence === '高') data.confidence = '中高';
             data._lowQuality = true
@@ -7654,7 +7625,6 @@
         return {ok: true, errors, warnings, data}
     }
 
-    /* ============ 修复 #14：seed 支持 ============ */
     async function callGroq(systemPrompt, userPrompt, maxRetry = 3, temperature = 0.35, seed = 0) {
         let delay = 1500;
         for (let attempt = 0; attempt <= maxRetry; attempt++) {
@@ -7749,7 +7719,6 @@
 
     let _skillCache = null, _verBarShown = false;
 
-    /* ============ 修复 #7：skill 版本不匹配时降级 confidence ============ */
     async function loadSkill() {
         if (_skillCache) return _skillCache;
         try {
@@ -7807,7 +7776,6 @@
         return null
     }
 
-    /* ============ 修复 #13：startPredict 用统一 prompt ============ */
     async function startPredict(retryCount = 0) {
         const btn = document.getElementById('predictBtn');
         const {round, home, away} = currentMatch();
@@ -7837,7 +7805,6 @@
             const H = teamStats.find(t => t.team === home) || {};
             const A = teamStats.find(t => t.team === away) || {};
             let userPrompt = buildPredictionPrompt(home, away, round, intel, st, existing);
-            // 修复 #13：重试时追加提示
             if (retryCount > 0) {
                 userPrompt += `\n【重试提示】上一次输出概率和不为 100 或方向矛盾，请严格检查后重新输出，概率之和必须等于 100。\n`
             }
@@ -7851,7 +7818,7 @@
             await new Promise(r => setTimeout(r, 400));
             let parsed;
             try {
-                parsed = JSON.parse(stripFence(raw))
+                parsed = JSON.parse(extractJSON(raw))
             } catch (e) {
                 card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
                 Sound.error();
@@ -7881,6 +7848,10 @@
             setTimeout(() => feedbackFloat('AI 已生成推演 · 命中率模拟 +' + (Math.random() * 2).toFixed(1) + '%', '#34d399'), 1200)
         } catch (err) {
             finishAnim();
+            if (err.message.includes('json_validate_failed') && retryCount < 2) {
+                toast('AI 输出格式偏离，正在自动重试…', 'warn', 2000);
+                return setTimeout(() => startPredict(retryCount + 1), 600);
+            }
             card.innerHTML = `<div class="empty">❌ ${escapeHtml(err.message)}<button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
             Sound.error();
             setBreath('slow');
@@ -8270,6 +8241,17 @@
                     document.getElementById('roundSel').value = rr;
                     MatchPicker.setRound(rr);
                     MatchPicker.selectMatch(idx);
+
+                    if (!_pickerShowFinished) {
+                        const st = getMatchStatus(h, a, rr);
+                        if (st.status === 'finished' || st.status === 'stale') {
+                            _pickerShowFinished = true;
+                            if (document.getElementById('matchPicker').classList.contains('open')) {
+                                MatchPicker.renderList(document.getElementById('matchSearch').value);
+                            }
+                        }
+                    }
+
                     document.getElementById('predictBtn').scrollIntoView({behavior: 'smooth', block: 'center'});
                     Sound.click()
                 }
@@ -8378,7 +8360,6 @@
         return getHistory().map(h => ({...h}))
     }
 
-    /* ============ 修复 #1/#18：slim 保留分析字段 ============ */
     function setHistory(list) {
         let slim = list.slice(-800).map(h => {
             const o = {
@@ -8416,7 +8397,6 @@
         invalidateTeamAtkCache()
     }
 
-    /* ============ 修复 #18：addHistory keep intel ============ */
     function addHistory(rec) {
         const list = getHistory();
         if (!rec._id) rec._id = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
@@ -8643,7 +8623,6 @@
         box.innerHTML = html
     }
 
-    /* ============ 修复 #2：calibBins 拆方向 + Brier 新增 ============ */
     function computeDeepStats(records) {
         const done = records.filter(r => r.actual && /^\d+-\d+$/.test(r.actual));
         if (!done.length) return null;
@@ -8717,14 +8696,12 @@
             S.predTotalDist[Math.min(a.predicted.total, 7)]++;
             S.realTotalDist[Math.min(a.actual.total, 7)]++;
 
-            // 原有"最大概率桶"的方向命中率（保留用于展示）
             const mainProb = Math.max(rec.homeWin || 0, rec.draw || 0, rec.awayWin || 0);
             const binKey = mainProb < 20 ? '0-20' : mainProb < 40 ? '20-40' : mainProb < 60 ? '40-60' : mainProb < 80 ? '60-80' : '80-100';
             S.calibBins[binKey].pred++;
             const maxDir = (rec.homeWin >= rec.draw && rec.homeWin >= rec.awayWin) ? 'H' : (rec.draw >= rec.awayWin) ? 'D' : 'A';
             if (maxDir === a.actual.wdl) S.calibBins[binKey].hit++;
 
-            // 修复 #2：真正概率校准 —— 按方向分桶
             const probs = {
                 H: (rec.homeWin || 0) / 100,
                 D: (rec.draw || 0) / 100,
@@ -8737,7 +8714,6 @@
                 if (a.actual.wdl === k) S.calibBinsByDir[k][bk].hit++
             }
 
-            // Brier Score（胜平负三分量）
             const pArr = [probs.H, probs.D, probs.A];
             const actualArr = [a.actual.wdl === 'H' ? 1 : 0, a.actual.wdl === 'D' ? 1 : 0, a.actual.wdl === 'A' ? 1 : 0];
             for (let i = 0; i < 3; i++) S.brierSum += Math.pow(pArr[i] - actualArr[i], 2);
@@ -8773,7 +8749,6 @@
         if (el.classList.contains('open')) renderDeepAnalysis()
     }
 
-    /* ============ 修复 #20：findActualScore 查历史 ============ */
     function findActualScore(home, away) {
         const key = `${home}|${away}`;
         for (const rk of Object.keys(RESULTS)) {
@@ -8895,7 +8870,6 @@
                     const cls = a.verdict === 'exact' ? 'hit' : a.verdict === 'miss' ? 'miss' : '';
                     vsHtml = `<div class="vs-row"><div class="vs-side pred"><div class="vs-lbl">AI</div><div class="vs-score">${escapeHtml(h.score)}</div></div><div class="vs-arrow">→</div><div class="vs-side real ${cls}"><div class="vs-lbl">实际</div><div class="vs-score">${escapeHtml(h.actual)}</div></div></div>`
                 }
-                // 修复 #44：快捷比分补客胜
                 const quickScores = ['1-0', '1-1', '2-1', '2-2', '3-1', '0-0', '0-1', '1-2', '0-2'];
                 return `<div class="hitem"><div class="top"><div class="teams2">${escapeHtml(h.home)} vs ${escapeHtml(h.away)}</div><div class="res-badge ${j}">${labels[j]}</div></div>${vsHtml}<div class="meta">概率 ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round + 1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div><div class="row2" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;"><span style="font-size:11px; color:var(--text-3); width:100%; margin-bottom:4px;">一键录入实际比分：</span>${quickScores.map(sc => `<button onclick="setActual('${id}', '${sc}')" style="flex:1; min-width:40px; padding:6px 0; border-radius:6px; border:1px solid ${h.actual === sc ? 'var(--emerald)' : 'var(--border-hi)'}; background:${h.actual === sc ? 'var(--emerald-soft)' : 'transparent'}; color:${h.actual === sc ? 'var(--emerald)' : 'var(--text-2)'}; font-weight:600; font-size:12px;">${sc}</button>`).join('')}<div style="display:flex; gap:4px; width:100%; margin-top:6px;"><input style="flex:1; padding:6px 10px; font-size:12px; border-radius:6px;" placeholder="其他比分" value="${escapeHtml(h.actual || '')}" onkeydown="if(event.key==='Enter')setActual('${id}',this.value)"><button onclick="setActual('${id}',this.querySelector('input').value)" style="padding:0 12px; border-radius:6px;">保存</button><button onclick="delHistory('${id}')" style="padding:0 12px; border-radius:6px; color:var(--rose);">删除</button></div></div></div>`
             }).join('')
@@ -8948,8 +8922,17 @@
     function setActual(idOrIdx, val) {
         const list = getHistory();
         let idx = -1;
-        if (typeof idOrIdx === 'number' && list[idOrIdx]) idx = idOrIdx; else idx = list.findIndex(h => h._id === idOrIdx);
+        if (typeof idOrIdx === 'number' && list[idOrIdx]) {
+            idx = idOrIdx;
+        } else {
+            idx = list.findIndex(h => h._id === idOrIdx);
+            if (idx < 0 && typeof idOrIdx === 'string' && /^\d+$/.test(idOrIdx)) {
+                const numIdx = Number(idOrIdx);
+                if (list[numIdx]) idx = numIdx;
+            }
+        }
         if (idx < 0) return;
+
         const rec = list[idx];
         const roundFixtures = FIXTURES[rec.round] || [];
         const fixture = roundFixtures.find(m => m.home === rec.home && m.away === rec.away);
@@ -8973,7 +8956,15 @@
     function delHistory(idOrIdx) {
         const list = getHistory();
         let idx = -1;
-        if (typeof idOrIdx === 'number' && list[idOrIdx]) idx = idOrIdx; else idx = list.findIndex(h => h._id === idOrIdx);
+        if (typeof idOrIdx === 'number' && list[idOrIdx]) {
+            idx = idOrIdx;
+        } else {
+            idx = list.findIndex(h => h._id === idOrIdx);
+            if (idx < 0 && typeof idOrIdx === 'string' && /^\d+$/.test(idOrIdx)) {
+                const numIdx = Number(idOrIdx);
+                if (list[numIdx]) idx = numIdx;
+            }
+        }
         if (idx < 0) return;
         list.splice(idx, 1);
         setHistory(list);
@@ -9119,7 +9110,6 @@
     });
     let batchN = 1;
 
-    /* ============ 修复 #17：抽 getPredictableMatches 共用 ============ */
     function getPredictableMatches(round) {
         const allRound = FIXTURES[round] || [];
         const hist = getHistory();
@@ -9157,7 +9147,6 @@
         toast('批量预测将停止…', 'warn', 2000)
     }
 
-    /* ============ 修复 #6/#9/#39：批量预测用统一 prompt + 传 intel + 概率平均 ============ */
     async function runBatch() {
         const btn = document.getElementById('batchBtn');
         if (!getKey()) return toast('请先填 Groq API Key', 'warn');
@@ -9202,7 +9191,7 @@
                             const temp = 0.5;
                             const raw = await callGroq(skill, userPrompt, 3, temp, seed);
                             try {
-                                const p = JSON.parse(stripFence(raw));
+                                const p = JSON.parse(extractJSON(raw));
                                 const v = validateAndNormalizePrediction(p, {H, A});
                                 if (v.ok) runs.push({
                                     score: v.data.score,
@@ -9221,7 +9210,6 @@
                         }
                         if (!runs.length) throw new Error('all runs failed');
 
-                        // 概率平均（修复 #39）
                         const avgH = runs.reduce((s, x) => s + x.homeWin, 0) / runs.length;
                         const avgD = runs.reduce((s, x) => s + x.draw, 0) / runs.length;
                         const avgA = runs.reduce((s, x) => s + x.awayWin, 0) / runs.length;
@@ -9230,7 +9218,6 @@
                         const normD = Math.round(avgD / total * 10000) / 100;
                         const normA = Math.round((100 - normH - normD) * 100) / 100;
 
-                        // 比分取与主方向一致的众数（修复 #39）
                         const mainDir = normH >= normD && normH >= normA ? 'H' : normD >= normA ? 'D' : 'A';
                         const scoreCount = {};
                         runs.forEach(x => {
@@ -9603,7 +9590,6 @@
         }, {passive: true})
     })();
 
-    /* ============ 修复 #5/#29/#41：loadExternalData 设置 _standingsLoaded 和 _season ============ */
     async function loadExternalData() {
         const banner = document.getElementById('fallbackBanner');
         const loadingEl = document.getElementById('dashRound');
@@ -9701,7 +9687,6 @@
         }
     }
 
-    /* ============ 修复 #19：多标签页同步 ============ */
     window.addEventListener('storage', e => {
         if (e.key === HIST_KEY) {
             _histMemCache = null;
