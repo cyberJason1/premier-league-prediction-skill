@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-18T07:28:56.129Z",
+  "updatedAt": "2026-10-18T12:50:48.018Z",
   "meta": {
-    "updatedAt": "2026-10-18T07:28:56.129Z",
+    "updatedAt": "2026-10-18T12:50:48.018Z",
     "health": {
       "pl": "ok",
       "fpl": "ok"
@@ -4974,5 +4974,1177 @@
         0
       ]
     }
-  }
+  },
+  "fplInjuries": [
+    {
+      "name": "William Saliba",
+      "team": "ARS",
+      "news": "Back injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Piero Hincapié",
+      "team": "ARS",
+      "news": "Ankle injury - Expected back 24 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Gabriel Martinelli Silva",
+      "team": "ARS",
+      "news": "Has joined Al Hilal permanently",
+      "chance": 0
+    },
+    {
+      "name": "Martín Zubimendi Ibáñez",
+      "team": "ARS",
+      "news": "Unspecified injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Ethan Nwaneri",
+      "team": "ARS",
+      "news": "Has joined Borussia Dortmund on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Fábio Ferreira Vieira",
+      "team": "ARS",
+      "news": "Has joined Hamburger SV permanently",
+      "chance": 0
+    },
+    {
+      "name": "Reiss Nelson",
+      "team": "ARS",
+      "news": "has departed the club as a free agent.",
+      "chance": 0
+    },
+    {
+      "name": "Gabriel Fernando de Jesus",
+      "team": "ARS",
+      "news": "Has joined FC Barcelona permanently",
+      "chance": 0
+    },
+    {
+      "name": "Christos Tzolis",
+      "team": "ARS",
+      "news": "Hamstring injury - Expected back 1 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Lucas Digne",
+      "team": "AVL",
+      "news": "Has joined Paris Saint-Germain permanently",
+      "chance": 0
+    },
+    {
+      "name": "Ian Maatsen",
+      "team": "AVL",
+      "news": "Ankle injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Kosta Nedeljkovic",
+      "team": "AVL",
+      "news": "Has joined Rangers on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Leon Bailey",
+      "team": "AVL",
+      "news": "Has joined Olympiakos permanently",
+      "chance": 0
+    },
+    {
+      "name": "Amadou Onana",
+      "team": "AVL",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Samuel Iling-Junior",
+      "team": "AVL",
+      "news": "Has joined Bolton Wanderers on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "George Hemmings",
+      "team": "AVL",
+      "news": "Knee injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Johan Manzambi",
+      "team": "AVL",
+      "news": "Calf injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Ollie Watkins",
+      "team": "AVL",
+      "news": "Has joined Al Hilal permanently",
+      "chance": 0
+    },
+    {
+      "name": "Matteo Ruggeri",
+      "team": "AVL",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Luka Lynch",
+      "team": "AVL",
+      "news": "Has joined Oxford United on loan until January",
+      "chance": 0
+    },
+    {
+      "name": "Aaron Wan-Bissaka",
+      "team": "AVL",
+      "news": "Hamstring injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Will Dennis",
+      "team": "BOU",
+      "news": "Has joined MK Dons permanently",
+      "chance": 0
+    },
+    {
+      "name": "Veljko Milosavljevic",
+      "team": "BOU",
+      "news": "Thigh injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Julián Araujo Zúñiga",
+      "team": "BOU",
+      "news": "Thigh injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Alex Scott",
+      "team": "BOU",
+      "news": "Thigh injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Junior Kroupi",
+      "team": "BOU",
+      "news": "Foot injury - Expected back 7 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Enes Ünal",
+      "team": "BOU",
+      "news": "Has joined Getafe permanently",
+      "chance": 0
+    },
+    {
+      "name": "Jannik Schuster",
+      "team": "BRE",
+      "news": "Ankle injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Vitaly Janelt",
+      "team": "BRE",
+      "news": "Suspended until 31 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Antoni Milambo",
+      "team": "BRE",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Yehor Yarmoliuk",
+      "team": "BRE",
+      "news": "Suspended until 23 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Josh Dasilva",
+      "team": "BRE",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Kaye Furo",
+      "team": "BRE",
+      "news": "Unspecified injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Igor Julio dos Santos de Paulo",
+      "team": "BHA",
+      "news": "Has joined Burnley permanently",
+      "chance": 0
+    },
+    {
+      "name": "Mitoma Kaoru",
+      "team": "BHA",
+      "news": "Hamstring injury - Expected back 18 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Yankuba Minteh",
+      "team": "BHA",
+      "news": "Leg injury - Expected back 28 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Facundo Buonanotte",
+      "team": "BHA",
+      "news": "Has joined Elche on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Mats Wieffer",
+      "team": "BHA",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Harry Howell",
+      "team": "BHA",
+      "news": "Has joined Leicester City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Tom Watson",
+      "team": "BHA",
+      "news": "Has joined Leicester City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Zadok Yohanna",
+      "team": "BHA",
+      "news": "Unspecified injury - Expected back 18 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Stefanos Tzimas",
+      "team": "BHA",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Evan Ferguson",
+      "team": "BHA",
+      "news": "Ankle injury - Expected back 18 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Pascal Struijk",
+      "team": "BHA",
+      "news": "Hamstring injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Amario Cozier-Duberry",
+      "team": "BHA",
+      "news": "Has joined Middlesbrough on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Femi Azeez",
+      "team": "BHA",
+      "news": "Hamstring injury - Expected back 18 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Emiliano Martínez Romero",
+      "team": "CHE",
+      "news": "Head injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Robert Lynch Sánchez",
+      "team": "CHE",
+      "news": "Has joined Como on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Filip Jörgensen",
+      "team": "CHE",
+      "news": "Has joined RC Strasbourg on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Reece James",
+      "team": "CHE",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Trevoh Chalobah",
+      "team": "CHE",
+      "news": "Has joined Como permanently",
+      "chance": 0
+    },
+    {
+      "name": "Malo Gusto",
+      "team": "CHE",
+      "news": "Illness - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Benoît Badiashile Mukinayi",
+      "team": "CHE",
+      "news": "Has joined Napoli on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Mamadou Sarr",
+      "team": "CHE",
+      "news": "Has joined Real Sociedad on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Jamie Bynoe-Gittens",
+      "team": "CHE",
+      "news": "Ankle injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Dário Luís Essugo",
+      "team": "CHE",
+      "news": "Has joined RC Strasbourg on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Marc Guiu Paz",
+      "team": "CHE",
+      "news": "Has joined RB Leipzig permanently",
+      "chance": 0
+    },
+    {
+      "name": "Emmanuel Emegha",
+      "team": "CHE",
+      "news": "Hamstring injury - Expected back 17 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Pep Chavarría",
+      "team": "CHE",
+      "news": "Unspecified injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Oliver Dovin",
+      "team": "COV",
+      "news": "Has joined Leyton Orient on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Liam Kitching",
+      "team": "COV",
+      "news": "Has joined Sheffield United on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Kaine Kesler-Hayden",
+      "team": "COV",
+      "news": "Hamstring injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Luke Woolfenden",
+      "team": "COV",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Miguel Brau",
+      "team": "COV",
+      "news": "Has joined Academico de Viseu on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Aurèle Amenda",
+      "team": "COV",
+      "news": "Calf injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Josh Eccles",
+      "team": "COV",
+      "news": "Ankle injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Raphael Borges Rodrigues",
+      "team": "COV",
+      "news": "Has joined Burton Albion on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Kai Andrews",
+      "team": "COV",
+      "news": "Has joined Oxford United on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Haji Wright",
+      "team": "COV",
+      "news": "Thigh injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Jahnoah Markelo",
+      "team": "COV",
+      "news": "Has joined Shabab Al-Ahli Dubai permanently",
+      "chance": 0
+    },
+    {
+      "name": "Norman Bassette",
+      "team": "COV",
+      "news": "Has joined KVC Westerlo on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Axel Disasi",
+      "team": "CRY",
+      "news": "Suspended until 25 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Dean Henderson",
+      "team": "CRY",
+      "news": "Foot injury - 50% chance of playing",
+      "chance": 50
+    },
+    {
+      "name": "Borna Sosa",
+      "team": "CRY",
+      "news": "Has joined FC Cologne on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Chadi Riad Dnanou",
+      "team": "CRY",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Justin Devenny",
+      "team": "CRY",
+      "news": "Has joined Stoke City permanently",
+      "chance": 0
+    },
+    {
+      "name": "Romain Esse",
+      "team": "CRY",
+      "news": "Has joined Millwall on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Matheus França de Oliveira",
+      "team": "CRY",
+      "news": "Has joined Alverca on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Jesurun Rak-Sakyi",
+      "team": "CRY",
+      "news": "has joined  Kasimpasa on loan for the rest of the seaon.",
+      "chance": 0
+    },
+    {
+      "name": "Rio Cardines",
+      "team": "CRY",
+      "news": "Has joined Bristol City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Christantus Uche",
+      "team": "CRY",
+      "news": "has returned to Getafe CF",
+      "chance": 0
+    },
+    {
+      "name": "Takehiro Tomiyasu",
+      "team": "CRY",
+      "news": "Calf injury - Expected back 18 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Ben Chilwell",
+      "team": "CRY",
+      "news": "Unspecified injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Nathan Patterson",
+      "team": "EVE",
+      "news": "Has joined Torino permanently",
+      "chance": 0
+    },
+    {
+      "name": "Adam Aznou",
+      "team": "EVE",
+      "news": "Has joined Malaga on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Norberto Bercique Gomes Betuncal",
+      "team": "EVE",
+      "news": "Has joined Fiorentina permanently",
+      "chance": 0
+    },
+    {
+      "name": "Alfie McNally",
+      "team": "FUL",
+      "news": "Has joined York City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Ryan Sessegnon",
+      "team": "FUL",
+      "news": "Suspended until 21 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Luc De Fougerolles",
+      "team": "FUL",
+      "news": "has joined  Real Salt Lake on loan for the rest of the seaon.",
+      "chance": 0
+    },
+    {
+      "name": "Hugo Larsson",
+      "team": "FUL",
+      "news": "Groin injury - 25% chance of playing",
+      "chance": 25
+    },
+    {
+      "name": "Jack Butland",
+      "team": "HUL",
+      "news": "Arm injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Harvey Cartwright",
+      "team": "HUL",
+      "news": "Has joined Grimsby Town on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Thimothée Lo-Tutala",
+      "team": "HUL",
+      "news": "Has joined Colchester United on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Charlie Hughes",
+      "team": "HUL",
+      "news": "Groin injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Cody Drameh",
+      "team": "HUL",
+      "news": "Has joined Genoa permanently",
+      "chance": 0
+    },
+    {
+      "name": "Matty Jacob",
+      "team": "HUL",
+      "news": "Has joined Newport County on loan until January",
+      "chance": 0
+    },
+    {
+      "name": "Liam Millar",
+      "team": "HUL",
+      "news": "Has joined Birmingham on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Eliot Matazo",
+      "team": "HUL",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Abu Kamara",
+      "team": "HUL",
+      "news": "Has joined Portsmouth permanently",
+      "chance": 0
+    },
+    {
+      "name": "David Akintola",
+      "team": "HUL",
+      "news": "Has joined Omonoia FC permanently",
+      "chance": 0
+    },
+    {
+      "name": "Darko Gyabi",
+      "team": "HUL",
+      "news": "Thigh injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Enis Destan",
+      "team": "HUL",
+      "news": "Has joined Konyaspor permanently",
+      "chance": 0
+    },
+    {
+      "name": "Mason Burstow",
+      "team": "HUL",
+      "news": "Has joined Sheffield Wednesday on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Matt Targett",
+      "team": "HUL",
+      "news": "Ankle injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Nobel Mendy",
+      "team": "HUL",
+      "news": "Groin injury - Expected back 31 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Lucas Gourna-Douath",
+      "team": "HUL",
+      "news": "Calf injury - Expected back 25 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Mohamed-Ali Cho",
+      "team": "HUL",
+      "news": "Unspecified injury - Expected back 25 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Ilyas Ansah",
+      "team": "HUL",
+      "news": "Back injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Robinio Vaz",
+      "team": "HUL",
+      "news": "Achilles injury - 50% chance of playing",
+      "chance": 50
+    },
+    {
+      "name": "Ben Johnson",
+      "team": "IPS",
+      "news": "Has joined Stoke City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Wes Burns",
+      "team": "IPS",
+      "news": "Has joined Leicester City permanently",
+      "chance": 0
+    },
+    {
+      "name": "Chiedozie Ogbene",
+      "team": "IPS",
+      "news": "Has joined Lincoln City on loan until January",
+      "chance": 0
+    },
+    {
+      "name": "George Hirst",
+      "team": "IPS",
+      "news": "Has joined Stoke City permanently",
+      "chance": 0
+    },
+    {
+      "name": "Sam Szmodics",
+      "team": "IPS",
+      "news": "Has joined Derby County on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Ali Al-Hamadi",
+      "team": "IPS",
+      "news": "Has joined Sheffield Wednesday on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Kayne van Oevelen",
+      "team": "IPS",
+      "news": "Has joined Valencia on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Cameron Humphreys",
+      "team": "IPS",
+      "news": "Has joined Huddersfield Town on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Lucas Estella Perri",
+      "team": "LEE",
+      "news": "Has joined Torino on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Joe Rodon",
+      "team": "LEE",
+      "news": "Hamstring injury - Expected back 21 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Sebastiaan Bornauw",
+      "team": "LEE",
+      "news": "Has joined Hamburg SV on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Wilfried Gnonto",
+      "team": "LEE",
+      "news": "Has joined ACF Fiorentina on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Jack Harrison",
+      "team": "LEE",
+      "news": "Has joined New England Revolution permanently",
+      "chance": 0
+    },
+    {
+      "name": "Daniel James",
+      "team": "LEE",
+      "news": "Back injury - 50% chance of playing",
+      "chance": 50
+    },
+    {
+      "name": "Joël Piroe",
+      "team": "LEE",
+      "news": "Has joined West Ham United on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Mateo Joseph Fernández-Regatillo",
+      "team": "LEE",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Armin Pecsi",
+      "team": "LIV",
+      "news": "Has joined TSV Hartberg on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Vitezslav Jaros",
+      "team": "LIV",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Jeremie Frimpong",
+      "team": "LIV",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Conor Bradley",
+      "team": "LIV",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Giovanni Leoni",
+      "team": "LIV",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Calvin Ramsay",
+      "team": "LIV",
+      "news": "Has joined St Mirren on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Dominik Szoboszlai",
+      "team": "LIV",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Curtis Jones",
+      "team": "LIV",
+      "news": "Has joined Internazionale permanently",
+      "chance": 0
+    },
+    {
+      "name": "Stefan Bajčetić Maquieira",
+      "team": "LIV",
+      "news": "Has joined Celta Vigo permanently",
+      "chance": 0
+    },
+    {
+      "name": "Hugo Ekitiké",
+      "team": "LIV",
+      "news": "Achilles injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Harvey Elliott",
+      "team": "LIV",
+      "news": "Has joined Valencia on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Max Alleyne",
+      "team": "MCI",
+      "news": "Has joined Burnley on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Antoine Semenyo",
+      "team": "MCI",
+      "news": "Knee injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Rodrigo 'Rodri' Hernandez Cascante",
+      "team": "MCI",
+      "news": "Has joined Barcelona permanently",
+      "chance": 0
+    },
+    {
+      "name": "Tijjani Reijnders",
+      "team": "MCI",
+      "news": "Has joined Al Qadsiah permanently",
+      "chance": 0
+    },
+    {
+      "name": "Claudio Echeverri",
+      "team": "MCI",
+      "news": "Has joined Benfica on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Kalvin Phillips",
+      "team": "MCI",
+      "news": "Has joined Sheffield United on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Divine Mukasa",
+      "team": "MCI",
+      "news": "has joined West Ham on loan for the rest of the seaon.",
+      "chance": 0
+    },
+    {
+      "name": "Jeremy Monga",
+      "team": "MCI",
+      "news": "Has joined Swansea City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Altay Bayındır",
+      "team": "MUN",
+      "news": "Has joined Celta Vigo on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Tom Heaton",
+      "team": "MUN",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Patrick Dorgu",
+      "team": "MUN",
+      "news": "Hamstring injury - Expected back 25 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Luke Shaw",
+      "team": "MUN",
+      "news": "Unspecified injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Tyler Fredricson",
+      "team": "MUN",
+      "news": "Has joined Lausanne-Sport permanently",
+      "chance": 0
+    },
+    {
+      "name": "Kobbie Mainoo",
+      "team": "MUN",
+      "news": "Unspecified injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Manuel Ugarte Ribeiro",
+      "team": "MUN",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Toby Collyer",
+      "team": "MUN",
+      "news": "Has joined West Brom permanently",
+      "chance": 0
+    },
+    {
+      "name": "Benjamin Sesko",
+      "team": "MUN",
+      "news": "Shin injury - Expected back 18 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Chido Obi",
+      "team": "MUN",
+      "news": "Has joined Willem II on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Ewen Jaouen",
+      "team": "NEW",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Tino Livramento",
+      "team": "NEW",
+      "news": "Unspecified injury - Expected back 2 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Alex Murphy",
+      "team": "NEW",
+      "news": "Has joined FC Kaiserslautern on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Anthony Elanga",
+      "team": "NEW",
+      "news": "Unspecified injury - Expected back 25 Oct",
+      "chance": 0
+    },
+    {
+      "name": "Jacob Ramsey",
+      "team": "NEW",
+      "news": "Thigh injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Nick Woltemade",
+      "team": "NEW",
+      "news": "Has joined Juventus on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Sean Neave",
+      "team": "NEW",
+      "news": "Has joined Wolves on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Leo Shahar",
+      "team": "NEW",
+      "news": "has joined Arouca on loan for the rest of the seaon.",
+      "chance": 0
+    },
+    {
+      "name": "Felipe Rodrigues da Silva",
+      "team": "NFO",
+      "news": "Has joined West Ham on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Nikola Milenković",
+      "team": "NFO",
+      "news": "Knee injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Nicolò Savona",
+      "team": "NFO",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Zach Abbott",
+      "team": "NFO",
+      "news": "Has joined Southampton on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Tyler Bindon",
+      "team": "NFO",
+      "news": "Has joined Charlton Athletic on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Morgan Gibbs-White",
+      "team": "NFO",
+      "news": "Muscular injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Omari Hutchinson",
+      "team": "NFO",
+      "news": "Has joined AC Milan on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Dilane Bakwa",
+      "team": "NFO",
+      "news": "Has joined Lille on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Igor Jesus Maciel da Cruz",
+      "team": "NFO",
+      "news": "Calf injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Guglielmo Vicario",
+      "team": "TOT",
+      "news": "Has joined Juventus on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Pedro Porro Sauceda",
+      "team": "TOT",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Cristian Romero",
+      "team": "TOT",
+      "news": "Has joined Atletico Madrid permanently",
+      "chance": 0
+    },
+    {
+      "name": "Djed Spence",
+      "team": "TOT",
+      "news": "Has joined Internazionale permanently",
+      "chance": 0
+    },
+    {
+      "name": "Ashley Phillips",
+      "team": "TOT",
+      "news": "Has joined Middlesbrough permanently",
+      "chance": 0
+    },
+    {
+      "name": "João Victor de Souza Menezes",
+      "team": "TOT",
+      "news": "Has joined FC Porto on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Xavi Simons",
+      "team": "TOT",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Rodrigo Bentancur",
+      "team": "TOT",
+      "news": "Suspended until 7 Nov",
+      "chance": 0
+    },
+    {
+      "name": "Wilson Odobert",
+      "team": "TOT",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Pape Matar Sarr",
+      "team": "TOT",
+      "news": "Has joined Juventus on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Dejan Kulusevski",
+      "team": "TOT",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Mikey Moore",
+      "team": "TOT",
+      "news": "Has joined FC Köln on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Richarlison de Andrade",
+      "team": "TOT",
+      "news": "not included in squad.",
+      "chance": 0
+    },
+    {
+      "name": "Dane Scarlett",
+      "team": "TOT",
+      "news": "Has joined Leyton Orient permanently",
+      "chance": 0
+    },
+    {
+      "name": "Mykhailo Mudryk",
+      "team": "TOT",
+      "news": "Ankle injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Anthony Patterson",
+      "team": "SUN",
+      "news": "Has joined Wrexham permanently",
+      "chance": 0
+    },
+    {
+      "name": "Daniel Ballard",
+      "team": "SUN",
+      "news": "Hamstring injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Jenson Seelt",
+      "team": "SUN",
+      "news": "Has joined Swansea City on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Leo Fuhr Hjelde",
+      "team": "SUN",
+      "news": "Has joined KV Mechelen on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Arthur Masuaku",
+      "team": "SUN",
+      "news": "Has joined Konyaspor permanently",
+      "chance": 0
+    },
+    {
+      "name": "Thomas Meunier",
+      "team": "SUN",
+      "news": "Groin injury - 75% chance of playing",
+      "chance": 75
+    },
+    {
+      "name": "Simon Adingra",
+      "team": "SUN",
+      "news": "Has joined Ajax on loan for the rest of the season",
+      "chance": 0
+    },
+    {
+      "name": "Romaine Mundle",
+      "team": "SUN",
+      "news": "Knee injury - Unknown return date",
+      "chance": 0
+    },
+    {
+      "name": "Wilson Isidor",
+      "team": "SUN",
+      "news": "Knock - 50% chance of playing",
+      "chance": 50
+    }
+  ]
 }
