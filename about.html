@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>关于 · 英超预测引擎 v16.0</title>
-    <meta name="description" content="英超预测引擎 v16.0 · 规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测与 FPL 最佳阵容推荐">
+    <title>关于 · 英超预测引擎 v16.1</title>
+    <meta name="description" content="英超预测引擎 v16.1 · 规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测与 FPL 最佳阵容推荐">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
@@ -175,9 +175,9 @@
 <div class="wrap">
 
     <div class="hero">
-        <div class="kick">About · 关于此项目 · v16.0</div>
+        <div class="kick">About · 关于此项目 · v16.1</div>
         <h1 id="aboutTitle">英超 <em>预测</em> 引擎</h1>
-        <p class="lead">一个完全开源、零成本、可持续运营的 AI 足球预测引擎。现在它不仅提供 18 维深度的 AI 比分预测，还为你每周自动挑选 FPL 梦幻英超的最佳阵容。</p>
+        <p class="lead">一个完全开源、零成本、可持续运营的 AI 足球预测引擎。现在它不仅提供 18 维深度的 AI 比分预测，还为你每周自动挑选 FPL 梦幻英超的最佳阵容，并实时同步全量伤停情报。</p>
     </div>
 
     <section id="what">
@@ -194,7 +194,7 @@
             <div class="layer"><div class="n">LAYER 01</div><div class="t">资料库</div><div class="d">20 队完整资料写死，只许引用，不许编造</div></div>
             <div class="layer"><div class="n">LAYER 02</div><div class="t">方法论</div><div class="d">近期状态 40%、硬实力 30%、历史交锋 10%、情境因素 20%</div></div>
             <div class="layer"><div class="n">LAYER 03</div><div class="t">输出契约</div><div class="d">严格 JSON 格式，字段、类型、长度全部锁死</div></div>
-            <div class="layer"><div class="n">LAYER 04</div><div class="t">动态情报区</div><div class="d">每日手动更新，优先级最高，冲突时以此为准</div></div>
+            <div class="layer"><div class="n">LAYER 04</div><div class="t">动态情报区</div><div class="d">每日自动注入官方伤停情报，优先级最高，冲突时以此为准</div></div>
         </div>
 
         <p>这套架构解决的问题是：<strong>杜绝模型瞎编历史、瞎编伤病、格式飘忽、信息过时</strong>。模型很聪明，但也会偷懒——必须用提示词强制约束。</p>
@@ -205,29 +205,30 @@
 
         <h3>技术栈</h3>
         <ul class="list">
-            <li><strong>规则层</strong> — <code>skill.md</code> v2.1.0 提示词工程（压缩至约 6300 tokens 以适配 Groq TPM）</li>
+            <li><strong>规则层</strong> — <code>skill.md</code> v2.2.0 提示词工程（引入数据时效约束，严禁 AI 臆造）</li>
             <li><strong>前端层</strong> — 单文件 <code>index.html</code>，原生 HTML/CSS/JS，零依赖零构建</li>
-            <li><strong>数据层</strong> — <code>data.json</code> 与 <code>fpl.json</code> 双数据源，与代码完全分离</li>
-            <li><strong>推理层</strong> — Groq 免费 API，模型 <code>openai/gpt-oss-120b</code>，每天 1000 次额度</li>
-            <li><strong>部署层</strong> — GitHub Pages + Service Worker 离线缓存，零服务器成本</li>
+            <li><strong>数据层</strong> — <code>data.json</code> 与 <code>fpl.json</code> 双数据源，每日自动注入最新伤停</li>
+            <li><strong>推理层</strong> — Groq 免费 API，模型 <code>openai/gpt-oss-120b</code>，自动重试防截断</li>
+            <li><strong>部署层</strong> — GitHub Pages + Service Worker 穿透缓存防污染，零服务器成本</li>
         </ul>
 
         <h3>核心功能</h3>
         <ul class="list">
             <li><strong>智能预测</strong> — 严格 JSON 输出，18 维深度分析（大小球/BTTS/概率校准/命中趋势）</li>
+            <li><strong>数据动态化</strong> — 每日自动同步英超官方阵容与伤停，强行注入 Prompt 避免 AI 用过期数据预测</li>
             <li><strong>防作弊机制</strong> — 已结束比赛禁止预测、唯一赛前定案、实时数据注入、实际比分时间锁</li>
             <li><strong>FPL 最佳阵容</strong> — 基于官方 API 数据，自动计算每周预测得分最高的 15 人阵容</li>
-            <li><strong>球员信息</strong> — 1539 张球员照片、进球概率、状态标签、推荐得分球员</li>
+            <li><strong>球员信息</strong> — 多源高清球员照片、进球概率、状态标签、推荐得分球员</li>
             <li><strong>比赛选择</strong> — 按轮次 / 按球队双模式，球队下拉显示 38 轮完整赛程</li>
             <li><strong>历史追踪</strong> — 自动去重、实际比分自动同步、命中率趋势图</li>
             <li><strong>沉浸体验</strong> — 光标光晕、漂浮粒子、3D 倾斜、命令面板、快捷键</li>
         </ul>
 
-        <h3>FPL 梦幻英超 <span class="badge-new">NEW</span></h3>
+        <h3>FPL 梦幻英超</h3>
         <div class="highlights">
             <div class="highlight"><span class="ico">🎮</span><div class="t">每周最佳阵容</div><div class="d">通过算法在所有球员中选出性价比最高、预测得分最强的 15 人阵容</div></div>
             <div class="highlight"><span class="ico">👑</span><div class="t">队长 / 副队长推荐</div><div class="d">基于预测得分自动推荐最佳队长人选，并以皇冠标识</div></div>
-            <div class="highlight"><span class="ico">⚽</span><div class="t">真实官方头像</div><div class="d">绿茵场上的每一位球员都直接接入英超官方高清半身像</div></div>
+            <div class="highlight"><span class="ico">⚽</span><div class="t">真实官方头像</div><div class="d">绿茵场上的每一位球员都直接接入全球 CDN 加速的高清半身像，100% 必出</div></div>
             <div class="highlight"><span class="ico">🛡️</span><div class="t">规则合规校验</div><div class="d">严格遵循 £100m 预算、同队最多 3 人、位置阵型等 FPL 官方规则</div></div>
         </div>
 
@@ -238,8 +239,9 @@
                 <tbody>
                 <tr><td>比赛数据</td><td><a href="https://www.football-data.org/" target="_blank" rel="noopener">football-data.org</a></td><td>积分榜、赛程、完赛比分、开赛时间、历史赛季</td></tr>
                 <tr><td>FPL 数据</td><td><a href="https://fantasy.premierleague.com/" target="_blank" rel="noopener">FPL 官方 API</a></td><td>球员身价、得分、状态、赛程难度、每周最佳阵容</td></tr>
+                <tr><td>实时伤停</td><td>FPL 官方 API (bootstrap-static)</td><td>每日自动提取全量球员伤停状态，强制注入 AI Prompt</td></tr>
                 <tr><td>球队队徽</td><td>ESPN CDN</td><td>20 队徽章展示（版权归各俱乐部所有）</td></tr>
-                <tr><td>球员照片</td><td>Bzzoiro Sports Data + TheSportsDB + 英超官方 CDN</td><td>球员照片（多源合并）</td></tr>
+                <tr><td>球员照片</td><td>wsrv.nl 全球加速 + 英超官方 CDN + 本地 SVG</td><td>球员照片（三级不死兜底，绝对出图）</td></tr>
                 <tr><td>AI 推理</td><td><a href="https://groq.com/" target="_blank" rel="noopener">Groq</a></td><td>根据 skill.md 生成结构化预测</td></tr>
                 </tbody>
             </table>
@@ -269,7 +271,7 @@
         <h3>版权说明</h3>
         <ul class="list">
             <li><strong>球队队徽</strong> — 版权归各英超俱乐部及 ESPN 所有，本项目仅用于学习演示，<strong>不做商业用途</strong></li>
-            <li><strong>球员照片</strong> — 来源于 Bzzoiro, TheSportsDB 及英超官方，版权归原始来源</li>
+            <li><strong>球员照片</strong> — 来源于全球图片 CDN 及英超官方，版权归原始来源</li>
             <li><strong>比赛数据</strong> — 遵循 football-data.org 免费层条款</li>
             <li><strong>项目代码</strong> — <a href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub 仓库</a>，可自由 Fork、学习、修改</li>
         </ul>
@@ -280,7 +282,7 @@
 
     <section id="journey">
         <h2>成长历程</h2>
-        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 31 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
+        <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 32 个里程碑。这不是一条直线，是踩坑、修复、重构、再踩坑的循环。</p>
 
         <div class="timeline">
             <div class="tl-item done"><strong>01</strong> 理解并改写 <code>skill.md</code> 提示词工程</div>
@@ -313,7 +315,8 @@
             <div class="tl-item done"><strong>28</strong> v13.2.2：清理冗余 + 球员照片瘦身</div>
             <div class="tl-item done"><strong>29</strong> v13.3：德比名徽章 + H2H 历史交锋 + 近期状态圆点</div>
             <div class="tl-item done"><strong>30</strong> v15.0：融合 FPL 梦幻英超最佳阵容推荐</div>
-            <div class="tl-item new"><strong>31</strong> v16.0：防作弊锁 + 实时数据注入 + 赛前定案 + OG 社交卡片 + 预测准确率修复</div>
+            <div class="tl-item done"><strong>31</strong> v16.0：防作弊锁 + 实时数据注入 + 赛前定案 + OG 社交卡片 + 预测准确率修复</div>
+            <div class="tl-item new"><strong>32</strong> v16.1：实时官方阵容伤停同步 + 数据时效硬约束 + 极限防截断重试 + 缓存彻底穿透防污染</div>
         </div>
     </section>
 
@@ -325,7 +328,7 @@
             <span style="color:var(--text-4)">·</span>
             <a href="#legal">免责声明</a>
         </div>
-        <div class="ver">Premier League Prediction Engine · v16.0</div>
+        <div class="ver">Premier League Prediction Engine · v16.1</div>
     </footer>
 </div>
 

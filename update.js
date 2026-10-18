@@ -38,6 +38,7 @@ function toChinese(name) { if (!name) return null; if (TEAM_MAP[name]) return TE
 function normalizeName(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
 
 async function fetchFromApi(token) {
+    if (!token) throw new Error('Missing Token');
     const headers = { 'X-Auth-Token': token }; const base = 'https://api.football-data.org/v4/competitions/PL';
     const sData = await fetchJSON(base + '/standings', { headers }, 15000);
     const standings = sData.standings[0].table.map(row => { const zh = toChinese(row.team.name); return zh ? { rank: row.position, team: zh, played: row.playedGames, won: row.won, drawn: row.draw, lost: row.lost, gf: row.goalsFor, ga: row.goalsAgainst, gd: row.goalDifference, points: row.points } : null; }).filter(Boolean);
@@ -67,7 +68,7 @@ async function fetchFPLData() {
     });
     const players = boot.elements.map(p => ({
         id: p.id, code: p.code, name: p.web_name, fullName: `${p.first_name} ${p.second_name}`,
-        photo: p.photo ? `https://resources.premierleague.com/premierleague/photos/players/110x140/${p.photo}` : null,
+        photo: p.photo || `${p.code}.png`, // 修复：只存文件名，前端自己拼装
         team: teamMap[p.team], teamId: p.team, position: p.element_type, cost: p.now_cost / 10,
         form: parseFloat(p.form) || 0, totalPoints: p.total_points || 0, ppg: parseFloat(p.points_per_game) || 0,
         ict: parseFloat(p.ict_index) || 0, xG: parseFloat(p.expected_goals) || 0, xA: parseFloat(p.expected_assists) || 0,
@@ -121,7 +122,7 @@ async function fetchBzzoiroPhotos(apiKey) {
     try { const tRes = await fetch(`https://sports.bzzoiro.com/api/v2/teams/?league_id=${leagueId}`, { headers }); if (tRes.ok) { const tData = await tRes.json(); (tData.results || []).forEach(t => { if (t.id) teamIds.push({ id: t.id, name: t.name }); }); } } catch(e) {}
     for (const team of teamIds) {
         try { const pRes = await fetch(`https://sports.bzzoiro.com/api/v2/players/?team_id=${team.id}`, { headers }); if (!pRes.ok) continue; const pData = await pRes.json(); (pData.results || []).forEach(p => { if (!p.name || !p.id) return; let zhName = null; for (const [zh, en] of Object.entries(PLAYER_NAME_MAP)) { if (normalizeName(en) === normalizeName(p.name)) { zhName = zh; break; } } if (zhName) photos[zhName] = `https://sports.bzzoiro.com/img/player/${p.id}/?sor=true&bg=transparent`; }); } catch(e) {}
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 300));
     }
     return photos;
 }
@@ -130,14 +131,15 @@ async function fetchTheSportsDBPhotos(existingPhotos) {
     const photos = { ...existingPhotos }; const missing = Object.entries(PLAYER_NAME_MAP).filter(([zh]) => !photos[zh]); if (!missing.length) return photos;
     for (const [zhName, enName] of missing) {
         const candidates = [enName, enName.normalize('NFD').replace(/[\u0300-\u036f]/g, ''), enName.replace(/-/g, ' ')]; let found = false;
-        for (const cand of [...new Set(candidates)]) { if (found) break; for (let attempt = 1; attempt <= 3; attempt++) { try { const res = await fetch(`https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}/searchplayers.php?p=${encodeURIComponent(cand)}`, { headers: { 'User-Agent': 'PL-Prediction-Engine/1.0' } }); if (res.status === 429) { await new Promise(r => setTimeout(r, 30000)); continue; } if (!res.ok) { found = true; break; } const data = await res.json(); const list = data.player || []; const want = normalizeName(cand); let best = list.find(p => normalizeName(p.strPlayer) === want) || list.find(p => normalizeName(p.strPlayer).startsWith(want)); if (best) { const url = best.strCutout || best.strRender || best.strThumb; if (url) photos[zhName] = url; } found = true; break; } catch(e) { await new Promise(r => setTimeout(r, 5000)); } } }
-        await new Promise(r => setTimeout(r, 2000));
+        for (const cand of [...new Set(candidates)]) { if (found) break; for (let attempt = 1; attempt <= 2; attempt++) { try { const res = await fetch(`https://www.thesportsdb.com/api/v1/json/${SPORTSDB_KEY}/searchplayers.php?p=${encodeURIComponent(cand)}`, { headers: { 'User-Agent': 'PL-Prediction-Engine/1.0' } }); if (res.status === 429) { await new Promise(r => setTimeout(r, 10000)); continue; } if (!res.ok) { found = true; break; } const data = await res.json(); const list = data.player || []; const want = normalizeName(cand); let best = list.find(p => normalizeName(p.strPlayer) === want) || list.find(p => normalizeName(p.strPlayer).startsWith(want)); if (best) { const url = best.strCutout || best.strRender || best.strThumb; if (url) photos[zhName] = url; } found = true; break; } catch(e) { await new Promise(r => setTimeout(r, 2000)); } } }
+        await new Promise(r => setTimeout(r, 1000));
     }
     return photos;
 }
 
 async function fetchHistoricalSeasons(token) {
     const out = {}; const headers = { 'X-Auth-Token': token };
+    if (!token) return out;
     try {
         const seasonsRes = await fetchJSON('https://api.football-data.org/v4/competitions/PL/seasons', { headers }, 15000);
         const nowY = new Date().getFullYear();
@@ -164,7 +166,7 @@ function pushDataFiles() {
         execSync('git add data.json fpl.json', { stdio: 'inherit' });
         const status = execSync('git status --short data.json fpl.json').toString().trim();
         if (!status) return;
-        execSync(`git commit -m "auto: update data"`, { stdio: 'inherit' });
+        execSync(`git commit -m "auto: update data & fpl"`, { stdio: 'inherit' });
         execSync('git pull --rebase origin main', { stdio: 'inherit' });
         execSync('git push origin main', { stdio: 'inherit' });
     } catch (e) {
@@ -175,29 +177,82 @@ function pushDataFiles() {
 
 async function main() {
     const fdToken = process.env.FD_TOKEN; const bzKey = process.env.BZZOIRO_KEY;
+
+    // 修复：即使没有 FD_TOKEN，也不要直接死掉，降级为只抓取 FPL
     if (!fdToken) {
-        console.error('❌ 缺少 FD_TOKEN 环境变量，请在 .env 或 GitHub Secrets 中配置');
-        process.exit(1);
+        console.warn('⚠️ 缺少 FD_TOKEN 环境变量，将仅更新 FPL 数据，不更新赛程/积分榜');
     }
+
     const oldData = readIfExists(DATA_FILE) || {}; const oldFpl = readIfExists(FPL_FILE); const health = {};
-    let apiData;
-    try { apiData = await fetchFromApi(fdToken); health.pl = 'ok'; } catch (e) { health.pl = 'fail'; apiData = { standings: oldData.standings || [], results: oldData.results || {}, fixtures: oldData.fixtures || [] }; }
+    let apiData = { standings: oldData.standings || [], results: oldData.results || {}, fixtures: oldData.fixtures || [] };
+
+    if (fdToken) {
+        try { apiData = await fetchFromApi(fdToken); health.pl = 'ok'; } catch (e) { health.pl = 'fail'; }
+    } else {
+        health.pl = 'skip';
+    }
+
     let historicalResults = oldData.historicalResults || {};
-    try { const fresh = await fetchHistoricalSeasons(fdToken); if (Object.keys(fresh).length) historicalResults = fresh; } catch(e) {}
+    if (fdToken) {
+        try { const fresh = await fetchHistoricalSeasons(fdToken); if (Object.keys(fresh).length) historicalResults = fresh; } catch(e) {}
+    }
+
     let playerPhotos = oldData.playerPhotos || {};
     if (bzKey) {
         try { const photos = await fetchBzzoiroPhotos(bzKey); if (Object.keys(photos).length) playerPhotos = photos; } catch(e) {}
         try { playerPhotos = await fetchTheSportsDBPhotos(playerPhotos); } catch(e) {}
     }
+
     let fplData = null;
-    try { fplData = await fetchFPLData(); health.fpl = 'ok'; } catch (e) { health.fpl = 'fail'; }
-    fs.writeFileSync(DATA_FILE, JSON.stringify({ updatedAt: new Date().toISOString(), meta: { updatedAt: new Date().toISOString(), health }, fixtures: apiData.fixtures, results: apiData.results, standings: apiData.standings, playerPhotos, historicalResults }, null, 2), 'utf8');
+    let fplInjuries = [];
+    let fplTransfers = [];
+
+    try {
+        fplData = await fetchFPLData();
+        health.fpl = 'ok';
+
+        // 核心新增：直接从 FPL 提取最新伤病和转会状态，写入 data.json
+        fplInjuries = fplData.players.filter(p => p.status !== 'a' && p.news).map(p => ({
+            name: p.fullName || p.name,
+            team: p.team,
+            news: p.news,
+            chance: p.chanceNext
+        }));
+    } catch (e) {
+        health.fpl = 'fail';
+    }
+
+    // 将最新伤停和球员名单直接写入 data.json，作为前端兜底
+    fs.writeFileSync(DATA_FILE, JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        meta: { updatedAt: new Date().toISOString(), health },
+        fixtures: apiData.fixtures,
+        results: apiData.results,
+        standings: apiData.standings,
+        playerPhotos,
+        historicalResults,
+        fplInjuries // 供前端直接读取
+    }, null, 2), 'utf8');
+
     if (fplData && fplData.players.length) {
         const squad = optimizeSquad(fplData.players);
-        if (squad) fs.writeFileSync(FPL_FILE, JSON.stringify({ updatedAt: new Date().toISOString(), meta: { updatedAt: new Date().toISOString(), health: { fpl: 'ok' } }, nextEvent: fplData.nextEvent, teams: fplData.teams, recommendedSquad: squad, allPlayers: fplData.players }, null, 2), 'utf8');
-    } else if (oldFpl) { console.log('保留旧 fpl.json'); }
+        if (squad) {
+            // 修复：fpl.json 里包含最新的 teams 和 players
+            fs.writeFileSync(FPL_FILE, JSON.stringify({
+                updatedAt: new Date().toISOString(),
+                meta: { updatedAt: new Date().toISOString(), health: { fpl: 'ok' } },
+                nextEvent: fplData.nextEvent,
+                teams: fplData.teams,
+                recommendedSquad: squad,
+                allPlayers: fplData.players
+            }, null, 2), 'utf8');
+        }
+    } else if (oldFpl) {
+        console.log('保留旧 fpl.json');
+    }
+
     if (!IS_CI && process.platform === 'win32') { try { exec(`explorer /select,"${path.resolve(FPL_FILE).replace(/\//g, '\\')}"`); } catch(e) {} }
     if (SHOULD_PUSH) pushDataFiles();
     else console.log('本地模式：已写入文件，未推送');
 }
-main().catch(e => process.exit(1));
+main().catch(e => { console.error(e); process.exit(1); });
