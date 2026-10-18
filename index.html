@@ -5739,10 +5739,8 @@
 <div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 <script>
     /* =====================================================================
-     *  v16.0 最新整合版
-     *  - 自动过滤完赛 / 智能轮次追踪 / 伤病情报联动
-     *  - JSON 极致容错 (extractJSON) / 移除强制 response_format
-     *  - 历史记录保留全字段 / 修复老数据删除索引 bug
+     *  v16.0 最终修复版
+     *  - 拦截截断报错 / 极限抢救 JSON / 限制分析字数 / 爆出原始输出
      * ===================================================================== */
 
     const Sound = (() => {
@@ -6351,7 +6349,7 @@
     }
 
     /* ================== 常量与状态 ================== */
-    const EXPECTED_SKILL_VERSION = '2.2.0'; // 同步更新
+    const EXPECTED_SKILL_VERSION = '2.2.0';
     const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
     const GROQ_MODEL = 'openai/gpt-oss-120b';
     const SKILL_CACHE_KEY = 'pl_skill_cache_v1';
@@ -6487,16 +6485,28 @@
         return null
     }
 
-    // 强力提取 JSON：兼容 markdown 代码块、前后废话、截断补齐
+    // 极限抢救 JSON
     function extractJSON(str) {
         if (!str) return '';
         let s = String(str).trim();
         s = s.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
         const start = s.indexOf('{');
         if (start === -1) return s;
+
         let end = s.lastIndexOf('}');
         if (end === -1) {
             s = s.substring(start);
+
+            // 抢救 1：如果以单引号开头，尝试替换为双引号（简单替换键值）
+            if (s.includes("'")) {
+                s = s.replace(/'([^']+)'\s*:/g, '"$1":').replace(/:\s*'([^']*)'/g, ':"$1"');
+            }
+
+            // 抢救 2：如果引号数量是奇数，说明截断在字符串里，强行补一个引号
+            const quoteCount = (s.match(/"/g) || []).length;
+            if (quoteCount % 2 !== 0) s += '"';
+
+            // 抢救 3：补齐大括号
             const leftBraces = (s.match(/\{/g) || []).length;
             const rightBraces = (s.match(/\}/g) || []).length;
             s += '}'.repeat(Math.max(0, leftBraces - rightBraces));
@@ -7462,7 +7472,7 @@
         prompt += `1. homeWin + draw + awayWin 必须等于 100；\n`;
         prompt += `2. 比分方向（主胜/平/客胜）必须与概率最大的方向一致；\n`;
         prompt += `3. 比分不得超过 6-6，总和不得超过 9；\n`;
-        prompt += `4. keyFactors 至少 2 条，analysis 至少 30 字；\n`;
+        prompt += `4. keyFactors 至少 2 条，analysis 最多 80 字，千万不要写长篇大论；\n`;
         prompt += `5. 若样本不足或数据缺失，置信度不得给"高"。\n`;
 
         return prompt
@@ -7501,9 +7511,9 @@
                 messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],
                 temperature: temperature,
                 top_p: 0.9,
-                max_tokens: 1500,
+                max_tokens: 2048,
                 seed: seed
-                // 移除了 response_format: {type: 'json_object'}
+                // 移除了 response_format: {type: 'json_object'} 以防止截断强退
             }),
             signal: ctrl.signal
         }).then(async resp => {
@@ -7519,7 +7529,12 @@
                 throw new Error(`Groq ${resp.status}: ${txt.slice(0, 240)}`)
             }
             const j = await resp.json();
-            return j.choices?.[0]?.message?.content || ''
+            const choice = j.choices?.[0];
+            // 修复：如果被截断，直接抛出明确错误
+            if (choice?.finish_reason === 'length') {
+                throw new Error('模型输出被截断（Token 超限），请精简情报或重试');
+            }
+            return choice?.message?.content || ''
         }).catch(e => {
             clearTimeout(tid);
             if (e.name === 'AbortError') throw new Error('请求超时（30s）');
@@ -7820,7 +7835,16 @@
             try {
                 parsed = JSON.parse(extractJSON(raw))
             } catch (e) {
-                card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
+                card.innerHTML = `<div class="empty" style="text-align:left; word-break:break-all;">
+                    <div style="color:var(--rose); font-weight:600; margin-bottom:12px; font-size:14px;">❌ JSON 解析失败</div>
+                    <div style="font-size:12px; color:var(--text-3); margin-bottom:8px;">错误信息: ${escapeHtml(e.message)}</div>
+                    <div style="font-size:12px; color:var(--text-3); margin-bottom:8px;">原始输出:</div>
+                    <pre style="background:rgba(0,0,0,.3); padding:12px; border-radius:8px; font-size:11px; max-height:200px; overflow-y:auto; white-space:pre-wrap;">${escapeHtml(raw)}</pre>
+                    <div style="display:flex; gap:8px; margin-top:16px;">
+                        <button class="btn ghost small" onclick="startPredict()">重试</button>
+                        <button class="btn ghost small" onclick="navigator.clipboard.writeText(\`${escapeHtml(raw).replace(/`/g, '\\`')}\`)">复制原始输出</button>
+                    </div>
+                </div>`;
                 Sound.error();
                 setBreath('slow');
                 return toast('模型返回非 JSON', 'err')
