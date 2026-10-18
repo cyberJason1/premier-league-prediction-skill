@@ -5738,6 +5738,14 @@
 </div>
 <div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 <script>
+    /* =====================================================================
+     *  v16.0 准确率修复版
+     *  三轮修复项：
+     *  [P0] 批量 prompt 与单场对齐 / 主客场拆分 / H2H 进 prompt / 概率后处理不扭曲
+     *  [P1] setHistory 保留分析字段 / 回退赛程特征守卫 / form 顺序 / 雷达 & 大小球 & 休息 & 对手调整进 prompt
+     *  [P2] H2H 时间排序 / calibBins 真校准 / HISTORICAL_RESULTS / stripFence / 排名守卫 / stale 状态
+     * ===================================================================== */
+
     const Sound = (() => {
         let enabled = false, ctx = null, lastX = 0, lastY = 0;
 
@@ -6343,6 +6351,7 @@
         }
     }
 
+    /* ================== 常量与状态 ================== */
     const EXPECTED_SKILL_VERSION = '2.1.0';
     const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
     const GROQ_MODEL = 'openai/gpt-oss-120b';
@@ -6350,6 +6359,10 @@
     const SKILL_CACHE_TTL = 24 * 3600 * 1000;
     const REQUEST_TIMEOUT = 30000;
     const INTEL_MAX = 300;
+
+    let _standingsLoaded = false;      // 修复 #5：standings 未加载时 getRank 返回 null
+    let _season = '2026-27';           // 修复 #41：赛季标签从 data.json 读
+    let _skillVersionMismatch = false; // 修复 #7：skill 版本不匹配时降级 confidence
 
     function escapeHtml(s) {
         if (s == null) return '';
@@ -6539,269 +6552,190 @@
     })();
     STATIC_STANDINGS = TEAMS.map(t => ({team: t, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, points: 0}));
 
-    function validateAndNormalizePrediction(raw) {
-        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {ok: false, errors: ['非对象'], data: raw};
-        const errors = [], warnings = [];
-        const data = JSON.parse(JSON.stringify(raw));
-        if (typeof data.score !== 'string' || !/^\d+-\d+$/.test(data.score)) {
-            const p = parseScoreArr(data.score);
-            if (p && Number.isFinite(p[0]) && Number.isFinite(p[1])) data.score = `${p[0]}-${p[1]}`; else {
-                errors.push('score 格式错误');
-                return {ok: false, errors, warnings, data}
-            }
-        }
-        if (!Array.isArray(data.keyFactors)) data.keyFactors = typeof data.keyFactors === 'string' ? data.keyFactors.split(/[、,，;；\n]/).map(s => s.trim()).filter(Boolean) : [];
-        if (typeof data.analysis !== 'string') data.analysis = data.analysis == null ? '' : String(data.analysis);
-        for (const k of ['homeKeyPlayers', 'awayKeyPlayers', 'likelyScorers']) {
-            if (data[k] != null && !Array.isArray(data[k])) data[k] = []
-        }
-        const required = ['homeWin', 'draw', 'awayWin', 'score', 'confidence', 'keyFactors', 'analysis'];
-        for (const k of required) {
-            if (data[k] === undefined || data[k] === null) errors.push(`缺少字段：${k}`)
-        }
-        if (errors.length) return {ok: false, errors, warnings, data};
-        let h = Number(data.homeWin), d = Number(data.draw), a = Number(data.awayWin);
-        if (![h, d, a].every(Number.isFinite)) {
-            errors.push('概率不是数字');
-            return {ok: false, errors, warnings, data}
-        }
-        const sum = h + d + a;
-        const diff = Math.abs(sum - 100);
-        if (diff > 2) {
-            warnings.push(`概率总和 ${sum}，偏差 > 2`);
-            return {ok: false, errors, warnings, data, hardFail: true}
-        }
-        if (diff > 0) {
-            const f = 100 / sum;
-            const r = [Math.round(h * f * 100), Math.round(d * f * 100), Math.round(a * f * 100)];
-            r[0] += 10000 - (r[0] + r[1] + r[2]);
-            data.homeWin = r[0] / 100;
-            data.draw = r[1] / 100;
-            data.awayWin = r[2] / 100
-        }
-        const [sh, sa] = data.score.split('-').map(Number);
-        const scoreDir = sh > sa ? 'H' : sh < sa ? 'A' : 'D';
-        const probDir = data.homeWin >= data.draw && data.homeWin >= data.awayWin ? 'H' : data.awayWin >= data.draw && data.awayWin >= data.homeWin ? 'A' : 'D';
-        if (scoreDir !== probDir) {
-            if (scoreDir === 'H') data.homeWin = Math.max(data.homeWin, data.draw + 1, data.awayWin + 1);
-            if (scoreDir === 'A') data.awayWin = Math.max(data.homeWin + 1, data.draw + 1, data.awayWin);
-            if (scoreDir === 'D') data.draw = Math.max(data.homeWin + 1, data.draw, data.awayWin + 1)
-        }
-        return {ok: true, errors, warnings, data}
-    }
-
-    const _toastKeys = new Set();
-
-    function toast(msg, kind = 'ok', dur = 3500) {
-        const key = kind + ':' + msg;
-        if (_toastKeys.has(key)) return;
-        _toastKeys.add(key);
-        const wrap = document.getElementById('toastWrap');
-        const el = document.createElement('div');
-        el.className = 'toast ' + kind;
-        el.textContent = msg;
-        el.title = '点击关闭';
-        const cleanup = () => {
-            if (el.parentNode) el.remove();
-            _toastKeys.delete(key)
-        };
-        el.onclick = cleanup;
-        wrap.appendChild(el);
-        let timer = setTimeout(cleanup, dur);
-        el.addEventListener('mouseenter', () => clearTimeout(timer));
-        el.addEventListener('mouseleave', () => {
-            timer = setTimeout(cleanup, 1500)
-        })
-    }
-
-    function confetti() {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const colors = ['#34d399', '#ff9f43', '#22d3ee', '#a78bfa', '#fbbf24'];
-        for (let i = 0; i < 50; i++) {
-            const el = document.createElement('div');
-            el.className = 'confetti';
-            el.style.left = Math.random() * 100 + 'vw';
-            el.style.background = colors[Math.floor(Math.random() * colors.length)];
-            el.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
-            el.style.animationDelay = (Math.random() * .3) + 's';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 3200)
-        }
-        Sound.exact()
-    }
-
-    function feedbackFloat(text, color) {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        const el = document.createElement('div');
-        el.className = 'feedback-float';
-        el.textContent = text;
-        el.style.left = (window.innerWidth / 2) + 'px';
-        el.style.top = (window.innerHeight * .6) + 'px';
-        if (color) el.style.color = color;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 2400)
-    }
-
-    function toggleKeyVisibility() {
-        const inp = document.getElementById('apiKey');
-        inp.type = inp.type === 'password' ? 'text' : 'password'
-    }
-
-    function saveKey() {
-        const k = document.getElementById('apiKey').value.trim();
-        if (!k) return toast('请输入 API Key', 'warn');
-        localStorage.setItem('groq_key', k);
-        toast('已保存')
-    }
-
-    function clearKey() {
-        localStorage.removeItem('groq_key');
-        document.getElementById('apiKey').value = '';
-        toast('已清除', 'warn')
-    }
-
-    function getKey() {
-        return localStorage.getItem('groq_key') || ''
-    }
-
-    let _skillCache = null, _verBarShown = false;
-
-    async function loadSkill() {
-        if (_skillCache) return _skillCache;
-        try {
-            const cached = JSON.parse(localStorage.getItem(SKILL_CACHE_KEY) || 'null');
-            if (cached && Date.now() - cached.ts < SKILL_CACHE_TTL && cached.version === EXPECTED_SKILL_VERSION) {
-                _skillCache = cached.text;
-                fetch(`skill.md?v=${Date.now()}`, {cache: 'no-store'}).then(r => r.text()).then(text => {
-                    const v = (text.match(/v(\d+\.\d+\.\d+)/) || [])[1];
-                    if (v === EXPECTED_SKILL_VERSION && text !== cached.text) {
-                        localStorage.setItem(SKILL_CACHE_KEY, JSON.stringify({ts: Date.now(), version: v, text}));
-                        _skillCache = null
-                    }
-                }).catch(() => {
-                });
-                return cached.text
-            }
-        } catch (e) {
-        }
-        const res = await fetch(`skill.md?v=${Date.now()}`, {cache: 'no-store'});
-        if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
-        let text = await res.text();
-        text = text.replace(/\r\n/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/<!--[\s\S]*?-->/g, '').trim();
-        const vm = text.match(/v(\d+\.\d+\.\d+)/);
-        const actualVersion = vm ? vm[1] : null;
-        if (actualVersion !== EXPECTED_SKILL_VERSION && !_verBarShown) {
-            const bar = document.createElement('div');
-            bar.className = 'verbar';
-            bar.textContent = `⚠️ skill.md 版本不符（期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}）`;
-            document.body.appendChild(bar);
-            _verBarShown = true
-        }
-        try {
-            localStorage.setItem(SKILL_CACHE_KEY, JSON.stringify({ts: Date.now(), version: actualVersion, text}))
-        } catch (e) {
-        }
-        _skillCache = text;
-        return text
-    }
-
-    async function callGroq(systemPrompt, userPrompt, maxRetry = 3) {
-        const key = getKey();
-        if (!key) throw new Error('未设置 API Key');
-        let delay = 1500;
-        for (let attempt = 0; attempt <= maxRetry; attempt++) {
-            const ctrl = new AbortController();
-            const tid = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT);
-            try {
-                const resp = await fetch(GROQ_URL, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key},
-                    body: JSON.stringify({
-                        model: GROQ_MODEL,
-                        messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],
-                        temperature: .2,
-                        response_format: {type: 'json_object'}
-                    }),
-                    signal: ctrl.signal
-                });
-                clearTimeout(tid);
-                if (resp.status === 429 && attempt < maxRetry) {
-                    await new Promise(r => setTimeout(r, delay));
-                    delay *= 2;
-                    continue
-                }
-                if (resp.status === 413) throw new Error('情报过长，请精简后重试');
-                if (!resp.ok) {
-                    const txt = await resp.text();
-                    throw new Error(`Groq ${resp.status}: ${txt.slice(0, 240)}`)
-                }
-                const j = await resp.json();
-                return j.choices?.[0]?.message?.content || ''
-            } catch (e) {
-                clearTimeout(tid);
-                if (e.name === 'AbortError') throw new Error('请求超时（30s）');
-                throw e
-            }
-        }
-        throw new Error('Groq 重试耗尽')
-    }
-
+    /* ============ 修复 #18：parseScoreArr 统一返回 null ============ */
     function parseScoreArr(sc) {
-        if (Array.isArray(sc)) return [+sc[0], +sc[1]];
-        if (typeof sc === 'string') {
-            const p = sc.split(/[-:]/);
-            return [+p[0], +p[1]]
+        if (sc == null) return null;
+        if (Array.isArray(sc)) {
+            const a = +sc[0], b = +sc[1];
+            return Number.isFinite(a) && Number.isFinite(b) ? [a, b] : null
         }
-        if (sc && typeof sc === 'object') return [+(sc.home ?? sc[0]), +(sc.away ?? sc[1])];
+        if (typeof sc === 'string') {
+            const p = sc.split(/[-:：]/);
+            const a = +p[0], b = +p[1];
+            return Number.isFinite(a) && Number.isFinite(b) ? [a, b] : null
+        }
+        if (typeof sc === 'object') {
+            const a = +(sc.home ?? sc[0]);
+            const b = +(sc.away ?? sc[1]);
+            return Number.isFinite(a) && Number.isFinite(b) ? [a, b] : null
+        }
         return null
     }
 
+    /* ============ 修复 #4：strip markdown code fence ============ */
+    function stripFence(s) {
+        if (typeof s !== 'string') return s;
+        return s.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
+    }
+
+    /* ============ 修复 #25：H2H 按时间降序返回，拆分主客 ============ */
     function computeH2H(home, away) {
         const matches = [];
         const key1 = `${home}|${away}`, key2 = `${away}|${home}`;
-        for (const rk of Object.keys(RESULTS)) {
+        const curSeasonKey = 9999;
+        // 当前赛季
+        const curRoundKeys = Object.keys(RESULTS).sort((a, b) => Number(a) - Number(b));
+        for (const rk of curRoundKeys) {
             const ro = RESULTS[rk];
             if (!ro || typeof ro !== 'object') continue;
             if (ro[key1]) {
                 const p = parseScoreArr(ro[key1]);
-                if (p) matches.push({season: '2026-27', round: +rk, home, away, hg: p[0], ag: p[1]})
+                if (p) matches.push({
+                    season: _season,
+                    round: +rk,
+                    home, away,
+                    hg: p[0], ag: p[1],
+                    sortKey: curSeasonKey * 10000 + (+rk)
+                })
             }
             if (ro[key2]) {
                 const p = parseScoreArr(ro[key2]);
-                if (p) matches.push({season: '2026-27', round: +rk, home: away, away: home, hg: p[0], ag: p[1]})
+                if (p) matches.push({
+                    season: _season,
+                    round: +rk,
+                    home: away, away: home,
+                    hg: p[0], ag: p[1],
+                    sortKey: curSeasonKey * 10000 + (+rk)
+                })
             }
         }
-        const seasonLabel = y => `${y}-${String(+y + 1).slice(2)}`;
-        const years = Object.keys(HISTORICAL_RESULTS).sort().reverse();
+        // 历史赛季
+        const years = Object.keys(HISTORICAL_RESULTS || {}).sort((a, b) => +b - +a);
         for (const y of years) {
             const sd = HISTORICAL_RESULTS[y];
             if (!sd || typeof sd !== 'object') continue;
+            const seasonLabel = `${y}-${String(+y + 1).slice(2)}`;
             if (sd[key1]) {
                 const p = parseScoreArr(sd[key1]);
-                if (p) matches.push({season: seasonLabel(y), home, away, hg: p[0], ag: p[1]})
+                if (p) matches.push({
+                    season: seasonLabel,
+                    round: null,
+                    home, away,
+                    hg: p[0], ag: p[1],
+                    sortKey: (+y) * 10000
+                })
             }
             if (sd[key2]) {
                 const p = parseScoreArr(sd[key2]);
-                if (p) matches.push({season: seasonLabel(y), home: away, away: home, hg: p[0], ag: p[1]})
+                if (p) matches.push({
+                    season: seasonLabel,
+                    round: null,
+                    home: away, away: home,
+                    hg: p[0], ag: p[1],
+                    sortKey: (+y) * 10000
+                })
             }
         }
+        matches.sort((a, b) => b.sortKey - a.sortKey);
         return matches
     }
 
-    function espnUrl(name) {
-        const zh = toChineseTeam(name);
-        const id = ESPN_IDS[zh];
-        return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null
+    /* ============ 修复 #3/#7/#27：显式排序 key，加入 HISTORICAL_RESULTS ============ */
+    function computeTeamAttackStats() {
+        if (_teamAtkCache) return _teamAtkCache;
+        const map = {};
+
+        function ensure(team) {
+            if (!map[team]) map[team] = {
+                team,
+                played: 0, gf: 0, ga: 0,
+                cleanSheets: 0, over25: 0, btts: 0,
+                homeGF: 0, homeGA: 0, homePlayed: 0,
+                awayGF: 0, awayGA: 0, awayPlayed: 0,
+                form: []
+            };
+            return map[team]
+        }
+
+        function feed(rk, ro, isHistorical) {
+            if (!ro || typeof ro !== 'object') return;
+            const keys = Object.keys(ro);
+            for (const key of keys) {
+                if (typeof key !== 'string' || !key.includes('|')) continue;
+                const [h, a] = key.split('|');
+                if (!h || !a) continue;
+                const p = parseScoreArr(ro[key]);
+                if (!p) continue;
+                const [hg, ag] = p;
+                const H = ensure(h), A = ensure(a);
+                H.played++; H.gf += hg; H.ga += ag;
+                H.homePlayed++; H.homeGF += hg; H.homeGA += ag;
+                A.played++; A.gf += ag; A.ga += hg;
+                A.awayPlayed++; A.awayGF += ag; A.awayGA += hg;
+                if (ag === 0) H.cleanSheets++;
+                if (hg === 0) A.cleanSheets++;
+                if (hg + ag > 2.5) { H.over25++; A.over25++ }
+                if (hg > 0 && ag > 0) { H.btts++; A.btts++ }
+                H.form.push(hg > ag ? 'W' : hg < ag ? 'L' : 'D');
+                A.form.push(ag > hg ? 'W' : ag < hg ? 'L' : 'D');
+            }
+        }
+
+        // 历史赛季先入（按年份升序）
+        const histYears = Object.keys(HISTORICAL_RESULTS || {}).sort((a, b) => +a - +b);
+        for (const y of histYears) feed(y, HISTORICAL_RESULTS[y], true);
+        // 当前赛季按轮次升序入
+        const curRoundKeys = Object.keys(RESULTS).sort((a, b) => Number(a) - Number(b));
+        for (const rk of curRoundKeys) feed(rk, RESULTS[rk], false);
+
+        const result = Object.values(map).map(t => ({
+            ...t,
+            avgGF: t.played ? t.gf / t.played : 0,
+            avgGA: t.played ? t.ga / t.played : 0,
+            avgHomeGF: t.homePlayed ? t.homeGF / t.homePlayed : 0,
+            avgHomeGA: t.homePlayed ? t.homeGA / t.homePlayed : 0,
+            avgAwayGF: t.awayPlayed ? t.awayGF / t.awayPlayed : 0,
+            avgAwayGA: t.awayPlayed ? t.awayGA / t.awayPlayed : 0,
+            over25Rate: t.played ? Math.round(t.over25 / t.played * 100) : 0,
+            bttsRate: t.played ? Math.round(t.btts / t.played * 100) : 0,
+            form5: t.form.slice(-5)
+        })).sort((a, b) => b.avgGF - a.avgGF);
+        _teamAtkCache = result;
+        return result
     }
 
-    function playerPhotoUrl(playerName) {
-        if (!playerName) return null;
-        if (PLAYER_PHOTOS[playerName]) return PLAYER_PHOTOS[playerName];
-        const en = Object.entries(PLAYER_ZH_MAP).find(([k, v]) => v === playerName)?.[0];
-        if (en && PLAYER_PHOTOS[en]) return PLAYER_PHOTOS[en];
-        const zh = PLAYER_ZH_MAP[playerName];
-        if (zh && PLAYER_PHOTOS[zh]) return PLAYER_PHOTOS[zh];
-        return null
+    /* ============ 修复 #3：buildLast5Cache 显式排序 ============ */
+    function buildLast5Cache() {
+        _last5Cache = {};
+        const histYears = Object.keys(HISTORICAL_RESULTS || {}).sort((a, b) => +a - +b);
+        const curRoundKeys = Object.keys(RESULTS).sort((a, b) => Number(a) - Number(b));
+        const seq = [];
+        for (const y of histYears) seq.push(HISTORICAL_RESULTS[y]);
+        for (const rk of curRoundKeys) seq.push(RESULTS[rk]);
+
+        for (const ro of seq) {
+            if (!ro || typeof ro !== 'object') continue;
+            for (const key of Object.keys(ro)) {
+                if (typeof key !== 'string' || !key.includes('|')) continue;
+                const [h, a] = key.split('|');
+                if (!h || !a) continue;
+                const p = parseScoreArr(ro[key]);
+                if (!p) continue;
+                const [hg, ag] = p;
+                const push = (t, r) => {
+                    if (!_last5Cache[t]) _last5Cache[t] = [];
+                    _last5Cache[t].push(r)
+                };
+                push(h, hg > ag ? 'W' : hg < ag ? 'L' : 'D');
+                push(a, ag > hg ? 'W' : ag < hg ? 'L' : 'D')
+            }
+        }
+        for (const k of Object.keys(_last5Cache)) _last5Cache[k] = _last5Cache[k].slice(-5)
+    }
+
+    function getLast5(team) {
+        if (!_last5Cache) buildLast5Cache();
+        return _last5Cache[team] || []
     }
 
     function getForm(team, n = 5) {
@@ -6809,11 +6743,14 @@
         return (_last5Cache[team] || []).slice(-n)
     }
 
+    /* ============ 修复 #5：getRank 守卫 ============ */
     function getRank(team) {
+        if (!_standingsLoaded) return null;
         const idx = STATIC_STANDINGS.findIndex(s => s.team === team);
         return idx >= 0 ? idx + 1 : null
     }
 
+    /* ============ 修复 #16/#40：getMatchStatus 支持 stale ============ */
     function getMatchStatus(home, away, round) {
         const key = `${home}|${away}`;
         for (const rk of Object.keys(RESULTS)) {
@@ -6825,6 +6762,12 @@
             }
         }
         const fixture = (FIXTURES[round] || []).find(m => m.home === home && m.away === away);
+        if (fixture && fixture.kickoff) {
+            const ko = new Date(fixture.kickoff).getTime();
+            if (Date.now() - ko > 3 * 3600 * 1000) {
+                return {status: 'stale', round, kickoff: fixture.kickoff}
+            }
+        }
         return {status: 'upcoming', round, kickoff: fixture ? fixture.kickoff : null}
     }
 
@@ -6891,10 +6834,16 @@
         refreshDashboard()
     }
 
+    /* ============ 修复 #35：持久化 key 用 round|home|away ============ */
     function loadTeamFixtures() {
         _teamFixtures = getTeamFixtures(_currentTeam);
-        const savedMatch = localStorage.getItem('last_team_match_' + _currentTeam);
-        _teamSelectedIdx = savedMatch !== null && _teamFixtures[+savedMatch] ? +savedMatch : 0;
+        const savedKey = localStorage.getItem('last_team_match_' + _currentTeam);
+        let idx = 0;
+        if (savedKey) {
+            const found = _teamFixtures.findIndex(f => `${f.round}|${f.home}|${f.away}` === savedKey);
+            if (found >= 0) idx = found
+        }
+        _teamSelectedIdx = idx;
         if (_filterMode === 'team') {
             const fix = _teamFixtures[_teamSelectedIdx];
             if (fix) {
@@ -6927,6 +6876,7 @@
 
     function formatKickoff(utcIso, st) {
         if (st.status === 'finished') return '已完赛';
+        if (st.status === 'stale') return '⏳ 数据待更新';
         if (!utcIso) return '待开赛';
         try {
             const d = new Date(utcIso);
@@ -6934,7 +6884,7 @@
             const now = new Date();
             const diffH = (d - now) / 3600000;
             if (diffH < 0 && diffH > -2.5) return '🔴 进行中';
-            if (diffH < -2.5) return '待更新';
+            if (diffH < -2.5) return '⏳ 数据待更新';
             const hh = String(d.getHours()).padStart(2, '0');
             const mm = String(d.getMinutes()).padStart(2, '0');
             const timeStr = `${hh}:${mm}`;
@@ -7033,7 +6983,11 @@
                     const isSelected = m.idx === _teamSelectedIdx;
                     const cls = ['mrow', isSelected ? 'selected' : '', isPredicted ? 'predicted' : ''].filter(Boolean).join(' ');
                     const sideTag = m.isHome ? '<span class="side home">主</span>' : '<span class="side away">客</span>';
-                    const statusHtml = st.status === 'finished' ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>` : `<span class="status upcoming">${formatKickoff(m.kickoff, st)}</span>`;
+                    const statusHtml = st.status === 'finished'
+                        ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>`
+                        : st.status === 'stale'
+                            ? `<span class="status upcoming">⏳ 数据待更新</span>`
+                            : `<span class="status upcoming">${formatKickoff(m.kickoff, st)}</span>`;
                     return `<div class="${cls}" data-midx="${m.idx}"><div class="mrow-team"><span style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--text-3);padding:1px 6px;border-radius:4px;background:rgba(255,255,255,.04)">第${m.round + 1}轮</span>${sideTag}${teamBadgeMini(m.opponent)}<span class="name">${escapeHtml(m.opponent)}</span>${rankChip(m.opponent)}${formBlocks(m.opponent)}</div><div class="mrow-meta">${statusHtml}</div></div>`
                 }).join('')
             } else {
@@ -7053,7 +7007,11 @@
                     const isPredicted = predictedKeys.has(`${m.home}|${m.away}`);
                     const isSelected = m.idx === selectedIdx;
                     const cls = ['mrow', isSelected ? 'selected' : '', isPredicted ? 'predicted' : ''].filter(Boolean).join(' ');
-                    const statusHtml = st.status === 'finished' ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>` : `<span class="status upcoming">${formatKickoff(m.kickoff, st)}</span>`;
+                    const statusHtml = st.status === 'finished'
+                        ? `<span class="status finished">已完赛</span><span class="score">${escapeHtml(st.score)}</span>`
+                        : st.status === 'stale'
+                            ? `<span class="status upcoming">⏳ 数据待更新</span>`
+                            : `<span class="status upcoming">${formatKickoff(m.kickoff, st)}</span>`;
                     return `<div class="${cls}" data-midx="${m.idx}"><div class="mrow-team">${teamBadgeMini(m.home)}<span class="side home">主</span><span class="name">${escapeHtml(m.home)}</span>${rankChip(m.home)}${formBlocks(m.home)}</div><div class="mrow-team">${teamBadgeMini(m.away)}<span class="side away">客</span><span class="name">${escapeHtml(m.away)}</span>${rankChip(m.away)}${formBlocks(m.away)}</div><div class="mrow-meta">${statusHtml}</div></div>`
                 }).join('')
             }
@@ -7075,9 +7033,9 @@
         function selectMatch(idx) {
             if (_filterMode === 'team') {
                 _teamSelectedIdx = idx;
-                localStorage.setItem('last_team_match_' + _currentTeam, idx);
                 const fix = _teamFixtures[idx];
                 if (fix) {
+                    localStorage.setItem('last_team_match_' + _currentTeam, `${fix.round}|${fix.home}|${fix.away}`);
                     document.getElementById('roundSel').value = fix.round;
                     MatchPicker.setRound(fix.round)
                 }
@@ -7246,90 +7204,65 @@
         return null
     }
 
-    function computeTeamAttackStats() {
-        if (_teamAtkCache) return _teamAtkCache;
-        const map = {};
-        for (const rk of Object.keys(RESULTS)) {
-            const ro = RESULTS[rk];
-            if (!ro || typeof ro !== 'object') continue;
-            for (const key of Object.keys(ro)) {
-                const [h, a] = key.split('|');
-                if (!h || !a) continue;
-                const p = parseScoreArr(ro[key]);
-                if (!p) continue;
-                const [hg, ag] = p;
-                if (!map[h]) map[h] = {
-                    team: h,
-                    played: 0,
-                    gf: 0,
-                    ga: 0,
-                    cleanSheets: 0,
-                    over25: 0,
-                    btts: 0,
-                    homeGF: 0,
-                    homeGA: 0,
-                    homePlayed: 0,
-                    awayGF: 0,
-                    awayGA: 0,
-                    awayPlayed: 0,
-                    form: []
-                };
-                if (!map[a]) map[a] = {
-                    team: a,
-                    played: 0,
-                    gf: 0,
-                    ga: 0,
-                    cleanSheets: 0,
-                    over25: 0,
-                    btts: 0,
-                    homeGF: 0,
-                    homeGA: 0,
-                    homePlayed: 0,
-                    awayGF: 0,
-                    awayGA: 0,
-                    awayPlayed: 0,
-                    form: []
-                };
-                map[h].played++;
-                map[h].gf += hg;
-                map[h].ga += ag;
-                map[h].homePlayed++;
-                map[h].homeGF += hg;
-                map[h].homeGA += ag;
-                map[a].played++;
-                map[a].gf += ag;
-                map[a].ga += hg;
-                map[a].awayPlayed++;
-                map[a].awayGF += ag;
-                map[a].awayGA += hg;
-                if (ag === 0) map[h].cleanSheets++;
-                if (hg === 0) map[a].cleanSheets++;
-                if (hg + ag > 2.5) {
-                    map[h].over25++;
-                    map[a].over25++
-                }
-                if (hg > 0 && ag > 0) {
-                    map[h].btts++;
-                    map[a].btts++
-                }
-                map[h].form.push(hg > ag ? 'W' : hg < ag ? 'L' : 'D');
-                map[a].form.push(ag > hg ? 'W' : ag < hg ? 'L' : 'D')
-            }
+    /* ============ 修复 #9：对手强度调整 ============ */
+    function opponentAdjustedGF(team, opp) {
+        const teamStats = computeTeamAttackStats();
+        const t = teamStats.find(x => x.team === team);
+        const o = teamStats.find(x => x.team === opp);
+        if (!t || !o || !o.avgGA || teamStats.length < 2) return null;
+        const leagueAvgGA = teamStats.reduce((s, x) => s + x.avgGA, 0) / teamStats.length;
+        if (!leagueAvgGA) return null;
+        return t.avgGF * (leagueAvgGA / o.avgGA)
+    }
+
+    /* ============ 修复 #8：休息天数 ============ */
+    function restDays(team, kickoff) {
+        const now = kickoff ? new Date(kickoff) : new Date();
+        const past = getTeamFixtures(team)
+            .filter(f => f.kickoff && new Date(f.kickoff) < now)
+            .sort((a, b) => new Date(b.kickoff) - new Date(a.kickoff));
+        return past.length ? Math.round((now - new Date(past[0].kickoff)) / 86400000) : null
+    }
+
+    /* ============ 修复 #6/#10：雷达四维进 prompt 用 ============ */
+    function computeRadarData(home, away) {
+        const teamStats = computeTeamAttackStats();
+        const homeStats = teamStats.find(t => t.team === home) || {};
+        const awayStats = teamStats.find(t => t.team === away) || {};
+
+        function scoreFromForm(form) {
+            if (!form || !form.length) return 50;
+            const map = {W: 1, D: .5, L: 0};
+            return Math.round(form.reduce((s, r) => s + map[r], 0) / form.length * 100)
         }
-        const result = Object.values(map).map(t => ({
-            ...t,
-            avgGF: t.played ? t.gf / t.played : 0,
-            avgGA: t.played ? t.ga / t.played : 0,
-            avgHomeGF: t.homePlayed ? t.homeGF / t.homePlayed : 0,
-            avgHomeGA: t.homePlayed ? t.homeGA / t.homePlayed : 0,
-            avgAwayGF: t.awayPlayed ? t.awayGF / t.awayPlayed : 0,
-            avgAwayGA: t.awayPlayed ? t.awayGA / t.awayPlayed : 0,
-            over25Rate: t.played ? Math.round(t.over25 / t.played * 100) : 0,
-            bttsRate: t.played ? Math.round(t.btts / t.played * 100) : 0,
-            form5: t.form.slice(-5)
-        })).sort((a, b) => b.avgGF - a.avgGF);
-        _teamAtkCache = result;
-        return result
+
+        function scoreFromRank(team) {
+            if (!_standingsLoaded) return 50;
+            const idx = STATIC_STANDINGS.findIndex(s => s.team === team);
+            if (idx < 0) return 50;
+            return Math.max(20, 100 - idx * 4)
+        }
+
+        function scoreFromAttack(st) {
+            if (!st.avgGF) return 50;
+            return Math.min(100, Math.round(st.avgGF / 2.5 * 100))
+        }
+
+        function scoreFromH2H(team) {
+            const m = computeH2H(home, away);
+            if (!m.length) return 50;
+            let wins = 0;
+            for (const x of m) {
+                if ((x.home === team && x.hg > x.ag) || (x.away === team && x.ag > x.hg)) wins++
+            }
+            return Math.round(wins / m.length * 100)
+        }
+
+        return {
+            home: [scoreFromForm(getForm(home, 5)), scoreFromRank(home), scoreFromAttack(homeStats), scoreFromH2H(home)],
+            away: [scoreFromForm(getForm(away, 5)), scoreFromRank(away), scoreFromAttack(awayStats), scoreFromH2H(away)],
+            labels: ['近期状态', '硬实力', '攻击力', '交锋战绩']
+        }
     }
 
     const REASONING_STEPS = [{icon: '📖', text: '读取 skill.md 约束文档'}, {
@@ -7447,6 +7380,12 @@
             btn.style.opacity = '0.5';
             btn.style.cursor = 'not-allowed';
             btn.title = '比赛结束，请去“战绩中心”对答案'
+        } else if (st.status === 'stale') {
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 数据待更新';
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.title = '比赛已过开赛时间但无结果，请等待同步'
         } else if (existing) {
             btn.disabled = false;
             btn.innerHTML = '🔄 基于最新数据更新预测';
@@ -7462,6 +7401,413 @@
         }
     }
 
+    /* ============================================================
+     * 修复核心：统一 prompt 构造器
+     * ============================================================ */
+    function buildPredictionPrompt(home, away, round, intel, st, existing) {
+        const teamStats = computeTeamAttackStats();
+        const H = teamStats.find(t => t.team === home) || {};
+        const A = teamStats.find(t => t.team === away) || {};
+        const hr = getRank(home), ar = getRank(away);
+        const hForm = getForm(home, 5).join('') || '无';
+        const aForm = getForm(away, 5).join('') || '无';
+        const radar = computeRadarData(home, away);
+        const h2hAll = computeH2H(home, away);
+        const h2hHome = h2hAll.filter(m => m.home === home).slice(0, 3);
+        const h2hAway = h2hAll.filter(m => m.home === away).slice(0, 3);
+        const hRest = restDays(home, st.kickoff);
+        const aRest = restDays(away, st.kickoff);
+        const hAdjGF = opponentAdjustedGF(home, away);
+        const aAdjGF = opponentAdjustedGF(away, home);
+
+        const roundProgress = FIXTURES.length ? (round + 1) / FIXTURES.length : 0.5;
+        let phase = '赛季中段';
+        if (roundProgress < 0.15) phase = '赛季初（样本少，向联赛基准收缩）';
+        else if (roundProgress > 0.85) phase = '赛季末（注意保级/争冠动机分化）';
+
+        const sampleNote = (!H.played || H.played < 3 || !A.played || A.played < 3)
+            ? '⚠️ 本赛季样本不足 3 场，请主要依据 H2H、排名和联赛基准推断，置信度不得给"高"。'
+            : '';
+
+        const h2hLine = (arr, host, guest) => {
+            if (!arr.length) return '无';
+            return arr.map(m => `${m.season}${m.round != null ? `·第${m.round + 1}轮` : ''}：${m.home} ${m.hg}-${m.ag} ${m.away}`).join(' / ')
+        };
+
+        const timeContext = st.kickoff
+            ? `距开赛 ${((new Date(st.kickoff) - Date.now()) / 3600000).toFixed(1)} 小时`
+            : '开赛时间未知';
+
+        let prompt = `【比赛】第 ${round + 1} 轮 ${home}（主） vs ${away}（客）\n`;
+        prompt += `【赛季阶段】${_season} · ${phase}\n`;
+        prompt += `【开赛】${st.kickoff || '未知'} · ${timeContext}\n`;
+        prompt += `【排名】${home} 第${hr ?? '未知'}名 · ${away} 第${ar ?? '未知'}名\n`;
+        prompt += `【近5场（左旧右新）】${home}: ${hForm} · ${away}: ${aForm}\n`;
+        prompt += `【休息】${home}: ${hRest ?? '未知'} 天 · ${away}: ${aRest ?? '未知'} 天\n\n`;
+
+        prompt += `【主客场攻防】\n`;
+        prompt += `${home}（主场）：场均进 ${(H.avgHomeGF ?? 0).toFixed(2)} / 失 ${(H.avgHomeGA ?? 0).toFixed(2)}（${H.homePlayed ?? 0} 场）\n`;
+        prompt += `${away}（客场）：场均进 ${(A.avgAwayGF ?? 0).toFixed(2)} / 失 ${(A.avgAwayGA ?? 0).toFixed(2)}（${A.awayPlayed ?? 0} 场）\n`;
+        prompt += `赛季总：${home} 进${(H.avgGF ?? 0).toFixed(2)}/失${(H.avgGA ?? 0).toFixed(2)} · ${away} 进${(A.avgGF ?? 0).toFixed(2)}/失${(A.avgGA ?? 0).toFixed(2)}\n`;
+        prompt += `零封：${home} ${H.cleanSheets ?? 0} 场 · ${away} ${A.cleanSheets ?? 0} 场\n`;
+        prompt += `大2.5率：${home} ${H.over25Rate ?? 0}% · ${away} ${A.over25Rate ?? 0}%\n`;
+        prompt += `BTTS率：${home} ${H.bttsRate ?? 0}% · ${away} ${A.bttsRate ?? 0}%\n`;
+        if (hAdjGF != null && aAdjGF != null) {
+            prompt += `对手强度调整后场均进球：${home} ${hAdjGF.toFixed(2)} · ${away} ${aAdjGF.toFixed(2)}\n`;
+        }
+        prompt += `\n`;
+
+        prompt += `【实力雷达（0-100）】\n`;
+        prompt += `${home}：状态 ${radar.home[0]} / 实力 ${radar.home[1]} / 攻击 ${radar.home[2]} / 交锋 ${radar.home[3]}\n`;
+        prompt += `${away}：状态 ${radar.away[0]} / 实力 ${radar.away[1]} / 攻击 ${radar.away[2]} / 交锋 ${radar.away[3]}\n\n`;
+
+        prompt += `【历史交锋 - ${home} 主场对 ${away}（近3场）】\n${h2hLine(h2hHome, home, away)}\n`;
+        prompt += `【历史交锋 - ${away} 主场对 ${home}（近3场）】\n${h2hLine(h2hAway, away, home)}\n\n`;
+
+        prompt += `【联赛基准】英超主场胜率约 45% / 平 25% / 客胜 30%，样本不足时请向此基准收缩。\n`;
+        if (sampleNote) prompt += `${sampleNote}\n`;
+        prompt += `\n`;
+
+        if (existing && (intel || !existing.intel)) {
+            prompt += `【上次预测】比分 ${existing.score}，置信度 ${existing.confidence}，概率 ${existing.homeWin}/${existing.draw}/${existing.awayWin}。\n`;
+            prompt += `本次如有新情报，请说明修正方向；如无实质变化，请保持或微调。\n\n`;
+        }
+
+        if (intel) prompt += `【用户情报】\n${intel}\n\n`;
+
+        prompt += `【指令】\n请结合所有数据，预测第 ${round + 1} 轮 ${home} vs ${away} 最终比分。\n`;
+        prompt += `严格按 skill.md 输出 JSON。硬约束：\n`;
+        prompt += `1. homeWin + draw + awayWin 必须等于 100；\n`;
+        prompt += `2. 比分方向（主胜/平/客胜）必须与概率最大的方向一致；\n`;
+        prompt += `3. 比分不得超过 6-6，总和不得超过 9；\n`;
+        prompt += `4. keyFactors 至少 2 条，analysis 至少 30 字；\n`;
+        prompt += `5. 若样本不足或数据缺失，置信度不得给"高"。\n`;
+
+        return prompt
+    }
+
+    /* ============ 修复 #8：真实概率校准（按方向分桶） ============ */
+    function buildCalibrationHint() {
+        const S = computeDeepStats(getHistoryCopy());
+        if (!S || S.total < 10) return '';
+        const lines = [];
+        for (const dir of ['H', 'D', 'A']) {
+            const bins = S.calibBinsByDir[dir];
+            for (const k of ['0-20', '20-40', '40-60', '60-80', '80-100']) {
+                const b = bins[k];
+                if (!b.pred || b.pred < 3) continue;
+                const actual = Math.round(b.hit / b.pred * 100);
+                const mid = parseInt(k.split('-')[0]) + 10;
+                if (Math.abs(actual - mid) > 12) {
+                    const dirName = {H: '主胜', D: '平局', A: '客胜'}[dir];
+                    lines.push(`- 你历史上预测"${dirName}"概率在 ${k}% 时实际命中 ${actual}%（${b.pred} 场），请校准`);
+                }
+            }
+        }
+        return lines.length ? `【历史校准提示】\n${lines.join('\n')}\n\n` : ''
+    }
+
+    function callGroqWithModel(systemPrompt, userPrompt, temperature, seed) {
+        const key = getKey();
+        if (!key) return Promise.reject(new Error('未设置 API Key'));
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), REQUEST_TIMEOUT);
+        return fetch(GROQ_URL, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key},
+            body: JSON.stringify({
+                model: GROQ_MODEL,
+                messages: [{role: 'system', content: systemPrompt}, {role: 'user', content: userPrompt}],
+                temperature: temperature,
+                top_p: 0.9,
+                max_tokens: 900,
+                seed: seed,
+                response_format: {type: 'json_object'}
+            }),
+            signal: ctrl.signal
+        }).then(async resp => {
+            clearTimeout(tid);
+            if (resp.status === 429) {
+                const err = new Error('rate_limited');
+                err.status = 429;
+                throw err
+            }
+            if (resp.status === 413) throw new Error('情报过长，请精简后重试');
+            if (!resp.ok) {
+                const txt = await resp.text();
+                throw new Error(`Groq ${resp.status}: ${txt.slice(0, 240)}`)
+            }
+            const j = await resp.json();
+            return j.choices?.[0]?.message?.content || ''
+        }).catch(e => {
+            clearTimeout(tid);
+            if (e.name === 'AbortError') throw new Error('请求超时（30s）');
+            throw e
+        })
+    }
+
+    function hashSeed(s) {
+        let h = 0;
+        for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+        return Math.abs(h) % 2147483647
+    }
+
+    /* ============ 修复 #12/#14/#17/#18/#37：validate 重写 ============ */
+    function validateAndNormalizePrediction(raw, ctx) {
+        ctx = ctx || {};
+        if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {ok: false, errors: ['非对象'], data: raw};
+        const errors = [], warnings = [];
+        const data = JSON.parse(JSON.stringify(raw));
+
+        // score 归一
+        if (typeof data.score !== 'string' || !/^\d+-\d+$/.test(data.score)) {
+            const p = parseScoreArr(data.score);
+            if (p) data.score = `${p[0]}-${p[1]}`; else {
+                errors.push('score 格式错误');
+                return {ok: false, errors, warnings, data}
+            }
+        }
+
+        // 比分合理性（#15）
+        const [sh, sa] = data.score.split('-').map(Number);
+        if (!Number.isFinite(sh) || !Number.isFinite(sa) || sh > 6 || sa > 6 || sh + sa > 9) {
+            errors.push('比分不合理');
+            return {ok: false, errors, warnings, data, hardFail: true}
+        }
+
+        if (!Array.isArray(data.keyFactors)) data.keyFactors = typeof data.keyFactors === 'string' ? data.keyFactors.split(/[、,，;；\n]/).map(s => s.trim()).filter(Boolean) : [];
+        if (typeof data.analysis !== 'string') data.analysis = data.analysis == null ? '' : String(data.analysis);
+        for (const k of ['homeKeyPlayers', 'awayKeyPlayers', 'likelyScorers']) {
+            if (data[k] != null && !Array.isArray(data[k])) data[k] = []
+        }
+        const required = ['homeWin', 'draw', 'awayWin', 'score', 'confidence', 'keyFactors', 'analysis'];
+        for (const k of required) {
+            if (data[k] === undefined || data[k] === null) errors.push(`缺少字段：${k}`)
+        }
+        if (errors.length) return {ok: false, errors, warnings, data};
+
+        let h = Number(data.homeWin), d = Number(data.draw), a = Number(data.awayWin);
+        if (![h, d, a].every(Number.isFinite)) {
+            errors.push('概率不是数字');
+            return {ok: false, errors, warnings, data}
+        }
+        const sum = h + d + a;
+        const diff = Math.abs(sum - 100);
+        if (diff > 2) {
+            warnings.push(`概率总和 ${sum}，偏差 > 2`);
+            return {ok: false, errors, warnings, data, hardFail: true}
+        }
+        if (diff > 0) {
+            const f = 100 / sum;
+            h = Math.round(h * f * 100) / 100;
+            d = Math.round(d * f * 100) / 100;
+            a = Math.round((100 - h - d) * 100) / 100;
+            data.homeWin = h;
+            data.draw = d;
+            data.awayWin = a
+        }
+
+        // 方向一致性：不改概率，改为降置信度 + 尝试重试
+        const scoreDir = sh > sa ? 'H' : sh < sa ? 'A' : 'D';
+        const probDir = h >= d && h >= a ? 'H' : a >= d && a >= h ? 'A' : 'D';
+        if (scoreDir !== probDir) {
+            warnings.push(`比分方向(${scoreDir})与概率方向(${probDir})矛盾`);
+            data._inconsistent = true
+        }
+
+        // 内容质量（#13）
+        if (!data.keyFactors || data.keyFactors.length < 2) warnings.push('keyFactors < 2');
+        if (!data.analysis || data.analysis.length < 30) warnings.push('analysis < 30 字');
+
+        // confidence 别名 + 校验（#12/#14）
+        const CONF_ALIAS = {
+            '高': '高', '较高': '中高', '中高': '中高', '中等': '中', '中': '中',
+            '低': '低', '较低': '低', 'High': '高', 'Medium': '中', 'Low': '低'
+        };
+        data.confidence = CONF_ALIAS[data.confidence] || '低';
+        const maxP = Math.max(h, d, a);
+        const confRank = {高: 3, 中高: 2, 中: 1, 低: 0};
+        if (maxP < 45 && confRank[data.confidence] >= 2) data.confidence = '中';
+        if (maxP < 38 && confRank[data.confidence] >= 1) data.confidence = '低';
+        if (maxP >= 60 && data.confidence === '低') data.confidence = '中';
+
+        // 样本不足时降级
+        const H = ctx.H || {}, A = ctx.A || {};
+        if ((!H.played || H.played < 3 || !A.played || A.played < 3) && data.confidence === '高') {
+            data.confidence = '中'
+        }
+        // skill 版本不匹配降级（#7）
+        if (_skillVersionMismatch && data.confidence === '高') data.confidence = '中高';
+
+        // 方向矛盾时降一档
+        if (data._inconsistent) {
+            const order = ['高', '中高', '中', '低'];
+            data.confidence = order[Math.min(order.length - 1, order.indexOf(data.confidence) + 1)]
+        }
+
+        // 质量不达标降级
+        if ((data.keyFactors || []).length < 2 || (data.analysis || '').length < 30) {
+            if (data.confidence === '高') data.confidence = '中高';
+            data._lowQuality = true
+        }
+
+        return {ok: true, errors, warnings, data}
+    }
+
+    /* ============ 修复 #14：seed 支持 ============ */
+    async function callGroq(systemPrompt, userPrompt, maxRetry = 3, temperature = 0.35, seed = 0) {
+        let delay = 1500;
+        for (let attempt = 0; attempt <= maxRetry; attempt++) {
+            try {
+                const raw = await callGroqWithModel(systemPrompt, userPrompt, temperature, seed);
+                return raw
+            } catch (e) {
+                if (e.status === 429 && attempt < maxRetry) {
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                    continue
+                }
+                throw e
+            }
+        }
+        throw new Error('Groq 重试耗尽')
+    }
+
+    const _toastKeys = new Set();
+
+    function toast(msg, kind = 'ok', dur = 3500) {
+        const key = kind + ':' + msg;
+        if (_toastKeys.has(key)) return;
+        _toastKeys.add(key);
+        const wrap = document.getElementById('toastWrap');
+        const el = document.createElement('div');
+        el.className = 'toast ' + kind;
+        el.textContent = msg;
+        el.title = '点击关闭';
+        const cleanup = () => {
+            if (el.parentNode) el.remove();
+            _toastKeys.delete(key)
+        };
+        el.onclick = cleanup;
+        wrap.appendChild(el);
+        let timer = setTimeout(cleanup, dur);
+        el.addEventListener('mouseenter', () => clearTimeout(timer));
+        el.addEventListener('mouseleave', () => {
+            timer = setTimeout(cleanup, 1500)
+        })
+    }
+
+    function confetti() {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const colors = ['#34d399', '#ff9f43', '#22d3ee', '#a78bfa', '#fbbf24'];
+        for (let i = 0; i < 50; i++) {
+            const el = document.createElement('div');
+            el.className = 'confetti';
+            el.style.left = Math.random() * 100 + 'vw';
+            el.style.background = colors[Math.floor(Math.random() * colors.length)];
+            el.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
+            el.style.animationDelay = (Math.random() * .3) + 's';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 3200)
+        }
+        Sound.exact()
+    }
+
+    function feedbackFloat(text, color) {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        const el = document.createElement('div');
+        el.className = 'feedback-float';
+        el.textContent = text;
+        el.style.left = (window.innerWidth / 2) + 'px';
+        el.style.top = (window.innerHeight * .6) + 'px';
+        if (color) el.style.color = color;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 2400)
+    }
+
+    function toggleKeyVisibility() {
+        const inp = document.getElementById('apiKey');
+        inp.type = inp.type === 'password' ? 'text' : 'password'
+    }
+
+    function saveKey() {
+        const k = document.getElementById('apiKey').value.trim();
+        if (!k) return toast('请输入 API Key', 'warn');
+        localStorage.setItem('groq_key', k);
+        toast('已保存')
+    }
+
+    function clearKey() {
+        localStorage.removeItem('groq_key');
+        document.getElementById('apiKey').value = '';
+        toast('已清除', 'warn')
+    }
+
+    function getKey() {
+        return localStorage.getItem('groq_key') || ''
+    }
+
+    let _skillCache = null, _verBarShown = false;
+
+    /* ============ 修复 #7：skill 版本不匹配时降级 confidence ============ */
+    async function loadSkill() {
+        if (_skillCache) return _skillCache;
+        try {
+            const cached = JSON.parse(localStorage.getItem(SKILL_CACHE_KEY) || 'null');
+            if (cached && Date.now() - cached.ts < SKILL_CACHE_TTL && cached.version === EXPECTED_SKILL_VERSION) {
+                _skillCache = cached.text;
+                _skillVersionMismatch = false;
+                fetch(`skill.md?v=${Date.now()}`, {cache: 'no-store'}).then(r => r.text()).then(text => {
+                    const v = (text.match(/v(\d+\.\d+\.\d+)/) || [])[1];
+                    if (v === EXPECTED_SKILL_VERSION && text !== cached.text) {
+                        localStorage.setItem(SKILL_CACHE_KEY, JSON.stringify({ts: Date.now(), version: v, text}));
+                        _skillCache = null
+                    }
+                }).catch(() => {
+                });
+                return cached.text
+            }
+        } catch (e) {
+        }
+        const res = await fetch(`skill.md?v=${Date.now()}`, {cache: 'no-store'});
+        if (!res.ok) throw new Error(`skill.md 加载失败：HTTP ${res.status}`);
+        let text = await res.text();
+        text = text.replace(/\r\n/g, '\n').replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/<!--[\s\S]*?-->/g, '').trim();
+        const vm = text.match(/v(\d+\.\d+\.\d+)/);
+        const actualVersion = vm ? vm[1] : null;
+        _skillVersionMismatch = actualVersion !== EXPECTED_SKILL_VERSION;
+        if (_skillVersionMismatch && !_verBarShown) {
+            const bar = document.createElement('div');
+            bar.className = 'verbar';
+            bar.textContent = `⚠️ skill.md 版本不符（期望 ${EXPECTED_SKILL_VERSION}，实际 ${actualVersion ?? '未知'}）· 本次预测置信度将降级`;
+            document.body.appendChild(bar);
+            _verBarShown = true
+        }
+        try {
+            localStorage.setItem(SKILL_CACHE_KEY, JSON.stringify({ts: Date.now(), version: actualVersion, text}))
+        } catch (e) {
+        }
+        _skillCache = text;
+        return text
+    }
+
+    function espnUrl(name) {
+        const zh = toChineseTeam(name);
+        const id = ESPN_IDS[zh];
+        return id ? `https://a.espncdn.com/i/teamlogos/soccer/500/${id}.png` : null
+    }
+
+    function playerPhotoUrl(playerName) {
+        if (!playerName) return null;
+        if (PLAYER_PHOTOS[playerName]) return PLAYER_PHOTOS[playerName];
+        const en = Object.entries(PLAYER_ZH_MAP).find(([k, v]) => v === playerName)?.[0];
+        if (en && PLAYER_PHOTOS[en]) return PLAYER_PHOTOS[en];
+        const zh = PLAYER_ZH_MAP[playerName];
+        if (zh && PLAYER_PHOTOS[zh]) return PLAYER_PHOTOS[zh];
+        return null
+    }
+
+    /* ============ 修复 #13：startPredict 用统一 prompt ============ */
     async function startPredict(retryCount = 0) {
         const btn = document.getElementById('predictBtn');
         const {round, home, away} = currentMatch();
@@ -7471,6 +7817,7 @@
         if (!getKey()) return toast('请先填 Groq API Key', 'warn');
         const st = getMatchStatus(home, away, round);
         if (st.status === 'finished') return toast('🚫 比赛已结束，结果已封存！', 'err');
+        if (st.status === 'stale') return toast('⏳ 比赛数据待更新，暂不可预测', 'warn');
         const hist = getHistory();
         const existing = hist.find(h => h.round === round && h.home === home && h.away === away);
         if (existing && retryCount === 0 && !intel && !existing.intel) {
@@ -7487,33 +7834,31 @@
         try {
             const skill = await loadSkill();
             const teamStats = computeTeamAttackStats();
-            const homeAtk = teamStats.find(t => t.team === home);
-            const awayAtk = teamStats.find(t => t.team === away);
-            const atkContext = (homeAtk || awayAtk) ? `【实时攻防数据】\n` + (homeAtk ? `${home}（主）：场均进 ${homeAtk.avgGF.toFixed(2)} / 失 ${homeAtk.avgGA.toFixed(2)}\n` : '') + (awayAtk ? `${away}（客）：场均进 ${awayAtk.avgGF.toFixed(2)} / 失 ${awayAtk.avgGA.toFixed(2)}\n` : '') : '';
-            const now = new Date();
-            const kickoff = st.kickoff ? new Date(st.kickoff) : null;
-            let timeContext = "比赛尚未开始";
-            if (kickoff) {
-                const diff = (kickoff - now) / 3600000;
-                timeContext = diff > 0 ? `距开赛 ${diff.toFixed(1)} 小时` : "即将开赛"
+            const H = teamStats.find(t => t.team === home) || {};
+            const A = teamStats.find(t => t.team === away) || {};
+            let userPrompt = buildPredictionPrompt(home, away, round, intel, st, existing);
+            // 修复 #13：重试时追加提示
+            if (retryCount > 0) {
+                userPrompt += `\n【重试提示】上一次输出概率和不为 100 或方向矛盾，请严格检查后重新输出，概率之和必须等于 100。\n`
             }
-            const hr = getRank(home), ar = getRank(away);
-            const hForm = getForm(home, 5).join(''), aForm = getForm(away, 5).join('');
-            const autoContext = `【实时状态】\n状态：${timeContext}\n主队：${home}（排名${hr}，近5场：${hForm}）\n客队：${away}（排名${ar}，近5场：${aForm}）\n\n`;
-            const userPrompt = autoContext + (intel ? `【用户情报】\n${intel}\n\n` : '') + atkContext + `【指令】\n请结合所有数据，预测第 ${round + 1} 轮 ${home} vs ${away} 最终比分。严格按 skill.md 输出 JSON。`;
-            const raw = await callGroq(skill, userPrompt);
+            const calibHint = buildCalibrationHint();
+            if (calibHint) userPrompt = calibHint + userPrompt;
+
+            const seed = hashSeed(`${home}|${away}|${round}`);
+            const temp = retryCount > 0 ? 0.6 : 0.35;
+            const raw = await callGroq(skill, userPrompt, 3, temp, seed);
             finishAnim();
             await new Promise(r => setTimeout(r, 400));
             let parsed;
             try {
-                parsed = JSON.parse(raw)
+                parsed = JSON.parse(stripFence(raw))
             } catch (e) {
                 card.innerHTML = `<div class="empty">❌ 模型返回非 JSON<button class="btn ghost small" style="margin-top:16px" onclick="startPredict()">重试</button></div>`;
                 Sound.error();
                 setBreath('slow');
                 return toast('模型返回非 JSON', 'err')
             }
-            const v = validateAndNormalizePrediction(parsed);
+            const v = validateAndNormalizePrediction(parsed, {H, A});
             if (!v.ok) {
                 if (v.hardFail && retryCount < 1) {
                     finishAnim();
@@ -7624,44 +7969,6 @@
             label = '未命中'
         }
         return `<div class="compare-actual"><div class="col pred"><div class="lbl2">预测</div><div class="v">${escapeHtml(predictedScore)}</div></div><div class="verdict ${verdict}">${label}</div><div class="col real ${j === 'exact' ? 'hit' : j === 'miss' ? 'miss' : ''}"><div class="lbl2">实际</div><div class="v">${escapeHtml(rec.actual)}</div></div></div>`
-    }
-
-    function computeRadarData(home, away) {
-        const homeStats = computeTeamAttackStats().find(t => t.team === home) || {};
-        const awayStats = computeTeamAttackStats().find(t => t.team === away) || {};
-
-        function scoreFromForm(form) {
-            if (!form || !form.length) return 50;
-            const map = {W: 1, D: .5, L: 0};
-            return Math.round(form.reduce((s, r) => s + map[r], 0) / form.length * 100)
-        }
-
-        function scoreFromRank(team) {
-            const idx = STATIC_STANDINGS.findIndex(s => s.team === team);
-            if (idx < 0) return 50;
-            return Math.max(20, 100 - idx * 4)
-        }
-
-        function scoreFromAttack(st) {
-            if (!st.avgGF) return 50;
-            return Math.min(100, Math.round(st.avgGF / 2.5 * 100))
-        }
-
-        function scoreFromH2H(team) {
-            const m = computeH2H(home, away);
-            if (!m.length) return 50;
-            let wins = 0;
-            for (const x of m) {
-                if ((x.home === team && x.hg > x.ag) || (x.away === team && x.ag > x.hg)) wins++
-            }
-            return Math.round(wins / m.length * 100)
-        }
-
-        return {
-            home: [scoreFromForm(getForm(home, 5)), scoreFromRank(home), scoreFromAttack(homeStats), scoreFromH2H(home)],
-            away: [scoreFromForm(getForm(away, 5)), scoreFromRank(away), scoreFromAttack(awayStats), scoreFromH2H(away)],
-            labels: ['近期状态', '硬实力', '攻击力', '交锋战绩']
-        }
     }
 
     function renderRadar(home, away) {
@@ -7799,35 +8106,6 @@
         toast('分享图功能演示阶段', 'ok', 2000)
     }
 
-    function buildLast5Cache() {
-        _last5Cache = {};
-        if (!RESULTS || typeof RESULTS !== 'object') return;
-        for (const roundKey of Object.keys(RESULTS)) {
-            const roundObj = RESULTS[roundKey];
-            if (!roundObj || typeof roundObj !== 'object') continue;
-            for (const key of Object.keys(roundObj)) {
-                if (typeof key !== 'string' || !key.includes('|')) continue;
-                const [h, a] = key.split('|');
-                if (!h || !a) continue;
-                const p = parseScoreArr(roundObj[key]);
-                if (!p) continue;
-                const [hg, ag] = p;
-                const push = (t, r) => {
-                    if (!_last5Cache[t]) _last5Cache[t] = [];
-                    _last5Cache[t].push(r)
-                };
-                push(h, hg > ag ? 'W' : hg < ag ? 'L' : 'D');
-                push(a, ag > hg ? 'W' : ag < hg ? 'L' : 'D')
-            }
-        }
-        for (const k of Object.keys(_last5Cache)) _last5Cache[k] = _last5Cache[k].slice(-5)
-    }
-
-    function getLast5(team) {
-        if (!_last5Cache) buildLast5Cache();
-        return _last5Cache[team] || []
-    }
-
     function renderStandings(list) {
         if (!list || !list.length) {
             document.getElementById('standings').innerHTML = '<div class="empty">暂无数据</div>';
@@ -7848,7 +8126,7 @@
     function refreshDashboard() {
         const r = +document.getElementById('roundSel').value || 0;
         document.getElementById('dashRound').textContent = '第 ' + (r + 1) + ' 轮';
-        document.getElementById('dashRoundSub').textContent = '2026-27 赛季 · 共 ' + FIXTURES.length + ' 轮';
+        document.getElementById('dashRoundSub').textContent = `${_season} 赛季 · 共 ` + FIXTURES.length + ' 轮';
         const played = Object.keys(RESULTS).length;
         const playedEl = document.getElementById('dashPlayed');
         if (playedEl && playedEl.dataset.lastVal !== String(played)) {
@@ -7876,7 +8154,8 @@
         if (streak >= 3) subEl.innerHTML = `录入实际赛果，自动判定命中 <span class="streak">🔥 ${streak} 连胜</span>`; else subEl.textContent = '录入实际赛果，自动判定命中';
         updateSeasonSummary();
         renderFocusMatches();
-        updateMood(hist)
+        updateMood(hist);
+        updatePredictButtonState()
     }
 
     function updateSeasonSummary() {
@@ -7884,7 +8163,7 @@
         if (!el) return;
         const hist = getHistory();
         if (hist.length === 0) {
-            el.innerHTML = '2026-27 赛季 · <b>还没有预测记录</b>';
+            el.innerHTML = `${_season} 赛季 · <b>还没有预测记录</b>`;
             return
         }
         const done = hist.filter(h => h.actual).length;
@@ -7895,7 +8174,7 @@
         const exact = hist.filter(h => judge(h) === 'exact').length;
         const wdlRate = done ? Math.round(hits / done * 100) : 0;
         const exactRate = done ? Math.round(exact / done * 100) : 0;
-        el.innerHTML = `2026-27 赛季 <span class="sep">·</span> 已预测 <b>${hist.length}</b> 场 <span class="sep">·</span> 已录入 <b>${done}</b> 场 <span class="sep">·</span> 胜平负命中 <b>${wdlRate}%</b> <span class="sep">·</span> 精确比分 <b>${exactRate}%</b>`
+        el.innerHTML = `${_season} 赛季 <span class="sep">·</span> 已预测 <b>${hist.length}</b> 场 <span class="sep">·</span> 已录入 <b>${done}</b> 场 <span class="sep">·</span> 胜平负命中 <b>${wdlRate}%</b> <span class="sep">·</span> 精确比分 <b>${exactRate}%</b>`
     }
 
     function updateMood(hist) {
@@ -8099,6 +8378,7 @@
         return getHistory().map(h => ({...h}))
     }
 
+    /* ============ 修复 #1/#18：slim 保留分析字段 ============ */
     function setHistory(list) {
         let slim = list.slice(-800).map(h => {
             const o = {
@@ -8114,6 +8394,10 @@
                 ts: h.ts
             };
             if (h.actual) o.actual = h.actual;
+            if (Array.isArray(h.keyFactors) && h.keyFactors.length) o.keyFactors = h.keyFactors.slice(0, 6);
+            if (typeof h.analysis === 'string' && h.analysis.length) o.analysis = h.analysis.slice(0, 500);
+            if (Array.isArray(h._runs) && h._runs.length) o._runs = h._runs.slice(0, 5);
+            if (typeof h.intel === 'string' && h.intel.length) o.intel = h.intel.slice(0, 200);
             return o
         });
         try {
@@ -8132,6 +8416,7 @@
         invalidateTeamAtkCache()
     }
 
+    /* ============ 修复 #18：addHistory keep intel ============ */
     function addHistory(rec) {
         const list = getHistory();
         if (!rec._id) rec._id = Date.now() + '_' + Math.random().toString(36).slice(2, 8);
@@ -8141,6 +8426,7 @@
             const keep = {};
             if (old.actual) keep.actual = old.actual;
             if (old._id) keep._id = old._id;
+            if (old.intel && !rec.intel) keep.intel = old.intel;
             list[existingIdx] = {...rec, ...keep}
         } else list.push(rec);
         setHistory(list);
@@ -8357,9 +8643,14 @@
         box.innerHTML = html
     }
 
+    /* ============ 修复 #2：calibBins 拆方向 + Brier 新增 ============ */
     function computeDeepStats(records) {
         const done = records.filter(r => r.actual && /^\d+-\d+$/.test(r.actual));
         if (!done.length) return null;
+        const emptyDirBins = () => ({
+            '0-20': {pred: 0, hit: 0}, '20-40': {pred: 0, hit: 0}, '40-60': {pred: 0, hit: 0},
+            '60-80': {pred: 0, hit: 0}, '80-100': {pred: 0, hit: 0}
+        });
         const S = {
             total: done.length,
             exact: 0,
@@ -8383,6 +8674,7 @@
                 '60-80': {pred: 0, hit: 0},
                 '80-100': {pred: 0, hit: 0}
             },
+            calibBinsByDir: {H: emptyDirBins(), D: emptyDirBins(), A: emptyDirBins()},
             sumDiffHome: 0,
             sumDiffAway: 0,
             sumDiffTotal: 0,
@@ -8391,7 +8683,9 @@
             hitSequence: [],
             maxWin: 0,
             maxLose: 0,
-            recent5Rate: 0
+            recent5Rate: 0,
+            brierSum: 0,
+            brierCount: 0
         };
         const sorted = [...done].sort((a, b) => (a.ts || 0) - (b.ts || 0));
         for (const rec of sorted) {
@@ -8422,17 +8716,39 @@
             S.sumActualTotal += a.actual.total;
             S.predTotalDist[Math.min(a.predicted.total, 7)]++;
             S.realTotalDist[Math.min(a.actual.total, 7)]++;
+
+            // 原有"最大概率桶"的方向命中率（保留用于展示）
             const mainProb = Math.max(rec.homeWin || 0, rec.draw || 0, rec.awayWin || 0);
             const binKey = mainProb < 20 ? '0-20' : mainProb < 40 ? '20-40' : mainProb < 60 ? '40-60' : mainProb < 80 ? '60-80' : '80-100';
             S.calibBins[binKey].pred++;
             const maxDir = (rec.homeWin >= rec.draw && rec.homeWin >= rec.awayWin) ? 'H' : (rec.draw >= rec.awayWin) ? 'D' : 'A';
-            if (maxDir === a.actual.wdl) S.calibBins[binKey].hit++
+            if (maxDir === a.actual.wdl) S.calibBins[binKey].hit++;
+
+            // 修复 #2：真正概率校准 —— 按方向分桶
+            const probs = {
+                H: (rec.homeWin || 0) / 100,
+                D: (rec.draw || 0) / 100,
+                A: (rec.awayWin || 0) / 100
+            };
+            for (const k of ['H', 'D', 'A']) {
+                const p = probs[k];
+                const bk = p < .2 ? '0-20' : p < .4 ? '20-40' : p < .6 ? '40-60' : p < .8 ? '60-80' : '80-100';
+                S.calibBinsByDir[k][bk].pred++;
+                if (a.actual.wdl === k) S.calibBinsByDir[k][bk].hit++
+            }
+
+            // Brier Score（胜平负三分量）
+            const pArr = [probs.H, probs.D, probs.A];
+            const actualArr = [a.actual.wdl === 'H' ? 1 : 0, a.actual.wdl === 'D' ? 1 : 0, a.actual.wdl === 'A' ? 1 : 0];
+            for (let i = 0; i < 3; i++) S.brierSum += Math.pow(pArr[i] - actualArr[i], 2);
+            S.brierCount++
         }
         S.avgDiffHome = S.sumDiffHome / S.total;
         S.avgDiffAway = S.sumDiffAway / S.total;
         S.avgDiffTotal = S.sumDiffTotal / S.total;
         S.avgPredTotal = S.sumPredTotal / S.total;
         S.avgActualTotal = S.sumActualTotal / S.total;
+        S.brier = S.brierCount ? S.brierSum / S.brierCount : null;
         let cw = 0, cl = 0;
         for (const h of S.hitSequence) {
             if (h) {
@@ -8457,10 +8773,19 @@
         if (el.classList.contains('open')) renderDeepAnalysis()
     }
 
+    /* ============ 修复 #20：findActualScore 查历史 ============ */
     function findActualScore(home, away) {
         const key = `${home}|${away}`;
         for (const rk of Object.keys(RESULTS)) {
             const ro = RESULTS[rk];
+            if (!ro || typeof ro !== 'object') continue;
+            if (ro[key]) {
+                const p = parseScoreArr(ro[key]);
+                if (p) return `${p[0]}-${p[1]}`
+            }
+        }
+        for (const y of Object.keys(HISTORICAL_RESULTS || {})) {
+            const ro = HISTORICAL_RESULTS[y];
             if (!ro || typeof ro !== 'object') continue;
             if (ro[key]) {
                 const p = parseScoreArr(ro[key]);
@@ -8570,7 +8895,9 @@
                     const cls = a.verdict === 'exact' ? 'hit' : a.verdict === 'miss' ? 'miss' : '';
                     vsHtml = `<div class="vs-row"><div class="vs-side pred"><div class="vs-lbl">AI</div><div class="vs-score">${escapeHtml(h.score)}</div></div><div class="vs-arrow">→</div><div class="vs-side real ${cls}"><div class="vs-lbl">实际</div><div class="vs-score">${escapeHtml(h.actual)}</div></div></div>`
                 }
-                return `<div class="hitem"><div class="top"><div class="teams2">${escapeHtml(h.home)} vs ${escapeHtml(h.away)}</div><div class="res-badge ${j}">${labels[j]}</div></div>${vsHtml}<div class="meta">概率 ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round + 1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div><div class="row2" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;"><span style="font-size:11px; color:var(--text-3); width:100%; margin-bottom:4px;">一键录入实际比分：</span>${['1-0', '1-1', '2-1', '2-2', '3-1', '0-0'].map(sc => `<button onclick="setActual('${id}', '${sc}')" style="flex:1; min-width:40px; padding:6px 0; border-radius:6px; border:1px solid ${h.actual === sc ? 'var(--emerald)' : 'var(--border-hi)'}; background:${h.actual === sc ? 'var(--emerald-soft)' : 'transparent'}; color:${h.actual === sc ? 'var(--emerald)' : 'var(--text-2)'}; font-weight:600; font-size:12px;">${sc}</button>`).join('')}<div style="display:flex; gap:4px; width:100%; margin-top:6px;"><input style="flex:1; padding:6px 10px; font-size:12px; border-radius:6px;" placeholder="其他比分" value="${escapeHtml(h.actual || '')}" onkeydown="if(event.key==='Enter')setActual('${id}',this.value)"><button onclick="setActual('${id}',this.querySelector('input').value)" style="padding:0 12px; border-radius:6px;">保存</button><button onclick="delHistory('${id}')" style="padding:0 12px; border-radius:6px; color:var(--rose);">删除</button></div></div></div>`
+                // 修复 #44：快捷比分补客胜
+                const quickScores = ['1-0', '1-1', '2-1', '2-2', '3-1', '0-0', '0-1', '1-2', '0-2'];
+                return `<div class="hitem"><div class="top"><div class="teams2">${escapeHtml(h.home)} vs ${escapeHtml(h.away)}</div><div class="res-badge ${j}">${labels[j]}</div></div>${vsHtml}<div class="meta">概率 ${h.homeWin}% / ${h.draw}% / ${h.awayWin}% · 第${h.round + 1}轮 · ${new Date(h.ts).toLocaleString('zh-CN')}</div><div class="row2" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;"><span style="font-size:11px; color:var(--text-3); width:100%; margin-bottom:4px;">一键录入实际比分：</span>${quickScores.map(sc => `<button onclick="setActual('${id}', '${sc}')" style="flex:1; min-width:40px; padding:6px 0; border-radius:6px; border:1px solid ${h.actual === sc ? 'var(--emerald)' : 'var(--border-hi)'}; background:${h.actual === sc ? 'var(--emerald-soft)' : 'transparent'}; color:${h.actual === sc ? 'var(--emerald)' : 'var(--text-2)'}; font-weight:600; font-size:12px;">${sc}</button>`).join('')}<div style="display:flex; gap:4px; width:100%; margin-top:6px;"><input style="flex:1; padding:6px 10px; font-size:12px; border-radius:6px;" placeholder="其他比分" value="${escapeHtml(h.actual || '')}" onkeydown="if(event.key==='Enter')setActual('${id}',this.value)"><button onclick="setActual('${id}',this.querySelector('input').value)" style="padding:0 12px; border-radius:6px;">保存</button><button onclick="delHistory('${id}')" style="padding:0 12px; border-radius:6px; color:var(--rose);">删除</button></div></div></div>`
             }).join('')
         }
         const done = judged.filter(x => x.h.actual).length;
@@ -8792,15 +9119,20 @@
     });
     let batchN = 1;
 
+    /* ============ 修复 #17：抽 getPredictableMatches 共用 ============ */
+    function getPredictableMatches(round) {
+        const allRound = FIXTURES[round] || [];
+        const hist = getHistory();
+        return allRound.filter(m => {
+            const isFinished = getMatchStatus(m.home, m.away, round).status === 'finished';
+            const isPredicted = hist.some(h => h.round === round && h.home === m.home && h.away === m.away);
+            return !isFinished && !isPredicted
+        })
+    }
+
     function updateQuota() {
         const r = +document.getElementById('roundSel').value || 0;
-        const allRound = FIXTURES[r] || [];
-        const hist = getHistory();
-        const validMatches = allRound.filter(m => {
-            const isFinished = getMatchStatus(m.home, m.away, r).status === 'finished';
-            const isPredicted = hist.some(h => h.round === r && h.home === m.home && h.away === m.away);
-            return !isFinished && !isPredicted
-        });
+        const validMatches = getPredictableMatches(r);
         const calls = validMatches.length * batchN;
         const el = document.getElementById('batchQuota');
         if (validMatches.length === 0) {
@@ -8825,17 +9157,14 @@
         toast('批量预测将停止…', 'warn', 2000)
     }
 
+    /* ============ 修复 #6/#9/#39：批量预测用统一 prompt + 传 intel + 概率平均 ============ */
     async function runBatch() {
         const btn = document.getElementById('batchBtn');
         if (!getKey()) return toast('请先填 Groq API Key', 'warn');
         const r = +document.getElementById('roundSel').value || 0;
         const allRound = FIXTURES[r] || [];
-        const hist = getHistory();
-        const round = allRound.filter(m => {
-            const isFinished = getMatchStatus(m.home, m.away, r).status === 'finished';
-            const isPredicted = hist.some(h => h.round === r && h.home === m.home && h.away === m.away);
-            return !isFinished && !isPredicted
-        });
+        const round = getPredictableMatches(r);
+        const intel = document.getElementById('intel').value.trim();
         if (!allRound.length) return toast('本轮无赛程', 'warn');
         if (!round.length) return toast('本轮剩余比赛已全部被 AI 预测或已结束！', 'warn');
         btn.disabled = true;
@@ -8850,6 +9179,7 @@
         let ok = 0, fail = 0, done = 0;
         try {
             const skill = await loadSkill();
+            const calibHint = buildCalibrationHint();
             const CONCURRENCY = 3;
             let cursor = 0;
 
@@ -8859,23 +9189,79 @@
                     const i = cursor++;
                     const {home, away} = round[i];
                     try {
+                        const st = getMatchStatus(home, away, r);
+                        const teamStats = computeTeamAttackStats();
+                        const H = teamStats.find(t => t.team === home) || {};
+                        const A = teamStats.find(t => t.team === away) || {};
                         const runs = [];
                         for (let k = 0; k < batchN; k++) {
                             if (_batchCancelled) break;
-                            const userPrompt = `【预测指令】\n请预测：第 ${r + 1} 轮 ${home} vs ${away}\n严格按 skill.md 输出 JSON。`;
-                            const raw = await callGroq(skill, userPrompt);
-                            const p = JSON.parse(raw);
-                            const v = validateAndNormalizePrediction(p);
-                            if (v.ok) runs.push(v.data)
+                            let userPrompt = buildPredictionPrompt(home, away, r, intel, st, null);
+                            if (calibHint) userPrompt = calibHint + userPrompt;
+                            const seed = hashSeed(`${home}|${away}|${r}|${k}`);
+                            const temp = 0.5;
+                            const raw = await callGroq(skill, userPrompt, 3, temp, seed);
+                            try {
+                                const p = JSON.parse(stripFence(raw));
+                                const v = validateAndNormalizePrediction(p, {H, A});
+                                if (v.ok) runs.push({
+                                    score: v.data.score,
+                                    homeWin: v.data.homeWin,
+                                    draw: v.data.draw,
+                                    awayWin: v.data.awayWin,
+                                    confidence: v.data.confidence,
+                                    keyFactors: v.data.keyFactors,
+                                    analysis: v.data.analysis,
+                                    homeKeyPlayers: v.data.homeKeyPlayers,
+                                    awayKeyPlayers: v.data.awayKeyPlayers,
+                                    likelyScorers: v.data.likelyScorers
+                                })
+                            } catch (e) {
+                            }
                         }
                         if (!runs.length) throw new Error('all runs failed');
+
+                        // 概率平均（修复 #39）
+                        const avgH = runs.reduce((s, x) => s + x.homeWin, 0) / runs.length;
+                        const avgD = runs.reduce((s, x) => s + x.draw, 0) / runs.length;
+                        const avgA = runs.reduce((s, x) => s + x.awayWin, 0) / runs.length;
+                        const total = avgH + avgD + avgA || 100;
+                        const normH = Math.round(avgH / total * 10000) / 100;
+                        const normD = Math.round(avgD / total * 10000) / 100;
+                        const normA = Math.round((100 - normH - normD) * 100) / 100;
+
+                        // 比分取与主方向一致的众数（修复 #39）
+                        const mainDir = normH >= normD && normH >= normA ? 'H' : normD >= normA ? 'D' : 'A';
                         const scoreCount = {};
-                        runs.forEach(d => {
-                            scoreCount[d.score] = (scoreCount[d.score] || 0) + 1
+                        runs.forEach(x => {
+                            const [sh, sa] = x.score.split('-').map(Number);
+                            const dir = sh > sa ? 'H' : sh < sa ? 'A' : 'D';
+                            if (dir === mainDir) scoreCount[x.score] = (scoreCount[x.score] || 0) + 1
+                        });
+                        if (!Object.keys(scoreCount).length) runs.forEach(x => {
+                            scoreCount[x.score] = (scoreCount[x.score] || 0) + 1
                         });
                         const bestScore = Object.entries(scoreCount).sort((a, b) => b[1] - a[1])[0][0];
-                        const main = runs.find(d => d.score === bestScore) || runs[0];
-                        addHistory({round: r, home, away, ...main, _runs: runs.map(d => d.score), ts: Date.now()});
+                        const main = runs.find(x => x.score === bestScore) || runs[0];
+
+                        addHistory({
+                            round: r,
+                            home,
+                            away,
+                            homeWin: normH,
+                            draw: normD,
+                            awayWin: normA,
+                            score: bestScore,
+                            confidence: main.confidence,
+                            keyFactors: main.keyFactors,
+                            analysis: main.analysis,
+                            homeKeyPlayers: main.homeKeyPlayers,
+                            awayKeyPlayers: main.awayKeyPlayers,
+                            likelyScorers: main.likelyScorers,
+                            intel,
+                            _runs: runs.map(x => x.score),
+                            ts: Date.now()
+                        });
                         ok++
                     } catch (e) {
                         fail++
@@ -9217,6 +9603,7 @@
         }, {passive: true})
     })();
 
+    /* ============ 修复 #5/#29/#41：loadExternalData 设置 _standingsLoaded 和 _season ============ */
     async function loadExternalData() {
         const banner = document.getElementById('fallbackBanner');
         const loadingEl = document.getElementById('dashRound');
@@ -9225,6 +9612,7 @@
             const res = await fetch(`data.json?v=${Date.now()}`, {cache: 'no-store'});
             if (!res.ok) {
                 _usingFallback = true;
+                _standingsLoaded = false;
                 banner.classList.add('show');
                 toast('data.json 加载失败', 'warn', 5000);
                 return
@@ -9245,9 +9633,13 @@
                 _last5Cache = null;
                 invalidateTeamAtkCache()
             }
-            if (Array.isArray(data.standings) && data.standings.length) STATIC_STANDINGS = data.standings;
+            if (Array.isArray(data.standings) && data.standings.length) {
+                STATIC_STANDINGS = data.standings;
+                _standingsLoaded = true
+            }
             if (data.playerPhotos && typeof data.playerPhotos === 'object') PLAYER_PHOTOS = data.playerPhotos;
             if (data.historicalResults && typeof data.historicalResults === 'object') HISTORICAL_RESULTS = data.historicalResults;
+            if (typeof data.season === 'string') _season = data.season;
             _usingFallback = !hasRealFixtures;
             banner.classList.toggle('show', _usingFallback);
             initSelectors();
@@ -9257,6 +9649,7 @@
             _lastDataUpdatedAt = data.updatedAt || 'unknown'
         } catch (e) {
             _usingFallback = true;
+            _standingsLoaded = false;
             banner.classList.add('show');
             toast('data.json 加载失败', 'warn')
         }
@@ -9308,6 +9701,17 @@
         }
     }
 
+    /* ============ 修复 #19：多标签页同步 ============ */
+    window.addEventListener('storage', e => {
+        if (e.key === HIST_KEY) {
+            _histMemCache = null;
+            invalidateHistCache();
+            invalidateTeamAtkCache();
+            refreshDashboard();
+            if (document.getElementById('histMask').classList.contains('show')) renderHistory()
+        }
+    });
+
     (async function boot() {
         if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
         setImmersion(_immersion);
@@ -9343,7 +9747,8 @@
             localStorage.setItem('last_round', rs.value);
             if (_filterMode === 'round') {
                 fillMatches();
-                updateURL()
+                updateURL();
+                updatePredictButtonState()
             }
         });
         document.getElementById('pickerMode').addEventListener('click', e => {
@@ -9412,6 +9817,7 @@
             }
         }
         LoadingBar.done();
+        updatePredictButtonState();
         const preload = () => {
             Object.values(ESPN_IDS).forEach(id => {
                 const img = new Image();

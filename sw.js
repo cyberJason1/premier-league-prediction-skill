@@ -5,10 +5,16 @@ const APP_SHELL = [
     './', './index.html', './skill.md', './data.json', './fpl.json', './about.html'
 ];
 
+// 数据类文件：离线兜底绝不能返回 index.html
+// 否则前端会把 HTML 当 JSON / skill 用，导致解析失败或 prompt 污染
+const DATA_FILES = new Set(['/data.json', '/fpl.json', '/skill.md']);
+
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
-            .then(cache => Promise.allSettled(APP_SHELL.map(url => cache.add(url).catch(() => null))))
+            .then(cache => Promise.allSettled(
+                APP_SHELL.map(url => cache.add(url).catch(() => null))
+            ))
             .then(() => self.skipWaiting())
     );
 });
@@ -16,10 +22,35 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys()
-            .then(keys => Promise.all(keys.filter(k => k.startsWith('pl-cache-') && k !== CACHE_NAME).map(k => caches.delete(k))))
+            .then(keys => Promise.all(
+                keys.filter(k => k.startsWith('pl-cache-') && k !== CACHE_NAME)
+                    .map(k => caches.delete(k))
+            ))
             .then(() => self.clients.claim())
     );
 });
+
+// 防御性：兼容 index.html 里 reg.waiting.postMessage({type:'SKIP_WAITING'})
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+function offlineFallback(pathname) {
+    // 数据文件离线时返回明确 503，让前端走 fallback 分支
+    if (DATA_FILES.has(pathname)) {
+        return new Response(
+            JSON.stringify({ error: 'offline', message: '离线且无缓存' }),
+            { status: 503, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
+        );
+    }
+    // 页面兜底：优先 index.html，全 miss 返回明确 503
+    return caches.match('./index.html').then(c => c || new Response('Offline', {
+        status: 503,
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    }));
+}
 
 self.addEventListener('fetch', event => {
     const req = event.request;
@@ -42,10 +73,16 @@ self.addEventListener('fetch', event => {
             fetch(req).then(res => {
                 if (res && res.status === 200) {
                     const clone = res.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(cacheKey, clone));
+                    // 修复：cache.put 放到 waitUntil 里，避免 SW 提前终止导致缓存不完整
+                    event.waitUntil(
+                        caches.open(CACHE_NAME).then(cache => cache.put(cacheKey, clone))
+                    );
                 }
                 return res;
-            }).catch(() => caches.match(cacheKey).then(c => c || caches.match('./index.html')))
+            }).catch(() => {
+                // 修复：全 miss 时返回明确 503，而不是 undefined 或 HTML
+                return caches.match(cacheKey).then(c => c || offlineFallback(url.pathname));
+            })
         );
         return;
     }
