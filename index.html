@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#08090d">
     <link rel="icon"
           href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v16.0</title>
+    <title>英超预测引擎 v16.1</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
@@ -5514,6 +5514,11 @@
                 <button class="btn ghost" style="flex:1" onclick="saveKey()">保存</button>
                 <button class="btn ghost" style="flex:1" onclick="clearKey()">清除</button>
             </div>
+            <h3>数据同步</h3>
+            <div style="display:flex;gap:var(--sp-2);margin-bottom:var(--sp-2)">
+                <button class="btn ghost" style="flex:1" id="syncSquadBtn" onclick="syncLatestSquad()">🔄 同步最新阵容</button>
+            </div>
+            <div id="syncSquadMsg" style="font-size:11px;color:var(--text-3);margin-bottom:var(--sp-4);line-height:1.5;min-height:16px;">尚未同步，点上方按钮拉取 FPL 官方最新阵容</div>
             <h3>比赛选择</h3>
             <div class="picker-mode" id="pickerMode">
                 <button data-mode="round" class="on">按轮次</button>
@@ -5565,7 +5570,7 @@
                 href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub</a><span
                 style="color:var(--text-4)">·</span><a href="about.html#legal">免责声明</a></div>
         <div class="legal">⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。</div>
-        <div class="ver">Premier League Prediction Engine · v16.0</div>
+        <div class="ver">Premier League Prediction Engine · v16.1</div>
     </footer>
 </div>
 <div class="fab-hub" id="fabHub">
@@ -5739,8 +5744,10 @@
 <div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 <script>
     /* =====================================================================
-     *  v16.0 最终修复版
-     *  - 拦截截断报错 / 极限抢救 JSON / 限制分析字数 / 爆出原始输出
+     *  v16.1 最终修复版
+     *  - SW 版本号 16.1
+     *  - 新增 FPL 官方阵容同步 + 数据时效硬约束
+     *  - 修复预测后按钮状态不刷新
      * ===================================================================== */
 
     const Sound = (() => {
@@ -7393,6 +7400,121 @@
         }
     }
 
+    /* ============ v16.1 新增：FPL 官方最新阵容同步 ============ */
+    async function syncLatestSquad() {
+        const msgEl = document.getElementById('syncSquadMsg');
+        const btnEl = document.getElementById('syncSquadBtn');
+        if (btnEl) btnEl.disabled = true;
+        if (msgEl) { msgEl.textContent = '正在拉取官方最新阵容…'; msgEl.style.color = 'var(--text-3)'; }
+
+        try {
+            // premierleague.com 在 SW 里已被排除拦截，直接走网络，天然最新
+            const res = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', { cache: 'no-store' });
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+
+            const teamMap = Object.fromEntries(data.teams.map(t => [t.id, t.name]));
+            const latest = data.elements.map(p => ({
+                id: p.id,
+                name: p.web_name,
+                fullName: `${p.first_name || ''} ${p.second_name || ''}`.trim() || p.web_name,
+                team: teamMap[p.team_id] || '',
+                position: p.element_type,
+                status: p.status,
+                news: p.news || ''
+            }));
+
+            let old = [];
+            try { old = JSON.parse(localStorage.getItem('fplSquad') || '[]'); } catch (e) {}
+            const oldMap = Object.fromEntries(old.map(p => [p.id, p.team]));
+            const transfers = latest
+                .filter(p => oldMap[p.id] && oldMap[p.id] !== p.team)
+                .map(p => ({ name: p.fullName || p.name, from: oldMap[p.id], to: p.team }));
+
+            const injuries = latest
+                .filter(p => p.status && p.status !== 'a' && p.news)
+                .map(p => ({ name: p.fullName || p.name, team: p.team, news: p.news }));
+
+            localStorage.setItem('fplSquad', JSON.stringify(latest));
+            localStorage.setItem('fplSquadUpdatedAt', new Date().toISOString());
+            localStorage.setItem('fplTransfers', JSON.stringify(transfers));
+            localStorage.setItem('fplInjuries', JSON.stringify(injuries));
+
+            const parts = [];
+            if (transfers.length) parts.push(`转会 ${transfers.length} 笔`);
+            if (injuries.length) parts.push(`伤停 ${injuries.length} 条`);
+            if (msgEl) {
+                msgEl.textContent = parts.length
+                    ? `✅ 已同步（${parts.join(' · ')}）`
+                    : '✅ 已同步，无变化';
+                msgEl.style.color = 'var(--emerald)';
+            }
+            return { transfers, injuries };
+        } catch (err) {
+            if (msgEl) {
+                msgEl.textContent = '❌ 同步失败：' + err.message + '（可稍后重试）';
+                msgEl.style.color = 'var(--rose)';
+            }
+            return null;
+        } finally {
+            if (btnEl) btnEl.disabled = false;
+        }
+    }
+
+    /* ============ v16.1 新增：生成"数据时效硬约束"块 ============ */
+    function buildTimeGuard() {
+        const updatedAt = localStorage.getItem('fplSquadUpdatedAt');
+        const hasSynced = !!updatedAt;
+        const ageDays = hasSynced
+            ? Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86400000)
+            : null;
+
+        let injuries = [];
+        let transfers = [];
+        try { injuries = JSON.parse(localStorage.getItem('fplInjuries') || '[]'); } catch (e) {}
+        try { transfers = JSON.parse(localStorage.getItem('fplTransfers') || '[]'); } catch (e) {}
+
+        let timeLine;
+        if (!hasSynced) {
+            timeLine = '- 官方阵容同步：尚未启用。请务必依赖用户提供的【今日情报】判断转会/伤病，若无法确认则标注"阵容待确认"，严禁臆造球员所属球队。';
+        } else {
+            timeLine = `- 官方阵容数据截止：${updatedAt}（距今 ${ageDays} 天）。`;
+            if (ageDays > 7) {
+                timeLine += ` 数据已超 7 天，若你判断某球员近期可能转会而无法确认，必须标注"阵容待确认"，严禁臆造其所属球队。`;
+            }
+            timeLine += ' 若用户提供的【今日情报】与数据冲突，以情报为准。';
+        }
+
+        const injuryText = injuries.length
+            ? injuries.slice(0, 30).map(x => `${x.name}(${x.team}): ${x.news}`).join('；')
+            : '（本次未获取到官方伤病快照，请以用户情报为准）';
+
+        const transferText = transfers.length
+            ? transfers.slice(0, 30).map(x => `${x.name}: ${x.from} → ${x.to}`).join('；')
+            : '（本次未检测到新转会，或尚未启用官方同步）';
+
+        return `
+【数据时效硬约束】
+${timeLine}
+
+【官方检测到的近期转会（英超）】
+${transferText}
+
+【官方伤病/停赛快照（英超）】
+${injuryText}
+`;
+    }
+
+    /* ============ v16.1 新增：自动同步调度（仅数据过期时才拉） ============ */
+    function maybeSyncSquad() {
+        const updatedAt = localStorage.getItem('fplSquadUpdatedAt');
+        const ageMs = updatedAt ? Date.now() - new Date(updatedAt).getTime() : Infinity;
+        // 从未同步，或超过 6 小时，才自动拉一次，避免每次打开都请求
+        if (ageMs > 6 * 3600 * 1000) {
+            syncLatestSquad().catch(() => {});
+        }
+    }
+
     function buildPredictionPrompt(home, away, round, intel, st, existing) {
         const teamStats = computeTeamAttackStats();
         const H = teamStats.find(t => t.team === home) || {};
@@ -7427,7 +7549,8 @@
             ? `距开赛 ${((new Date(st.kickoff) - Date.now()) / 3600000).toFixed(1)} 小时`
             : '开赛时间未知';
 
-        let prompt = `【比赛】第 ${round + 1} 轮 ${home}（主） vs ${away}（客）\n`;
+        const timeGuard = buildTimeGuard();
+        let prompt = timeGuard + `【比赛】第 ${round + 1} 轮 ${home}（主） vs ${away}（客）\n`;
         prompt += `【赛季阶段】${_season} · ${phase}\n`;
         prompt += `【开赛】${st.kickoff || '未知'} · ${timeContext}\n`;
         prompt += `【排名】${home} 第${hr ?? '未知'}名 · ${away} 第${ar ?? '未知'}名\n`;
@@ -7883,7 +8006,8 @@
         } finally {
             btn.disabled = false;
             btn.classList.remove('loading');
-            btn.title = "Ctrl + Enter"
+            btn.title = "Ctrl + Enter";
+            try { updatePredictButtonState(); } catch (e) {}
         }
     }
 
@@ -9738,7 +9862,7 @@
         LoadingBar.start();
         if (!localStorage.getItem('pl_welcomed')) {
             setTimeout(() => {
-                toast('👋 欢迎使用 v16.0 · 先填 Groq API Key', 'ok', 6500)
+                toast('👋 欢迎使用 v16.1 · 先填 Groq API Key', 'ok', 6500)
             }, 2200);
             localStorage.setItem('pl_welcomed', '1')
         }
@@ -9802,6 +9926,7 @@
         updateMatchdayLine();
         await loadExternalData();
         loadFPL();
+        maybeSyncSquad();
         const n0 = syncActualsToHistory(true);
         if (n0 > 0) {
             renderStandings(STATIC_STANDINGS);
@@ -9838,7 +9963,7 @@
     })();
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js').then(reg => {
+            navigator.serviceWorker.register('./sw.js?v=16.1').then(reg => {
                 reg.addEventListener('updatefound', () => {
                     const newSW = reg.installing;
                     if (!newSW) return;

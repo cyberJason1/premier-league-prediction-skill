@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v16.0';
+const CACHE_VERSION = 'v16.1'; // v16.1 改动：bump 版本，强制旧缓存清退
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -70,17 +70,18 @@ self.addEventListener('fetch', event => {
     if (url.origin === self.location.origin) {
         const cacheKey = new Request(url.origin + url.pathname);
         event.respondWith(
-            fetch(req).then(res => {
+            // v16.1 改动：加 cache:'no-store'，绕过浏览器 HTTP 缓存，真正每次问服务器
+            fetch(req, { cache: 'no-store' }).then(res => {
                 if (res && res.status === 200) {
                     const clone = res.clone();
-                    // 修复：cache.put 放到 waitUntil 里，避免 SW 提前终止导致缓存不完整
+                    // cache.put 放到 waitUntil 里，避免 SW 提前终止导致缓存不完整
                     event.waitUntil(
                         caches.open(CACHE_NAME).then(cache => cache.put(cacheKey, clone))
                     );
                 }
                 return res;
             }).catch(() => {
-                // 修复：全 miss 时返回明确 503，而不是 undefined 或 HTML
+                // 全 miss 时返回明确 503，而不是 undefined 或 HTML
                 return caches.match(cacheKey).then(c => c || offlineFallback(url.pathname));
             })
         );
