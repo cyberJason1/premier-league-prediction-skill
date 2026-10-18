@@ -7400,19 +7400,49 @@
         }
     }
 
-    /* ============ v16.1 新增：FPL 官方最新阵容同步 ============ */
+    /* ============ v16.1 修复：FPL 官方最新阵容同步（带代理兜底） ============ */
     async function syncLatestSquad() {
         const msgEl = document.getElementById('syncSquadMsg');
         const btnEl = document.getElementById('syncSquadBtn');
         if (btnEl) btnEl.disabled = true;
         if (msgEl) { msgEl.textContent = '正在拉取官方最新阵容…'; msgEl.style.color = 'var(--text-3)'; }
 
-        try {
-            // premierleague.com 在 SW 里已被排除拦截，直接走网络，天然最新
-            const res = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', { cache: 'no-store' });
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
+        const targetUrl = 'https://fantasy.premierleague.com/api/bootstrap-static/';
+        let data = null;
 
+        try {
+            // 尝试直连
+            let res = await fetch(targetUrl, { cache: 'no-store' });
+            if (res.ok) {
+                data = await res.json();
+            } else {
+                throw new Error('HTTP ' + res.status);
+            }
+        } catch (err) {
+            // 直连失败，尝试通过免费代理兜底
+            try {
+                if (msgEl) msgEl.textContent = '直连失败，正在尝试备用节点…';
+                // 使用 corsproxy.io 作为兜底代理
+                const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+                let res = await fetch(proxyUrl, { cache: 'no-store' });
+                if (res.ok) {
+                    data = await res.json();
+                } else {
+                    throw new Error('Proxy HTTP ' + res.status);
+                }
+            } catch (proxyErr) {
+                // 彻底失败，温和提示，不吓人
+                if (msgEl) {
+                    msgEl.textContent = '⚠️ 官方阵容同步受限，请在下方【今日情报】手动输入最新伤停/转会';
+                    msgEl.style.color = 'var(--gold)';
+                }
+                if (btnEl) btnEl.disabled = false;
+                return null;
+            }
+        }
+
+        try {
+            // 处理数据
             const teamMap = Object.fromEntries(data.teams.map(t => [t.id, t.name]));
             const latest = data.elements.map(p => ({
                 id: p.id,
@@ -7450,9 +7480,9 @@
                 msgEl.style.color = 'var(--emerald)';
             }
             return { transfers, injuries };
-        } catch (err) {
+        } catch (parseErr) {
             if (msgEl) {
-                msgEl.textContent = '❌ 同步失败：' + err.message + '（可稍后重试）';
+                msgEl.textContent = '❌ 解析失败：数据格式异常';
                 msgEl.style.color = 'var(--rose)';
             }
             return null;
