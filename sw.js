@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v16.2'; // v16.2 改动：bump 版本，强制旧缓存清退
+const CACHE_VERSION = 'v16.3'; // v16.2 改动：bump 版本，强制旧缓存清退
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 const APP_SHELL = [
