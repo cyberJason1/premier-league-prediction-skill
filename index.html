@@ -714,22 +714,40 @@
     async function syncLatestSquad() {
         const btn = $('#syncBtn'), msg = $('#syncMsg');
         btn.textContent = '同步中...'; btn.disabled = true;
+        msg.innerHTML = '<span style="color:var(--amber)">正在通过代理连接 FPL 官方...</span>';
+
         try {
-            const res = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/');
+            // 使用 allorigins 公共代理绕过 CORS 限制
+            const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://fantasy.premierleague.com/api/bootstrap-static/');
+            const res = await fetch(proxyUrl);
+            if (!res.ok) throw new Error('Proxy failed');
             const data = await res.json();
+
+            if (!data || !data.teams) throw new Error('Invalid data');
+
+            // 更新球队徽章和攻防强度 (先验)
             data.teams.forEach(t => {
-                const team = state.teams.find(x => x.name.includes(t.name) || t.name.includes(x.name));
+                // 通过简称或名字匹配
+                const team = state.teams.find(x =>
+                    x.name.toLowerCase().includes(t.name.toLowerCase()) ||
+                    t.name.toLowerCase().includes(x.name.toLowerCase()) ||
+                    x.short === t.short_name
+                );
                 if(team) {
                     team.fplId = t.id;
                     team.badge = `https://resources.premierleague.com/premierleague/badges/70/t${t.id}.png`;
-                    team.strAtt = (t.strength_attack_home + t.strength_attack_away)/2;
-                    team.strDef = (t.strength_defence_home + t.strength_defence_away)/2;
+                    team.strAtt = (t.strength_attack_home + t.strength_attack_away) / 2;
+                    team.strDef = (t.strength_defence_home + t.strength_defence_away) / 2;
                 }
             });
-            msg.innerHTML = `<span style="color:var(--emerald)">✅ 成功同步 ${data.elements.length} 名球员</span>`;
-            renderFocus(); renderStandings();
+
+            msg.innerHTML = `<span style="color:var(--emerald)">✅ 成功同步 ${data.elements.length} 名球员和 20 支球队</span>`;
+            renderFocus();
+            renderStandings();
+            renderDash();
         } catch(e) {
-            msg.innerHTML = `<span style="color:var(--text-4)">网络受限，已使用内置先验数据</span>`;
+            console.error(e);
+            msg.innerHTML = `<span style="color:var(--rose)">代理同步失败，请确保已运行 node update.js 或等待 GitHub Actions</span>`;
         } finally {
             btn.textContent = '🔄 同步最新阵容'; btn.disabled = false;
         }

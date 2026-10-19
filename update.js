@@ -8,27 +8,13 @@ if (typeof fetch !== 'function') { console.error('❌ 需要 Node 18+'); process
 const IS_CI = !!process.env.CI;
 const SHOULD_PUSH = IS_CI || process.argv.includes('--push');
 
-(function loadEnv(){
-    const envPath = path.join(__dirname, '.env');
-    if (!fs.existsSync(envPath)) return;
-    fs.readFileSync(envPath, 'utf8').split(/\r?\n/).forEach(line => {
-        const t = line.trim();
-        if (!t || t.startsWith('#')) return;
-        const i = t.indexOf('=');
-        if (i < 0) return;
-        const k = t.slice(0, i).trim();
-        const v = t.slice(i + 1).trim().replace(/^["']|["']$/g, '');
-        if (!process.env[k]) process.env[k] = v;
-    });
-})();
-
 const DATA_FILE = path.join(__dirname, 'data.json');
 const FPL_FILE  = path.join(__dirname, 'fpl.json');
 
 const FPL_BOOT     = 'https://fantasy.premierleague.com/api/bootstrap-static/';
 const FPL_FIXTURES = 'https://fantasy.premierleague.com/api/fixtures/';
 const BADGE = id => `https://resources.premierleague.com/premierleague/badges/70/t${id}.png`;
-const UA = { 'User-Agent': 'PL-Prediction-Engine/1.0' };
+const UA = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' };
 
 const CLUBELO_MAP = {
     'Arsenal': 'Arsenal', 'Aston Villa': 'AstonVilla', 'Bournemouth': 'Bournemouth',
@@ -40,14 +26,32 @@ const CLUBELO_MAP = {
     'Wolves': 'Wolves', 'Burnley': 'Burnley'
 };
 
-async function fetchJSON(url, timeout = 20000, extraHeaders = {}) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), timeout);
+// 🌟 核心黑科技：自动重试 + 自动代理
+async function fetchWithProxy(url, timeout = 12000, extraHeaders = {}) {
+    // 尝试 1：直连
     try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeout);
         const res = await fetch(url, { signal: ctrl.signal, headers: { ...UA, ...extraHeaders } });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return await res.json();
-    } finally { clearTimeout(timer); }
+        clearTimeout(timer);
+        if (res.ok) return await res.json();
+    } catch (e) {
+        // 直连失败，静默切换到代理
+    }
+
+    // 尝试 2：免费代理通道（跳过网络限制）
+    try {
+        console.log(`  ⚠️ 直连超时，正在通过云端通道重试...`);
+        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), timeout + 8000);
+        const res = await fetch(proxyUrl, { signal: ctrl.signal, headers: { ...UA, ...extraHeaders } });
+        clearTimeout(timer);
+        if (res.ok) return await res.json();
+        throw new Error('Proxy HTTP ' + res.status);
+    } catch (e) {
+        throw new Error('网络被完全阻断，无法获取数据');
+    }
 }
 
 function readIfExists(file) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } }
@@ -67,8 +71,12 @@ async function fetchUnderstatXG(seasonYear) {
     const url = `https://understat.com/getLeagueData/EPL/${seasonYear}`;
     const headers = { 'X-Requested-With': 'XMLHttpRequest', 'Referer': `https://understat.com/league/EPL/${seasonYear}` };
     try {
-        await fetch(`https://understat.com/league/EPL/${seasonYear}`, { headers: UA });
-        const data = await fetchJSON(url, 25000, headers);
+        // Understat 对代理支持较差，尽量直连
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 15000);
+        const data = await fetch(url, { signal: ctrl.signal, headers: { ...UA, ...headers } }).then(r=>r.json());
+        clearTimeout(timer);
+
         const teamsRaw = data.teams || {};
         const out = {};
         for (const [teamKey, info] of Object.entries(teamsRaw)) {
@@ -80,7 +88,10 @@ async function fetchUnderstatXG(seasonYear) {
             out[teamKey.replace(/_/g, ' ').toLowerCase()] = { xG: +avgXG.toFixed(3), xGA: +avgXGA.toFixed(3), xGMatches: lastN.length };
         }
         return out;
-    } catch (e) { return null; }
+    } catch (e) {
+        console.log('  ⚠️ Understat 网络不通，跳过 xG 数据');
+        return null;
+    }
 }
 
 async function fetchClubElo(teams) {
@@ -96,7 +107,6 @@ async function fetchClubElo(teams) {
             const elo = parseFloat(lines[lines.length - 1].split(',')[4]);
             out[t.id] = isNaN(elo) ? null : elo;
         } catch { out[t.id] = null; }
-        await new Promise(r => setTimeout(r, 200));
     }
     return out;
 }
@@ -104,7 +114,7 @@ async function fetchClubElo(teams) {
 function matchUnderstatToTeam(teamName, understatMap) {
     const norm = s => s.toLowerCase().replace(/[^a-z]/g, '');
     const target = norm(teamName);
-    for (const [usKey, val] of Object.entries(understatMap)) {
+    for (const [usKey, val] of Object.entries(understatMap || {})) {
         if (norm(usKey) === target || norm(usKey).includes(target) || target.includes(norm(usKey))) return val;
     }
     return null;
@@ -157,23 +167,23 @@ function pushDataFiles() {
 }
 
 async function main() {
-    console.log('📡 拉取 FPL 数据…');
-    const boot = await fetchJSON(FPL_BOOT, 25000);
-    const rawFixtures = await fetchJSON(FPL_FIXTURES, 25000);
+    console.log('========================================');
+    console.log('📡 正在从 FPL 官方拉取数据 (自动穿透网络)...');
+    const boot = await fetchWithProxy(FPL_BOOT, 20000);
+    const rawFixtures = await fetchWithProxy(FPL_FIXTURES, 20000);
+
     const season = seasonFromEvents(boot.events);
     const seasonStartYear = parseInt(season.split('/')[0], 10);
 
-    console.log('🎯 拉取 xG 数据…');
+    console.log('🎯 正在拉取 Understat xG 数据...');
     const understatXG = await fetchUnderstatXG(seasonStartYear);
     if (understatXG) console.log(`✅ xG 覆盖：${Object.keys(understatXG).length} 队`);
-    else console.warn('⚠️ xG 抓取失败，前端将降级处理');
 
     const fplTeams = boot.teams.map(t => ({ id: t.id, name: t.name }));
-    console.log('📈 拉取 Elo 评级…');
+    console.log('📈 正在拉取 ClubElo 评级...');
     const clubElo = await fetchClubElo(fplTeams);
     const eloCover = Object.values(clubElo).filter(v => v != null).length;
     if (eloCover) console.log(`✅ Elo 覆盖：${eloCover}/${fplTeams.length} 队`);
-    else console.warn('⚠️ Elo 抓取失败，前端将降级处理');
 
     const teams = buildTeams(boot, understatXG, clubElo);
     const fixtures = buildFixtures(rawFixtures);
@@ -183,7 +193,7 @@ async function main() {
         updatedAt: new Date().toISOString(),
         season, currentRound, teams, fixtures
     }, null, 2), 'utf8');
-    console.log('💾 data.json 已写入');
+    console.log('💾 data.json 已写入！');
 
     // fpl.json
     const teamMap = {};
@@ -196,9 +206,15 @@ async function main() {
         status: p.status, chanceNext: p.chance_of_playing_next_round, news: p.news || ''
     }));
     fs.writeFileSync(FPL_FILE, JSON.stringify({ nextEvent, teams: boot.teams, players }, null, 2), 'utf8');
-    console.log('💾 fpl.json 已写入');
+    console.log('💾 fpl.json 已写入！');
+    console.log('========================================');
+    console.log('🎉 更新成功！快去刷新网页吧！');
 
     if (SHOULD_PUSH) pushDataFiles();
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(e => {
+    console.error('\n❌ 失败原因：', e.message);
+    console.log('建议：如果你在中国大陆或网络受限地区，请开启科学上网工具后重试。\n');
+    process.exit(1);
+});
