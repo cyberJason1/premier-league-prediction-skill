@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>关于 · 英超预测引擎 v17</title>
+    <title>关于 · 英超预测引擎 v17.1</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -64,6 +64,7 @@
         .formula{font-family:var(--font-mono);font-size:12.5px;line-height:2;background:var(--bg-2);border:1px solid var(--border-hi);border-radius:var(--r-md);padding:16px 18px;margin:14px 0;color:var(--text-2);overflow-x:auto}
         .formula b{color:var(--amber);font-weight:600}
         .formula .c{color:var(--cyan)}
+        .formula .e{color:var(--emerald)}
         .timeline{list-style:none;position:relative;padding-left:20px}
         .timeline::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,var(--amber),var(--cyan),transparent)}
         .timeline li{position:relative;padding:8px 0 8px 6px;font-size:14px;color:var(--text-2)}
@@ -94,55 +95,67 @@
 <div class="wrap">
 
     <section class="hero">
-        <div class="kick">About · v17</div>
-        <h1>关于 · 英超预测引擎 <em>v17</em></h1>
-        <p class="lead">v17 是一次引擎级重写：预测核心从「提示词约束 + 大模型推理」迁移为 <b>Dixon-Coles 双泊松统计模型</b>，全部计算在浏览器本地完成——无 API Key、无网络请求、无延迟等待，且结果可复现、可解释、可调参。</p>
+        <div class="kick">About · v17.1</div>
+        <h1>关于 · 英超预测引擎 <em>v17.1</em></h1>
+        <p class="lead">v17.1 在 Dixon-Coles 引擎之上完成<b>三源融合升级</b>：FPL 官方攻防评分作为先验，Understat 的滚动 xG/xGA 作为去噪后的实力信号，ClubElo 跨赛季 Elo 作为稳定性锚点。三者在 λ 计算前按样本量动态加权，让预测对赛季走势敏感，而不是停留在季前先验。</p>
         <div class="badges">
             <span class="badge a">Dixon-Coles</span>
-            <span class="badge c">1000 次蒙特卡洛</span>
-            <span class="badge e">零依赖单文件</span>
-            <span class="badge">FPL 实时注入</span>
+            <span class="badge c">xG 融合</span>
+            <span class="badge e">Elo 微调</span>
+            <span class="badge">1000 次蒙特卡洛</span>
             <span class="badge">What-If 模拟</span>
+            <span class="badge">零依赖单文件</span>
         </div>
     </section>
 
     <h2>这是什么</h2>
     <p>一个纯前端、零服务器、可离线运行的英超比分预测工具。它不依赖任何大模型接口，而是用统计学派中最经典的 <b>Dixon-Coles 模型</b>（1997）对每场比赛的主客队预期进球 λ 建模，生成完整的比分概率矩阵，再从中推导胜平负、大小球、双方进球（BTTS）与最可能比分。</p>
-    <p>相比提示词方案，统计模型的最大优势是<b>确定性</b>：同样的输入永远得到同样的输出，每个概率都能追溯到具体的 λ 与参数，不存在「模型编造数据」的风险。</p>
+    <p>v17.1 的关键升级是<b>输入信号质量</b>：λ 不再是「FPL 静态评分 × 实际进球」的简单融合，而是引入两个独立信号——Understat 的预期进球（xG）与 ClubElo 的跨赛季评级（Elo），让模型能在赛季第 3 轮就识别出布莱顿的真实强势，而不是被 5-0 的偶然比分误导。</p>
 
     <div class="card">
-        <div class="card-ttl">为什么选 Dixon-Coles 而不是普通泊松</div>
+        <div class="card-ttl">为什么是 xG + Elo，而不是堆 ML 模型</div>
         <ul class="list">
-            <li><strong>低比分修正</strong> 真实足球中 0-0、1-0、1-1 的出现频率显著高于独立泊松假设，τ 函数专门修正这一偏差</li>
-            <li><strong>主客分离</strong> 主场优势被显式建模进 λ，而不是简单乘一个系数</li>
-            <li><strong>可解释</strong> 每个 λ 都能拆解为「联赛均值 × 进攻 × 防守 × 伤病 × 休息」的乘积</li>
-            <li><strong>轻量</strong> 单场比赛全矩阵计算 < 2ms，1000 次蒙特卡洛 < 20ms</li>
+            <li><strong>xG 去噪</strong> 一场 3-0 可能来自 0.9 xG，也可能来自 2.8 xG；xG 比实际进球更能反映球队真实的进攻质量</li>
+            <li><strong>Elo 连续</strong> 跨赛季不断档，赛季初样本稀缺时提供稳定的实力锚点，避免「每季重置」的信息损失</li>
+            <li><strong>三源互补</strong> FPL 先验覆盖阵容深度，xG 覆盖近期表现，Elo 覆盖长期趋势——三者失效条件不同，融合后鲁棒性显著高于单源</li>
+            <li><strong>边际收益递减</strong> 公开基准显示，Dixon-Coles 单独准确率约 49.0%，赔率增强后约 53.1%；继续堆 ML 的边际收益只有 1–2 个百分点，而输入信号质量的提升空间远大于模型复杂度</li>
         </ul>
     </div>
 
     <h2>模型怎么算</h2>
-    <h3>1 · 预期进球 λ</h3>
+    <h3>1 · 球队攻防强度（三源加权融合）</h3>
     <div class="formula">
-        λ<sub>home</sub> = <b>μ<sub>H</sub></b> × <span class="c">Att<sub>h</sub></span> × (1 / <span class="c">Def<sub>a</sub></span>) × Inj<sub>h</sub> × Rest<sub>h</sub><br>
-        λ<sub>away</sub> = <b>μ<sub>A</sub></b> × <span class="c">Att<sub>a</sub></span> × (1 / <span class="c">Def<sub>h</sub></span>) × Inj<sub>a</sub> × Rest<sub>a</sub>
+        Att = <span class="c">W<sub>prior</sub></span>·FPL<sub>att</sub> + <span class="e">W<sub>xG</sub></span>·xG<sub>att</sub> + <b>W<sub>actual</sub></b>·Goals<sub>att</sub><br>
+        Def = <span class="c">W<sub>prior</sub></span>·FPL<sub>def</sub> + <span class="e">W<sub>xG</sub></span>·xG<sub>def</sub> + <b>W<sub>actual</sub></b>·Goals<sub>def</sub>
+    </div>
+    <ul class="list">
+        <li><strong>W<sub>xG</sub></strong> xG 权重，xG 样本 ≥ 3 场时启用，按样本量 clamp 到 0.3–0.7</li>
+        <li><strong>W<sub>actual</sub></strong> 实际进球权重，按赛程样本量 w = n/(n+6) 缩放</li>
+        <li><strong>W<sub>prior</sub></strong> FPL 先验权重，为 1 − W<sub>xG</sub> − W<sub>actual</sub>，xG 和实际数据都不可用时才主导</li>
+        <li><strong>FPL<sub>att</sub> / FPL<sub>def</sub></strong> FPL 官方 strength_attack / strength_defence，按主客场取平均</li>
+        <li><strong>xG<sub>att</sub> / xG<sub>def</sub></strong> Understat 近 5 场滚动 xG / xGA，除以联赛平均后归一化</li>
+    </ul>
+
+    <h3>2 · 预期进球 λ</h3>
+    <div class="formula">
+        λ<sub>home</sub> = <b>μ<sub>H</sub></b> × Att<sub>h</sub> × (1 / Def<sub>a</sub>) × <span class="e">Elo<sub>mult</sub></span><br>
+        λ<sub>away</sub> = <b>μ<sub>A</sub></b> × Att<sub>a</sub> × (1 / Def<sub>h</sub>) × (1 / <span class="e">Elo<sub>mult</sub></span>)
     </div>
     <ul class="list">
         <li><strong>μ<sub>H</sub> / μ<sub>A</sub></strong> 联赛主场 / 客场平均进球，赛季样本 ≥ 8 场时自动从 data.json 实算，否则回退到先验 1.55 / 1.30</li>
-        <li><strong>Att / Def</strong> 球队攻防强度，由 FPL 官方 strength_attack / strength_defence 与赛季实际进失球按样本量加权融合</li>
-        <li><strong>Inj</strong> 伤病系数，扫描 FPL 全量球员状态（i / s / d），按身价加权扣减，下限 0.72</li>
-        <li><strong>Rest</strong> 休息天数系数，间隔 &lt; 3.2 天为 0.96，&gt; 6 天为 1.015</li>
+        <li><strong>Elo<sub>mult</sub></strong> Elo 差修正乘数，公式 <code>clamp(1 + ΔElo × 0.0015, 0.75, 1.35)</code>，即 100 Elo 差约带来 ±15% 的 λ 调整</li>
     </ul>
 
-    <h3>2 · 比分概率矩阵</h3>
+    <h3>3 · 比分概率矩阵</h3>
     <div class="formula">
         P(X=i, Y=j) = τ(i, j) · Pois(i; λ<sub>home</sub>) · Pois(j; λ<sub>away</sub>)
     </div>
     <p>τ 为 Dixon-Coles 低比分修正项，ρ = −0.06。矩阵覆盖 0–10 球共 121 种比分，并做归一化处理，确保概率总和为 1。</p>
 
-    <h3>3 · 蒙特卡洛校验</h3>
+    <h3>4 · 蒙特卡洛校验</h3>
     <p>在解析矩阵之外，额外做 1000 次泊松抽样模拟，用于交叉验证胜平负概率，并在「模型健康度」面板中与解析解并列展示——两者若出现明显偏差，说明矩阵截断或归一化存在问题。</p>
 
-    <h3>4 · 置信度分级</h3>
+    <h3>5 · 置信度分级</h3>
     <table>
         <tr><th>档位</th><th>最大单项概率</th><th>含义</th></tr>
         <tr><td>高</td><td>≥ 58%</td><td>胜负格局清晰</td></tr>
@@ -153,61 +166,45 @@
 
     <h2>核心功能</h2>
     <ul class="list">
+        <li><strong>三源实力融合</strong> FPL 先验 + Understat xG + ClubElo Elo，按样本量动态加权，赛季第 3 轮即可感知真实强弱</li>
         <li><strong>焦点战影院</strong> 主焦点大卡 + 右侧赛程轨，自动挑选本轮最值得看的比赛，实时倒计时</li>
         <li><strong>比分概率矩阵</strong> 7×7 热力图，颜色亮度直接映射概率，悬停查看精确百分比</li>
         <li><strong>胜平负环形图</strong> SVG 环形进度 + 三段式概率条，动画入场</li>
-        <li><strong>六维雷达</strong> 进攻 / 防守 / 控球 / 转换 / 定位球 / 深度，主客叠加对比</li>
-        <li><strong>因素分解</strong> 把 λ 的对数影响拆成 6 条正负向横条，一眼看出谁在推动预测</li>
+        <li><strong>因素分解</strong> 把 λ 的对数影响拆成多条正负向横条，含 xG 影响与 Elo 修正</li>
         <li><strong>What-If 模拟</strong> 拖动双滑块实时改变 λ，三档概率即时重算，无需重新预测</li>
-        <li><strong>模型健康度</strong> 解析解 vs 蒙特卡洛并列，BTTS、大 2.5、大 1.5 球概率</li>
-        <li><strong>历史交锋</strong> 真实完赛数据聚合，主队视角胜负平统计</li>
-        <li><strong>关键球员</strong> 基于 FPL 的评分、状态标签、影响概率条、简短理由</li>
-        <li><strong>射手概率</strong> 按 xG/90 × λ 估算，前 6 名带进度条</li>
-        <li><strong>预测指纹</strong> 由比分矩阵哈希生成的 96×96 像素图案，同一预测永远同一图案</li>
-        <li><strong>战绩中心</strong> 保存预测、自动匹配实际比分、精确/胜负/未中三档判定、命中率、热力图、6 项成就</li>
-        <li><strong>批量预测</strong> 按轮次一次扫 3 / 5 / 整轮，带进度条</li>
-        <li><strong>揭晓动画</strong> 全屏 shockwave + 队徽飞入 + 比分数字弹入，配合音效</li>
-        <li><strong>命令面板</strong> <code>Ctrl+K</code> 唤起，模糊搜索所有操作</li>
-        <li><strong>多主题</strong> 暗金 / 海洋 / 极光三套配色，一键循环</li>
-        <li><strong>氛围光效</strong> 跟随鼠标的径向光晕，可关闭</li>
+        <li><strong>模型健康度</strong> 解析解 vs 蒙特卡洛并列，BTTS、大 2.5 球概率</li>
+        <li><strong>积分榜</strong> 由真实完赛比分实时计算，近 5 场胜平负色块</li>
+        <li><strong>战绩中心</strong> 保存预测到 localStorage，历史记录可回溯</li>
         <li><strong>点球彩蛋</strong> 点球门面板，十次机会，命中触发震屏与音效</li>
-        <li><strong>响应式 & 无障碍</strong> 移动端适配、<code>prefers-reduced-motion</code> 支持、<code>aria-live</code> 播报</li>
+        <li><strong>响应式</strong> 移动端适配、CSS Grid 自动堆叠</li>
     </ul>
 
     <h2>数据从哪来</h2>
     <table>
         <tr><th>类型</th><th>来源</th><th>用途</th><th>是否必需</th></tr>
-        <tr><td>赛程与比分</td><td>data.json（可选）</td><td>轮次、对阵、完赛比分、开赛时间</td><td>否 · 缺失则生成循环赛</td></tr>
-        <tr><td>球队与球员</td><td>FPL 官方 API</td><td>队徽、攻防强度、球员评分、伤病状态</td><td>否 · 缺失则用先验</td></tr>
-        <tr><td>球员照片</td><td>Premier League CDN</td><td>球员头像</td><td>否 · 失败显示首字母</td></tr>
+        <tr><td>赛程与比分</td><td>FPL fixtures API</td><td>轮次、对阵、完赛比分、开赛时间</td><td>否 · 缺失则生成循环赛</td></tr>
+        <tr><td>球队先验强度</td><td>FPL bootstrap-static</td><td>strength_attack / strength_defence</td><td>否 · 缺失则用中性先验 3</td></tr>
+        <tr><td>滚动 xG / xGA</td><td>Understat getLeagueData</td><td>近 5 场预期进球，去噪后的攻防信号</td><td>否 · 缺失则跳过 xG 权重</td></tr>
+        <tr><td>跨赛季 Elo</td><td>ClubElo API</td><td>长期实力锚点，λ 微调</td><td>否 · 缺失则跳过 Elo 修正</td></tr>
+        <tr><td>球员与伤病</td><td>FPL bootstrap-static</td><td>球员评分、状态标签</td><td>否 · 缺失则隐藏球员面板</td></tr>
         <tr><td>队徽</td><td>Premier League CDN</td><td>球队徽章</td><td>否 · 失败显示三字母</td></tr>
     </table>
     <div class="note">
-        <b>降级策略</b>：所有外部数据源均为可选。data.json 加载失败时自动生成 38 轮双循环赛程并在顶部显示警告条；FPL API 不可达时使用 6 小时本地缓存，缓存也没有则回退到球队先验强度——预测功能始终可用。
+        <b>降级策略</b>：三源独立抓取，任一失败不影响其余。data.json 缺失时生成 38 轮双循环赛程；Understat 失败则 xG 权重置零，回退到「实际进球 + FPL 先验」；ClubElo 失败则 Elo 乘数设为 1，其余逻辑不变。预测功能在任何降级状态下都可用。
     </div>
 
     <h2>技术栈</h2>
     <ul class="list">
         <li><span class="tag">引擎</span><strong>Dixon-Coles 双泊松</strong> 纯 JS 实现，含 τ 低比分修正与矩阵归一化</li>
+        <li><span class="tag">融合</span><strong>三源加权</strong> FPL 先验 + Understat xG + ClubElo Elo，按样本量动态调整权重</li>
         <li><span class="tag">模拟</span><strong>蒙特卡洛</strong> 1000 次泊松抽样，Knuth 算法</li>
         <li><span class="tag">前端</span><strong>单文件 HTML</strong> 原生 JS，零依赖、零构建、零 CDN 运行时</li>
-        <li><span class="tag cy">存储</span><strong>localStorage</strong> 战绩、设置、FPL 缓存、API Key 全部本地</li>
-        <li><span class="tag cy">数据</span><strong>FPL bootstrap-static</strong> 官方公开接口，无需鉴权</li>
+        <li><span class="tag cy">存储</span><strong>localStorage</strong> 战绩、设置全部本地</li>
+        <li><span class="tag cy">数据</span><strong>FPL + Understat + ClubElo</strong> 三源聚合，全公开接口，无需鉴权</li>
         <li><span class="tag em">部署</span><strong>GitHub Pages</strong> 静态托管，零服务器成本</li>
     </ul>
 
-    <h2>v17 相对 v16.3 的变化</h2>
-    <ul class="list">
-        <li><strong>引擎替换</strong> 移除 Groq 大模型推理链路，改为本地 Dixon-Coles，预测从 3–8 秒降至 &lt; 30ms</li>
-        <li><strong>新增</strong> 比分概率矩阵热力图、What-If 双滑块模拟、因素分解条、模型健康度面板</li>
-        <li><strong>新增</strong> 六维雷达对比、预测指纹、蒙特卡洛交叉验证</li>
-        <li><strong>新增</strong> 命令面板、快捷键体系、FAB 轨道菜单、点球彩蛋</li>
-        <li><strong>增强</strong> 战绩中心加入成就系统与深链分析折叠区</li>
-        <li><strong>增强</strong> 三套主题 + 氛围光效 + 揭晓全屏动画</li>
-        <li><strong>保留</strong> FPL 阵容同步、球队详情、积分榜、批量预测、历史记录</li>
-    </ul>
-
-    <h2>成长历程</h2>
+    <h2>版本演进</h2>
     <ul class="timeline">
         <li class="done">01–10　部署上线、接入 API、实现本地与云端自动更新</li>
         <li class="done">11–20　历史记录、真实队徽、深度分析、球员照片双源合并</li>
@@ -216,12 +213,14 @@
         <li class="done">32　v16.1　官方伤停同步 + 数据时效硬约束 + 防截断重试 + 缓存穿透</li>
         <li class="done">33　v16.2　焦点战 2.0（8 维评分 + 主焦点卡 + 侧轨）+ 球队主题色渗透</li>
         <li class="done">34　v16.3　完整终极版 · 单文件单 script · 全功能保留</li>
-        <li class="new">35　v17　Dixon-Coles 统计引擎重写 · 比分矩阵 · What-If · 因素分解 · 蒙特卡洛校验</li>
+        <li class="done">35　v17　Dixon-Coles 统计引擎重写 · 比分矩阵 · What-If · 因素分解 · 蒙特卡洛校验</li>
+        <li class="new">36　v17.1　xG + Elo 三源融合 · 攻防强度动态加权 · λ Elo 微调 · 因素分解新增 xG/Elo 条</li>
     </ul>
 
     <h2>已知局限</h2>
     <ul class="list">
-        <li><strong>样本依赖</strong> 赛季前 8 场以内，联赛均值与球队强度主要来自先验，预测偏保守</li>
+        <li><strong>xG 样本依赖</strong> Understat 只保留近 5 场滚动窗口，赛季前 3 轮 xG 权重极低，模型接近纯先验</li>
+        <li><strong>Elo 是快照</strong> ClubElo 提供的是当前评级，不区分赛季内动态；同一球队跨赛季 Elo 变化可能滞后</li>
         <li><strong>无阵容级建模</strong> 伤病只做整体系数扣减，不区分位置（缺前锋与缺后卫影响相同）</li>
         <li><strong>无红黄牌 / 轮换</strong> 模型不感知停赛累积、欧战轮换、杯赛分心</li>
         <li><strong>静态 ρ</strong> 低比分修正系数固定为 −0.06，未按联赛或赛季重新估计</li>
@@ -233,8 +232,8 @@
     </div>
 
     <footer>
-        Premier League Prediction Engine · v17<br>
-        <span class="ver">Dixon-Coles Engine · 单文件构建 · 零服务器</span>
+        Premier League Prediction Engine · v17.1<br>
+        <span class="ver">Dixon-Coles Engine · 三源融合 · 单文件构建 · 零服务器</span>
         <div style="margin-top:10px">
             <a href="index.html">返回预测</a>·<a href="javascript:void(0)" onclick="history.back()">上一页</a>
         </div>

@@ -1,7 +1,7 @@
-const CACHE_VERSION = 'v17'; // v17 改动：引擎重写为本地 Dixon-Coles，缓存清单同步收缩
+const CACHE_VERSION = 'v17.1'; // v17.1 改动：引擎接入 xG/Elo，强制旧缓存清退
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
-// v17：不再依赖 skill.md / fpl.json / Groq / football-data.org
+// v17.1：不再依赖 skill.md / fpl.json / Groq / football-data.org
 // data.json 仍可选（缺失时前端自动生成循环赛），保留在 shell 中做离线兜底
 const APP_SHELL = [
     './', './index.html', './data.json', './about.html'
@@ -61,10 +61,11 @@ self.addEventListener('fetch', event => {
     const url = new URL(req.url);
 
     // 1. 外部接口和图片：完全不拦截，直接走网络保证最新鲜
-    //    v17：移除 groq.com / football-data.org / espncdn / thesportsdb（已不再使用）
-    //    保留 FPL 官方接口与球员/队徽 CDN
+    //    v17.1：新增 understat.com 和 clubelo.com 白名单
     if (url.hostname.includes('fantasy.premierleague.com') ||
-        url.hostname.includes('premierleague.com')) {
+        url.hostname.includes('premierleague.com') ||
+        url.hostname.includes('understat.com') ||
+        url.hostname.includes('clubelo.com')) {
         return;
     }
 
