@@ -6354,9 +6354,9 @@
       "form": 2,
       "totalPoints": 15,
       "ppg": 2.5,
-      "status": "a",
-      "chanceNext": null,
-      "news": ""
+      "status": "d",
+      "chanceNext": 75,
+      "news": "Groin injury - 75% chance of playing"
     },
     {
       "id": 300,
@@ -8050,9 +8050,9 @@
       "form": 2.7,
       "totalPoints": 13,
       "ppg": 2.2,
-      "status": "a",
-      "chanceNext": 100,
-      "news": ""
+      "status": "d",
+      "chanceNext": 75,
+      "news": "Back injury - 75% chance of playing"
     },
     {
       "id": 388,
@@ -8082,9 +8082,9 @@
       "form": 3,
       "totalPoints": 19,
       "ppg": 3.8,
-      "status": "a",
-      "chanceNext": 100,
-      "news": ""
+      "status": "d",
+      "chanceNext": 75,
+      "news": "Unspecified injury - 75% chance of playing"
     },
     {
       "id": 390,
@@ -8306,9 +8306,9 @@
       "form": 1.7,
       "totalPoints": 7,
       "ppg": 2.3,
-      "status": "a",
-      "chanceNext": 100,
-      "news": ""
+      "status": "d",
+      "chanceNext": 75,
+      "news": "Unspecified injury - 75% chance of playing"
     },
     {
       "id": 407,
