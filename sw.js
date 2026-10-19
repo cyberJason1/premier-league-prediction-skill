@@ -1,13 +1,15 @@
-const CACHE_VERSION = 'v16.3'; // v16.2 改动：bump 版本，强制旧缓存清退
+const CACHE_VERSION = 'v17'; // v17 改动：引擎重写为本地 Dixon-Coles，缓存清单同步收缩
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
+// v17：不再依赖 skill.md / fpl.json / Groq / football-data.org
+// data.json 仍可选（缺失时前端自动生成循环赛），保留在 shell 中做离线兜底
 const APP_SHELL = [
-    './', './index.html', './skill.md', './data.json', './fpl.json', './about.html'
+    './', './index.html', './data.json', './about.html'
 ];
 
 // 数据类文件：离线兜底绝不能返回 index.html
-// 否则前端会把 HTML 当 JSON / skill 用，导致解析失败或 prompt 污染
-const DATA_FILES = new Set(['/data.json', '/fpl.json', '/skill.md']);
+// 否则前端会把 HTML 当 JSON 解析，导致 data.json 解析失败
+const DATA_FILES = new Set(['/data.json']);
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -58,12 +60,11 @@ self.addEventListener('fetch', event => {
     if (req.method !== 'GET') return;
     const url = new URL(req.url);
 
-    // 1. 接口和图片：完全不拦截，直接走网络保证最新鲜
-    if (url.hostname.includes('groq.com') ||
-        url.hostname.includes('football-data.org') ||
-        url.hostname.includes('premierleague.com') ||
-        url.hostname.includes('espncdn.com') ||
-        url.hostname.includes('thesportsdb.com')) {
+    // 1. 外部接口和图片：完全不拦截，直接走网络保证最新鲜
+    //    v17：移除 groq.com / football-data.org / espncdn / thesportsdb（已不再使用）
+    //    保留 FPL 官方接口与球员/队徽 CDN
+    if (url.hostname.includes('fantasy.premierleague.com') ||
+        url.hostname.includes('premierleague.com')) {
         return;
     }
 
@@ -71,7 +72,6 @@ self.addEventListener('fetch', event => {
     if (url.origin === self.location.origin) {
         const cacheKey = new Request(url.origin + url.pathname);
 
-        // v16.2 修复：用 async 包裹，await 缓存写入完成，避免 waitUntil 时序问题
         event.respondWith((async () => {
             try {
                 const res = await fetch(req, { cache: 'no-store' });

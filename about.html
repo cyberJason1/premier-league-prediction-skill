@@ -5,109 +5,241 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>关于 · 英超预测引擎 v16.2</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>关于 · 英超预测引擎 v17</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root{
-            --bg:#08090d;--surface:rgba(18,22,32,.7);--border:rgba(255,255,255,.06);--border-hi:rgba(255,255,255,.12);
+            --bg:#06080c;--bg-2:#0a0e15;--surface:rgba(18,22,32,.72);--surface-2:rgba(12,15,22,.85);
+            --border:rgba(255,255,255,.06);--border-hi:rgba(255,255,255,.12);
             --amber:#ff9f43;--amber-soft:rgba(255,159,67,.14);--amber-glow:rgba(255,159,67,.35);
-            --cyan:#22d3ee;--emerald:#34d399;--rose:#ef4444;--text:#f1f5f9;--text-2:#b0bccd;--text-3:#8a97a8;--text-4:#616d7c;
+            --cyan:#22d3ee;--cyan-soft:rgba(34,211,238,.14);
+            --emerald:#34d399;--emerald-soft:rgba(52,211,153,.14);
+            --rose:#ef4444;--violet:#a78bfa;--gold:#fbbf24;
+            --text:#f1f5f9;--text-2:#b0bccd;--text-3:#8a97a8;--text-4:#616d7c;
+            --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-full:999px;
             --font-sans:"Inter","Noto Sans SC",system-ui,sans-serif;
+            --font-serif:"Playfair Display","Noto Sans SC",Georgia,serif;
+            --font-mono:"SF Mono","JetBrains Mono",Consolas,monospace;
+            --ease:cubic-bezier(.16,1,.3,1);
         }
         *{box-sizing:border-box;margin:0;padding:0}
-        body{background:var(--bg);color:var(--text);font-family:var(--font-sans);line-height:1.7;min-height:100vh;padding-bottom:80px}
-        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:rgba(8,9,13,.9);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
-        .nav-link{color:var(--text-3);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:8px}
-        .nav-link:hover{color:var(--amber);background:var(--amber-soft)}
-        .wrap{max-width:800px;margin:0 auto;padding:100px 24px 40px}
-        h1{color:var(--amber);font-size:36px;margin-bottom:16px}
-        h2{font-size:22px;margin:32px 0 16px;border-left:4px solid var(--amber);padding-left:12px}
-        h3{font-size:16px;margin:24px 0 12px;color:var(--cyan)}
-        p{color:var(--text-2);margin-bottom:16px;font-size:15px}
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+        html{background:var(--bg);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+        body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.75;min-height:100vh;padding-bottom:80px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+        body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1400px 800px at 50% -20%,rgba(255,159,67,.13),transparent 55%),radial-gradient(1000px 600px at 50% 120%,rgba(34,211,238,.07),transparent 55%)}
+        code{font-family:var(--font-mono);font-size:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);padding:1px 6px;border-radius:5px;color:#ffc48a}
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+        .topbar .brand{display:flex;align-items:center;gap:12px;font-weight:600;font-size:14px}
+        .topbar .logo{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.5),0 0 20px -4px var(--amber-glow);animation:spinSlow 20s linear infinite;flex-shrink:0}
+        @keyframes spinSlow{to{transform:rotate(360deg)}}
+        .nav-link{color:var(--text-3);text-decoration:none;font-size:13px;font-weight:500;padding:8px 14px;border-radius:var(--r-sm);border:1px solid transparent;transition:all .2s var(--ease)}
+        .nav-link:hover{color:var(--amber);background:var(--amber-soft);border-color:rgba(255,159,67,.3)}
+        .wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:104px 24px 40px}
+        @media(max-width:640px){.wrap{padding:88px 16px 32px}.topbar{padding:0 16px}}
+        .hero{margin-bottom:8px}
+        .kick{display:inline-flex;align-items:center;gap:8px;font-size:10px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--amber);margin-bottom:18px;padding:6px 14px;border:1px solid rgba(255,159,67,.3);border-radius:var(--r-full);background:var(--amber-soft)}
+        h1{font-family:var(--font-serif);font-size:clamp(30px,6vw,42px);font-weight:500;line-height:1.15;letter-spacing:-.02em;margin-bottom:16px}
+        h1 em{font-style:italic;background:linear-gradient(135deg,var(--amber),#ffb968 45%,var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+        .lead{color:var(--text-2);font-size:15px;line-height:1.75;margin-bottom:8px}
+        h2{font-family:var(--font-serif);font-size:21px;font-weight:500;margin:40px 0 16px;padding-left:14px;border-left:3px solid var(--amber);line-height:1.4}
+        h3{font-size:14px;font-weight:600;margin:24px 0 12px;color:var(--cyan);letter-spacing:.02em}
+        p{color:var(--text-2);margin-bottom:16px;font-size:14.5px}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;margin-bottom:16px;backdrop-filter:blur(20px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+        .card .card-ttl{font-weight:600;color:var(--text);margin-bottom:12px;font-size:14px;display:flex;align-items:center;gap:8px}
+        .card .card-ttl::before{content:"";width:3px;height:12px;background:linear-gradient(180deg,var(--amber),var(--cyan));border-radius:2px}
         .list{list-style:none}
-        .list li{padding:10px 0;border-bottom:1px solid var(--border);color:var(--text-2);font-size:14px}
+        .list li{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-2);font-size:14px;display:flex;gap:10px;align-items:baseline}
         .list li:last-child{border-bottom:0}
-        .list li strong{color:var(--text)}
-        table{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px}
-        th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border)}
-        th{color:var(--text-3);font-weight:600}
+        .list li strong{color:var(--text);font-weight:600;flex-shrink:0}
+        .list li .tag{font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;background:var(--amber-soft);color:var(--amber);border:1px solid rgba(255,159,67,.3);flex-shrink:0}
+        .list li .tag.cy{background:var(--cyan-soft);color:var(--cyan);border-color:rgba(34,211,238,.3)}
+        .list li .tag.em{background:var(--emerald-soft);color:var(--emerald);border-color:rgba(52,211,153,.3)}
+        table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;display:block;overflow-x:auto;white-space:nowrap}
+        @media(min-width:640px){table{display:table;white-space:normal}}
+        th,td{padding:11px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.05)}
+        th{color:var(--text-3);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
         td{color:var(--text-2)}
-        .timeline li{list-style:none;padding:8px 0;font-size:14px;color:var(--text-2)}
-        .timeline li::before{content:"•";color:var(--emerald);margin-right:8px;font-size:18px}
+        td:first-child{color:var(--text);font-weight:500}
+        .formula{font-family:var(--font-mono);font-size:12.5px;line-height:2;background:var(--bg-2);border:1px solid var(--border-hi);border-radius:var(--r-md);padding:16px 18px;margin:14px 0;color:var(--text-2);overflow-x:auto}
+        .formula b{color:var(--amber);font-weight:600}
+        .formula .c{color:var(--cyan)}
+        .timeline{list-style:none;position:relative;padding-left:20px}
+        .timeline::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;width:1px;background:linear-gradient(180deg,var(--amber),var(--cyan),transparent)}
+        .timeline li{position:relative;padding:8px 0 8px 6px;font-size:14px;color:var(--text-2)}
+        .timeline li::before{content:"";position:absolute;left:-19px;top:16px;width:7px;height:7px;border-radius:50%;background:var(--text-4)}
+        .timeline li.done::before{background:var(--emerald);box-shadow:0 0 8px rgba(52,211,153,.6)}
         .timeline li.new{color:var(--amber);font-weight:600}
-        footer{margin-top:60px;text-align:center;font-size:12px;color:var(--text-4);padding-top:20px;border-top:1px solid var(--border)}
+        .timeline li.new::before{background:var(--amber);box-shadow:0 0 10px var(--amber-glow)}
+        .badges{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 0}
+        .badge{font-size:11px;font-weight:600;padding:5px 12px;border-radius:var(--r-full);background:rgba(255,255,255,.03);border:1px solid var(--border-hi);color:var(--text-2)}
+        .badge.a{background:var(--amber-soft);border-color:rgba(255,159,67,.35);color:var(--amber)}
+        .badge.c{background:var(--cyan-soft);border-color:rgba(34,211,238,.35);color:var(--cyan)}
+        .badge.e{background:var(--emerald-soft);border-color:rgba(52,211,153,.35);color:var(--emerald)}
+        .note{background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(251,191,36,.03));border:1px solid rgba(251,191,36,.3);border-radius:var(--r-md);padding:14px 18px;font-size:13px;color:var(--gold);line-height:1.7;margin:16px 0}
+        footer{margin-top:56px;text-align:center;font-size:12px;color:var(--text-4);padding-top:24px;border-top:1px solid var(--border);line-height:2}
+        footer .ver{font-family:var(--font-mono);font-size:10.5px;color:var(--text-4);letter-spacing:.06em}
+        footer a{color:var(--text-3);text-decoration:none;margin:0 6px}
+        footer a:hover{color:var(--amber)}
+        @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     </style>
 </head>
 <body>
 
 <header class="topbar">
-    <div style="font-weight:600;color:var(--text)">英超 <em style="color:var(--amber)">预测</em></div>
-    <a href="index.html" class="nav-link">返回预测</a>
+    <div class="brand"><div class="logo"></div>英超 <em style="color:var(--amber);font-style:italic">预测</em></div>
+    <a href="index.html" class="nav-link">← 返回预测</a>
 </header>
 
 <div class="wrap">
-    <h1>关于 · 英超预测引擎 v16.2</h1>
-    <p>一个完全开源、零成本、可持续运营的 AI 足球预测引擎。v16.2 重新设计了焦点战展示与页面动线：8 维加权评分、主焦点卡 + 侧轨切换、球队主题色氛围渗透，让赛程浏览真正具备"天工级"视觉张力。同时保留 18 维深度 AI 比分预测、FPL 梦幻英超最佳阵容、全量伤停实时同步等全部能力。</p>
+
+    <section class="hero">
+        <div class="kick">About · v17</div>
+        <h1>关于 · 英超预测引擎 <em>v17</em></h1>
+        <p class="lead">v17 是一次引擎级重写：预测核心从「提示词约束 + 大模型推理」迁移为 <b>Dixon-Coles 双泊松统计模型</b>，全部计算在浏览器本地完成——无 API Key、无网络请求、无延迟等待，且结果可复现、可解释、可调参。</p>
+        <div class="badges">
+            <span class="badge a">Dixon-Coles</span>
+            <span class="badge c">1000 次蒙特卡洛</span>
+            <span class="badge e">零依赖单文件</span>
+            <span class="badge">FPL 实时注入</span>
+            <span class="badge">What-If 模拟</span>
+        </div>
+    </section>
 
     <h2>这是什么</h2>
-    <p>它不是机器学习模型，也不需要数据科学背景。本质上是把一份精心设计的 <code>skill.md</code> 规则文档，作为 system 提示词塞给任意 OpenAI 兼容接口的大模型，让模型在严格约束下推理并输出 JSON。</p>
+    <p>一个纯前端、零服务器、可离线运行的英超比分预测工具。它不依赖任何大模型接口，而是用统计学派中最经典的 <b>Dixon-Coles 模型</b>（1997）对每场比赛的主客队预期进球 λ 建模，生成完整的比分概率矩阵，再从中推导胜平负、大小球、双方进球（BTTS）与最可能比分。</p>
+    <p>相比提示词方案，统计模型的最大优势是<b>确定性</b>：同样的输入永远得到同样的输出，每个概率都能追溯到具体的 λ 与参数，不存在「模型编造数据」的风险。</p>
+
     <div class="card">
-        <div style="font-weight:600;color:var(--text);margin-bottom:12px">四层约束架构</div>
+        <div class="card-ttl">为什么选 Dixon-Coles 而不是普通泊松</div>
         <ul class="list">
-            <li><strong>LAYER 01 资料库</strong> — 20 队完整资料写死，只许引用，不许编造</li>
-            <li><strong>LAYER 02 方法论</strong> — 近期状态 40%、硬实力 30%、历史交锋 10%、情境因素 20%</li>
-            <li><strong>LAYER 03 输出契约</strong> — 严格 JSON 格式，字段、类型、长度全部锁死</li>
-            <li><strong>LAYER 04 动态情报区</strong> — 每日自动注入官方伤停情报，优先级最高，冲突时以此为准</li>
+            <li><strong>低比分修正</strong> 真实足球中 0-0、1-0、1-1 的出现频率显著高于独立泊松假设，τ 函数专门修正这一偏差</li>
+            <li><strong>主客分离</strong> 主场优势被显式建模进 λ，而不是简单乘一个系数</li>
+            <li><strong>可解释</strong> 每个 λ 都能拆解为「联赛均值 × 进攻 × 防守 × 伤病 × 休息」的乘积</li>
+            <li><strong>轻量</strong> 单场比赛全矩阵计算 < 2ms，1000 次蒙特卡洛 < 20ms</li>
         </ul>
     </div>
 
-    <h2>怎么做的</h2>
-    <h3>技术栈</h3>
+    <h2>模型怎么算</h2>
+    <h3>1 · 预期进球 λ</h3>
+    <div class="formula">
+        λ<sub>home</sub> = <b>μ<sub>H</sub></b> × <span class="c">Att<sub>h</sub></span> × (1 / <span class="c">Def<sub>a</sub></span>) × Inj<sub>h</sub> × Rest<sub>h</sub><br>
+        λ<sub>away</sub> = <b>μ<sub>A</sub></b> × <span class="c">Att<sub>a</sub></span> × (1 / <span class="c">Def<sub>h</sub></span>) × Inj<sub>a</sub> × Rest<sub>a</sub>
+    </div>
     <ul class="list">
-        <li><strong>规则层</strong> — skill.md v2.2.0 提示词工程（引入数据时效约束，严禁 AI 臆造）</li>
-        <li><strong>前端层</strong> — 单文件 index.html，原生 HTML/CSS/JS，零依赖零构建</li>
-        <li><strong>数据层</strong> — data.json 与 fpl.json 双数据源，每日自动注入最新伤停</li>
-        <li><strong>推理层</strong> — Groq 免费 API，模型 openai/gpt-oss-120b，自动重试防截断</li>
-        <li><strong>部署层</strong> — GitHub Pages + Service Worker 穿透缓存防污染，零服务器成本</li>
+        <li><strong>μ<sub>H</sub> / μ<sub>A</sub></strong> 联赛主场 / 客场平均进球，赛季样本 ≥ 8 场时自动从 data.json 实算，否则回退到先验 1.55 / 1.30</li>
+        <li><strong>Att / Def</strong> 球队攻防强度，由 FPL 官方 strength_attack / strength_defence 与赛季实际进失球按样本量加权融合</li>
+        <li><strong>Inj</strong> 伤病系数，扫描 FPL 全量球员状态（i / s / d），按身价加权扣减，下限 0.72</li>
+        <li><strong>Rest</strong> 休息天数系数，间隔 &lt; 3.2 天为 0.96，&gt; 6 天为 1.015</li>
     </ul>
 
-    <h3>核心功能</h3>
+    <h3>2 · 比分概率矩阵</h3>
+    <div class="formula">
+        P(X=i, Y=j) = τ(i, j) · Pois(i; λ<sub>home</sub>) · Pois(j; λ<sub>away</sub>)
+    </div>
+    <p>τ 为 Dixon-Coles 低比分修正项，ρ = −0.06。矩阵覆盖 0–10 球共 121 种比分，并做归一化处理，确保概率总和为 1。</p>
+
+    <h3>3 · 蒙特卡洛校验</h3>
+    <p>在解析矩阵之外，额外做 1000 次泊松抽样模拟，用于交叉验证胜平负概率，并在「模型健康度」面板中与解析解并列展示——两者若出现明显偏差，说明矩阵截断或归一化存在问题。</p>
+
+    <h3>4 · 置信度分级</h3>
+    <table>
+        <tr><th>档位</th><th>最大单项概率</th><th>含义</th></tr>
+        <tr><td>高</td><td>≥ 58%</td><td>胜负格局清晰</td></tr>
+        <tr><td>中高</td><td>47% – 58%</td><td>有倾向但存在变数</td></tr>
+        <tr><td>中</td><td>37% – 47%</td><td>接近三选一</td></tr>
+        <tr><td>低</td><td>&lt; 37%</td><td>高度均势</td></tr>
+    </table>
+
+    <h2>核心功能</h2>
     <ul class="list">
-        <li><strong>智能预测</strong> — 严格 JSON 输出，18 维深度分析（大小球/BTTS/概率校准/命中趋势）</li>
-        <li><strong>焦点战 2.0</strong> — 8 维加权评分（德比/豪门/排名/争冠/保级/状态/H2H/进球预期/时间），主焦点卡 + 侧轨切换</li>
-        <li><strong>球队主题色渗透</strong> — 悬停任意球队，全局氛围光、鼠标光晕随该队球衣色变化</li>
-        <li><strong>数据动态化</strong> — 每日自动同步英超官方阵容与伤停，强行注入 Prompt 避免 AI 用过期数据预测</li>
-        <li><strong>防作弊机制</strong> — 已结束比赛禁止预测、唯一赛前定案、实时数据注入、实际比分时间锁</li>
-        <li><strong>FPL 最佳阵容</strong> — 基于官方 API 数据，自动计算每周预测得分最高的 15 人阵容</li>
-        <li><strong>球员信息</strong> — 多源高清球员照片、进球概率、状态标签、推荐得分球员</li>
-        <li><strong>比赛选择</strong> — 按轮次 / 按球队双模式，球队下拉显示 38 轮完整赛程</li>
+        <li><strong>焦点战影院</strong> 主焦点大卡 + 右侧赛程轨，自动挑选本轮最值得看的比赛，实时倒计时</li>
+        <li><strong>比分概率矩阵</strong> 7×7 热力图，颜色亮度直接映射概率，悬停查看精确百分比</li>
+        <li><strong>胜平负环形图</strong> SVG 环形进度 + 三段式概率条，动画入场</li>
+        <li><strong>六维雷达</strong> 进攻 / 防守 / 控球 / 转换 / 定位球 / 深度，主客叠加对比</li>
+        <li><strong>因素分解</strong> 把 λ 的对数影响拆成 6 条正负向横条，一眼看出谁在推动预测</li>
+        <li><strong>What-If 模拟</strong> 拖动双滑块实时改变 λ，三档概率即时重算，无需重新预测</li>
+        <li><strong>模型健康度</strong> 解析解 vs 蒙特卡洛并列，BTTS、大 2.5、大 1.5 球概率</li>
+        <li><strong>历史交锋</strong> 真实完赛数据聚合，主队视角胜负平统计</li>
+        <li><strong>关键球员</strong> 基于 FPL 的评分、状态标签、影响概率条、简短理由</li>
+        <li><strong>射手概率</strong> 按 xG/90 × λ 估算，前 6 名带进度条</li>
+        <li><strong>预测指纹</strong> 由比分矩阵哈希生成的 96×96 像素图案，同一预测永远同一图案</li>
+        <li><strong>战绩中心</strong> 保存预测、自动匹配实际比分、精确/胜负/未中三档判定、命中率、热力图、6 项成就</li>
+        <li><strong>批量预测</strong> 按轮次一次扫 3 / 5 / 整轮，带进度条</li>
+        <li><strong>揭晓动画</strong> 全屏 shockwave + 队徽飞入 + 比分数字弹入，配合音效</li>
+        <li><strong>命令面板</strong> <code>Ctrl+K</code> 唤起，模糊搜索所有操作</li>
+        <li><strong>多主题</strong> 暗金 / 海洋 / 极光三套配色，一键循环</li>
+        <li><strong>氛围光效</strong> 跟随鼠标的径向光晕，可关闭</li>
+        <li><strong>点球彩蛋</strong> 点球门面板，十次机会，命中触发震屏与音效</li>
+        <li><strong>响应式 & 无障碍</strong> 移动端适配、<code>prefers-reduced-motion</code> 支持、<code>aria-live</code> 播报</li>
     </ul>
 
     <h2>数据从哪来</h2>
     <table>
-        <tr><th>类型</th><th>来源</th><th>用途</th></tr>
-        <tr><td>比赛数据</td><td>football-data.org</td><td>积分榜、赛程、完赛比分、开赛时间、历史赛季</td></tr>
-        <tr><td>FPL 数据</td><td>FPL 官方 API</td><td>球员身价、得分、状态、赛程难度、每周最佳阵容</td></tr>
-        <tr><td>实时伤停</td><td>FPL 官方 API</td><td>每日自动提取全量球员伤停状态，强制注入 AI Prompt</td></tr>
-        <tr><td>球员照片</td><td>全球 CDN + 本地 SVG</td><td>球员照片（三级不死兜底，绝对出图）</td></tr>
+        <tr><th>类型</th><th>来源</th><th>用途</th><th>是否必需</th></tr>
+        <tr><td>赛程与比分</td><td>data.json（可选）</td><td>轮次、对阵、完赛比分、开赛时间</td><td>否 · 缺失则生成循环赛</td></tr>
+        <tr><td>球队与球员</td><td>FPL 官方 API</td><td>队徽、攻防强度、球员评分、伤病状态</td><td>否 · 缺失则用先验</td></tr>
+        <tr><td>球员照片</td><td>Premier League CDN</td><td>球员头像</td><td>否 · 失败显示首字母</td></tr>
+        <tr><td>队徽</td><td>Premier League CDN</td><td>球队徽章</td><td>否 · 失败显示三字母</td></tr>
     </table>
+    <div class="note">
+        <b>降级策略</b>：所有外部数据源均为可选。data.json 加载失败时自动生成 38 轮双循环赛程并在顶部显示警告条；FPL API 不可达时使用 6 小时本地缓存，缓存也没有则回退到球队先验强度——预测功能始终可用。
+    </div>
 
-    <h2>成长历程</h2>
-    <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 33 个里程碑。</p>
-    <ul class="timeline">
-        <li>01-10：从部署、接入 API 到实现本地及云端全自动化更新</li>
-        <li>11-20：历史记录、真实队徽、深度分析、球员照片双源合并</li>
-        <li>21-30：无障碍、AI 推理可视化、极致视觉体验与 FPL 梦幻英超融合</li>
-        <li>31：v16.0 防作弊锁 + 实时数据注入 + 赛前定案</li>
-        <li>32：v16.1 实时官方阵容伤停同步 + 数据时效硬约束 + 极限防截断重试 + 缓存彻底穿透防污染</li>
-        <li class="new">33：v16.2 焦点战 2.0（8 维评分 + 主焦点卡 + 侧轨）+ 布局重构（首屏动线优化）+ 球队主题色渗透</li>
+    <h2>技术栈</h2>
+    <ul class="list">
+        <li><span class="tag">引擎</span><strong>Dixon-Coles 双泊松</strong> 纯 JS 实现，含 τ 低比分修正与矩阵归一化</li>
+        <li><span class="tag">模拟</span><strong>蒙特卡洛</strong> 1000 次泊松抽样，Knuth 算法</li>
+        <li><span class="tag">前端</span><strong>单文件 HTML</strong> 原生 JS，零依赖、零构建、零 CDN 运行时</li>
+        <li><span class="tag cy">存储</span><strong>localStorage</strong> 战绩、设置、FPL 缓存、API Key 全部本地</li>
+        <li><span class="tag cy">数据</span><strong>FPL bootstrap-static</strong> 官方公开接口，无需鉴权</li>
+        <li><span class="tag em">部署</span><strong>GitHub Pages</strong> 静态托管，零服务器成本</li>
     </ul>
 
+    <h2>v17 相对 v16.3 的变化</h2>
+    <ul class="list">
+        <li><strong>引擎替换</strong> 移除 Groq 大模型推理链路，改为本地 Dixon-Coles，预测从 3–8 秒降至 &lt; 30ms</li>
+        <li><strong>新增</strong> 比分概率矩阵热力图、What-If 双滑块模拟、因素分解条、模型健康度面板</li>
+        <li><strong>新增</strong> 六维雷达对比、预测指纹、蒙特卡洛交叉验证</li>
+        <li><strong>新增</strong> 命令面板、快捷键体系、FAB 轨道菜单、点球彩蛋</li>
+        <li><strong>增强</strong> 战绩中心加入成就系统与深链分析折叠区</li>
+        <li><strong>增强</strong> 三套主题 + 氛围光效 + 揭晓全屏动画</li>
+        <li><strong>保留</strong> FPL 阵容同步、球队详情、积分榜、批量预测、历史记录</li>
+    </ul>
+
+    <h2>成长历程</h2>
+    <ul class="timeline">
+        <li class="done">01–10　部署上线、接入 API、实现本地与云端自动更新</li>
+        <li class="done">11–20　历史记录、真实队徽、深度分析、球员照片双源合并</li>
+        <li class="done">21–30　无障碍、AI 推理可视化、视觉体验与 FPL 融合</li>
+        <li class="done">31　v16.0　防作弊锁 + 实时数据注入 + 赛前定案</li>
+        <li class="done">32　v16.1　官方伤停同步 + 数据时效硬约束 + 防截断重试 + 缓存穿透</li>
+        <li class="done">33　v16.2　焦点战 2.0（8 维评分 + 主焦点卡 + 侧轨）+ 球队主题色渗透</li>
+        <li class="done">34　v16.3　完整终极版 · 单文件单 script · 全功能保留</li>
+        <li class="new">35　v17　Dixon-Coles 统计引擎重写 · 比分矩阵 · What-If · 因素分解 · 蒙特卡洛校验</li>
+    </ul>
+
+    <h2>已知局限</h2>
+    <ul class="list">
+        <li><strong>样本依赖</strong> 赛季前 8 场以内，联赛均值与球队强度主要来自先验，预测偏保守</li>
+        <li><strong>无阵容级建模</strong> 伤病只做整体系数扣减，不区分位置（缺前锋与缺后卫影响相同）</li>
+        <li><strong>无红黄牌 / 轮换</strong> 模型不感知停赛累积、欧战轮换、杯赛分心</li>
+        <li><strong>静态 ρ</strong> 低比分修正系数固定为 −0.06，未按联赛或赛季重新估计</li>
+        <li><strong>不建模平局偏置</strong> 强强对话的战术保守倾向未被单独刻画</li>
+    </ul>
+
+    <div class="note" style="background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.03));border-color:rgba(239,68,68,.3);color:#ff9f9f">
+        <b>免责声明</b>：本工具仅用于统计学习与娱乐。所有输出均为概率模型的数学结果，不构成任何投注建议。足球比赛存在大量随机性，历史概率不代表未来结果。
+    </div>
+
     <footer>
-        Premier League Prediction Engine · v16.2<br>
-        AI 生成内容，仅供娱乐，不构成投注建议。
+        Premier League Prediction Engine · v17<br>
+        <span class="ver">Dixon-Coles Engine · 单文件构建 · 零服务器</span>
+        <div style="margin-top:10px">
+            <a href="index.html">返回预测</a>·<a href="javascript:void(0)" onclick="history.back()">上一页</a>
+        </div>
     </footer>
+
 </div>
 
 </body>
