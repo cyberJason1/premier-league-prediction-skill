@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>关于 · 英超预测引擎 v16.1</title>
+    <title>关于 · 英超预测引擎 v16.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root{
@@ -47,8 +47,8 @@
 </header>
 
 <div class="wrap">
-    <h1>关于 · 英超预测引擎 v16.1</h1>
-    <p>一个完全开源、零成本、可持续运营的 AI 足球预测引擎。现在它不仅提供 18 维深度的 AI 比分预测，还为你每周自动挑选 FPL 梦幻英超的最佳阵容，并实时同步全量伤停情报。</p>
+    <h1>关于 · 英超预测引擎 v16.2</h1>
+    <p>一个完全开源、零成本、可持续运营的 AI 足球预测引擎。v16.2 重新设计了焦点战展示与页面动线：8 维加权评分、主焦点卡 + 侧轨切换、球队主题色氛围渗透，让赛程浏览真正具备"天工级"视觉张力。同时保留 18 维深度 AI 比分预测、FPL 梦幻英超最佳阵容、全量伤停实时同步等全部能力。</p>
 
     <h2>这是什么</h2>
     <p>它不是机器学习模型，也不需要数据科学背景。本质上是把一份精心设计的 <code>skill.md</code> 规则文档，作为 system 提示词塞给任意 OpenAI 兼容接口的大模型，让模型在严格约束下推理并输出 JSON。</p>
@@ -75,6 +75,8 @@
     <h3>核心功能</h3>
     <ul class="list">
         <li><strong>智能预测</strong> — 严格 JSON 输出，18 维深度分析（大小球/BTTS/概率校准/命中趋势）</li>
+        <li><strong>焦点战 2.0</strong> — 8 维加权评分（德比/豪门/排名/争冠/保级/状态/H2H/进球预期/时间），主焦点卡 + 侧轨切换</li>
+        <li><strong>球队主题色渗透</strong> — 悬停任意球队，全局氛围光、鼠标光晕随该队球衣色变化</li>
         <li><strong>数据动态化</strong> — 每日自动同步英超官方阵容与伤停，强行注入 Prompt 避免 AI 用过期数据预测</li>
         <li><strong>防作弊机制</strong> — 已结束比赛禁止预测、唯一赛前定案、实时数据注入、实际比分时间锁</li>
         <li><strong>FPL 最佳阵容</strong> — 基于官方 API 数据，自动计算每周预测得分最高的 15 人阵容</li>
@@ -92,17 +94,18 @@
     </table>
 
     <h2>成长历程</h2>
-    <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 32 个里程碑。</p>
+    <p>从一个 GitHub Fork 到一个完整可运营的产品，经历了 33 个里程碑。</p>
     <ul class="timeline">
         <li>01-10：从部署、接入 API 到实现本地及云端全自动化更新</li>
         <li>11-20：历史记录、真实队徽、深度分析、球员照片双源合并</li>
         <li>21-30：无障碍、AI 推理可视化、极致视觉体验与 FPL 梦幻英超融合</li>
         <li>31：v16.0 防作弊锁 + 实时数据注入 + 赛前定案</li>
-        <li class="new">32：v16.1 实时官方阵容伤停同步 + 数据时效硬约束 + 极限防截断重试 + 缓存彻底穿透防污染</li>
+        <li>32：v16.1 实时官方阵容伤停同步 + 数据时效硬约束 + 极限防截断重试 + 缓存彻底穿透防污染</li>
+        <li class="new">33：v16.2 焦点战 2.0（8 维评分 + 主焦点卡 + 侧轨）+ 布局重构（首屏动线优化）+ 球队主题色渗透</li>
     </ul>
 
     <footer>
-        Premier League Prediction Engine · v16.1<br>
+        Premier League Prediction Engine · v16.2<br>
         AI 生成内容，仅供娱乐，不构成投注建议。
     </footer>
 </div>

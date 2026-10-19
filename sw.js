@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v16.1'; // v16.1 改动：bump 版本，强制旧缓存清退
+const CACHE_VERSION = 'v16.2'; // v16.2 改动：bump 版本，强制旧缓存清退
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -45,8 +45,9 @@ function offlineFallback(pathname) {
             { status: 503, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
         );
     }
-    // 页面兜底：优先 index.html，全 miss 返回明确 503
-    return caches.match('./index.html').then(c => c || new Response('Offline', {
+    // 页面兜底：用注册 scope 下的绝对 URL 匹配，避免相对路径 key 不匹配
+    const indexUrl = new URL('./index.html', self.registration.scope).href;
+    return caches.match(indexUrl).then(c => c || new Response('Offline', {
         status: 503,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' }
     }));
@@ -69,22 +70,25 @@ self.addEventListener('fetch', event => {
     // 2. 同源静态资源：网络优先，缓存兜底（缓存 key 去 query）
     if (url.origin === self.location.origin) {
         const cacheKey = new Request(url.origin + url.pathname);
-        event.respondWith(
-            // v16.1 改动：加 cache:'no-store'，绕过浏览器 HTTP 缓存，真正每次问服务器
-            fetch(req, { cache: 'no-store' }).then(res => {
+
+        // v16.2 修复：用 async 包裹，await 缓存写入完成，避免 waitUntil 时序问题
+        event.respondWith((async () => {
+            try {
+                const res = await fetch(req, { cache: 'no-store' });
                 if (res && res.status === 200) {
                     const clone = res.clone();
-                    // cache.put 放到 waitUntil 里，避免 SW 提前终止导致缓存不完整
-                    event.waitUntil(
-                        caches.open(CACHE_NAME).then(cache => cache.put(cacheKey, clone))
-                    );
+                    // await 缓存写入，确保 SW 不会在 put 完成前被终止
+                    await caches.open(CACHE_NAME)
+                        .then(cache => cache.put(cacheKey, clone))
+                        .catch(() => {});
                 }
                 return res;
-            }).catch(() => {
+            } catch (e) {
                 // 全 miss 时返回明确 503，而不是 undefined 或 HTML
-                return caches.match(cacheKey).then(c => c || offlineFallback(url.pathname));
-            })
-        );
+                const cached = await caches.match(cacheKey);
+                return cached || offlineFallback(url.pathname);
+            }
+        })());
         return;
     }
 });

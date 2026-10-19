@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v16.1</title>
+    <title>英超预测引擎 v16.2</title>
     <meta property="og:type" content="website">
     <meta property="og:title" content="英超预测引擎 · 2026/27">
     <meta property="og:description" content="规则工程 + 前端工程 + 自动化 · 免费开源的 AI 英超比分预测">
@@ -28,7 +28,7 @@
         html{background:var(--bg);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
         body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.5;min-height:100vh;min-height:100dvh;overflow-x:hidden;font-feature-settings:"cv02","cv03","cv04","cv11";-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;transition:background .5s var(--ease)}
         body.no-scroll{overflow:hidden}
-        button,a,[onclick],.mrow,.cmd-item,.fmatch{touch-action:manipulation}
+        button,a,[onclick],.mrow,.cmd-item,.fmatch,.focus-hero,.focus-rail-item{touch-action:manipulation}
         #loadingBar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--amber),#ffb968,var(--cyan),var(--emerald));background-size:300% 100%;z-index:500;opacity:0;box-shadow:0 0 16px var(--amber-glow),0 0 32px var(--amber-glow);transition:width .3s var(--ease),opacity .3s var(--ease);animation:loadingShimmer 2s linear infinite}
         #loadingBar.active{opacity:1}
         #loadingBar.done{opacity:0;transition:opacity .5s .3s}
@@ -51,11 +51,10 @@
         body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.075;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/></svg>"),linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:200px 200px,64px 64px,64px 64px;mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);-webkit-mask-image:radial-gradient(ellipse at center,black 40%,transparent 85%);mix-blend-mode:overlay}
         @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.fade-in,.reveal{opacity:1!important;transform:none!important}#ambientCursor,#particleLayer{display:none!important}body::before{animation:none!important}}
 
-        /* ===== v16.1 修复：进场动效基础态 ===== */
+        /* ===== v16.1 修复 ===== */
         .fade-in{animation:fadeUp .8s var(--ease) .1s both}
         .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
         .reveal.visible{opacity:1;transform:none}
-        /* ===== v16.1 修复：ripple 定位修正 ===== */
         .filter-btn,.batch-opts button,.picker-mode button{position:relative;overflow:hidden}
 
         .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:88px var(--sp-6) 140px}
@@ -79,11 +78,13 @@
         .topbar .icon-btn{width:34px;height:34px;border-radius:var(--r-sm);border:1px solid var(--border-hi);background:transparent;color:var(--text-3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s var(--ease);font-size:14px}
         .topbar .icon-btn:hover{color:var(--amber);border-color:var(--border-focus);background:var(--amber-soft);transform:translateY(-1px)}
         .topbar .icon-btn.off{color:var(--text-4);opacity:.6}
-        .hero{position:relative;padding:var(--sp-10) 0 var(--sp-8);text-align:center}
+
+        /* Hero v16.2 精简 */
+        .hero{position:relative;padding:var(--sp-8) 0 var(--sp-6);text-align:center}
         .hero.matchday::before{content:"";position:absolute;inset:-60px -40px 0 -40px;background:radial-gradient(ellipse at 50% 0%,rgba(255,159,67,.18) 0%,transparent 60%);pointer-events:none;z-index:-1;animation:matchPulse 3.2s ease-in-out infinite}
         @keyframes matchPulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
-        .hero .kick{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:11px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-5);padding:8px 16px;border:1px solid rgba(255,159,67,.3);border-radius:var(--r-full);background:var(--amber-soft)}
-        .hero h1{position:relative;font-family:var(--font-serif);font-size:clamp(48px,9vw,96px);font-weight:500;line-height:1;letter-spacing:-.04em;margin-bottom:var(--sp-5);perspective:1200px}
+        .hero .kick{display:inline-flex;align-items:center;gap:var(--sp-2);font-size:11px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);margin-bottom:var(--sp-4);padding:7px 14px;border:1px solid rgba(255,159,67,.3);border-radius:var(--r-full);background:var(--amber-soft)}
+        .hero h1{position:relative;font-family:var(--font-serif);font-size:clamp(40px,7vw,72px);font-weight:500;line-height:1;letter-spacing:-.04em;margin-bottom:var(--sp-3);perspective:1200px}
         .hero h1::before{content:"";position:absolute;inset:0;background:radial-gradient(circle 200px at var(--hx,50%) var(--hy,50%),rgba(255,159,67,.35),transparent 70%);pointer-events:none;mix-blend-mode:screen;opacity:0;transition:opacity .3s var(--ease);z-index:-1;filter:blur(20px)}
         .hero h1:hover::before{opacity:1}
         .hero h1 .char{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-90deg) scale(.9);transform-origin:50% 100%;animation:charIn 1s var(--ease-spring) forwards;backface-visibility:hidden}
@@ -91,7 +92,7 @@
         @keyframes titleShine{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
         .hero h1 em .char{background:inherit;-webkit-background-clip:inherit;background-clip:inherit;-webkit-text-fill-color:inherit}
         @keyframes charIn{0%{opacity:0;transform:translateY(60px) rotateX(-90deg) scale(.85)}60%{opacity:1;transform:translateY(0) rotateX(8deg) scale(1.02)}100%{opacity:1;transform:translateY(0) rotateX(0) scale(1)}}
-        .hero .lead{color:var(--text-2);font-size:clamp(14px,1.6vw,17px);line-height:1.7;max-width:560px;margin:0 auto var(--sp-6);opacity:0;animation:fadeUp .9s var(--ease) .8s forwards}
+        .hero .lead{color:var(--text-2);font-size:14px;line-height:1.65;max-width:560px;margin:0 auto var(--sp-4);opacity:0;animation:fadeUp .9s var(--ease) .8s forwards}
         .hero .tag-line{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);flex-wrap:wrap;font-size:12px;color:var(--text-3);opacity:0;animation:fadeUp .9s var(--ease) 1s forwards}
         .hero kbd{font-family:var(--font-mono);font-size:10px;font-weight:600;padding:3px 6px;border-radius:5px;background:var(--surface);border:1px solid var(--border-hi);color:var(--text-2);margin:0 1px}
         .field-bg{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);opacity:.09;pointer-events:none;z-index:-1}
@@ -99,64 +100,74 @@
         .field-bg .cyan{stroke:var(--cyan);animation-delay:1s}
         .field-bg .violet{stroke:var(--violet);animation-delay:2s}
         @keyframes drawLine{to{stroke-dashoffset:0}}
+
+        /* ================= v16.2 焦点战电影感 ================= */
+        .focus-cinema{position:relative;margin:0 auto var(--sp-8);max-width:1240px;padding:0 var(--sp-6)}
+        @media (max-width:640px){.focus-cinema{padding:0 var(--sp-4)}}
+        .focus-cinema-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-4);gap:var(--sp-3);flex-wrap:wrap}
+        .focus-cinema-header h4{font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--text-2);display:flex;align-items:center;gap:8px;margin:0}
+        .focus-cinema-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:var(--sp-4);align-items:stretch}
+        @media (max-width:900px){.focus-cinema-grid{grid-template-columns:1fr}}
+
+        /* 主焦点卡 */
+        .focus-hero{position:relative;border-radius:var(--r-2xl);overflow:hidden;min-height:400px;background:linear-gradient(135deg,#0d1420 0%,#1a2233 100%);border:1px solid var(--border-hi);padding:var(--sp-8);display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:transform .4s var(--ease),border-color .3s var(--ease);isolation:isolate}
+        .focus-hero:hover{transform:translateY(-3px);border-color:var(--border-focus)}
+        .focus-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--hero-hx,50%) var(--hero-hy,50%),var(--team-glow,rgba(255,159,67,.3)),transparent 65%);opacity:.5;transition:opacity .4s var(--ease);z-index:-1;mix-blend-mode:screen}
+        .focus-hero:hover::before{opacity:.95}
+        .focus-hero .hero-head{display:flex;gap:var(--sp-2);flex-wrap:wrap;align-items:center;z-index:1}
+        .focus-hero .hero-tag{font-size:10px;font-weight:700;letter-spacing:.06em;padding:3px 10px;border-radius:var(--r-full);background:rgba(239,68,68,.15);color:#ff9f9f;border:1px solid rgba(239,68,68,.4);text-transform:uppercase}
+        .focus-hero .hero-tag.hot{background:rgba(251,191,36,.15);color:var(--gold);border-color:rgba(251,191,36,.4)}
+        .focus-hero .hero-tag.top{background:var(--violet-soft);color:var(--violet);border-color:rgba(167,139,250,.4)}
+        .focus-hero .hero-tag.live{background:rgba(239,68,68,.25);color:#fff;border-color:rgba(239,68,68,.7);animation:pulse 2s ease-in-out infinite}
+        .focus-hero .hero-teams{display:flex;flex-direction:column;gap:var(--sp-3);margin:var(--sp-3) 0;z-index:1;position:relative}
+        .focus-hero .hero-team{display:flex;align-items:center;gap:var(--sp-4)}
+        .focus-hero .hero-badge{width:60px;height:60px;flex-shrink:0;object-fit:contain;filter:drop-shadow(0 6px 16px rgba(0,0,0,.6));transition:transform .3s var(--ease)}
+        .focus-hero:hover .hero-badge{transform:scale(1.08) rotate(-4deg)}
+        .focus-hero .hero-badge-fb{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1a2233,#0d1420);display:flex;align-items:center;justify-content:center;font-family:var(--font-serif);font-size:20px;color:var(--text-2);border:2px solid var(--border-hi);flex-shrink:0}
+        .focus-hero .hero-team-info{flex:1;min-width:0}
+        .focus-hero .hero-team-name{font-family:var(--font-serif);font-size:clamp(20px,3vw,30px);font-weight:600;line-height:1.1;letter-spacing:-.02em;color:var(--text);display:block}
+        .focus-hero .hero-team-sub{font-size:11px;color:var(--text-3);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;font-family:var(--font-mono);align-items:center}
+        .focus-hero .hero-team-sub .rank{color:var(--gold);font-weight:700}
+        .focus-hero .hero-team-sub .form{display:inline-flex;gap:3px}
+        .focus-hero .hero-team-sub .fc{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+        .focus-hero .hero-team-sub .fc.W{background:#22c55e;box-shadow:0 0 6px #22c55e}
+        .focus-hero .hero-team-sub .fc.D{background:#64748b}
+        .focus-hero .hero-team-sub .fc.L{background:#ef4444;box-shadow:0 0 6px #ef4444}
+        .focus-hero .hero-vs{display:flex;justify-content:center;align-items:center;gap:var(--sp-3);font-family:var(--font-mono);font-size:11px;color:var(--text-4);letter-spacing:.3em;text-transform:uppercase;z-index:1;position:relative;padding:2px 0}
+        .focus-hero .hero-vs::before,.focus-hero .hero-vs::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border-hi),transparent)}
+        .focus-hero .hero-score{font-family:var(--font-serif);font-size:clamp(40px,7vw,60px);font-weight:500;line-height:1;letter-spacing:-.04em;color:var(--emerald);text-align:center;text-shadow:0 0 40px rgba(52,211,153,.5);z-index:1;position:relative;font-variant-numeric:tabular-nums;padding:4px 0}
+        .focus-hero .hero-footer{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--sp-3);z-index:1;position:relative;margin-top:var(--sp-4);padding-top:var(--sp-4);border-top:1px solid rgba(255,255,255,.08);flex-wrap:wrap}
+        .focus-hero .hero-kickoff{font-size:11px;color:var(--text-3);font-family:var(--font-mono);line-height:1.5}
+        .focus-hero .hero-kickoff strong{color:var(--amber);font-size:13px;font-weight:700;display:block;margin-bottom:2px}
+        .focus-hero .hero-kickoff.live strong{color:var(--rose);animation:pulse 2s ease-in-out infinite}
+        .focus-hero .hero-countdown{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--amber);padding:6px 12px;border-radius:var(--r-full);background:var(--amber-soft);border:1px solid rgba(255,159,67,.3);letter-spacing:.04em}
+        .focus-hero .hero-countdown.live{color:var(--rose);background:var(--rose-soft);border-color:rgba(239,68,68,.4)}
+        .focus-hero .hero-cta{font-size:11px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:4px;transition:gap .25s var(--ease)}
+        .focus-hero:hover .hero-cta{gap:8px}
+
+        /* 侧轨 */
+        .focus-rail{display:flex;flex-direction:column;gap:var(--sp-2);max-height:400px;overflow-y:auto;padding-right:4px}
+        .focus-rail::-webkit-scrollbar{width:4px}
+        .focus-rail::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px}
+        .focus-rail-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);cursor:pointer;transition:all .25s var(--ease);position:relative;flex-shrink:0}
+        .focus-rail-item:hover{background:rgba(255,255,255,.04);border-color:var(--border-hi);transform:translateX(-3px)}
+        .focus-rail-item.active{background:var(--amber-soft);border-color:rgba(255,159,67,.4);box-shadow:0 0 20px -6px var(--amber-glow)}
+        .focus-rail-item.active::before{content:"";position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--amber);border-radius:2px;box-shadow:0 0 8px var(--amber-glow)}
+        .focus-rail-item .rail-badge{width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
+        .focus-rail-item .rail-badge-fb{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700;flex-shrink:0}
+        .focus-rail-item .rail-info{flex:1;min-width:0}
+        .focus-rail-item .rail-teams{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+        .focus-rail-item .rail-meta{font-size:10px;color:var(--text-3);margin-top:2px;font-family:var(--font-mono);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+        .focus-rail-item .rail-tag{font-size:8px;font-weight:700;padding:1px 5px;border-radius:3px;background:rgba(251,191,36,.15);color:var(--gold);text-transform:uppercase}
+        .focus-rail-item .rail-tag.derby{background:rgba(239,68,68,.15);color:#ff9f9f}
+        .focus-rail-empty{color:var(--text-4);font-size:12px;text-align:center;padding:30px 16px;background:var(--surface);border:1px dashed var(--border);border-radius:var(--r-md)}
+
+        /* 原有 focus-strip 样式保留（未使用但不删除以免冲突） */
         .focus-strip{position:relative;margin:0 auto var(--sp-8);max-width:1240px;padding:0 var(--sp-6)}
-        @media (max-width:640px){.focus-strip{padding:0 var(--sp-4)}}
-        .focus-strip h4{font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2);opacity:0;animation:fadeUp .8s var(--ease) 1.2s forwards}
-        .focus-strip h4::before{content:"🔥";font-size:12px}
-        .focus-scroll-wrap{position:relative}
-        .focus-scroll-wrap::before,.focus-scroll-wrap::after{content:"";position:absolute;top:0;bottom:16px;width:60px;pointer-events:none;z-index:2;transition:opacity .3s var(--ease)}
-        .focus-scroll-wrap::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
-        .focus-scroll-wrap::after{right:0;background:linear-gradient(270deg,var(--bg),transparent)}
-        .focus-scroll-wrap.at-start::before{opacity:0}
-        .focus-scroll-wrap.at-end::after{opacity:0}
-        .focus-scroll{display:flex;gap:var(--sp-3);overflow-x:auto;padding:4px 0 16px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;cursor:grab}
-        .focus-scroll:active{cursor:grabbing}
-        .focus-scroll::-webkit-scrollbar{display:none}
-        .focus-scroll.dragging{scroll-snap-type:none}
-        .focus-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:36px;height:36px;border-radius:50%;border:1px solid var(--border-hi);background:rgba(18,22,32,.9);backdrop-filter:blur(12px);color:var(--text-2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s var(--ease);opacity:0;pointer-events:none}
-        .focus-arrow.show{opacity:1;pointer-events:auto}
-        .focus-arrow:hover{color:var(--amber);border-color:var(--border-focus);background:var(--amber-soft);transform:translateY(-50%) scale(1.1)}
-        .focus-arrow.left{left:-8px}
-        .focus-arrow.right{right:-8px}
-        .focus-arrow svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-        .focus-dots{display:flex;justify-content:center;gap:6px;margin-top:8px}
-        .focus-dots .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.15);transition:all .3s var(--ease)}
-        .focus-dots .dot.on{background:var(--amber);width:20px;border-radius:3px;box-shadow:0 0 8px var(--amber-glow)}
-        .fmatch{flex:0 0 240px;scroll-snap-align:start;position:relative;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:var(--sp-4);cursor:pointer;transition:all .35s var(--ease);overflow:hidden;backdrop-filter:blur(20px);text-align:left;opacity:0;transform:translateY(40px) scale(.92)}
-        .fmatch.in-view{animation:cardSlideIn .7s var(--ease-spring) forwards}
-        @keyframes cardSlideIn{to{opacity:1;transform:translateY(0) scale(1)}}
-        .fmatch::before{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--angle,0deg),transparent 0deg,var(--amber) 60deg,transparent 120deg);opacity:0;transition:opacity .4s;-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;padding:1px;pointer-events:none}
-        .fmatch:hover{transform:translateY(-4px);border-color:var(--border-hi);box-shadow:0 16px 40px -10px rgba(0,0,0,.6),0 0 0 1px rgba(255,159,67,.1)}
-        .fmatch:hover::before{opacity:.7;animation:borderRotate 3s linear infinite}
-        @keyframes borderRotate{to{--angle:360deg}}
-        .fmatch .tagline{display:flex;gap:4px;margin-bottom:var(--sp-3);flex-wrap:wrap}
-        .fmatch .tag-sm{font-size:9px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:var(--r-full);text-transform:uppercase}
-        .tag-sm.derby{background:rgba(239,68,68,.15);color:#ff7a7a;border:1px solid rgba(239,68,68,.4)}
-        .tag-sm.hot{background:rgba(251,191,36,.15);color:var(--gold);border:1px solid rgba(251,191,36,.4)}
-        .tag-sm.top{background:var(--violet-soft);color:var(--violet);border:1px solid rgba(167,139,250,.4)}
-        .fmatch .frow{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:8px}
-        .fmatch .fbadge{width:28px;height:28px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.5))}
-        .fmatch .fbadge-fb{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--text-3);font-weight:700;flex-shrink:0}
-        .fmatch .fname{flex:1;min-width:0;font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .25s var(--ease)}
-        .fmatch .fscore{font-family:var(--font-serif);font-size:24px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums;min-width:22px;text-align:right;flex-shrink:0;letter-spacing:-.02em}
-        .fmatch .fscore.win{color:var(--amber);text-shadow:0 0 14px var(--amber-glow)}
-        .fmatch .fscore.lose{color:var(--text-3)}
-        .fmatch .fscore.draw{color:var(--text-2)}
-        .fmatch .frow.dim .fname{color:var(--text-3)}
-        .fmatch .fmeta{display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--border);font-size:10px;color:var(--text-3)}
-        .fmatch .fmeta .ftime{color:var(--amber);font-weight:700;font-variant-numeric:tabular-nums}
-        .fmatch .fmeta .ftime.live{color:var(--rose);animation:pulse 2s ease-in-out infinite}
-        .fmatch .fform{display:inline-flex;gap:2px;flex-shrink:0;margin-right:2px}
-        .fmatch .fform .fc{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-        .fmatch .fform .fc.W{background:#22c55e;box-shadow:0 0 5px rgba(34,197,94,.7)}
-        .fmatch .fform .fc.D{background:#64748b}
-        .fmatch .fform .fc.L{background:#ef4444;box-shadow:0 0 5px rgba(239,68,68,.6)}
-        .fmatch .fh2h{margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,.08);font-size:10px;color:var(--text-3);display:flex;align-items:center;gap:5px;overflow:hidden}
-        .fmatch .fh2h .fh2h-lbl{color:var(--violet);font-weight:700;flex-shrink:0;font-size:11px}
-        .fmatch .fh2h .fh2h-team{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-2);font-weight:500}
-        .fmatch .fh2h .fh2h-sc{color:var(--amber);font-family:var(--font-mono);font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
-        .fmatch .fh2h .fh2h-date{color:var(--text-4);margin-left:auto;flex-shrink:0;font-size:9px;font-family:var(--font-mono)}
+        .focus-strip h4{font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--text-3);margin-bottom:var(--sp-3);display:flex;align-items:center;gap:var(--sp-2)}
         .focus-empty{color:var(--text-4);font-size:12px;text-align:center;padding:20px;flex:0 0 100%}
+
+        /* Dash */
         .dash{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:var(--sp-3);margin-bottom:var(--sp-8)}
         @media (max-width:900px){.dash{grid-template-columns:repeat(2,1fr)}}
         @media (max-width:560px){.dash{grid-template-columns:1fr;gap:var(--sp-2)}}
@@ -357,6 +368,7 @@
         .pcard::after{content:"";position:absolute;inset:0;border-radius:inherit;background:conic-gradient(from var(--angle,0deg),#ff9f43,#22d3ee,#a78bfa,#34d399,#ff9f43);mix-blend-mode:overlay;opacity:0;pointer-events:none;transition:opacity .4s}
         .pcard:hover{transform:translateY(-4px) scale(1.01);border-color:rgba(255,159,67,.35);box-shadow:0 20px 40px -10px rgba(255,159,67,.3)}
         .pcard:hover::after{opacity:.35;animation:borderRotate 4s linear infinite}
+        @keyframes borderRotate{to{--angle:360deg}}
         .pcard.is-focal{border-color:rgba(255,159,67,.5);background:linear-gradient(160deg,rgba(255,159,67,.14),rgba(34,211,238,.05))}
         .pcard.is-focal::before{content:"★ FOCAL";position:absolute;top:0;right:0;font-size:9px;font-weight:800;padding:3px 8px;background:linear-gradient(135deg,var(--amber),#ffb968);color:#1a0d02;border-radius:0 var(--r-lg) 0 var(--r-md);z-index:3}
         .pcard .photo-wrap{position:relative;width:56px;height:56px;flex-shrink:0;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#1a2233,#0d1420);border:2px solid var(--border-hi);display:flex;align-items:center;justify-content:center;z-index:2}
@@ -742,25 +754,20 @@
         <svg class="field-bg" viewBox="0 0 800 400" preserveAspectRatio="none"><path d="M 0,200 Q 400,180 800,200"/><path class="cyan" d="M 400,0 Q 380,200 400,400"/><circle class="violet" cx="400" cy="200" r="80"/></svg>
         <div class="kick"><span id="matchdayDot" style="display:none;width:6px;height:6px;border-radius:50%;background:var(--rose);box-shadow:0 0 12px var(--rose);animation:pulse 1.8s ease-in-out infinite"></span><span id="matchdayLine">Premier League 2026/27</span></div>
         <h1 id="heroTitle">英超 <em>预测</em> 引擎</h1>
-        <p class="lead">基于 skill.md 约束文档的 AI 比分预测引擎 · 18 维深度分析 · 全量高清球员头像 · 全自动云端更新</p>
+        <p class="lead">基于 skill.md 约束的 AI 比分预测引擎 · 18 维深度分析 · 全自动云端更新</p>
         <div class="tag-line"><span><kbd>Ctrl</kbd><kbd>K</kbd> 命令面板</span><span style="color:var(--text-4)">·</span><span><kbd>Ctrl</kbd><kbd>↵</kbd> 开始预测</span><span style="color:var(--text-4)">·</span><span><kbd>Ctrl</kbd><kbd>I</kbd> 沉浸模式</span></div>
     </section>
-    <section id="fplSection" style="margin-bottom:var(--sp-8)">
-        <div id="fplLoading" class="fpl-card" style="height:400px;background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.03) 100%);background-size:200% 100%;animation:skeletonShimmer 1.5s infinite"></div>
-        <div id="fplContent" style="display:none">
-            <div class="fpl-header"><h2>Gameweek <span id="fplGW">-</span></h2><div class="fpl-meta"><span>预测总分: <b id="fplXPts">-</b></span><span>花费: <b id="fplCost">-</b></span><span>阵型: <b id="fplFormation">-</b></span></div></div>
-            <div class="fpl-card" style="margin-bottom:0;border-radius:0 0 var(--r-2xl) var(--r-2xl);border-top:none;padding-top:0;box-shadow:none"><div class="fpl-pitch" id="fplPitch"></div><div class="fpl-bench" id="fplBench"></div></div>
+
+    <section class="focus-cinema" id="focusStrip">
+        <div class="focus-cinema-header">
+            <h4>🔥 今日焦点战</h4>
         </div>
-        <div id="fplError" class="fpl-card" style="display:none;text-align:center"><h3 style="color:var(--text-3);margin-bottom:8px">⚠️ FPL 数据暂不可用</h3><p style="color:var(--text-4);font-size:12px">请确认 fpl.json 已生成并推送。</p></div>
-    </section>
-    <section class="focus-strip" id="focusStrip"><h4>今日焦点战</h4>
-        <div class="focus-scroll-wrap" id="focusWrap">
-            <button class="focus-arrow left" id="focusPrev" aria-label="上一组"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
-            <div class="focus-scroll" id="focusScroll"><div class="focus-empty">加载中…</div></div>
-            <button class="focus-arrow right" id="focusNext" aria-label="下一组"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        <div class="focus-cinema-grid">
+            <div class="focus-hero" id="focusHero"></div>
+            <div class="focus-rail" id="focusRail"></div>
         </div>
-        <div class="focus-dots" id="focusDots"></div>
     </section>
+
     <section class="dash fade-in">
         <div class="cell primary"><div class="lbl">🏆 当前轮次</div><div class="val orange" id="dashRound">—</div><div class="sub" id="dashRoundSub">2026-27 赛季</div></div>
         <div class="cell"><div class="lbl">⚽ 已完赛</div><div class="val" id="dashPlayed">—</div><div class="sub">场次已录入</div></div>
@@ -792,6 +799,16 @@
         </div>
         <div class="card fade-in" id="resultCard"><div class="empty"><div class="empty-ball"></div><div>选择比赛 → 填写情报 → 开始预测</div><div class="hint">按 Ctrl+K 打开命令面板 · 点积分榜任意行查看球队详情</div></div></div>
     </div>
+
+    <section id="fplSection" style="margin-bottom:var(--sp-8)">
+        <div id="fplLoading" class="fpl-card" style="height:400px;background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.03) 100%);background-size:200% 100%;animation:skeletonShimmer 1.5s infinite"></div>
+        <div id="fplContent" style="display:none">
+            <div class="fpl-header"><h2>Gameweek <span id="fplGW">-</span></h2><div class="fpl-meta"><span>预测总分: <b id="fplXPts">-</b></span><span>花费: <b id="fplCost">-</b></span><span>阵型: <b id="fplFormation">-</b></span></div></div>
+            <div class="fpl-card" style="margin-bottom:0;border-radius:0 0 var(--r-2xl) var(--r-2xl);border-top:none;padding-top:0;box-shadow:none"><div class="fpl-pitch" id="fplPitch"></div><div class="fpl-bench" id="fplBench"></div></div>
+        </div>
+        <div id="fplError" class="fpl-card" style="display:none;text-align:center"><h3 style="color:var(--text-3);margin-bottom:8px">⚠️ FPL 数据暂不可用</h3><p style="color:var(--text-4);font-size:12px">请确认 fpl.json 已生成并推送。</p></div>
+    </section>
+
     <div class="card fade-in reveal" style="margin-top:var(--sp-6)"><h3>积分榜</h3><div class="standings" id="standings">
         <div class="skeleton" style="height:40px;margin-bottom:8px;border-radius:8px"></div>
         <div class="skeleton" style="height:40px;margin-bottom:8px;border-radius:8px"></div>
@@ -802,7 +819,7 @@
     <footer class="site-footer">
         <div><a href="about.html">关于项目</a><span style="color:var(--text-4)">·</span><a href="https://github.com/cyberJason1/premier-league-prediction-skill" target="_blank" rel="noopener">GitHub</a><span style="color:var(--text-4)">·</span><a href="about.html#legal">免责声明</a></div>
         <div class="legal">⚠️ AI 生成内容，仅供娱乐，<b>不构成投注建议</b>。API Key 仅存本地浏览器。</div>
-        <div class="ver">Premier League Prediction Engine · v16.1</div>
+        <div class="ver">Premier League Prediction Engine · v16.2</div>
     </footer>
 </div>
 <div class="fab-hub" id="fabHub">
@@ -853,10 +870,8 @@
 <div class="toast-wrap" id="toastWrap" role="status" aria-live="polite"></div>
 <script>
     /* =====================================================================
-     *  v16.1 完整修复版
-     *  - FPL 图片三级兜底
-     *  - FPL 官方阵容代理兜底
-     *  - 修复 startPredict force / manualReload / pollDataUpdate / MatchPicker close / wheel & observer / heatmap class
+     *  v16.2 · 布局重构 + 焦点战 2.0 + 球队色渗透
+     *  所有 v16.1 修复 + v16.2 升级已集成
      * ===================================================================== */
 
     const Sound = (() => {
@@ -1191,17 +1206,6 @@
         });
         card.addEventListener('pointerleave', () => { layers.forEach(({sel}) => { const el = card.querySelector(sel); if (el) el.style.transform = ''; }); });
     }
-
-    /* v16.1 修复：清理旧 observer，避免泄漏和闪烁 */
-    let _focusObserver = null;
-    function setupFocusReveal() {
-        if (_focusObserver) { _focusObserver.disconnect(); _focusObserver = null; }
-        if (!('IntersectionObserver' in window)) { document.querySelectorAll('.fmatch').forEach(el => el.classList.add('in-view')); return; }
-        _focusObserver = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) { setTimeout(() => e.target.classList.add('in-view'), +e.target.dataset.idx * 80); _focusObserver.unobserve(e.target); } });
-        }, {threshold: .15});
-        document.querySelectorAll('.fmatch').forEach((el, i) => { el.dataset.idx = i; _focusObserver.observe(el); });
-    }
     function genFingerprint(seed) {
         let h = 0; for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
         const rng = () => { h = (h * 9301 + 49297) % 233280; return Math.abs(h) / 233280; };
@@ -1242,6 +1246,22 @@
     const PLAYER_ZH_MAP = { 'Bukayo Saka': '萨卡', 'Martin Odegaard': '厄德高', 'Gabriel Jesus': '热苏斯', 'Erling Haaland': '哈兰德', 'Rayan Cherki': '谢尔基', 'Rodri': '罗德里', 'Mohamed Salah': '萨拉赫', 'Alexander Isak': '伊萨克', 'Cody Gakpo': '加克波', 'Joao Pedro': '若昂·佩德罗', 'Morgan Rogers': '摩根·罗杰斯', 'Cole Palmer': '帕尔默', 'James Maddison': '麦迪逊', 'Bruno Fernandes': 'B费', 'Marcus Rashford': '拉什福德', 'Bruno Guimaraes': '吉马良斯', 'Ollie Watkins': '沃特金斯', 'John McGinn': '麦金', 'Kaoru Mitoma': '三笘薰', 'Danny Welbeck': '维尔贝克', 'Dominic Calvert-Lewin': '卡尔弗特-勒温', 'Thierno Barry': '蒂耶尔诺·巴里', 'James Tarkowski': '塔科夫斯基', 'Tarkowski': '塔科夫斯基', 'Jordan Pickford': '皮克福德', 'Raul Jimenez': '希门尼斯', 'Eberechi Eze': '埃泽', 'Jean-Philippe Mateta': '马特塔', 'Bryan Mbeumo': '姆贝乌莫', 'Yoane Wissa': '维萨', 'Dominic Solanke': '索兰克', 'Antoine Semenyo': '塞梅尼奥', 'Chris Wood': '伍德', 'Morgan Gibbs-White': '吉布斯-怀特', 'Joel Piroe': '皮罗', 'Wilfried Gnonto': '尼奥托', 'Brian Brobbey': '布罗比', 'Wilson Isidor': '伊西多', 'Haji Wright': '哈吉·赖特', 'Jack Rudoni': '杰克·鲁多尼', 'Mohamed Belloumi': '贝卢米', 'Konstantinos Tzolakis': 'Tzolakis', 'Jack Clarke': '杰克·克拉克' };
     function toChinesePlayer(name) { if (!name) return name; return PLAYER_ZH_MAP[name] || name; }
     function makeAbbr(name) { if (!name) return '?'; if (/[\u4e00-\u9fa5]/.test(name)) return name.slice(0, 2); return name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase(); }
+
+    /* ================= v16.2 球队主题色 ================= */
+    const TEAM_COLORS = {
+        '阿森纳':'#EF0107','曼城':'#6CABDD','利物浦':'#C8102E','切尔西':'#034694',
+        '热刺':'#132257','曼联':'#DA291C','纽卡斯尔联':'#241F20','阿斯顿维拉':'#95BFE5',
+        '布莱顿':'#0057B8','埃弗顿':'#003399','富勒姆':'#CC0000','水晶宫':'#1B458F',
+        '布伦特福德':'#E30613','伯恩茅斯':'#DA291C','诺丁汉森林':'#DD0000','利兹联':'#FFCD00',
+        '桑德兰':'#EB172B','考文垂城':'#00B2E3','赫尔城':'#F5A12D','伊普斯维奇镇':'#3A64A3'
+    };
+    function applyTeamAura(team) {
+        const color = TEAM_COLORS[team] || '#ff9f43';
+        document.body.style.setProperty('--team-glow', color + '55');
+        const cursor = document.getElementById('ambientCursor');
+        if (cursor) cursor.style.background = `radial-gradient(circle, ${color}33 0%, transparent 70%)`;
+    }
+
     const FIXTURES = []; const RESULTS = {};
     let STATIC_STANDINGS = []; let _last5Cache = null; let _usingFallback = false;
     let PLAYER_PHOTOS = {}; let HISTORICAL_RESULTS = {}; let _teamAtkCache = null;
@@ -1447,11 +1467,7 @@
     const DERBY_NAMES = [{teams: ['曼联', '利物浦'], name: '双红会'}, {teams: ['曼城', '曼联'], name: '曼市德比'}, {teams: ['阿森纳', '热刺'], name: '北伦敦德比'}, {teams: ['利物浦', '埃弗顿'], name: '默西塞德德比'}, {teams: ['切尔西', '热刺'], name: '伦敦德比'}, {teams: ['阿森纳', '切尔西'], name: '伦敦德比'}, {teams: ['纽卡斯尔联', '桑德兰'], name: '泰恩-威尔德比'}, {teams: ['曼城', '利物浦'], name: '红蓝大战'}, {teams: ['阿森纳', '曼联'], name: '经典对决'}, {teams: ['切尔西', '曼联'], name: '红蓝大战'}];
     function getDerbyName(h, a) { for (const d of DERBY_NAMES) { const [x, y] = d.teams; if ((h === x && a === y) || (h === y && a === x)) return d.name; } return null; }
     function isDerby(h, a) { return !!getDerbyName(h, a); }
-    function formDots(team) { const form = getForm(team, 5); if (!form.length) return ''; return `<span class="fform">${form.map(r => `<span class="fc ${r}"></span>`).join('')}</span>`; }
-    function focusH2H(home, away) {
-        const matches = computeH2H(home, away); if (!matches.length) return ''; const last = matches[0];
-        return `<div class="fh2h"><span class="fh2h-lbl">⚔️</span><span class="fh2h-team">${escapeHtml(last.home)}</span><span class="fh2h-sc">${last.hg}-${last.ag}</span><span class="fh2h-team">${escapeHtml(last.away)}</span><span class="fh2h-date">${escapeHtml(last.season)}</span></div>`;
-    }
+
     const MatchPicker = (() => {
         let selectedIdx = 0, currentRound = 0, isOpen = false, focusIdx = 0;
         function open() {
@@ -1469,7 +1485,6 @@
                 if (!_pickerShowFinished) { items = items.filter(m => { const st = getMatchStatus(m.home, m.away, m.round); return st.status !== 'finished' && st.status !== 'stale'; }); }
                 if (q) items = items.filter(m => m.opponent.toLowerCase().includes(q));
                 if (!items.length) {
-                    /* v16.1 修复：使用 MatchPicker.close() 而非 window.close() */
                     list.innerHTML = headerHtml + `<div class="empty-list">当前条件下无比赛<br><br><button class="btn ghost small" onclick="event.stopPropagation(); window.togglePickerFinished()">查看全部</button><br><br><button class="btn ghost small" onclick="event.stopPropagation(); MatchPicker.close(); openHistory();">📊 去战绩中心回顾</button></div>`;
                     return;
                 }
@@ -1486,7 +1501,6 @@
                 if (!_pickerShowFinished) { items = items.filter(m => { const st = getMatchStatus(m.home, m.away, currentRound); return st.status !== 'finished' && st.status !== 'stale'; }); }
                 if (q) items = items.filter(m => m.home.toLowerCase().includes(q) || m.away.toLowerCase().includes(q));
                 if (!items.length) {
-                    /* v16.1 修复：使用 MatchPicker.close() 而非 window.close() */
                     list.innerHTML = headerHtml + `<div class="empty-list">本轮暂无未开赛比赛<br><br><button class="btn ghost small" onclick="event.stopPropagation(); window.togglePickerFinished()">查看已完赛</button><br><br><button class="btn ghost small" onclick="event.stopPropagation(); MatchPicker.close(); openHistory();">📊 去战绩中心回顾</button></div>`;
                     return;
                 }
@@ -1655,7 +1669,6 @@
             clearInterval(timer); stepsEl.querySelectorAll('li').forEach(el => { el.classList.remove('active'); el.classList.add('done'); }); barEl.style.width = '100%';
         };
     }
-    /* v16.1 修复：explicit btn.onclick —— 避免 existing 分支走旧缓存 */
     function updatePredictButtonState() {
         const {round, home, away} = currentMatch(); const btn = document.getElementById('predictBtn'); if (!btn || !home) return;
         const st = getMatchStatus(home, away, round); const existing = getHistory().find(h => h.round === round && h.home === home && h.away === away);
@@ -1665,7 +1678,7 @@
             btn.disabled = true; btn.innerHTML = '⏳ 数据待更新'; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; btn.title = '比赛已过开赛时间但无结果，请等待同步'; btn.onclick = null;
         } else if (existing) {
             btn.disabled = false; btn.innerHTML = '🔄 基于最新数据更新预测'; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; btn.title = '已有定案，点击可覆盖更新';
-            btn.onclick = () => startPredict(0, true);   /* 强制重跑 */
+            btn.onclick = () => startPredict(0, true);
         } else {
             btn.disabled = false; btn.innerHTML = '开始预测'; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; btn.title = 'Ctrl + Enter';
             btn.onclick = () => startPredict();
@@ -1894,7 +1907,6 @@
         const en = Object.entries(PLAYER_ZH_MAP).find(([k, v]) => v === playerName)?.[0]; if (en && PLAYER_PHOTOS[en]) return PLAYER_PHOTOS[en];
         const zh = PLAYER_ZH_MAP[playerName]; if (zh && PLAYER_PHOTOS[zh]) return PLAYER_PHOTOS[zh]; return null;
     }
-    /* v16.1 修复：加 force 参数，重跑/更新时不再短路旧缓存 */
     async function startPredict(retryCount = 0, force = false) {
         const btn = document.getElementById('predictBtn'); const {round, home, away} = currentMatch();
         if (!home || !away) return toast('未选择比赛', 'warn');
@@ -2030,7 +2042,6 @@
         const multiRunsHtml = d._runs && d._runs.length > 1 ? `<div class="multi-runs">⚡ ${d._runs.length} 次运行：${d._runs.map(escapeHtml).join(' / ')} · 取众数 <b>${escapeHtml(d.score)}</b></div>` : '';
         const derbyName = getDerbyName(home, away); const derbyHtml = derbyName ? `<div style="text-align:center"><span class="derby-badge">⚔️ ${escapeHtml(derbyName)}</span></div>` : '';
         const fingerprintHtml = `<div class="fingerprint"><canvas id="fpCanvas" title="本场预测指纹"></canvas></div>`; const multiverseHtml = d._runs && d._runs.length > 1 ? renderMultiverse(d._runs) : '';
-        /* v16.1 修复：重跑按钮走 force */
         card.innerHTML = `<div class="scoreboard"><div class="teams"><div class="team left">${badgeHtml(home)}<div class="nm">${escapeHtml(home)}</div></div><div class="score" id="revealScore">0-0</div><div class="team right">${badgeHtml(away)}<div class="nm">${escapeHtml(away)}</div></div></div>${derbyHtml}<div style="margin-top:12px; display:flex; justify-content:center; align-items:center; gap:8px;"><span class="conf ${confClass(d.confidence)}">置信度 ${escapeHtml(d.confidence)}</span><span style="font-size:11px; background:linear-gradient(135deg,#10b981,#059669); color:#fff; padding:4px 10px; border-radius:20px; font-weight:700; box-shadow:0 0 10px rgba(16,185,129,0.4);">✅ 赛前最新定案</span></div>${renderCompareActual(home, away, ctx.round, d.score)}${multiRunsHtml}<div class="result-actions"><button class="btn ghost small" onclick="copyResult()">📋 复制</button><button class="btn ghost small" onclick="generateShareCard()">📷 分享图</button><button class="btn ghost small" onclick="copyLink()">🔗 链接</button><button class="btn ghost small" onclick="startPredict(0, true)">🔄 重跑</button></div></div>${fingerprintHtml}<div class="rings">${ring(h, 'h')}${ring(dr, 'd')}${ring(a, 'a')}</div><div class="compare"><div class="seg h"></div><div class="seg d"></div><div class="seg a"></div></div>${renderRadar(home, away)}${multiverseHtml}${h2h}<div class="sect"><div class="ttl">关键因素</div><div class="factors">${(d.keyFactors || []).map(f => `<span class="chip">${escapeHtml(f)}</span>`).join('')}</div><div class="kv" id="analysisKv"></div></div>${scorerHtml}${playersHtml}`;
         const scoreEl = document.getElementById('revealScore'); revealScore(scoreEl, d.score); renderFingerprint(document.getElementById('fpCanvas'), d);
         const kv = document.getElementById('analysisKv'); setTimeout(() => typewrite(kv, d.analysis || ''), 1600);
@@ -2104,80 +2115,245 @@
         if (day === 0 || day === 6) { el.textContent = '🔴 比赛日 · 记得录入上一轮实际赛果'; dot.style.display = 'inline-block'; topbarDot.classList.remove('off'); hero.classList.add('matchday'); }
         else { el.textContent = `距下个比赛日还有 ${(6 - day + 7) % 7 || 7} 天`; dot.style.display = 'none'; topbarDot.classList.add('off'); hero.classList.remove('matchday'); }
     }
-    function renderFocusMatches() {
-        const scroll = document.getElementById('focusScroll'); if (!scroll) return;
-        const r = +document.getElementById('roundSel').value || 0; const round = FIXTURES[r] || [];
-        if (!round.length) { scroll.innerHTML = '<div class="focus-empty">本轮无赛程</div>'; return; }
-        const scored = round.map(m => {
-            let score = 0; const hr = getRank(m.home) || 20, ar = getRank(m.away) || 20;
-            if (isDerby(m.home, m.away)) score += 100; if (hr <= 4 && ar <= 4) score += 60; if (hr <= 6 || ar <= 6) score += 20;
-            return {...m, score};
-        }).sort((a, b) => b.score - a.score).slice(0, 8);
-        scroll.innerHTML = scored.map(m => {
-            const st = getMatchStatus(m.home, m.away, r); const derbyName = getDerbyName(m.home, m.away); const hr = getRank(m.home), ar = getRank(m.away); const isFinished = st.status === 'finished';
-            let hs = null, as = null, hCls = '', aCls = '';
-            if (isFinished) {
-                [hs, as] = st.score.split('-').map(Number);
-                if (hs > as) { hCls = 'win'; aCls = 'lose'; } else if (hs < as) { hCls = 'lose'; aCls = 'win'; } else { hCls = 'draw'; aCls = 'draw'; }
-            }
-            const tags = [];
-            if (derbyName) tags.push(`<span class="tag-sm derby">🔥 ${escapeHtml(derbyName)}</span>`);
-            if (hr && ar && hr <= 4 && ar <= 4) tags.push('<span class="tag-sm top">TOP4</span>');
-            if (!isFinished) tags.push('<span class="tag-sm hot">待预测</span>');
-            const hUrl = espnUrl(m.home), aUrl = espnUrl(m.away);
-            const hImg = hUrl ? `<img class="fbadge" src="${hUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')"><div class="fbadge-fb" style="display:none">${ABBR[m.home] || m.home.slice(0, 3)}</div>` : `<div class="fbadge-fb">${ABBR[m.home] || m.home.slice(0, 3)}</div>`;
-            const aImg = aUrl ? `<img class="fbadge" src="${aUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')"><div class="fbadge-fb" style="display:none">${ABBR[m.away] || m.away.slice(0, 3)}</div>` : `<div class="fbadge-fb">${ABBR[m.away] || m.away.slice(0, 3)}</div>`;
-            const isLive = !isFinished && m.kickoff && (() => { const diffH = (new Date(m.kickoff) - Date.now()) / 3600000; return diffH < 0 && diffH > -2.5; })();
-            return `<div class="fmatch" data-home="${escapeHtml(m.home)}" data-away="${escapeHtml(m.away)}" data-round="${r}">${tags.length ? `<div class="tagline">${tags.join('')}</div>` : ''}<div class="frow${hCls === 'lose' ? ' dim' : ''}">${hImg}<span class="fname">${escapeHtml(m.home)}</span>${formDots(m.home)}${isFinished ? `<span class="fscore ${hCls}">${hs}</span>` : ''}</div><div class="frow${aCls === 'lose' ? ' dim' : ''}">${aImg}<span class="fname">${escapeHtml(m.away)}</span>${formDots(m.away)}${isFinished ? `<span class="fscore ${aCls}">${as}</span>` : ''}</div><div class="fmeta"><span>第 ${r + 1} 轮</span><span class="ftime${isLive ? ' live' : ''}">${formatKickoff(m.kickoff, st)}</span></div>${focusH2H(m.home, m.away)}</div>`;
-        }).join('');
-        scroll.querySelectorAll('.fmatch').forEach(el => {
-            el.addEventListener('click', () => {
-                const h = el.dataset.home, a = el.dataset.away, rr = +el.dataset.round; const round = FIXTURES[rr] || []; const idx = round.findIndex(m => m.home === h && m.away === a);
-                if (idx >= 0) {
-                    document.getElementById('roundSel').value = rr; MatchPicker.setRound(rr); MatchPicker.selectMatch(idx);
-                    if (!_pickerShowFinished) { const st = getMatchStatus(h, a, rr); if (st.status === 'finished' || st.status === 'stale') { _pickerShowFinished = true; if (document.getElementById('matchPicker').classList.contains('open')) { MatchPicker.renderList(document.getElementById('matchSearch').value); } } }
-                    document.getElementById('predictBtn').scrollIntoView({behavior: 'smooth', block: 'center'}); Sound.click();
-                }
-            });
-        });
-        setupFocusReveal(); setupFocusScroll();
+
+    /* ================= v16.2 天工焦点战 2.0 ================= */
+    function computeFocusScore(m, round) {
+        const home = m.home, away = m.away;
+        const hr = getRank(home) || 20, ar = getRank(away) || 20;
+        const BIG6 = ['曼联','利物浦','曼城','阿森纳','切尔西','热刺'];
+        const hBig = BIG6.includes(home), aBig = BIG6.includes(away);
+        const st = getMatchStatus(home, away, round);
+        let score = 0;
+        const reasons = [];
+
+        // ① 德比
+        const derby = getDerbyName(home, away);
+        if (derby) { score += 400; reasons.push({ tag: derby, cls: 'derby' }); }
+
+        // ② 豪门
+        if (hBig && aBig) { score += 250; reasons.push({ tag: 'BIG6 对决', cls: 'top' }); }
+        else if (hBig || aBig) score += 80;
+
+        // ③ 排名接近度
+        const rankGap = Math.abs(hr - ar);
+        if (hr <= 4 && ar <= 4) { score += 150; reasons.push({ tag: 'TOP4 强强', cls: 'top' }); }
+        else if (hr <= 6 && ar <= 6) { score += 100; reasons.push({ tag: '欧战区', cls: 'top' }); }
+        else if (hr <= 4 || ar <= 4) score += 50;
+        if (rankGap <= 2 && hr <= 10 && ar <= 10) score += 60;
+
+        // ④ 争冠/保级
+        if (hr <= 2 && ar <= 2) { score += 120; reasons.push({ tag: '争冠战', cls: 'hot' }); }
+        if (hr >= 17 && ar >= 17) { score += 100; reasons.push({ tag: '保级生死', cls: 'derby' }); }
+
+        // ⑤ 状态对撞
+        const hForm = getForm(home, 5), aForm = getForm(away, 5);
+        if (hForm.length >= 3 && aForm.length >= 3) {
+            const hW = hForm.filter(x => x === 'W').length;
+            const aW = aForm.filter(x => x === 'W').length;
+            if (hW >= 4 && aW >= 4) { score += 80; reasons.push({ tag: '双热状态', cls: 'hot' }); }
+            else if (hW + aW >= 7) score += 50;
+        }
+
+        // ⑥ H2H 恩怨
+        const h2h = computeH2H(home, away);
+        if (h2h.length >= 3) {
+            const recent3 = h2h.slice(0, 3);
+            if (recent3.some(x => Math.abs(x.hg - x.ag) >= 3)) { score += 50; reasons.push({ tag: '历史恩怨', cls: 'top' }); }
+            if (recent3.every(x => x.hg !== x.ag)) score += 30;
+        }
+
+        // ⑦ 进球预期
+        const stats = computeTeamAttackStats();
+        const H = stats.find(t => t.team === home) || {};
+        const A = stats.find(t => t.team === away) || {};
+        const totalAvg = (H.avgGF || 0) + (A.avgGF || 0);
+        if (totalAvg >= 3.5) { score += 60; reasons.push({ tag: '对攻大战', cls: 'hot' }); }
+        else if (totalAvg >= 2.8) score += 20;
+
+        // ⑧ 时间紧迫度
+        if (st.kickoff) {
+            const diffH = (new Date(st.kickoff) - Date.now()) / 3600000;
+            if (diffH < 0 && diffH > -2.5) { score += 300; reasons.push({ tag: '🔴 直播中', cls: 'live' }); }
+            else if (diffH > 0 && diffH < 24) { score += 60; reasons.push({ tag: '今日开赛', cls: 'hot' }); }
+            else if (diffH > 24 && diffH < 72) score += 20;
+        }
+
+        return { ...m, score, reasons };
     }
-    let _focusResizeHandler = null;
-    function setupFocusScroll() {
-        const scroll = document.getElementById('focusScroll'); const wrap = document.getElementById('focusWrap'); const prevBtn = document.getElementById('focusPrev'); const nextBtn = document.getElementById('focusNext'); const dotsEl = document.getElementById('focusDots');
-        if (!scroll || !wrap || !prevBtn || !nextBtn) return;
-        const isOverflow = () => scroll.scrollWidth > scroll.clientWidth + 5;
-        const updateState = () => {
-            const max = scroll.scrollWidth - scroll.clientWidth; const atStart = scroll.scrollLeft <= 2; const atEnd = scroll.scrollLeft >= max - 2;
-            wrap.classList.toggle('at-start', atStart); wrap.classList.toggle('at-end', atEnd);
-            prevBtn.classList.toggle('show', isOverflow() && !atStart); nextBtn.classList.toggle('show', isOverflow() && !atEnd);
-            if (!isOverflow()) { dotsEl.innerHTML = ''; return; }
-            const visibleW = scroll.clientWidth; const pages = Math.ceil(scroll.scrollWidth / visibleW); const currentPage = Math.round(scroll.scrollLeft / visibleW);
-            dotsEl.innerHTML = Array.from({length: pages}, (_, i) => `<span class="dot${i === currentPage ? ' on' : ''}"></span>`).join('');
+
+    function renderFocusHero(m, round) {
+        const el = document.getElementById('focusHero');
+        if (!el || !m) return;
+        const st = getMatchStatus(m.home, m.away, round);
+        const isFinished = st.status === 'finished';
+        const isStale = st.status === 'stale';
+        const hr = getRank(m.home), ar = getRank(m.away);
+        const hForm = getForm(m.home, 5), aForm = getForm(m.away, 5);
+
+        const tags = m.reasons.length
+            ? m.reasons.slice(0, 3).map(x => `<span class="hero-tag ${x.cls}">${escapeHtml(x.tag)}</span>`).join('')
+            : '';
+
+        const badge = (team) => {
+            const url = espnUrl(team);
+            return url
+                ? `<img class="hero-badge" src="${url}" alt="${escapeHtml(team)}" loading="eager" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')"><div class="hero-badge-fb" style="display:none">${ABBR[team] || team.slice(0,2)}</div>`
+                : `<div class="hero-badge-fb">${ABBR[team] || team.slice(0,2)}</div>`;
         };
-        const step = () => scroll.clientWidth * .85; prevBtn.onclick = () => scroll.scrollBy({left: -step(), behavior: 'smooth'}); nextBtn.onclick = () => scroll.scrollBy({left: step(), behavior: 'smooth'});
-        /* v16.1 修复：wheel 只绑定一次，防止累积 */
-        if (!scroll._wheelBound) {
-            scroll._wheelBound = true;
-            scroll.addEventListener('wheel', e => {
-                if (e.deltaY === 0 || !isOverflow()) return; if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-                e.preventDefault(); scroll.scrollBy({left: e.deltaY * 1.2, behavior: 'auto'});
-            }, {passive: false});
+
+        const formHtml = (form) => form.length
+            ? `<span class="form">${form.map(r => `<span class="fc ${r}"></span>`).join('')}</span>`
+            : '';
+
+        let centerHtml = '';
+        let footerHtml = '';
+        let kickoffClass = '';
+
+        if (isFinished) {
+            centerHtml = `<div class="hero-score">${escapeHtml(st.score)}</div>`;
+            footerHtml = `<div class="hero-kickoff"><strong>已完赛</strong>第 ${round + 1} 轮 · 点击查看详情</div><div class="hero-cta">查看详情 →</div>`;
+        } else if (isStale) {
+            centerHtml = `<div class="hero-vs">⏳</div>`;
+            footerHtml = `<div class="hero-kickoff"><strong>数据待更新</strong>等待赛果同步中…</div>`;
+        } else {
+            centerHtml = `<div class="hero-vs">VS</div>`;
+            let countdown = '';
+            let diffH = null;
+            if (st.kickoff) {
+                diffH = (new Date(st.kickoff) - Date.now()) / 3600000;
+                if (diffH < 0 && diffH > -2.5) {
+                    countdown = `<div class="hero-countdown live">🔴 直播中</div>`;
+                    kickoffClass = ' live';
+                } else if (diffH > 0 && diffH < 48) {
+                    const hh = Math.floor(diffH), mm = Math.floor((diffH - hh) * 60);
+                    countdown = `<div class="hero-countdown">⏱ ${hh}h ${mm}m</div>`;
+                }
+            }
+            footerHtml = `<div class="hero-kickoff${kickoffClass}"><strong>${formatKickoff(m.kickoff, st)}</strong>第 ${round + 1} 轮 · 点击开始预测</div>${countdown || '<div class="hero-cta">开始预测 →</div>'}`;
         }
-        if (!scroll._dragBound) {
-            scroll._dragBound = true; let isDown = false, startX = 0, startLeft = 0, moved = false;
-            scroll.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') return; isDown = true; moved = false; startX = e.clientX; startLeft = scroll.scrollLeft; scroll.classList.add('dragging'); });
-            window.addEventListener('pointermove', e => { if (!isDown) return; const dx = e.clientX - startX; if (Math.abs(dx) > 5) moved = true; scroll.scrollLeft = startLeft - dx; });
-            window.addEventListener('pointerup', () => { if (!isDown) return; isDown = false; scroll.classList.remove('dragging'); if (moved) setTimeout(() => { moved = false; }, 0); });
-            scroll.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
-            scroll.addEventListener('scroll', updateState, {passive: true});
-        }
-        if (_focusResizeHandler) window.removeEventListener('resize', _focusResizeHandler);
-        _focusResizeHandler = updateState; window.addEventListener('resize', _focusResizeHandler);
-        const curRound = +document.getElementById('roundSel').value || 0;
-        if (scroll._lastRound !== curRound) { scroll.scrollLeft = 0; scroll._lastRound = curRound; }
-        requestAnimationFrame(updateState);
+
+        el.innerHTML = `
+        <div class="hero-head">${tags}</div>
+        <div class="hero-teams">
+            <div class="hero-team">
+                ${badge(m.home)}
+                <div class="hero-team-info">
+                    <span class="hero-team-name">${escapeHtml(m.home)}</span>
+                    <div class="hero-team-sub">
+                        ${hr ? `<span class="rank">#${hr}</span>` : ''}
+                        <span>主</span>
+                        ${formHtml(hForm)}
+                    </div>
+                </div>
+            </div>
+            ${centerHtml}
+            <div class="hero-team">
+                ${badge(m.away)}
+                <div class="hero-team-info">
+                    <span class="hero-team-name">${escapeHtml(m.away)}</span>
+                    <div class="hero-team-sub">
+                        ${ar ? `<span class="rank">#${ar}</span>` : ''}
+                        <span>客</span>
+                        ${formHtml(aForm)}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-footer">${footerHtml}</div>
+    `;
+
+        // 每次渲染时重新绑定事件（覆盖式，无累积）
+        el.onclick = () => {
+            const round_ = round;
+            const fixtureRound = FIXTURES[round_] || [];
+            const idx = fixtureRound.findIndex(mm => mm.home === m.home && mm.away === m.away);
+            if (idx < 0) return;
+            document.getElementById('roundSel').value = round_;
+            MatchPicker.setRound(round_);
+            MatchPicker.selectMatch(idx);
+            if (!_pickerShowFinished) {
+                const st2 = getMatchStatus(m.home, m.away, round_);
+                if (st2.status === 'finished' || st2.status === 'stale') {
+                    _pickerShowFinished = true;
+                    if (document.getElementById('matchPicker').classList.contains('open')) {
+                        MatchPicker.renderList(document.getElementById('matchSearch').value);
+                    }
+                }
+            }
+            document.getElementById('predictBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            Sound.click();
+        };
+        el.onmouseenter = () => applyTeamAura(m.home);
+        el.onmouseleave = () => applyTeamAura(null);
+        el.onpointermove = e => {
+            const rect = el.getBoundingClientRect();
+            el.style.setProperty('--hero-hx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+            el.style.setProperty('--hero-hy', ((e.clientY - rect.top) / rect.height * 100) + '%');
+        };
     }
+
+    function renderFocusMatches() {
+        const heroEl = document.getElementById('focusHero');
+        const railEl = document.getElementById('focusRail');
+        if (!heroEl || !railEl) return;
+        const r = +document.getElementById('roundSel').value || 0;
+        const round = FIXTURES[r] || [];
+        if (!round.length) {
+            heroEl.innerHTML = '<div class="focus-rail-empty">本轮无赛程</div>';
+            railEl.innerHTML = '';
+            return;
+        }
+
+        // 8 维评分 → 排序 → 取前 5
+        const scored = round.map(m => computeFocusScore(m, r)).sort((a, b) => b.score - a.score);
+        const top5 = scored.slice(0, 5);
+
+        // 主焦点
+        const main = top5[0];
+        renderFocusHero(main, r);
+
+        // 侧轨
+        const rest = top5.slice(1);
+        if (!rest.length) {
+            railEl.innerHTML = '<div class="focus-rail-empty">本轮仅 1 场焦点赛</div>';
+        } else {
+            railEl.innerHTML = rest.map((m, i) => {
+                const st = getMatchStatus(m.home, m.away, r);
+                const isFinished = st.status === 'finished';
+                const hUrl = espnUrl(m.home);
+                const hImg = hUrl
+                    ? `<img class="rail-badge" src="${hUrl}" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='flex')"><div class="rail-badge-fb" style="display:none">${ABBR[m.home]||m.home.slice(0,2)}</div>`
+                    : `<div class="rail-badge-fb">${ABBR[m.home]||m.home.slice(0,2)}</div>`;
+                const tag = m.reasons[0]
+                    ? `<span class="rail-tag ${m.reasons[0].cls === 'derby' ? 'derby' : ''}">${escapeHtml(m.reasons[0].tag)}</span>`
+                    : '';
+                return `<div class="focus-rail-item${i === 0 ? ' active' : ''}" data-idx="${i + 1}">
+                ${hImg}
+                <div class="rail-info">
+                    <div class="rail-teams">${escapeHtml(m.home)} vs ${escapeHtml(m.away)}</div>
+                    <div class="rail-meta">${tag}${isFinished ? escapeHtml(st.score) : formatKickoff(m.kickoff, st)}</div>
+                </div>
+            </div>`;
+            }).join('');
+        }
+
+        // 侧轨交互
+        railEl.querySelectorAll('.focus-rail-item').forEach(item => {
+            item.addEventListener('click', () => {
+                railEl.querySelectorAll('.focus-rail-item').forEach(x => x.classList.remove('active'));
+                item.classList.add('active');
+                const idx = +item.dataset.idx;
+                if (top5[idx]) renderFocusHero(top5[idx], r);
+                Sound.click();
+            });
+            item.addEventListener('mouseenter', () => {
+                const idx = +item.dataset.idx;
+                if (rest[idx - 1]) applyTeamAura(rest[idx - 1].home);
+            });
+            item.addEventListener('mouseleave', () => applyTeamAura(null));
+        });
+    }
+
     const HIST_KEY = 'pl_history_v2';
     let histFilter = 'all', _histMemCache = null;
     function getHistory() { if (!_histMemCache) { try { _histMemCache = JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { _histMemCache = []; } } return _histMemCache; }
@@ -2233,7 +2409,6 @@
         return { verdict, hitExact, hitWdl, hitOU25, hitOU15, hitOU35, hitBTTS, hitMargin, hitHomeGoals, hitAwayGoals, predicted: {h: ph, a: pa, wdl: pWdl, total: pTotal}, actual: {h: ah, a: aa, wdl: aWdl, total: aTotal}, diffHome, diffAway, diffTotal, deviations };
     }
     function judge(rec) { return analyzeRecord(rec).verdict; }
-    /* v16.1 修复：类名映射 exact→hit, wdl→partial */
     function renderHeatmap() {
         const grid = document.getElementById('heatmapGrid'); if (!grid) return;
         const hist = getHistoryCopy().slice(-80); if (!hist.length) { grid.innerHTML = '<div style="font-size:11px;color:var(--text-4)">暂无数据</div>'; return; }
@@ -2334,7 +2509,6 @@
     function manualSync() {
         const n = syncActualsToHistory(false); refreshDashboard(); if (document.getElementById('histMask').classList.contains('show')) renderHistory(); if (n === 0) toast('暂无新结果', 'warn', 2500);
     }
-    /* v16.1 修复：manualReload 真正重载 */
     function manualReload() {
         _lastDataEtag = null;
         toast('正在加载最新数据…', 'ok', 2000);
@@ -2344,7 +2518,6 @@
             refreshDashboard();
         });
     }
-    /* v16.1 修复：首次 null 不再早退 */
     async function pollDataUpdate() {
         if (document.hidden) return;
         try {
@@ -2696,7 +2869,7 @@
         const savedSound = localStorage.getItem('pl_sound') === '1';
         if (savedSound) { Sound.toggle(); document.getElementById('soundBtn').textContent = '🔊'; document.getElementById('soundBtn').classList.remove('off'); } else { document.getElementById('soundBtn').classList.add('off'); }
         Ambient.init(); LoadingBar.start();
-        if (!localStorage.getItem('pl_welcomed')) { setTimeout(() => { toast('👋 欢迎使用 v16.1 · 先填 Groq API Key', 'ok', 6500); }, 2200); localStorage.setItem('pl_welcomed', '1'); }
+        if (!localStorage.getItem('pl_welcomed')) { setTimeout(() => { toast('👋 欢迎使用 v16.2 · 先填 Groq API Key', 'ok', 6500); }, 2200); localStorage.setItem('pl_welcomed', '1'); }
         setTimeout(() => LoadingBar.done(), 1800);
         splitHeroTitle(); startClock(); setupReveal(); attachRipple(); CommandPalette.bind(); MatchPicker.bind();
         const saved = localStorage.getItem('groq_key'); if (saved) document.getElementById('apiKey').value = saved;
@@ -2729,7 +2902,7 @@
     })();
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./sw.js?v=16.1').then(reg => {
+            navigator.serviceWorker.register('./sw.js?v=16.2').then(reg => {
                 reg.addEventListener('updatefound', () => {
                     const newSW = reg.installing; if (!newSW) return;
                     newSW.addEventListener('statechange', () => { if (newSW.state === 'installed' && navigator.serviceWorker.controller) showUpdateToast(reg); });
