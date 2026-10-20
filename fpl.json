@@ -894,7 +894,7 @@
       "team": "ARS",
       "teamId": 1,
       "position": 4,
-      "cost": 7.1,
+      "cost": 7,
       "form": 1,
       "totalPoints": 4,
       "ppg": 1,
@@ -1422,7 +1422,7 @@
       "team": "AVL",
       "teamId": 2,
       "position": 2,
-      "cost": 4.5,
+      "cost": 4.4,
       "form": 0.5,
       "totalPoints": 6,
       "ppg": 1.5,
@@ -4430,7 +4430,7 @@
       "team": "CRY",
       "teamId": 8,
       "position": 3,
-      "cost": 4.4,
+      "cost": 4.3,
       "form": 0.5,
       "totalPoints": 3,
       "ppg": 1,
@@ -5486,7 +5486,7 @@
       "team": "FUL",
       "teamId": 10,
       "position": 4,
-      "cost": 5.4,
+      "cost": 5.3,
       "form": 0.5,
       "totalPoints": 4,
       "ppg": 0.8,
@@ -7230,7 +7230,7 @@
       "team": "LEE",
       "teamId": 13,
       "position": 4,
-      "cost": 5.4,
+      "cost": 5.3,
       "form": 1,
       "totalPoints": 9,
       "ppg": 1.5,
@@ -7598,7 +7598,7 @@
       "team": "LIV",
       "teamId": 14,
       "position": 2,
-      "cost": 5,
+      "cost": 5.1,
       "form": 3,
       "totalPoints": 30,
       "ppg": 4.3,
@@ -7790,7 +7790,7 @@
       "team": "LIV",
       "teamId": 14,
       "position": 3,
-      "cost": 4.9,
+      "cost": 4.8,
       "form": 0,
       "totalPoints": 0,
       "ppg": 0,
@@ -8722,9 +8722,9 @@
       "form": 0.5,
       "totalPoints": 2,
       "ppg": 1,
-      "status": "a",
-      "chanceNext": null,
-      "news": ""
+      "status": "d",
+      "chanceNext": 75,
+      "news": "Illness - 75% chance of playing"
     },
     {
       "id": 422,
@@ -8754,9 +8754,9 @@
       "form": 1.5,
       "totalPoints": 12,
       "ppg": 2.4,
-      "status": "d",
-      "chanceNext": 75,
-      "news": "Unspecified injury - 75% chance of playing"
+      "status": "i",
+      "chanceNext": 0,
+      "news": "Unspecified injury - Unknown return date"
     },
     {
       "id": 424,
@@ -8850,9 +8850,9 @@
       "form": 0.5,
       "totalPoints": 11,
       "ppg": 1.8,
-      "status": "a",
-      "chanceNext": 100,
-      "news": ""
+      "status": "d",
+      "chanceNext": 75,
+      "news": "Hip injury - 75% chance of playing"
     },
     {
       "id": 430,
@@ -8898,9 +8898,9 @@
       "form": 2,
       "totalPoints": 26,
       "ppg": 4.3,
-      "status": "d",
-      "chanceNext": 75,
-      "news": "Unspecified injury - 75% chance of playing"
+      "status": "i",
+      "chanceNext": 0,
+      "news": "Unspecified injury - Expected back 8 Nov"
     },
     {
       "id": 433,
@@ -9854,7 +9854,7 @@
       "team": "NFO",
       "teamId": 18,
       "position": 3,
-      "cost": 5.8,
+      "cost": 5.7,
       "form": 1,
       "totalPoints": 3,
       "ppg": 1,
