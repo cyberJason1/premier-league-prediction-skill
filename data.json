@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-10-19T14:40:55.415Z",
+  "updatedAt": "2026-10-21T02:12:09.457Z",
   "season": "2026/27",
-  "currentRound": 7,
+  "currentRound": 8,
   "teams": [
     {
       "id": 1,
@@ -809,90 +809,90 @@
       "round": 7,
       "home": 9,
       "away": 6,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 0,
+      "awayGoals": 2,
+      "finished": true,
       "kickoff": "2026-10-17T11:30:00Z"
     },
     {
       "round": 7,
       "home": 4,
       "away": 14,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 1,
+      "awayGoals": 2,
+      "finished": true,
       "kickoff": "2026-10-17T14:00:00Z"
     },
     {
       "round": 7,
       "home": 10,
       "away": 11,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 1,
+      "awayGoals": 0,
+      "finished": true,
       "kickoff": "2026-10-17T14:00:00Z"
     },
     {
       "round": 7,
       "home": 15,
       "away": 12,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 3,
+      "awayGoals": 2,
+      "finished": true,
       "kickoff": "2026-10-17T14:00:00Z"
     },
     {
       "round": 7,
       "home": 17,
       "away": 2,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 0,
+      "awayGoals": 1,
+      "finished": true,
       "kickoff": "2026-10-17T16:30:00Z"
     },
     {
       "round": 7,
       "home": 3,
       "away": 20,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 2,
+      "awayGoals": 0,
+      "finished": true,
       "kickoff": "2026-10-18T13:00:00Z"
     },
     {
       "round": 7,
       "home": 5,
       "away": 8,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 5,
+      "awayGoals": 0,
+      "finished": true,
       "kickoff": "2026-10-18T13:00:00Z"
     },
     {
       "round": 7,
       "home": 13,
       "away": 16,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 1,
+      "awayGoals": 1,
+      "finished": true,
       "kickoff": "2026-10-18T13:00:00Z"
     },
     {
       "round": 7,
       "home": 18,
       "away": 1,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 0,
+      "awayGoals": 1,
+      "finished": true,
       "kickoff": "2026-10-18T15:30:00Z"
     },
     {
       "round": 7,
       "home": 19,
       "away": 7,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
+      "homeGoals": 3,
+      "awayGoals": 1,
+      "finished": true,
       "kickoff": "2026-10-19T19:00:00Z"
     },
     {
@@ -1347,30 +1347,12 @@
     },
     {
       "round": 13,
-      "home": 2,
-      "away": 9,
+      "home": 7,
+      "away": 12,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
-    },
-    {
-      "round": 13,
-      "home": 3,
-      "away": 5,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
-    },
-    {
-      "round": 13,
-      "home": 4,
-      "away": 1,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-01T20:00:00Z"
     },
     {
       "round": 13,
@@ -1379,16 +1361,7 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
-    },
-    {
-      "round": 13,
-      "home": 7,
-      "away": 12,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-02T19:30:00Z"
     },
     {
       "round": 13,
@@ -1397,7 +1370,7 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-02T19:30:00Z"
     },
     {
       "round": 13,
@@ -1406,7 +1379,7 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-02T19:30:00Z"
     },
     {
       "round": 13,
@@ -1415,7 +1388,34 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-02T19:30:00Z"
+    },
+    {
+      "round": 13,
+      "home": 2,
+      "away": 9,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-02T20:15:00Z"
+    },
+    {
+      "round": 13,
+      "home": 3,
+      "away": 5,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-02T20:15:00Z"
+    },
+    {
+      "round": 13,
+      "home": 4,
+      "away": 1,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-02T20:15:00Z"
     },
     {
       "round": 13,
@@ -1424,7 +1424,7 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-02T20:15:00Z"
     },
     {
       "round": 13,
@@ -1433,7 +1433,16 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-02T20:00:00Z"
+      "kickoff": "2026-12-03T20:00:00Z"
+    },
+    {
+      "round": 14,
+      "home": 6,
+      "away": 14,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-05T12:30:00Z"
     },
     {
       "round": 14,
@@ -1448,33 +1457,6 @@
       "round": 14,
       "home": 3,
       "away": 11,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-05T15:00:00Z"
-    },
-    {
-      "round": 14,
-      "home": 4,
-      "away": 15,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-05T15:00:00Z"
-    },
-    {
-      "round": 14,
-      "home": 6,
-      "away": 14,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-05T15:00:00Z"
-    },
-    {
-      "round": 14,
-      "home": 9,
-      "away": 10,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
@@ -1500,21 +1482,39 @@
     },
     {
       "round": 14,
-      "home": 17,
-      "away": 20,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-05T15:00:00Z"
-    },
-    {
-      "round": 14,
       "home": 18,
       "away": 5,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-05T15:00:00Z"
+      "kickoff": "2026-12-05T17:30:00Z"
+    },
+    {
+      "round": 14,
+      "home": 4,
+      "away": 15,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-05T20:00:00Z"
+    },
+    {
+      "round": 14,
+      "home": 9,
+      "away": 10,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-06T14:00:00Z"
+    },
+    {
+      "round": 14,
+      "home": 17,
+      "away": 20,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-06T14:00:00Z"
     },
     {
       "round": 14,
@@ -1523,57 +1523,12 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-05T15:00:00Z"
-    },
-    {
-      "round": 15,
-      "home": 1,
-      "away": 3,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
-    },
-    {
-      "round": 15,
-      "home": 5,
-      "away": 9,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
-    },
-    {
-      "round": 15,
-      "home": 7,
-      "away": 2,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
-    },
-    {
-      "round": 15,
-      "home": 8,
-      "away": 16,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
+      "kickoff": "2026-12-06T16:30:00Z"
     },
     {
       "round": 15,
       "home": 10,
       "away": 4,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
-    },
-    {
-      "round": 15,
-      "home": 11,
-      "away": 19,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
@@ -1604,7 +1559,25 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
+      "kickoff": "2026-12-12T17:30:00Z"
+    },
+    {
+      "round": 15,
+      "home": 1,
+      "away": 3,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-13T14:00:00Z"
+    },
+    {
+      "round": 15,
+      "home": 5,
+      "away": 9,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-13T14:00:00Z"
     },
     {
       "round": 15,
@@ -1613,16 +1586,43 @@
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-12T15:00:00Z"
+      "kickoff": "2026-12-13T14:00:00Z"
     },
     {
-      "round": 16,
-      "home": 1,
+      "round": 15,
+      "home": 7,
+      "away": 2,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-13T16:30:00Z"
+    },
+    {
+      "round": 15,
+      "home": 8,
       "away": 16,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-19T15:00:00Z"
+      "kickoff": "2026-12-13T19:00:00Z"
+    },
+    {
+      "round": 15,
+      "home": 11,
+      "away": 19,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-14T20:00:00Z"
+    },
+    {
+      "round": 16,
+      "home": 4,
+      "away": 17,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-19T12:30:00Z"
     },
     {
       "round": 16,
@@ -1635,44 +1635,8 @@
     },
     {
       "round": 16,
-      "home": 4,
-      "away": 17,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-19T15:00:00Z"
-    },
-    {
-      "round": 16,
-      "home": 5,
-      "away": 12,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-19T15:00:00Z"
-    },
-    {
-      "round": 16,
-      "home": 6,
-      "away": 2,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-19T15:00:00Z"
-    },
-    {
-      "round": 16,
       "home": 13,
       "away": 10,
-      "homeGoals": null,
-      "awayGoals": null,
-      "finished": false,
-      "kickoff": "2026-12-19T15:00:00Z"
-    },
-    {
-      "round": 16,
-      "home": 14,
-      "away": 19,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
@@ -1698,12 +1662,48 @@
     },
     {
       "round": 16,
+      "home": 14,
+      "away": 19,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-19T17:30:00Z"
+    },
+    {
+      "round": 16,
+      "home": 5,
+      "away": 12,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-20T14:00:00Z"
+    },
+    {
+      "round": 16,
       "home": 20,
       "away": 8,
       "homeGoals": null,
       "awayGoals": null,
       "finished": false,
-      "kickoff": "2026-12-19T15:00:00Z"
+      "kickoff": "2026-12-20T14:00:00Z"
+    },
+    {
+      "round": 16,
+      "home": 1,
+      "away": 16,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-20T16:30:00Z"
+    },
+    {
+      "round": 16,
+      "home": 6,
+      "away": 2,
+      "homeGoals": null,
+      "awayGoals": null,
+      "finished": false,
+      "kickoff": "2026-12-21T20:00:00Z"
     },
     {
       "round": 17,
