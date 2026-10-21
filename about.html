@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>关于 · 英超预测引擎 v17.1</title>
+    <title>关于 · 英超预测引擎 v17.1 Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -95,112 +95,49 @@
 <div class="wrap">
 
     <section class="hero">
-        <div class="kick">About · v17.1</div>
-        <h1>关于 · 英超预测引擎 <em>v17.1</em></h1>
-        <p class="lead">v17.1 在 Dixon-Coles 引擎之上完成<b>三源融合升级</b>：FPL 官方攻防评分作为先验，Understat 的滚动 xG/xGA 作为去噪后的实力信号，ClubElo 跨赛季 Elo 作为稳定性锚点。三者在 λ 计算前按样本量动态加权，让预测对赛季走势敏感，而不是停留在季前先验。</p>
+        <div class="kick">About · v17.1 Pro</div>
+        <h1>关于 · 英超预测引擎 <em>v17.1 Pro</em></h1>
+        <p class="lead">v17.1 完成了底层架构的质变：摒弃了仅依赖大模型的脆弱预测，转为<b>真实量化数据驱动</b>。由 Bzzorio 提供包含实时 xG 与 ELO 的 Dixon-Coles 深度预测模型，Football-Data 提供最权威的赛程底座。大模型在此仅作为“外脑”，基于这些真实数据进行解读与叙事。</p>
         <div class="badges">
-            <span class="badge a">Dixon-Coles</span>
-            <span class="badge c">xG 融合</span>
-            <span class="badge e">Elo 微调</span>
-            <span class="badge">1000 次蒙特卡洛</span>
-            <span class="badge">What-If 模拟</span>
-            <span class="badge">零依赖单文件</span>
+            <span class="badge a">Bzzorio 量化模型</span>
+            <span class="badge c">Football-Data</span>
+            <span class="badge e">Dixon-Coles 引擎</span>
+            <span class="badge">xG / ELO</span>
+            <span class="badge">防幻觉架构</span>
         </div>
     </section>
 
     <h2>这是什么</h2>
-    <p>一个纯前端、零服务器、可离线运行的英超比分预测工具。它不依赖任何大模型接口，而是用统计学派中最经典的 <b>Dixon-Coles 模型</b>（1997）对每场比赛的主客队预期进球 λ 建模，生成完整的比分概率矩阵，再从中推导胜平负、大小球、双方进球（BTTS）与最可能比分。</p>
-    <p>v17.1 的关键升级是<b>输入信号质量</b>：λ 不再是「FPL 静态评分 × 实际进球」的简单融合，而是引入两个独立信号——Understat 的预期进球（xG）与 ClubElo 的跨赛季评级（Elo），让模型能在赛季第 3 轮就识别出布莱顿的真实强势，而不是被 5-0 的偶然比分误导。</p>
+    <p>一个将顶级体育数据与 AI 深度融合的预测工具。它不再让 AI 去“猜”比分，而是让 AI 去“读”数据。</p>
+    <p>后台的 `update.js` 会定时从 Football-Data 拉取赛程与积分榜，并调用 Bzzorio 的 API，利用其底层训练的 <b>Dixon-Coles 双变量泊松模型</b>计算出每场比赛的真实概率矩阵、xG（预期进球）和 ELO 修正。生成的数据被写入 `data.json`。前端页面则直接读取这些权威结论。如果你选择调用大模型，我们也会把这份数据喂给模型，确保它基于事实输出分析。</p>
 
     <div class="card">
-        <div class="card-ttl">为什么是 xG + Elo，而不是堆 ML 模型</div>
+        <div class="card-ttl">为什么这是更高级的做法</div>
         <ul class="list">
-            <li><strong>xG 去噪</strong> 一场 3-0 可能来自 0.9 xG，也可能来自 2.8 xG；xG 比实际进球更能反映球队真实的进攻质量</li>
-            <li><strong>Elo 连续</strong> 跨赛季不断档，赛季初样本稀缺时提供稳定的实力锚点，避免「每季重置」的信息损失</li>
-            <li><strong>三源互补</strong> FPL 先验覆盖阵容深度，xG 覆盖近期表现，Elo 覆盖长期趋势——三者失效条件不同，融合后鲁棒性显著高于单源</li>
-            <li><strong>边际收益递减</strong> 公开基准显示，Dixon-Coles 单独准确率约 49.0%，赔率增强后约 53.1%；继续堆 ML 的边际收益只有 1–2 个百分点，而输入信号质量的提升空间远大于模型复杂度</li>
+            <li><strong>去幻觉</strong> 纯大模型预测（如早期的 Groq 方案）很容易凭空捏造不存在的数据。现在有 Bzzorio 的底层概率作为“锚点”，AI 就无法信口开河。</li>
+            <li><strong>顶级统计基石</strong> Bzzorio 采用经典的 Dixon-Coles 模型处理低比分依赖，这是学术界和职业机构验证过的最稳健的足球预测方法。</li>
+            <li><strong>速度极快</strong> 当后台跑完 `update.bat` 后，前端只需毫秒级读取 `data.json` 即可展示结果。如果你不想花时间等 AI 生成，可以直接点击绿色按钮查看量化模型结论。</li>
         </ul>
     </div>
-
-    <h2>模型怎么算</h2>
-    <h3>1 · 球队攻防强度（三源加权融合）</h3>
-    <div class="formula">
-        Att = <span class="c">W<sub>prior</sub></span>·FPL<sub>att</sub> + <span class="e">W<sub>xG</sub></span>·xG<sub>att</sub> + <b>W<sub>actual</sub></b>·Goals<sub>att</sub><br>
-        Def = <span class="c">W<sub>prior</sub></span>·FPL<sub>def</sub> + <span class="e">W<sub>xG</sub></span>·xG<sub>def</sub> + <b>W<sub>actual</sub></b>·Goals<sub>def</sub>
-    </div>
-    <ul class="list">
-        <li><strong>W<sub>xG</sub></strong> xG 权重，xG 样本 ≥ 3 场时启用，按样本量 clamp 到 0.3–0.7</li>
-        <li><strong>W<sub>actual</sub></strong> 实际进球权重，按赛程样本量 w = n/(n+6) 缩放</li>
-        <li><strong>W<sub>prior</sub></strong> FPL 先验权重，为 1 − W<sub>xG</sub> − W<sub>actual</sub>，xG 和实际数据都不可用时才主导</li>
-        <li><strong>FPL<sub>att</sub> / FPL<sub>def</sub></strong> FPL 官方 strength_attack / strength_defence，按主客场取平均</li>
-        <li><strong>xG<sub>att</sub> / xG<sub>def</sub></strong> Understat 近 5 场滚动 xG / xGA，除以联赛平均后归一化</li>
-    </ul>
-
-    <h3>2 · 预期进球 λ</h3>
-    <div class="formula">
-        λ<sub>home</sub> = <b>μ<sub>H</sub></b> × Att<sub>h</sub> × (1 / Def<sub>a</sub>) × <span class="e">Elo<sub>mult</sub></span><br>
-        λ<sub>away</sub> = <b>μ<sub>A</sub></b> × Att<sub>a</sub> × (1 / Def<sub>h</sub>) × (1 / <span class="e">Elo<sub>mult</sub></span>)
-    </div>
-    <ul class="list">
-        <li><strong>μ<sub>H</sub> / μ<sub>A</sub></strong> 联赛主场 / 客场平均进球，赛季样本 ≥ 8 场时自动从 data.json 实算，否则回退到先验 1.55 / 1.30</li>
-        <li><strong>Elo<sub>mult</sub></strong> Elo 差修正乘数，公式 <code>clamp(1 + ΔElo × 0.0015, 0.75, 1.35)</code>，即 100 Elo 差约带来 ±15% 的 λ 调整</li>
-    </ul>
-
-    <h3>3 · 比分概率矩阵</h3>
-    <div class="formula">
-        P(X=i, Y=j) = τ(i, j) · Pois(i; λ<sub>home</sub>) · Pois(j; λ<sub>away</sub>)
-    </div>
-    <p>τ 为 Dixon-Coles 低比分修正项，ρ = −0.06。矩阵覆盖 0–10 球共 121 种比分，并做归一化处理，确保概率总和为 1。</p>
-
-    <h3>4 · 蒙特卡洛校验</h3>
-    <p>在解析矩阵之外，额外做 1000 次泊松抽样模拟，用于交叉验证胜平负概率，并在「模型健康度」面板中与解析解并列展示——两者若出现明显偏差，说明矩阵截断或归一化存在问题。</p>
-
-    <h3>5 · 置信度分级</h3>
-    <table>
-        <tr><th>档位</th><th>最大单项概率</th><th>含义</th></tr>
-        <tr><td>高</td><td>≥ 58%</td><td>胜负格局清晰</td></tr>
-        <tr><td>中高</td><td>47% – 58%</td><td>有倾向但存在变数</td></tr>
-        <tr><td>中</td><td>37% – 47%</td><td>接近三选一</td></tr>
-        <tr><td>低</td><td>&lt; 37%</td><td>高度均势</td></tr>
-    </table>
-
-    <h2>核心功能</h2>
-    <ul class="list">
-        <li><strong>三源实力融合</strong> FPL 先验 + Understat xG + ClubElo Elo，按样本量动态加权，赛季第 3 轮即可感知真实强弱</li>
-        <li><strong>焦点战影院</strong> 主焦点大卡 + 右侧赛程轨，自动挑选本轮最值得看的比赛，实时倒计时</li>
-        <li><strong>比分概率矩阵</strong> 7×7 热力图，颜色亮度直接映射概率，悬停查看精确百分比</li>
-        <li><strong>胜平负环形图</strong> SVG 环形进度 + 三段式概率条，动画入场</li>
-        <li><strong>因素分解</strong> 把 λ 的对数影响拆成多条正负向横条，含 xG 影响与 Elo 修正</li>
-        <li><strong>What-If 模拟</strong> 拖动双滑块实时改变 λ，三档概率即时重算，无需重新预测</li>
-        <li><strong>模型健康度</strong> 解析解 vs 蒙特卡洛并列，BTTS、大 2.5 球概率</li>
-        <li><strong>积分榜</strong> 由真实完赛比分实时计算，近 5 场胜平负色块</li>
-        <li><strong>战绩中心</strong> 保存预测到 localStorage，历史记录可回溯</li>
-        <li><strong>点球彩蛋</strong> 点球门面板，十次机会，命中触发震屏与音效</li>
-        <li><strong>响应式</strong> 移动端适配、CSS Grid 自动堆叠</li>
-    </ul>
 
     <h2>数据从哪来</h2>
     <table>
         <tr><th>类型</th><th>来源</th><th>用途</th><th>是否必需</th></tr>
-        <tr><td>赛程与比分</td><td>FPL fixtures API</td><td>轮次、对阵、完赛比分、开赛时间</td><td>否 · 缺失则生成循环赛</td></tr>
-        <tr><td>球队先验强度</td><td>FPL bootstrap-static</td><td>strength_attack / strength_defence</td><td>否 · 缺失则用中性先验 3</td></tr>
-        <tr><td>滚动 xG / xGA</td><td>Understat getLeagueData</td><td>近 5 场预期进球，去噪后的攻防信号</td><td>否 · 缺失则跳过 xG 权重</td></tr>
-        <tr><td>跨赛季 Elo</td><td>ClubElo API</td><td>长期实力锚点，λ 微调</td><td>否 · 缺失则跳过 Elo 修正</td></tr>
-        <tr><td>球员与伤病</td><td>FPL bootstrap-static</td><td>球员评分、状态标签</td><td>否 · 缺失则隐藏球员面板</td></tr>
-        <tr><td>队徽</td><td>Premier League CDN</td><td>球队徽章</td><td>否 · 失败显示三字母</td></tr>
+        <tr><td>赛程与比分</td><td>Football-Data.org</td><td>英超38轮完整对阵、完赛比分、开赛时间</td><td>是 · 需 FD_TOKEN</td></tr>
+        <tr><td>预测概率 / xG</td><td>Bzzorio Sports Data</td><td>胜平负概率、最可能比分、双方预期进球</td><td>是 · 需 BZZOIRO_KEY</td></tr>
+        <tr><td>阵容与伤停</td><td>FPL API</td><td>球员头像、伤停状态、最佳阵容推荐</td><td>否 · 失败自动隐藏</td></tr>
+        <tr><td>AI 叙事解读</td><td>Groq API</td><td>结合底层数据与用户情报，生成文字分析</td><td>否 · 属于可选的增强功能</td></tr>
     </table>
     <div class="note">
-        <b>降级策略</b>：三源独立抓取，任一失败不影响其余。data.json 缺失时生成 38 轮双循环赛程；Understat 失败则 xG 权重置零，回退到「实际进球 + FPL 先验」；ClubElo 失败则 Elo 乘数设为 1，其余逻辑不变。预测功能在任何降级状态下都可用。
+        <b>降级策略</b>：如果 Football-Data 或 Bzzorio 抓取失败，`update.js` 会保留上一次成功抓取的缓存；如果完全没有 `data.json`，前端会生成模拟循环赛以保证页面可展示。如果缺失 Groq API Key，AI 功能会被禁用，但你依然可以点击绿色按钮，查看底层的量化模型结果。
     </div>
 
     <h2>技术栈</h2>
     <ul class="list">
-        <li><span class="tag">引擎</span><strong>Dixon-Coles 双泊松</strong> 纯 JS 实现，含 τ 低比分修正与矩阵归一化</li>
-        <li><span class="tag">融合</span><strong>三源加权</strong> FPL 先验 + Understat xG + ClubElo Elo，按样本量动态调整权重</li>
-        <li><span class="tag">模拟</span><strong>蒙特卡洛</strong> 1000 次泊松抽样，Knuth 算法</li>
-        <li><span class="tag">前端</span><strong>单文件 HTML</strong> 原生 JS，零依赖、零构建、零 CDN 运行时</li>
-        <li><span class="tag cy">存储</span><strong>localStorage</strong> 战绩、设置全部本地</li>
-        <li><span class="tag cy">数据</span><strong>FPL + Understat + ClubElo</strong> 三源聚合，全公开接口，无需鉴权</li>
+        <li><span class="tag">后端抓取</span><strong>Node.js (update.js)</strong> 定时聚合 Football-Data 与 Bzzorio 接口</li>
+        <li><span class="tag">量化模型</span><strong>Bzzorio Dixon-Coles</strong> 包含预期进球（xG）驱动的双泊松概率矩阵</li>
+        <li><span class="tag">前端</span><strong>单文件 HTML</strong> 原生 JS，保留所有粒子动效与高级 UI</li>
+        <li><span class="tag cy">存储</span><strong>localStorage</strong> 保存历史战绩、API Key 和用户偏好</li>
         <li><span class="tag em">部署</span><strong>GitHub Pages</strong> 静态托管，零服务器成本</li>
     </ul>
 
@@ -213,18 +150,8 @@
         <li class="done">32　v16.1　官方伤停同步 + 数据时效硬约束 + 防截断重试 + 缓存穿透</li>
         <li class="done">33　v16.2　焦点战 2.0（8 维评分 + 主焦点卡 + 侧轨）+ 球队主题色渗透</li>
         <li class="done">34　v16.3　完整终极版 · 单文件单 script · 全功能保留</li>
-        <li class="done">35　v17　Dixon-Coles 统计引擎重写 · 比分矩阵 · What-If · 因素分解 · 蒙特卡洛校验</li>
-        <li class="new">36　v17.1　xG + Elo 三源融合 · 攻防强度动态加权 · λ Elo 微调 · 因素分解新增 xG/Elo 条</li>
-    </ul>
-
-    <h2>已知局限</h2>
-    <ul class="list">
-        <li><strong>xG 样本依赖</strong> Understat 只保留近 5 场滚动窗口，赛季前 3 轮 xG 权重极低，模型接近纯先验</li>
-        <li><strong>Elo 是快照</strong> ClubElo 提供的是当前评级，不区分赛季内动态；同一球队跨赛季 Elo 变化可能滞后</li>
-        <li><strong>无阵容级建模</strong> 伤病只做整体系数扣减，不区分位置（缺前锋与缺后卫影响相同）</li>
-        <li><strong>无红黄牌 / 轮换</strong> 模型不感知停赛累积、欧战轮换、杯赛分心</li>
-        <li><strong>静态 ρ</strong> 低比分修正系数固定为 −0.06，未按联赛或赛季重新估计</li>
-        <li><strong>不建模平局偏置</strong> 强强对话的战术保守倾向未被单独刻画</li>
+        <li class="done">35　v17　Dixon-Coles 统计引擎重写 · 比分矩阵 · What-If · 因素分解</li>
+        <li class="new">36　v17.1 Pro　接入 Bzzorio 真实量化模型 · Football-Data 权威底座 · 双源防幻觉架构</li>
     </ul>
 
     <div class="note" style="background:linear-gradient(135deg,rgba(239,68,68,.1),rgba(239,68,68,.03));border-color:rgba(239,68,68,.3);color:#ff9f9f">
@@ -232,8 +159,8 @@
     </div>
 
     <footer>
-        Premier League Prediction Engine · v17.1<br>
-        <span class="ver">Dixon-Coles Engine · 三源融合 · 单文件构建 · 零服务器</span>
+        Premier League Prediction Engine · v17.1 Pro<br>
+        <span class="ver">Bzzorio + Football-Data · 双源融合 · 单文件构建</span>
         <div style="margin-top:10px">
             <a href="index.html">返回预测</a>·<a href="javascript:void(0)" onclick="history.back()">上一页</a>
         </div>

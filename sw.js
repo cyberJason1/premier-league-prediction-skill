@@ -1,15 +1,13 @@
-const CACHE_VERSION = 'v17.1'; // v17.1 改动：引擎接入 xG/Elo，强制旧缓存清退
+const CACHE_VERSION = 'v17.1-pro'; // 强制清退旧缓存
 const CACHE_NAME = `pl-cache-${CACHE_VERSION}`;
 
-// v17.1：不再依赖 skill.md / fpl.json / Groq / football-data.org
-// data.json 仍可选（缺失时前端自动生成循环赛），保留在 shell 中做离线兜底
+// 离线应用壳：包括主页、关于页和两个核心数据文件
 const APP_SHELL = [
-    './', './index.html', './data.json', './about.html'
+    './', './index.html', './data.json', './fpl.json', './about.html'
 ];
 
-// 数据类文件：离线兜底绝不能返回 index.html
-// 否则前端会把 HTML 当 JSON 解析，导致 data.json 解析失败
-const DATA_FILES = new Set(['/data.json']);
+// 数据文件离线时绝不能返回 index.html，否则 JSON 解析会报错
+const DATA_FILES = new Set(['/data.json', '/fpl.json']);
 
 self.addEventListener('install', event => {
     event.waitUntil(
@@ -32,7 +30,6 @@ self.addEventListener('activate', event => {
     );
 });
 
-// 防御性：兼容 index.html 里 reg.waiting.postMessage({type:'SKIP_WAITING'})
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
         self.skipWaiting();
@@ -40,14 +37,12 @@ self.addEventListener('message', event => {
 });
 
 function offlineFallback(pathname) {
-    // 数据文件离线时返回明确 503，让前端走 fallback 分支
     if (DATA_FILES.has(pathname)) {
         return new Response(
             JSON.stringify({ error: 'offline', message: '离线且无缓存' }),
             { status: 503, headers: { 'Content-Type': 'application/json; charset=utf-8' } }
         );
     }
-    // 页面兜底：用注册 scope 下的绝对 URL 匹配，避免相对路径 key 不匹配
     const indexUrl = new URL('./index.html', self.registration.scope).href;
     return caches.match(indexUrl).then(c => c || new Response('Offline', {
         status: 503,
@@ -57,19 +52,24 @@ function offlineFallback(pathname) {
 
 self.addEventListener('fetch', event => {
     const req = event.request;
-    if (req.method !== 'GET') return;
+    if (req.method !== 'GET') return; // 只拦截 GET 请求
     const url = new URL(req.url);
 
-    // 1. 外部接口和图片：完全不拦截，直接走网络保证最新鲜
-    //    v17.1：新增 understat.com 和 clubelo.com 白名单
+    // 1. 外部接口和图片：完全不拦截，直接走网络
+    // 包含：FPL 官方、英超 CDN、AI 接口
     if (url.hostname.includes('fantasy.premierleague.com') ||
         url.hostname.includes('premierleague.com') ||
-        url.hostname.includes('understat.com') ||
-        url.hostname.includes('clubelo.com')) {
+        url.hostname.includes('api.groq.com')) {
         return;
     }
 
-    // 2. 同源静态资源：网络优先，缓存兜底（缓存 key 去 query）
+    // 2. 字体资源走网络，不占用本地缓存
+    if (url.hostname.includes('fonts.googleapis.com') ||
+        url.hostname.includes('fonts.gstatic.com')) {
+        return;
+    }
+
+    // 3. 同源静态资源：网络优先，缓存兜底
     if (url.origin === self.location.origin) {
         const cacheKey = new Request(url.origin + url.pathname);
 
@@ -78,14 +78,12 @@ self.addEventListener('fetch', event => {
                 const res = await fetch(req, { cache: 'no-store' });
                 if (res && res.status === 200) {
                     const clone = res.clone();
-                    // await 缓存写入，确保 SW 不会在 put 完成前被终止
                     await caches.open(CACHE_NAME)
                         .then(cache => cache.put(cacheKey, clone))
                         .catch(() => {});
                 }
                 return res;
             } catch (e) {
-                // 全 miss 时返回明确 503，而不是 undefined 或 HTML
                 const cached = await caches.match(cacheKey);
                 return cached || offlineFallback(url.pathname);
             }

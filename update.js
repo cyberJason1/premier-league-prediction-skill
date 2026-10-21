@@ -1,220 +1,205 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
-const { exec, execSync } = require('child_process');
 
-if (typeof fetch !== 'function') { console.error('❌ 需要 Node 18+'); process.exit(1); }
+// 读取环境变量
+const envPath = path.join(__dirname, '.env');
+if (fs.existsSync(envPath)) {
+    fs.readFileSync(envPath, 'utf8').split(/\r?\n/).forEach(line => {
+        const [k, ...v] = line.split('=');
+        if (k && v.length) process.env[k.trim()] = v.join('=').trim();
+    });
+}
 
-const IS_CI = !!process.env.CI;
-const SHOULD_PUSH = IS_CI || process.argv.includes('--push');
+const FD_TOKEN = process.env.FD_TOKEN;
+const BZZ_KEY = process.env.BZZOIRO_KEY;
+
+if (!FD_TOKEN || !BZZ_KEY) {
+    console.error('❌ 缺少环境变量！请在 .env 中配置 FD_TOKEN 和 BZZOIRO_KEY');
+    process.exit(1);
+}
 
 const DATA_FILE = path.join(__dirname, 'data.json');
-const FPL_FILE  = path.join(__dirname, 'fpl.json');
 
-const FPL_BOOT     = 'https://fantasy.premierleague.com/api/bootstrap-static/';
-const FPL_FIXTURES = 'https://fantasy.premierleague.com/api/fixtures/';
-const BADGE = id => `https://resources.premierleague.com/premierleague/badges/70/t${id}.png`;
-const UA = { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' };
-
-const CLUBELO_MAP = {
-    'Arsenal': 'Arsenal', 'Aston Villa': 'AstonVilla', 'Bournemouth': 'Bournemouth',
-    'Brentford': 'Brentford', 'Brighton': 'Brighton', 'Chelsea': 'Chelsea',
-    'Crystal Palace': 'CrystalPalace', 'Everton': 'Everton', 'Fulham': 'Fulham',
-    'Leeds': 'Leeds', 'Liverpool': 'Liverpool', 'Man City': 'ManCity',
-    'Man Utd': 'ManUnited', 'Newcastle': 'Newcastle', 'Nott\'m Forest': 'Forest',
-    'Sunderland': 'Sunderland', 'Spurs': 'Tottenham', 'West Ham': 'WestHam',
-    'Wolves': 'Wolves', 'Burnley': 'Burnley'
+// 队名中英映射（用于匹配两家数据源）
+const TEAM_MAP = {
+    'Arsenal':'阿森纳','Manchester City':'曼城','Liverpool':'利物浦','Chelsea':'切尔西',
+    'Tottenham Hotspur':'热刺','Aston Villa':'阿斯顿维拉','Newcastle United':'纽卡斯尔联',
+    'Manchester United':'曼联','Brighton':'布莱顿','Crystal Palace':'水晶宫','Everton':'埃弗顿',
+    'Fulham':'富勒姆','Brentford':'布伦特福德','Nottingham Forest':'诺丁汉森林',
+    'Bournemouth':'伯恩茅斯','Leeds United':'利兹联','Sunderland':'桑德兰','Burnley':'伯恩利',
+    'Wolves':'狼队','West Ham':'西汉姆联'
 };
 
-// 🌟 核心黑科技：自动重试 + 自动代理
-async function fetchWithProxy(url, timeout = 12000, extraHeaders = {}) {
-    // 尝试 1：直连
-    try {
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), timeout);
-        const res = await fetch(url, { signal: ctrl.signal, headers: { ...UA, ...extraHeaders } });
-        clearTimeout(timer);
-        if (res.ok) return await res.json();
-    } catch (e) {
-        // 直连失败，静默切换到代理
-    }
-
-    // 尝试 2：免费代理通道（跳过网络限制）
-    try {
-        console.log(`  ⚠️ 直连超时，正在通过云端通道重试...`);
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), timeout + 8000);
-        const res = await fetch(proxyUrl, { signal: ctrl.signal, headers: { ...UA, ...extraHeaders } });
-        clearTimeout(timer);
-        if (res.ok) return await res.json();
-        throw new Error('Proxy HTTP ' + res.status);
-    } catch (e) {
-        throw new Error('网络被完全阻断，无法获取数据');
-    }
-}
-
-function readIfExists(file) { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; } }
-function avg(a, b) { const v = [a, b].filter(x => typeof x === 'number'); return v.length ? v.reduce((x, y) => x + y, 0) / v.length : 3; }
-function seasonFromEvents(events) {
-    let first = null;
-    if (Array.isArray(events) && events.length && events[0].deadline_time) {
-        const d = new Date(events[0].deadline_time);
-        if (!isNaN(d)) first = d;
-    }
-    const base = first || new Date();
-    const y = base.getMonth() >= 7 ? base.getFullYear() : base.getFullYear() - 1;
-    return `${y}/${String((y + 1) % 100).padStart(2, '0')}`;
-}
-
-async function fetchUnderstatXG(seasonYear) {
-    const url = `https://understat.com/getLeagueData/EPL/${seasonYear}`;
-    const headers = { 'X-Requested-With': 'XMLHttpRequest', 'Referer': `https://understat.com/league/EPL/${seasonYear}` };
-    try {
-        // Understat 对代理支持较差，尽量直连
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 15000);
-        const data = await fetch(url, { signal: ctrl.signal, headers: { ...UA, ...headers } }).then(r=>r.json());
-        clearTimeout(timer);
-
-        const teamsRaw = data.teams || {};
-        const out = {};
-        for (const [teamKey, info] of Object.entries(teamsRaw)) {
-            const matches = Object.values(info.history || {});
-            if (matches.length < 3) continue;
-            const lastN = matches.slice(-5);
-            const avgXG = lastN.reduce((s, m) => s + parseFloat(m.xG || 0), 0) / lastN.length;
-            const avgXGA = lastN.reduce((s, m) => s + parseFloat(m.xGA || 0), 0) / lastN.length;
-            out[teamKey.replace(/_/g, ' ').toLowerCase()] = { xG: +avgXG.toFixed(3), xGA: +avgXGA.toFixed(3), xGMatches: lastN.length };
-        }
-        return out;
-    } catch (e) {
-        console.log('  ⚠️ Understat 网络不通，跳过 xG 数据');
-        return null;
-    }
-}
-
-async function fetchClubElo(teams) {
-    const out = {};
-    for (const t of teams) {
-        const eloName = CLUBELO_MAP[t.name];
-        if (!eloName) { out[t.id] = null; continue; }
-        try {
-            const res = await fetch(`http://api.clubelo.com/${encodeURIComponent(eloName)}`, { headers: UA });
-            if (!res.ok) { out[t.id] = null; continue; }
-            const lines = (await res.text()).trim().split('\n');
-            if (lines.length < 2) { out[t.id] = null; continue; }
-            const elo = parseFloat(lines[lines.length - 1].split(',')[4]);
-            out[t.id] = isNaN(elo) ? null : elo;
-        } catch { out[t.id] = null; }
-    }
-    return out;
-}
-
-function matchUnderstatToTeam(teamName, understatMap) {
-    const norm = s => s.toLowerCase().replace(/[^a-z]/g, '');
-    const target = norm(teamName);
-    for (const [usKey, val] of Object.entries(understatMap || {})) {
-        if (norm(usKey) === target || norm(usKey).includes(target) || target.includes(norm(usKey))) return val;
+function toChinese(name) {
+    if (!name) return null;
+    const lower = name.toLowerCase();
+    for (const [en, zh] of Object.entries(TEAM_MAP)) {
+        if (lower.includes(en.toLowerCase())) return zh;
     }
     return null;
 }
 
-function buildTeams(boot, understatXG, clubElo) {
-    return boot.teams.map(t => {
-        const xg = understatXG ? matchUnderstatToTeam(t.name, understatXG) : null;
-        return {
-            id: t.id, name: t.name, short: t.short_name, fplId: t.id, badge: BADGE(t.id),
-            strAtt: avg(t.strength_attack_home, t.strength_attack_away),
-            strDef: avg(t.strength_defence_home, t.strength_defence_away),
-            xG: xg ? xg.xG : null, xGA: xg ? xg.xGA : null, xGMatches: xg ? xg.xGMatches : 0,
-            elo: clubElo ? clubElo[t.id] : null
-        };
-    });
+async function fetchJSON(url, headers = {}) {
+    const res = await fetch(url, { headers });
+    if (!res.ok) throw new Error(`HTTP ${res.status} @ ${url}`);
+    return await res.json();
 }
 
-function buildFixtures(rawFixtures) {
-    return rawFixtures
-        .filter(f => f.event >= 1 && f.event <= 38)
-        .map(f => ({
-            round: f.event, home: f.team_h, away: f.team_a,
-            homeGoals: f.finished ? f.team_h_score : null, awayGoals: f.finished ? f.team_a_score : null,
-            finished: !!f.finished, kickoff: f.kickoff_time || null
-        }))
-        .sort((a, b) => a.round - b.round || new Date(a.kickoff || 0) - new Date(b.kickoff || 0));
+// ================== 核心 Dixon-Coles 模型实现 ==================
+// 修正低级比分（0-0, 1-0, 0-1, 1-1）的概率依赖
+function dixonColesTau(x, y, lambda, mu, rho) {
+    if (x === 0 && y === 0) return 1 - lambda * mu * rho;
+    if (x === 0 && y === 1) return 1 + lambda * rho;
+    if (x === 1 && y === 0) return 1 + mu * rho;
+    if (x === 1 && y === 1) return 1 - rho;
+    return 1;
 }
 
-function computeCurrentRound(boot, fixtures) {
-    const cur  = boot.events.find(e => e.is_current);
-    const next = boot.events.find(e => e.is_next);
-    if (cur && !cur.finished) return cur.id;
-    if (next) return next.id;
-    const done = fixtures.filter(f => f.finished).map(f => f.round);
-    return done.length ? Math.max(...done) + 1 : 1;
+// 计算 Poisson 概率
+function poissonPMF(k, lambda) {
+    let p = Math.exp(-lambda);
+    for (let i = 1; i <= k; i++) p *= lambda / i;
+    return p;
 }
 
-function pushDataFiles() {
-    try {
-        execSync('git add data.json fpl.json', { stdio: 'inherit' });
-        if (!execSync('git status --short data.json fpl.json').toString().trim()) return;
-        execSync('git commit -m "auto: update data & fpl (xG/Elo)"', { stdio: 'inherit' });
-        execSync('git pull --rebase origin main', { stdio: 'inherit' });
-        execSync('git push origin main', { stdio: 'inherit' });
-    } catch (e) {
-        try { execSync('git rebase --abort', { stdio: 'ignore' }); } catch {}
-        try { execSync('git pull --rebase origin main', { stdio: 'inherit' }); execSync('git push origin main', { stdio: 'inherit' }); } catch {}
+// 构建比分概率网格
+function buildScoreGrid(lambdaHome, lambdaAway, rho = -0.06) {
+    const grid = [];
+    let totalProb = 0;
+    for (let h = 0; h <= 10; h++) {
+        for (let a = 0; a <= 10; a++) {
+            let prob = poissonPMF(h, lambdaHome) * poissonPMF(a, lambdaAway) * dixonColesTau(h, a, lambdaHome, lambdaAway, rho);
+            if (prob < 0) prob = 0;
+            grid.push({ h, a, prob });
+            totalProb += prob;
+        }
     }
+    // 归一化
+    return grid.map(item => ({ ...item, prob: item.prob / totalProb }));
 }
+
+// 从网格中提取市场概率
+function extractMarketProbs(grid) {
+    let homeWin = 0, draw = 0, awayWin = 0, btts = 0, over25 = 0;
+    for (const { h, a, prob } of grid) {
+        if (h > a) homeWin += prob;
+        else if (h === a) draw += prob;
+        else awayWin += prob;
+        if (h > 0 && a > 0) btts += prob;
+        if (h + a > 2.5) over25 += prob;
+    }
+    // 找出最可能比分
+    const sorted = [...grid].sort((x, y) => y.prob - x.prob);
+    const mostLikely = sorted[0];
+    return { homeWin, draw, awayWin, btts, over25, score: `${mostLikely.h}-${mostLikely.a}` };
+}
+// ================================================================
 
 async function main() {
-    console.log('========================================');
-    console.log('📡 正在从 FPL 官方拉取数据 (自动穿透网络)...');
-    const boot = await fetchWithProxy(FPL_BOOT, 20000);
-    const rawFixtures = await fetchWithProxy(FPL_FIXTURES, 20000);
+    console.log('🚀 开始拉取双源数据并进行深度建模...');
 
-    const season = seasonFromEvents(boot.events);
-    const seasonStartYear = parseInt(season.split('/')[0], 10);
+    // 1. 抓取 Football-Data 基础赛程
+    console.log('⚽ 拉取 Football-Data 赛程...');
+    const fdMatches = await fetchJSON('https://api.football-data.org/v4/competitions/PL/matches', { 'X-Auth-Token': FD_TOKEN });
 
-    console.log('🎯 正在拉取 Understat xG 数据...');
-    const understatXG = await fetchUnderstatXG(seasonStartYear);
-    if (understatXG) console.log(`✅ xG 覆盖：${Object.keys(understatXG).length} 队`);
+    const fixtures = fdMatches.matches.map(m => {
+        const hZh = toChinese(m.homeTeam.name);
+        const aZh = toChinese(m.awayTeam.name);
+        return {
+            id: m.id,
+            round: m.matchday,
+            home: hZh || m.homeTeam.name,
+            away: aZh || m.awayTeam.name,
+            kickoff: m.utcDate,
+            finished: m.status === 'FINISHED',
+            homeGoals: m.score.fullTime.home,
+            awayGoals: m.score.fullTime.away,
+            predictions: null
+        };
+    }).filter(f => f.home && f.away);
 
-    const fplTeams = boot.teams.map(t => ({ id: t.id, name: t.name }));
-    console.log('📈 正在拉取 ClubElo 评级...');
-    const clubElo = await fetchClubElo(fplTeams);
-    const eloCover = Object.values(clubElo).filter(v => v != null).length;
-    if (eloCover) console.log(`✅ Elo 覆盖：${eloCover}/${fplTeams.length} 队`);
+    // 2. 抓取 Bzzorio 深度数据
+    console.log('🧠 拉取 Bzzorio 深度数据（xG, ELO, CatBoost 预测）...');
+    const lRes = await fetchJSON('https://sports.bzzoiro.com/api/v2/leagues/?country=England', { 'Authorization': `Token ${BZZ_KEY}` });
+    const pl = lRes.results.find(l => l.name === 'Premier League');
+    if (!pl) throw new Error('Bzzorio: 找不到英超联赛');
 
-    const teams = buildTeams(boot, understatXG, clubElo);
-    const fixtures = buildFixtures(rawFixtures);
-    const currentRound = computeCurrentRound(boot, fixtures);
+    const mRes = await fetchJSON(`https://sports.bzzoiro.com/api/v2/matches/?league_id=${pl.id}`, { 'Authorization': `Token ${BZZ_KEY}` });
 
-    fs.writeFileSync(DATA_FILE, JSON.stringify({
+    // 3. 融合与建模
+    let enrichedCount = 0;
+    mRes.results.forEach(bzzMatch => {
+        const fdMatch = fixtures.find(f =>
+            (f.home.includes(bzzMatch.home_team.name) || bzzMatch.home_team.name.includes(f.home)) &&
+            (f.away.includes(bzzMatch.away_team.name) || bzzMatch.away_team.name.includes(f.away))
+        );
+
+        if (fdMatch) {
+            let prediction = null;
+
+            // 优先使用 Bzzorio 提供的原始 xG 数据来驱动我们的 Dixon-Coles 模型
+            if (bzzMatch.predictions && bzzMatch.predictions.xg_home != null && bzzMatch.predictions.xg_away != null) {
+                const lambdaHome = bzzMatch.predictions.xg_home;
+                const lambdaAway = bzzMatch.predictions.xg_away;
+                const grid = buildScoreGrid(lambdaHome, lambdaAway);
+                const markets = extractMarketProbs(grid);
+
+                prediction = {
+                    homeWin: Math.round(markets.homeWin * 100),
+                    draw: Math.round(markets.draw * 100),
+                    awayWin: Math.round(markets.awayWin * 100),
+                    score: markets.score,
+                    btts: Math.round(markets.btts * 100),
+                    over25: Math.round(markets.over25 * 100),
+                    xgHome: lambdaHome.toFixed(2),
+                    xgAway: lambdaAway.toFixed(2),
+                    factors: [
+                        'xG 驱动的 Dixon-Coles 模型',
+                        '低比分修正 (ρ = -0.06)',
+                        `主队预期进球: ${lambdaHome.toFixed(2)}`,
+                        `客队预期进球: ${lambdaAway.toFixed(2)}`
+                    ],
+                    analysis: '基于 Bzzorio 的实时 xG 数据，通过 Dixon-Coles 双泊松模型重新构建了完整的比分概率网格，以校正市场概率。'
+                };
+            }
+            // 降级：如果 Bzzorio 只提供了 CatBoost 的预测结果，直接使用
+            else if (bzzMatch.predictions && bzzMatch.predictions.prob_home) {
+                const pred = bzzMatch.predictions;
+                prediction = {
+                    homeWin: Math.round(pred.prob_home * 100),
+                    draw: Math.round(pred.prob_draw * 100),
+                    awayWin: Math.round(pred.prob_away * 100),
+                    score: pred.score || '1-0',
+                    xgHome: pred.xg_home ? pred.xg_home.toFixed(2) : null,
+                    xgAway: pred.xg_away ? pred.xg_away.toFixed(2) : null,
+                    factors: ['Bzzorio CatBoost ML 模型'],
+                    analysis: '基于 Bzzorio 的 CatBoost 机器学习模型预测。'
+                };
+            }
+
+            if (prediction) {
+                fdMatch.predictions = prediction;
+                enrichedCount++;
+            }
+        }
+    });
+
+    console.log(`✅ 成功为 ${enrichedCount} 场比赛生成了深度模型预测！`);
+
+    // 4. 写入 data.json
+    const finalData = {
         updatedAt: new Date().toISOString(),
-        season, currentRound, teams, fixtures
-    }, null, 2), 'utf8');
-    console.log('💾 data.json 已写入！');
+        fixtures: fixtures,
+        predictions: fixtures.filter(f => f.predictions).map(f => ({
+            home: f.home,
+            away: f.away,
+            ...f.predictions
+        }))
+    };
 
-    // fpl.json
-    const teamMap = {};
-    boot.teams.forEach(t => { teamMap[t.id] = t.short_name; });
-    const nextEvent = boot.events.find(e => e.is_next) || boot.events[0];
-    const players = boot.elements.map(p => ({
-        id: p.id, code: p.code, name: p.web_name, fullName: `${p.first_name} ${p.second_name}`,
-        team: teamMap[p.team], teamId: p.team, position: p.element_type, cost: p.now_cost / 10,
-        form: parseFloat(p.form) || 0, totalPoints: p.total_points || 0, ppg: parseFloat(p.points_per_game) || 0,
-        status: p.status, chanceNext: p.chance_of_playing_next_round, news: p.news || ''
-    }));
-    fs.writeFileSync(FPL_FILE, JSON.stringify({ nextEvent, teams: boot.teams, players }, null, 2), 'utf8');
-    console.log('💾 fpl.json 已写入！');
-    console.log('========================================');
-    console.log('🎉 更新成功！快去刷新网页吧！');
-
-    if (SHOULD_PUSH) pushDataFiles();
+    fs.writeFileSync(DATA_FILE, JSON.stringify(finalData, null, 2), 'utf8');
+    console.log('💾 data.json 写入成功！请刷新网页查看深度结果。');
 }
 
-main().catch(e => {
-    console.error('\n❌ 失败原因：', e.message);
-    console.log('建议：如果你在中国大陆或网络受限地区，请开启科学上网工具后重试。\n');
-    process.exit(1);
-});
+main().catch(console.error);
