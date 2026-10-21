@@ -5,53 +5,65 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="theme-color" content="#08090d">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23ff9f43'/><text y='.9em' x='50%25' text-anchor='middle' font-size='60' fill='%23000'>⚽</text></svg>">
-    <title>英超预测引擎 v17 · Dixon-Coles</title>
+    <title>英超预测引擎 v17.1 · Dixon-Coles</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root{--bg:#06080c;--bg-2:#0a0e15;--surface:rgba(18,22,32,.72);--surface-2:rgba(12,15,22,.85);--surface-hi:rgba(24,30,44,.8);--border:rgba(255,255,255,.06);--border-hi:rgba(255,255,255,.12);--border-focus:rgba(255,159,67,.5);--amber:#ff9f43;--amber-soft:rgba(255,159,67,.14);--amber-glow:rgba(255,159,67,.35);--cyan:#22d3ee;--cyan-soft:rgba(34,211,238,.14);--emerald:#34d399;--emerald-soft:rgba(52,211,153,.14);--rose:#ef4444;--rose-soft:rgba(239,68,68,.14);--violet:#a78bfa;--text:#f1f5f9;--text-2:#b0bccd;--text-3:#8a97a8;--text-4:#616d7c;--r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-2xl:28px;--r-full:999px;--font-sans:"Inter","Noto Sans SC",system-ui,sans-serif;--font-serif:"Playfair Display",Georgia,serif;--font-mono:"SF Mono",Consolas,monospace;--ease:cubic-bezier(.16,1,.3,1)}
         *{box-sizing:border-box;margin:0;padding:0}
         body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:15px;line-height:1.5;min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
-        body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1400px 800px at 50% -20%,rgba(255,159,67,.14),transparent 55%),radial-gradient(1000px 600px at 50% 120%,rgba(34,211,238,.08),transparent 55%)}
+        body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1400px 800px at 50% -20%,rgba(255,159,67,.14),transparent 55%),radial-gradient(1000px 600px at 50% 120%,rgba(34,211,238,.08),transparent 55%);animation:breathe 14s ease-in-out infinite}
+        @keyframes breathe{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.15);opacity:.65}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes badgeInLeft{0%{opacity:0;transform:translateX(-120px) rotate(-360deg) scale(.4)}100%{opacity:1;transform:translateX(0) rotate(0) scale(1)}}
+        @keyframes badgeInRight{0%{opacity:0;transform:translateX(120px) rotate(360deg) scale(.4)}100%{opacity:1;transform:translateX(0) rotate(0) scale(1)}}
+
         .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:88px 24px 140px}
         @media (max-width:640px){.wrap{padding:76px 16px 120px}}
 
         /* Topbar */
-        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:rgba(8,9,13,.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
+        .topbar{position:fixed;top:0;left:0;right:0;z-index:50;height:64px;background:linear-gradient(180deg,rgba(8,9,13,.95),rgba(8,9,13,.75));backdrop-filter:blur(24px) saturate(1.6);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px}
         .topbar-left{display:flex;align-items:center;gap:12px;font-size:16px;font-weight:600;font-family:var(--font-serif)}
+        .topbar-left .logo{width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,transparent 13%),conic-gradient(from 0deg,#fff 0 25%,#1a2233 25% 50%,#fff 50% 75%,#1a2233 75% 100%);box-shadow:0 0 0 2px rgba(255,255,255,.06),0 4px 12px rgba(0,0,0,.5),0 0 20px -4px var(--amber-glow);animation:spin 20s linear infinite;flex-shrink:0}
         .topbar-center{font-family:var(--font-mono);font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:8px}
         .live-dot{width:6px;height:6px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:pulse 2s infinite}
         .topbar-right{display:flex;align-items:center;gap:12px}
-        .nav-link{color:var(--text-2);font-size:13px;text-decoration:none}
-        .icon-btn{background:none;border:none;color:var(--text-2);font-size:16px;cursor:pointer}
+        .nav-link{color:var(--text-2);font-size:13px;text-decoration:none;transition:color .2s}
+        .nav-link:hover{color:var(--amber)}
 
         /* Hero */
-        .hero{text-align:center;padding:32px 0 24px}
-        .hero h1{font-family:var(--font-serif);font-size:clamp(32px, 6vw, 56px);margin-bottom:12px}
-        .hero h1 em{color:var(--amber);font-style:italic}
+        .hero{text-align:center;padding:32px 0 24px;animation:fadeUp .8s var(--ease) both}
+        .hero h1{font-family:var(--font-serif);font-size:clamp(36px, 6vw, 64px);font-weight:500;line-height:1.1;margin-bottom:12px;letter-spacing:-.02em}
+        .hero h1 em{color:var(--amber);font-style:italic;background:linear-gradient(135deg,var(--amber),#ffb968 45%,var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
         .hero p{color:var(--text-2);font-size:14px;max-width:560px;margin:0 auto}
 
         /* Focus Cinema */
-        .focus-cinema{margin-bottom:32px}
+        .focus-cinema{margin-bottom:32px;animation:fadeUp .8s var(--ease) .1s both}
         .focus-header{font-size:11px;font-weight:700;letter-spacing:.2em;color:var(--text-3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
         .focus-grid{display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:stretch}
         @media(max-width:960px){.focus-grid{grid-template-columns:1fr}}
-        .focus-hero{background:linear-gradient(135deg, #0d1420, #1a2233);border:1px solid var(--border-hi);border-radius:var(--r-2xl);padding:32px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
-        .focus-tags{display:flex;gap:8px;margin-bottom:24px}
+        .focus-hero{background:linear-gradient(135deg, #0d1420, #1a2233);border:1px solid var(--border-hi);border-radius:var(--r-2xl);padding:32px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 16px 40px -16px rgba(0,0,0,.5);transition:transform .3s var(--ease)}
+        .focus-hero:hover{transform:translateY(-3px);border-color:var(--border-focus)}
+        .focus-tags{display:flex;gap:8px;margin-bottom:24px;position:relative;z-index:2}
         .tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:var(--r-full);background:rgba(239,68,68,.15);color:#ff9f9f;border:1px solid rgba(239,68,68,.4)}
-        .focus-matchup{display:flex;align-items:center;justify-content:space-between;gap:20px}
-        .team-block{display:flex;flex-direction:column;align-items:center;gap:12px;flex:1}
-        .team-logo{width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.5))}
+        .tag.amber{background:var(--amber-soft);color:var(--amber);border-color:var(--amber)}
+        .focus-matchup{display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative;z-index:2}
+        .team-block{display:flex;flex-direction:column;align-items:center;gap:16px;flex:1}
+        .team-logo{width:80px;height:80px;object-fit:contain;filter:drop-shadow(0 8px 16px rgba(0,0,0,.6));transition:transform .3s}
+        .focus-hero:hover .team-logo{transform:scale(1.1) rotate(-3deg)}
         .team-logo-fb{width:80px;height:80px;border-radius:50%;background:#1a2233;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:var(--text-2);border:2px solid var(--border)}
-        .team-name{font-size:20px;font-weight:600;text-align:center}
-        .vs-badge{font-family:var(--font-serif);font-size:24px;color:var(--text-4);font-style:italic}
-        .focus-footer{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)}
+        .team-name{font-family:var(--font-serif);font-size:clamp(18px, 3vw, 24px);font-weight:600;text-align:center}
+        .vs-badge{font-family:var(--font-serif);font-size:28px;color:var(--text-4);font-style:italic}
+        .focus-footer{display:flex;justify-content:space-between;align-items:center;margin-top:32px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:2}
         .match-time{font-family:var(--font-mono);font-size:13px;color:var(--amber)}
-        .btn-predict{background:var(--amber);color:#1a0d02;border:none;padding:10px 24px;border-radius:var(--r-full);font-weight:700;font-size:13px;cursor:pointer;transition:transform .2s}
-        .btn-predict:hover{transform:translateY(-2px);filter:brightness(1.1)}
-        .focus-rail{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto}
-        .rail-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .2s}
+        .btn-predict{background:var(--amber);color:#1a0d02;border:none;padding:12px 28px;border-radius:var(--r-full);font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;box-shadow:0 4px 12px var(--amber-glow)}
+        .btn-predict:hover{transform:translateY(-2px);filter:brightness(1.1);box-shadow:0 8px 24px var(--amber-glow)}
+
+        .focus-rail{display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:4px}
+        .rail-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:all .25s var(--ease)}
         .rail-item:hover{background:var(--surface-hi);border-color:var(--border-hi);transform:translateX(-4px)}
         .rail-badge{width:24px;height:24px;object-fit:contain}
         .rail-badge-fb{width:24px;height:24px;background:rgba(255,255,255,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
@@ -60,107 +72,115 @@
         .rail-meta{font-size:10px;color:var(--text-3);font-family:var(--font-mono);margin-top:2px}
 
         /* Dashboard */
-        .dash{display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;margin-bottom:32px}
+        .dash{display:grid;grid-template-columns:repeat(4, 1fr);gap:16px;margin-bottom:32px;animation:fadeUp .8s var(--ease) .2s both}
         @media(max-width:768px){.dash{grid-template-columns:repeat(2, 1fr)}}
-        .cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);padding:24px;position:relative;overflow:hidden}
-        .cell-lbl{font-size:10px;font-weight:600;letter-spacing:.15em;color:var(--text-3);text-transform:uppercase}
-        .cell-val{font-family:var(--font-serif);font-size:36px;font-weight:500;margin-top:8px;color:var(--text)}
-        .cell-val.amber{color:var(--amber)}
-        .cell-val.cyan{color:var(--cyan)}
+        .cell{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:24px;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+        .cell::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.04),transparent 40%);pointer-events:none}
+        .cell-lbl{font-size:10px;font-weight:600;letter-spacing:.15em;color:var(--text-3);text-transform:uppercase;position:relative}
+        .cell-val{font-family:var(--font-serif);font-size:36px;font-weight:500;margin-top:8px;position:relative}
+        .cell-val.amber{color:var(--amber);text-shadow:0 0 20px var(--amber-glow)}
+        .cell-val.cyan{color:var(--cyan);text-shadow:0 0 20px rgba(34,211,238,.3)}
 
         /* Layout Grid */
-        .grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start}
+        .grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start;animation:fadeUp .8s var(--ease) .3s both}
         @media(max-width:1024px){.grid{grid-template-columns:1fr}}
-        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:24px;backdrop-filter:blur(24px)}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:24px;backdrop-filter:blur(24px);box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 16px 40px -16px rgba(0,0,0,.5)}
         .card h3{font-size:11px;font-weight:600;letter-spacing:.2em;color:var(--text-3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-        .card h3::before{content:"";width:3px;height:12px;background:var(--amber);border-radius:2px}
+        .card h3::before{content:"";width:3px;height:12px;background:linear-gradient(180deg,var(--amber),var(--cyan));border-radius:2px}
 
         /* Form & Selectors */
         .field{margin-bottom:16px}
         .field label{display:block;font-size:12px;color:var(--text-2);margin-bottom:8px}
-        select,.match-picker-trigger{width:100%;background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);padding:12px 14px;border-radius:var(--r-md);font-size:14px;cursor:pointer;appearance:none;display:flex;justify-content:space-between;align-items:center}
-        select:focus,.match-picker-trigger:focus{border-color:var(--amber);outline:none}
+        select,.match-picker-trigger{width:100%;background:var(--surface-2);border:1px solid var(--border-hi);color:var(--text);padding:12px 14px;border-radius:var(--r-md);font-size:14px;cursor:pointer;appearance:none;display:flex;justify-content:space-between;align-items:center;transition:all .2s}
+        select:focus,.match-picker-trigger:focus{border-color:var(--amber);outline:none;box-shadow:0 0 0 3px var(--amber-soft)}
         .picker-mode{display:flex;gap:8px;margin-bottom:16px}
-        .picker-mode button{flex:1;padding:8px;border-radius:var(--r-sm);border:1px solid var(--border);background:none;color:var(--text-3);cursor:pointer;font-size:12px;font-weight:600}
+        .picker-mode button{flex:1;padding:10px;border-radius:var(--r-md);border:1px solid var(--border);background:transparent;color:var(--text-3);cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
         .picker-mode button.on{background:var(--amber-soft);color:var(--amber);border-color:var(--amber)}
 
         /* Buttons */
-        .btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;background:var(--amber);color:#1a0d02;transition:all .2s}
-        .btn:hover{filter:brightness(1.1)}
-        .btn.ghost{background:transparent;border:1px solid var(--border-hi);color:var(--text-2)}
-        .btn.ghost:hover{border-color:var(--amber);color:var(--amber)}
+        .btn{width:100%;padding:14px;border-radius:var(--r-md);border:none;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;background:linear-gradient(135deg,var(--amber),#ffb968);color:#1a0d02;transition:all .25s;box-shadow:0 4px 12px var(--amber-glow)}
+        .btn:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 8px 24px var(--amber-glow)}
+        .btn.ghost{background:transparent;border:1px solid var(--border-hi);color:var(--text-2);box-shadow:none}
+        .btn.ghost:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
         .btn-row{display:flex;gap:8px;margin-bottom:24px}
 
-        /* Kick Game */
-        .kick-panel{display:flex;flex-direction:column;gap:12px;margin-top:24px}
-        .kick-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-        .kick-cell{padding:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);color:var(--text-2);font-family:var(--font-mono);cursor:pointer;transition:all .2s}
-        .kick-cell:hover{background:var(--emerald-soft);color:var(--emerald);border-color:var(--emerald)}
-        .goal-target{width:100%;height:60px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;font-size:24px;position:relative}
+        /* Result Empty */
+        .empty{padding:80px 20px;text-align:center;color:var(--text-3);display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+        .empty-icon{font-size:48px;margin-bottom:16px;opacity:.5;animation:pulse 3s infinite}
 
-        /* Result UI */
-        .empty{padding:60px 20px;text-align:center;color:var(--text-3)}
-        .empty-icon{font-size:48px;margin-bottom:16px;opacity:.5}
-
-        .scoreboard{text-align:center;padding:20px 0;border-bottom:1px solid var(--border);margin-bottom:24px}
-        .teams{display:flex;align-items:center;justify-content:center;gap:24px}
-        .score{font-family:var(--font-serif);font-size:64px;line-height:1;color:var(--emerald);text-shadow:0 0 40px rgba(52,211,153,.4);padding:0 16px}
-        .result-actions{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
-        .result-actions .btn{width:auto;padding:8px 16px;font-size:12px}
+        /* 预测结果的高级 UI */
+        .scoreboard{text-align:center;padding:20px 0 32px;border-bottom:1px solid var(--border);margin-bottom:24px;position:relative}
+        .teams{display:flex;align-items:center;justify-content:center;gap:24px;position:relative}
+        .team.left{animation:badgeInLeft 1s var(--ease) both}
+        .team.right{animation:badgeInRight 1s var(--ease) both}
+        .score{font-family:var(--font-serif);font-size:clamp(56px,8vw,80px);line-height:1;color:var(--emerald);text-shadow:0 0 40px rgba(52,211,153,.5);padding:0 16px;font-weight:600}
+        .result-actions{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+        .result-actions .btn{width:auto;padding:8px 16px;font-size:12px;border-radius:var(--r-full)}
 
         .rings{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
         .ring{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 12px;text-align:center;position:relative}
-        .ring svg{width:100%;max-width:80px;transform:rotate(-90deg);margin:0 auto}
+        .ring svg{width:100%;max-width:84px;transform:rotate(-90deg);margin:0 auto;display:block}
         .ring circle{fill:none;stroke-width:6;stroke-linecap:round}
         .ring .track{stroke:rgba(255,255,255,.06)}
-        .ring .bar{transition:stroke-dashoffset 1s var(--ease)}
-        .ring .num{font-family:var(--font-serif);font-size:24px;margin-top:8px}
+        .ring .bar{transition:stroke-dashoffset 1.3s var(--ease);filter:drop-shadow(0 0 6px currentColor)}
+        .ring .lbl2{font-size:10px;font-weight:600;letter-spacing:.16em;color:var(--text-3);margin-top:12px;text-transform:uppercase}
+        .ring .num{font-family:var(--font-serif);font-size:24px;margin-top:4px;font-weight:500}
         .ring.h .num{color:var(--amber)} .ring.d .num{color:var(--text-2)} .ring.a .num{color:var(--cyan)}
 
         .compare{display:flex;height:16px;background:var(--surface-2);border-radius:var(--r-full);overflow:hidden;border:1px solid var(--border);margin-bottom:20px}
-        .compare .seg{height:100%;transition:width 1s var(--ease)}
-        .compare .seg.h{background:var(--amber)} .compare .seg.d{background:#64748b} .compare .seg.a{background:var(--cyan)}
+        .compare .seg{height:100%;transition:width 1.3s var(--ease);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#000}
+        .compare .seg.h{background:linear-gradient(90deg,var(--amber),#ffb968)} .compare .seg.d{background:#64748b;color:#fff} .compare .seg.a{background:linear-gradient(90deg,#0891b2,var(--cyan))}
 
-        .sect{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
-        .sect .ttl{font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--text-3);margin-bottom:16px}
+        .sect{margin-top:24px;padding-top:24px;border-top:1px solid var(--border)}
+        .sect .ttl{font-size:11px;font-weight:600;letter-spacing:.15em;color:var(--text-3);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+        .sect .ttl::before{content:"";width:3px;height:12px;background:var(--amber);border-radius:2px}
 
-        .radar-wrap,.whatif-panel{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:16px}
-        .radar-box{display:flex;justify-content:center;align-items:center;gap:24px;flex-wrap:wrap}
+        .radar-wrap,.whatif-panel{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px;margin-bottom:16px}
+        .radar-box{display:flex;justify-content:center;align-items:center;gap:32px;flex-wrap:wrap}
         .radar-svg{width:min(100%,300px)}
-        .radar-svg .poly-home{fill:var(--amber);fill-opacity:.22;stroke:var(--amber);stroke-width:2}
+        .radar-svg .poly-home{fill:var(--amber);fill-opacity:.22;stroke:var(--amber);stroke-width:2;filter:drop-shadow(0 0 6px var(--amber-glow))}
         .radar-svg .poly-away{fill:var(--cyan);fill-opacity:.18;stroke:var(--cyan);stroke-width:2}
         .radar-svg .grid-line{stroke:rgba(255,255,255,.08);stroke-width:1;fill:none}
         .radar-svg .axis-line{stroke:rgba(255,255,255,.08);stroke-width:1}
         .radar-svg .radar-label{fill:var(--text-3);font-size:10px;font-weight:600}
+        .radar-legend{display:flex;flex-direction:column;gap:8px;font-size:12px}
+        .radar-legend .item{display:flex;align-items:center;gap:8px;color:var(--text-2)}
+        .radar-legend .dot{width:10px;height:10px;border-radius:50%}
+        .radar-legend .item.home .dot{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+        .radar-legend .item.away .dot{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
 
-        .factor-row{display:flex;align-items:center;gap:12px;padding:6px 0;font-size:12px}
-        .factor-row .fr-label{width:80px;color:var(--text-2)}
+        .factor-row{display:flex;align-items:center;gap:12px;padding:8px 0;font-size:12px}
+        .factor-row .fr-icon{width:20px;text-align:center}
+        .factor-row .fr-label{width:90px;color:var(--text-2)}
         .factor-row .fr-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.04);border-radius:3px;position:relative;overflow:visible}
         .factor-row .fr-bar-center{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:var(--border-hi)}
         .factor-row .fr-bar{position:absolute;top:0;height:100%;border-radius:3px}
-        .factor-row .fr-bar.positive{background:var(--emerald)} .factor-row .fr-bar.negative{background:var(--rose)}
-        .factor-row .fr-delta{width:48px;text-align:right;font-family:var(--font-mono);font-weight:700}
+        .factor-row .fr-bar.positive{background:linear-gradient(90deg,var(--emerald),#6ee7b7);box-shadow:0 0 8px rgba(52,211,153,.4)}
+        .factor-row .fr-bar.negative{background:linear-gradient(90deg,#fca5a5,var(--rose));box-shadow:0 0 8px rgba(239,68,68,.4)}
+        .factor-row .fr-delta{width:52px;text-align:right;font-family:var(--font-mono);font-weight:700}
         .factor-row .fr-delta.pos{color:var(--emerald)} .factor-row .fr-delta.neg{color:var(--rose)}
 
-        .whatif-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:12px;font-size:12px}
-        .whatif-slider-row label{width:60px;color:var(--text-2)}
+        .whatif-slider-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:12px}
+        .whatif-slider-row label{width:80px;color:var(--text-2);font-weight:600}
         .whatif-slider-row input[type="range"]{flex:1;height:4px;-webkit-appearance:none;background:rgba(255,255,255,.08);border-radius:2px;outline:none}
-        .whatif-slider-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--amber);cursor:pointer}
-        .whatif-val{width:36px;text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--amber)}
+        .whatif-slider-row input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--amber);cursor:pointer;box-shadow:0 0 10px var(--amber-glow)}
+        .whatif-val{width:42px;text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--amber)}
         .whatif-result{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
-        .wf-prob{text-align:center;padding:10px;border-radius:var(--r-sm);background:rgba(255,255,255,.02);border:1px solid var(--border)}
-        .wf-num{font-family:var(--font-serif);font-size:20px}
+        .wf-prob{text-align:center;padding:12px;border-radius:var(--r-md);background:rgba(255,255,255,.02);border:1px solid var(--border)}
+        .wf-num{font-family:var(--font-serif);font-size:22px;font-weight:500}
 
-        .heatmap-grid{display:grid;grid-template-columns:20px repeat(6,1fr);gap:2px;min-width:280px;margin:0 auto}
+        .heatmap-grid{display:grid;grid-template-columns:24px repeat(6,1fr);gap:3px;max-width:320px;margin:0 auto}
         .heatmap-axis{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-4);font-family:var(--font-mono)}
-        .heatmap-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:8px;color:#fff;transition:transform .2s}
-        .heatmap-cell:hover{transform:scale(1.2);z-index:2;box-shadow:0 0 10px rgba(255,255,255,.2)}
+        .heatmap-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:9px;color:rgba(255,255,255,.9);transition:transform .2s;cursor:pointer}
+        .heatmap-cell:hover{transform:scale(1.2);z-index:2;box-shadow:0 0 10px rgba(255,255,255,.3)}
 
-        .standings-card{margin-top:32px}
+        /* Standings */
+        .standings-card{margin-top:32px;animation:fadeUp .8s var(--ease) .4s both}
         .standings-scroll{overflow-x:auto;margin:0 -24px;padding:0 24px}
         table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:700px}
-        th{font-size:10px;color:var(--text-3);text-transform:uppercase;padding:12px 8px;border-bottom:1px solid var(--border);text-align:left}
-        td{padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.03);font-size:13px}
+        th{font-size:10px;color:var(--text-3);text-transform:uppercase;padding:14px 8px;border-bottom:1px solid var(--border);text-align:left;font-weight:600}
+        td{padding:14px 8px;border-bottom:1px solid rgba(255,255,255,.03);font-size:13px;transition:background .2s}
+        tr:hover td{background:rgba(255,159,67,.04)}
         th:nth-child(1),td:nth-child(1){width:40px;text-align:center}
         th:nth-child(2),td:nth-child(2){width:auto}
         th:nth-child(3),td:nth-child(3),
@@ -168,26 +188,21 @@
         th:nth-child(5),td:nth-child(5),
         th:nth-child(6),td:nth-child(6),
         th:nth-child(7),td:nth-child(7){width:50px;text-align:center}
-        th:nth-child(8),td:nth-child(8){width:100px;text-align:center}
-        .team-cell{display:flex;align-items:center;gap:12px}
+        th:nth-child(8),td:nth-child(8){width:120px;text-align:center}
+        .team-cell{display:flex;align-items:center;gap:12px;font-weight:500}
         .mini-badge{width:24px;height:24px;object-fit:contain}
 
-        .fpl-card{margin-top:32px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-2xl);padding:24px}
-        .fpl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-        .fpl-pitch{background:linear-gradient(180deg,rgba(24,44,24,.6),rgba(12,24,12,.8));border:1px solid rgba(52,211,153,.2);border-radius:var(--r-lg);padding:40px 20px;text-align:center;color:var(--text-3)}
-
+        /* Footer */
         footer{margin-top:60px;padding-top:32px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--text-4);line-height:1.8}
-        footer a{color:var(--text-3);text-decoration:none;margin:0 8px}
+        footer a{color:var(--text-3);text-decoration:none;margin:0 8px;transition:color .2s}
         footer a:hover{color:var(--amber)}
-
-        .fab{position:fixed;right:32px;bottom:32px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1e2738,#0a0d13);border:1px solid var(--amber-glow);display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.6);z-index:60;transition:transform .3s}
-        .fab:hover{transform:scale(1.1) rotate(15deg)}
     </style>
 </head>
 <body>
+
 <div class="topbar">
-    <div class="topbar-left"><span style="color:var(--amber)">⚽</span> 英超预测引擎</div>
-    <div class="topbar-center"><span class="live-dot"></span> Dixon-Coles · v17</div>
+    <div class="topbar-left"><div class="logo"></div> 英超预测引擎</div>
+    <div class="topbar-center"><span class="live-dot"></span> Dixon-Coles · v17.1</div>
     <div class="topbar-right"><a href="about.html" class="nav-link">关于</a></div>
 </div>
 
@@ -213,37 +228,44 @@
     </section>
 
     <div class="grid">
+        <!-- 左侧控制台 -->
         <div class="card">
             <h3>数据同步</h3>
             <div class="btn-row"><button class="btn ghost" onclick="syncLatestSquad()" id="syncBtn">🔄 同步最新阵容</button></div>
-            <div style="font-size:11px;color:var(--text-4);margin-bottom:24px;min-height:16px" id="syncMsg">点击拉取 FPL 官方数据</div>
+            <div style="font-size:11px;color:var(--text-4);margin-bottom:24px;min-height:16px" id="syncMsg">点击拉取官方数据，或运行 update.bat</div>
 
             <h3>比赛选择</h3>
-            <div class="picker-mode" id="pickerMode">
-                <button data-mode="round" class="on">按轮次</button><button data-mode="team">按球队</button>
+            <div class="field">
+                <label>轮次</label>
+                <select id="roundSel"></select>
             </div>
-            <div class="field" id="roundWrap"><label>轮次</label><select id="roundSel"></select></div>
-            <div class="field" id="teamWrap" style="display:none"><label>球队</label><select id="teamSel"></select></div>
-            <div class="field"><label>对阵</label><div class="match-picker-trigger" id="matchTrigger"><span id="matchLabel">选择比赛…</span><span>▼</span></div></div>
+            <div class="field">
+                <label>对阵</label>
+                <div class="match-picker-trigger" id="matchTrigger">
+                    <span id="matchLabel">选择比赛…</span>
+                    <span>▼</span>
+                </div>
+                <div id="matchList" style="display:none; background:var(--surface-2); border:1px solid var(--border-hi); border-radius:8px; margin-top:8px; max-height:200px; overflow-y:auto;"></div>
+            </div>
 
             <button class="btn" onclick="runPrediction()" id="predictBtn" style="margin-top:16px">⚡ 开始预测</button>
-
-            <div class="kick-panel">
-                <div class="kick-grid" id="kickGrid"></div>
-                <div class="goal-target">🥅</div>
-            </div>
         </div>
 
-        <div class="card" id="resultCard">
+        <!-- 右侧结果 -->
+        <div class="card" id="resultCard" style="min-height:500px">
             <h3>预测结果</h3>
-            <div id="resultRoot">
-                <div class="empty"><div class="empty-icon">⚽</div><div>选择一场比赛，点击「开始预测」</div><div style="font-size:12px;color:var(--text-4);margin-top:8px">模型将生成比分概率矩阵</div></div>
+            <div id="resultRoot" style="height:100%">
+                <div class="empty">
+                    <div class="empty-icon">⚽</div>
+                    <div style="font-size:15px;font-weight:600;color:var(--text-2)">选择一场比赛，点击「开始预测」</div>
+                    <div style="font-size:12px;color:var(--text-4);margin-top:8px">模型将生成比分概率矩阵</div>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="card standings-card">
-        <h3>积分榜 <span style="font-size:12px;color:var(--text-4);font-weight:400" id="seasonLabel"></span></h3>
+        <h3>积分榜 <span style="font-size:12px;color:var(--text-4);font-weight:400;letter-spacing:0" id="seasonLabel"></span></h3>
         <div class="standings-scroll">
             <table>
                 <thead><tr><th>#</th><th>球队</th><th>赛</th><th>进</th><th>失</th><th>净</th><th>分</th><th>近5场</th></tr></thead>
@@ -252,30 +274,20 @@
         </div>
     </div>
 
-    <div class="fpl-card">
-        <div class="fpl-header">
-            <h2 style="font-family:var(--font-serif);font-size:20px">FPL 阵容推荐</h2>
-            <span style="font-size:12px;color:var(--violet);background:var(--violet-soft);padding:2px 8px;border-radius:99px">实时数据</span>
-        </div>
-        <div class="fpl-pitch" id="fplPitch">点击上方「同步最新阵容」拉取 FPL 官方球员数据</div>
-    </div>
-
     <footer>
         <div>本工具仅用于统计学习与娱乐，所有预测为概率模型输出，不构成任何投注建议。</div>
         <div style="margin-top:12px"><a href="about.html">关于引擎</a> · <a href="javascript:void(0)" onclick="openHistory()">战绩中心</a></div>
-        <div style="margin-top:12px;font-family:var(--font-mono);font-size:10px">Dixon-Coles Engine · v17 · 融合 xG/Elo</div>
+        <div style="margin-top:12px;font-family:var(--font-mono);font-size:10px">Dixon-Coles Engine · v17.1 · 融合 xG/Elo</div>
     </footer>
 </div>
 
-<div class="fab" onclick="scrollTo({top:0,behavior:'smooth'})">⬆️</div>
-
-<div id="historyMask" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
-    <div style="background:#0f1219;padding:24px;border-radius:16px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto">
-        <div style="display:flex;justify-content:space-between;margin-bottom:16px">
-            <h2 style="font-family:var(--font-serif)">战绩中心</h2>
-            <button onclick="document.getElementById('historyMask').style.display='none'" style="background:none;border:none;color:#fff;cursor:pointer">✕</button>
+<div id="historyMask" style="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(10px)" onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:var(--surface);border:1px solid var(--border-hi);padding:32px;border-radius:20px;width:90%;max-width:600px;max-height:80vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;margin-bottom:24px">
+            <h2 style="font-family:var(--font-serif);font-size:24px">战绩中心</h2>
+            <button onclick="document.getElementById('historyMask').style.display='none'" style="background:none;border:none;color:var(--text-3);font-size:20px;cursor:pointer">✕</button>
         </div>
-        <div id="historyList" style="font-size:13px;color:var(--text-2)"></div>
+        <div id="historyList" style="font-size:14px;color:var(--text-2)"></div>
     </div>
 </div>
 
@@ -286,34 +298,45 @@
         fixtures: [],
         currentRound: 1,
         selectedMatch: null,
-        pickerMode: 'round',
-        fpl: null,
         history: JSON.parse(localStorage.getItem('epl_history') || '[]')
     };
 
-    const BASE_TEAMS = [['Arsenal','ARS'],['Aston Villa','AVL'],['Bournemouth','BOU'],['Brentford','BRE'],['Brighton','BHA'],['Chelsea','CHE'],['Crystal Palace','CRY'],['Everton','EVE'],['Fulham','FUL'],['Leeds United','LEE'],['Liverpool','LIV'],['Man City','MCI'],['Man Utd','MUN'],['Newcastle','NEW'],['Nott\'m Forest','NFO'],['Sunderland','SUN'],['Spurs','TOT'],['West Ham','WHU'],['Wolves','WOL'],['Burnley','BUR']];
+    // 兜底队伍（如果 data.json 没加载成功）
+    const BASE_TEAMS = [
+        {id:1, name:"Arsenal", short:"ARS", strAtt:3, strDef:3},
+        {id:2, name:"Aston Villa", short:"AVL", strAtt:3, strDef:3},
+        {id:3, name:"Bournemouth", short:"BOU", strAtt:3, strDef:3},
+        {id:4, name:"Brentford", short:"BRE", strAtt:3, strDef:3},
+        {id:5, name:"Brighton", short:"BHA", strAtt:3, strDef:3},
+        {id:6, name:"Chelsea", short:"CHE", strAtt:3, strDef:3},
+        {id:7, name:"Crystal Palace", short:"CRY", strAtt:3, strDef:3},
+        {id:8, name:"Everton", short:"EVE", strAtt:3, strDef:3},
+        {id:9, name:"Fulham", short:"FUL", strAtt:3, strDef:3},
+        {id:10, name:"Leeds United", short:"LEE", strAtt:3, strDef:3},
+        {id:11, name:"Liverpool", short:"LIV", strAtt:3, strDef:3},
+        {id:12, name:"Man City", short:"MCI", strAtt:3, strDef:3},
+        {id:13, name:"Man Utd", short:"MUN", strAtt:3, strDef:3},
+        {id:14, name:"Newcastle", short:"NEW", strAtt:3, strDef:3},
+        {id:15, name:"Nott'm Forest", short:"NFO", strAtt:3, strDef:3},
+        {id:16, name:"Sunderland", short:"SUN", strAtt:3, strDef:3},
+        {id:17, name:"Spurs", short:"TOT", strAtt:3, strDef:3},
+        {id:18, name:"West Ham", short:"WHU", strAtt:3, strDef:3},
+        {id:19, name:"Wolves", short:"WOL", strAtt:3, strDef:3},
+        {id:20, name:"Burnley", short:"BUR", strAtt:3, strDef:3}
+    ];
 
     const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
     const esc = s => String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-
     function teamById(id){ return state.teams.find(t => t.id === id); }
 
-    /* ================= 核心算法 (含 xG/Elo 融合) ================= */
+    /* ================= 引擎核心 ================= */
     function factorial(n){ let f=1; for(let i=2;i<=n;i++) f*=i; return f; }
     function poisson(k, lambda){ return Math.exp(-lambda) * Math.pow(lambda, k) / factorial(k); }
     function tau(x, y, lh, la, rho){ if(x===0&&y===0)return 1-lh*la*rho; if(x===0&&y===1)return 1+lh*rho; if(x===1&&y===0)return 1+la*rho; if(x===1&&y===1)return 1-rho; return 1; }
-
     function buildMatrix(lh, la, rho, max=10){
         const m = []; let sum = 0;
-        for(let i=0;i<=max;i++){
-            m[i]=[];
-            for(let j=0;j<=max;j++){
-                let p = poisson(i,lh)*poisson(j,la)*tau(i,j,lh,la,rho);
-                if(p<0)p=0; m[i][j]=p; sum+=p;
-            }
-        }
+        for(let i=0;i<=max;i++){ m[i]=[]; for(let j=0;j<=max;j++){ let p = poisson(i,lh)*poisson(j,la)*tau(i,j,lh,la,rho); if(p<0)p=0; m[i][j]=p; sum+=p; } }
         if(sum>0) for(let i=0;i<=max;i++) for(let j=0;j<=max;j++) m[i][j]/=sum;
         return m;
     }
@@ -344,28 +367,23 @@
         const la = leagueAverages();
         const sample = s.played;
 
-        // 1) 计算联赛平均 xG/xGA（从 data.json 里获取）
         const teamsWithXG = state.teams.filter(t => t.xG != null && t.xGA != null);
         const leagueAvgXG = teamsWithXG.length ? teamsWithXG.reduce((sum, t) => sum + t.xG, 0) / teamsWithXG.length : (la.home + la.away)/2;
         const leagueAvgXGA = teamsWithXG.length ? teamsWithXG.reduce((sum, t) => sum + t.xGA, 0) / teamsWithXG.length : (la.home + la.away)/2;
 
-        // 2) xG 强度
         let xgAtt = 1, xgDef = 1;
         if (team.xG != null && team.xGMatches >= 3) {
             xgAtt = clamp(team.xG / Math.max(0.6, leagueAvgXG), 0.5, 2.0);
             xgDef = clamp(team.xGA / Math.max(0.6, leagueAvgXGA), 0.5, 2.0);
         }
 
-        // 3) 实际进球强度
         const w = sample / (sample + 6);
         const obsAtt = sample ? (s.gf / sample) / Math.max(0.6, (la.home + la.away) / 2) : 1;
         const obsDef = sample ? (s.ga / sample) / Math.max(0.6, (la.home + la.away) / 2) : 1;
 
-        // 4) FPL 先验
         const priorAtt = (team.strAtt || 3) / 3;
         const priorDef = 3 / (team.strDef || 3);
 
-        // 5) 权重融合
         const xgW = team.xGMatches >= 3 ? clamp(team.xGMatches / (team.xGMatches + 4), 0.3, 0.7) : 0;
         const actualW = (1 - xgW) * w;
         const priorW = 1 - xgW - actualW;
@@ -378,13 +396,13 @@
 
     function predictMatch(homeId, awayId) {
         const home = teamById(homeId), away = teamById(awayId);
+        if(!home || !away) return null;
         const la = leagueAverages();
         const hs = teamStrength(home), as = teamStrength(away);
 
         let lh = Math.max(0.6, la.home) * hs.att * (1 / as.def);
         let la_ = Math.max(0.5, la.away) * as.att * (1 / hs.def);
 
-        // Elo 微调
         let eloMult = 1;
         if (home.elo != null && away.elo != null) {
             const eloDiff = home.elo - away.elo;
@@ -409,14 +427,6 @@
         for(let i=0;i<=6;i++) for(let j=0;j<=6;j++) scores.push({h:i, a:j, p:matrix[i][j]});
         scores.sort((a,b)=>b.p-a.p);
 
-        // 蒙特卡洛
-        let mcH=0, mcD=0, mcA=0;
-        for(let k=0;k<1000;k++){
-            const rH = poissonSample(lh), rA = poissonSample(la_);
-            if(rH>rA) mcH++; else if(rH===rA) mcD++; else mcA++;
-        }
-
-        // 因素分解
         const factors = [
             { label:'主场优势', delta: Math.log(la.home/1.55), icon:'🏟' },
             { label:'进攻强度', delta: Math.log(hs.att/as.att), icon:'⚔️' },
@@ -425,16 +435,10 @@
             { label:'xG 影响', delta: Math.log((hs.xgW+0.1)/(as.xgW+0.1)), icon:'🎯' }
         ];
 
-        return { home, away, lh, la: la_, probs:{h:ph, d:pd, a:pa}, btts, over25, topScores: scores.slice(0,5), factors, mc: {h: mcH/1000, d: mcD/1000, a: mcA/1000} };
+        return { home, away, lh, la: la_, probs:{h:ph, d:pd, a:pa}, btts, over25, topScores: scores.slice(0,5), factors, matrix };
     }
 
-    function poissonSample(lambda){
-        const L = Math.exp(-lambda); let k = 0, p = 1;
-        do { k++; p *= Math.random(); } while(p > L);
-        return k - 1;
-    }
-
-    /* ================= 赛程生成与加载 ================= */
+    /* ================= 初始化与渲染 ================= */
     function generateFixtures(teams) {
         const n = teams.length, half = n/2, rounds = n-1;
         let arr = teams.map(t=>t.id);
@@ -457,10 +461,6 @@
     }
 
     async function loadData() {
-        state.teams = BASE_TEAMS.map(([name, short], i) => ({
-            id: i + 1, name, short, fplId: null, badge: null, strAtt: 3, strDef: 3, xG: null, xGA: null, xGMatches: 0, elo: null
-        }));
-
         let data = null;
         try {
             const res = await fetch('data.json', {cache:'no-store'});
@@ -472,12 +472,12 @@
             state.fixtures = data.fixtures || [];
             state.currentRound = data.currentRound || 1;
         } else {
+            state.teams = BASE_TEAMS;
             state.fixtures = generateFixtures(state.teams);
             state.currentRound = 1;
         }
     }
 
-    /* ================= UI 渲染 ================= */
     function renderFocus() {
         const hero = $('#focusHero'), rail = $('#focusRail');
         const list = state.fixtures.filter(f => f.round === state.currentRound).sort((a,b)=>new Date(a.kickoff)-new Date(b.kickoff));
@@ -487,10 +487,9 @@
         const h = teamById(main.home), a = teamById(main.away);
         const d = new Date(main.kickoff);
         const isLive = d.getTime() <= Date.now() && !main.finished;
-        const statusText = main.finished ? '已完赛' : (isLive ? '进行中' : '未开赛');
 
         hero.innerHTML = `
-    <div class="focus-tags"><span class="tag">${statusText}</span><span class="tag" style="background:var(--amber-soft);color:var(--amber);border-color:var(--amber)">第 ${main.round} 轮</span></div>
+    <div class="focus-tags"><span class="tag">${main.finished ? '已完赛' : (isLive ? '进行中' : '未开赛')}</span><span class="tag amber">第 ${main.round} 轮</span></div>
     <div class="focus-matchup">
       <div class="team-block">${h.badge ? `<img src="${h.badge}" class="team-logo" onerror="this.style.display='none'">` : `<div class="team-logo-fb">${h.short}</div>`}<div class="team-name">${esc(h.name)}</div></div>
       <div class="vs-badge">VS</div>
@@ -524,22 +523,33 @@
         const rounds = Array.from(new Set(state.fixtures.map(f=>f.round))).sort((a,b)=>a-b);
         const sel = $('#roundSel');
         sel.innerHTML = rounds.map(r => `<option value="${r}" ${r===state.currentRound?'selected':''}>第 ${r} 轮</option>`).join('');
-        const tSel = $('#teamSel');
-        tSel.innerHTML = state.teams.sort((a,b)=>a.name.localeCompare(b.name)).map(t => `<option value="${t.id}">${esc(t.name)}</option>`).join('');
 
-        sel.onchange = () => { renderFocus(); updateMatchList(); };
-        const first = state.fixtures.find(f=>f.round===state.currentRound && !f.finished);
+        sel.onchange = () => {
+            state.currentRound = +sel.value;
+            renderFocus();
+            updateMatchList();
+        };
+
+        const first = state.fixtures.find(f=>f.round===state.currentRound);
         if(first) selectMatch(first.home, first.away);
+    }
+
+    function updateMatchList() {
+        const list = state.fixtures.filter(f => f.round === state.currentRound);
+        const box = $('#matchList');
+        box.innerHTML = list.map(f => {
+            const h = teamById(f.home), a = teamById(f.away);
+            return `<div style="padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; font-size:13px" onclick="selectMatch(${f.home}, ${f.away})">
+            ${esc(h.name)} vs ${esc(a.name)}
+        </div>`;
+        }).join('');
     }
 
     function selectMatch(hId, aId) {
         state.selectedMatch = { home: hId, away: aId };
         const h = teamById(hId), a = teamById(aId);
         $('#matchLabel').textContent = `${h.name} vs ${a.name}`;
-    }
-
-    function updateMatchList() {
-        // 如果后续扩展下拉框，这里填充
+        $('#matchList').style.display = 'none';
     }
 
     function renderStandings() {
@@ -559,77 +569,67 @@
         $('#standingsBody').innerHTML = table.map((r, i) => `
     <tr>
       <td>${i+1}</td>
-      <td><div class="team-cell">${r.team.badge ? `<img src="${r.team.badge}" class="mini-badge">` : `<div class="rail-badge-fb">${r.team.short}</div>`}${esc(r.team.name)}</div></td>
+      <td><div class="team-cell">${r.team.badge ? `<img src="${r.team.badge}" class="mini-badge">` : `<div class="rail-badge-fb" style="width:24px;height:24px">${r.team.short}</div>`} ${esc(r.team.name)}</div></td>
       <td>${r.played}</td><td>${r.gf}</td><td>${r.ga}</td>
       <td>${r.gd>0?'+':''}${r.gd}</td>
-      <td><b>${r.pts}</b></td>
-      <td>${r.form.map(f=>`<span style="display:inline-block;width:14px;height:14px;line-height:14px;text-align:center;border-radius:3px;font-size:9px;font-weight:700;background:${f==='W'?'#22c55e':f==='D'?'#64748b':'#ef4444'};margin-right:2px">${f}</span>`).join('')}</td>
+      <td><b style="color:var(--amber)">${r.pts}</b></td>
+      <td>
+        <div style="display:flex;justify-content:center;gap:3px">
+          ${r.form.map(f=>`<span style="display:inline-block;width:18px;height:18px;line-height:18px;text-align:center;border-radius:4px;font-size:10px;font-weight:700;color:#fff;background:${f==='W'?'#22c55e':f==='D'?'#64748b':'#ef4444'}">${f}</span>`).join('')}
+        </div>
+      </td>
     </tr>`).join('');
     }
 
-    /* ================= 预测交互 ================= */
+    /* ================= 预测与结果展示 ================= */
     function runPrediction() {
         if(!state.selectedMatch) return alert('请先选择比赛');
         const pr = predictMatch(state.selectedMatch.home, state.selectedMatch.away);
+        if(!pr) return;
         const best = pr.topScores[0];
 
-        // 1. 构建基础结果
         let html = `
     <div class="scoreboard">
-      <div style="font-size:14px;color:var(--text-2);margin-bottom:8px">${esc(pr.home.name)} vs ${esc(pr.away.name)}</div>
-      <div class="score">${best.h} : ${best.a}</div>
-      <div style="font-size:12px;color:var(--text-4);margin-top:8px">最可能比分 · 置信度 ${pr.probs.h>0.5||pr.probs.a>0.5?'高':'中'}</div>
+      <div style="font-size:14px;color:var(--text-2);margin-bottom:12px;font-weight:500">${esc(pr.home.name)} vs ${esc(pr.away.name)}</div>
+      <div class="teams">
+        <div class="team left">${pr.home.badge ? `<img src="${pr.home.badge}" style="width:60px;height:60px;object-fit:contain">` : `<div class="team-logo-fb">${pr.home.short}</div>`}</div>
+        <div class="score">${best.h} : ${best.a}</div>
+        <div class="team right">${pr.away.badge ? `<img src="${pr.away.badge}" style="width:60px;height:60px;object-fit:contain">` : `<div class="team-logo-fb">${pr.away.short}</div>`}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-4);margin-top:12px">最可能比分 · 置信度 ${pr.probs.h>0.5||pr.probs.a>0.5?'高':'中'}</div>
       <div class="result-actions">
         <button class="btn ghost" onclick="saveHistory(${best.h}, ${best.a})">💾 保存预测</button>
       </div>
     </div>`;
 
-        // 2. 环形图与对比条
         const hw = pr.probs.h * 100, dw = pr.probs.d * 100, aw = pr.probs.a * 100;
         html += `
     <div class="sect">
       <div class="ttl">胜平负概率</div>
       <div class="rings">
-        <div class="ring h"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="40"/><circle class="bar" cx="50" cy="50" r="40" stroke="var(--amber)" stroke-dasharray="${2*Math.PI*40}" stroke-dashoffset="${2*Math.PI*40*(1-pr.probs.h)}"/></svg><div class="lbl2">主胜</div><div class="num">${hw.toFixed(1)}%</div></div>
-        <div class="ring d"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="40"/><circle class="bar" cx="50" cy="50" r="40" stroke="#94a3b8" stroke-dasharray="${2*Math.PI*40}" stroke-dashoffset="${2*Math.PI*40*(1-pr.probs.d)}"/></svg><div class="lbl2">平局</div><div class="num">${dw.toFixed(1)}%</div></div>
-        <div class="ring a"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="40"/><circle class="bar" cx="50" cy="50" r="40" stroke="var(--cyan)" stroke-dasharray="${2*Math.PI*40}" stroke-dashoffset="${2*Math.PI*40*(1-pr.probs.a)}"/></svg><div class="lbl2">客胜</div><div class="num">${aw.toFixed(1)}%</div></div>
+        <div class="ring h"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="42"/><circle class="bar" cx="50" cy="50" r="42" stroke="var(--amber)" stroke-dasharray="${2*Math.PI*42}" stroke-dashoffset="${2*Math.PI*42*(1-pr.probs.h)}"/></svg><div class="lbl2">主胜</div><div class="num">${hw.toFixed(1)}%</div></div>
+        <div class="ring d"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="42"/><circle class="bar" cx="50" cy="50" r="42" stroke="#94a3b8" stroke-dasharray="${2*Math.PI*42}" stroke-dashoffset="${2*Math.PI*42*(1-pr.probs.d)}"/></svg><div class="lbl2">平局</div><div class="num">${dw.toFixed(1)}%</div></div>
+        <div class="ring a"><svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="42"/><circle class="bar" cx="50" cy="50" r="42" stroke="var(--cyan)" stroke-dasharray="${2*Math.PI*42}" stroke-dashoffset="${2*Math.PI*42*(1-pr.probs.a)}"/></svg><div class="lbl2">客胜</div><div class="num">${aw.toFixed(1)}%</div></div>
       </div>
       <div class="compare"><div class="seg h" style="width:${hw}%"></div><div class="seg d" style="width:${dw}%"></div><div class="seg a" style="width:${aw}%"></div></div>
     </div>`;
 
-        // 3. 比分热力图 (仅展示前 6x6)
-        let hmGrid = '';
-        for(let i=0;i<=6;i++){
-            hmGrid += `<div class="heatmap-axis">${i}</div>`;
-            for(let j=0;j<=6;j++){
-                const p = pr.matrix ? pr.matrix[i][j] : (i===best.h&&j===best.a?best.p:0);
+        // 热力图
+        let hmHtml = `<div class="heatmap-grid"><div></div><div class="heatmap-axis">0</div><div class="heatmap-axis">1</div><div class="heatmap-axis">2</div><div class="heatmap-axis">3</div><div class="heatmap-axis">4</div><div class="heatmap-axis">5</div>`;
+        for(let i=0;i<=5;i++){
+            hmHtml += `<div class="heatmap-axis">${i}</div>`;
+            for(let j=0;j<=5;j++){
+                const p = pr.matrix[i][j];
                 const intensity = Math.min(1, p * 5);
                 const hue = 45 - intensity*40;
                 const light = 12 + intensity*50;
-                hmGrid += `<div class="heatmap-cell" style="background:hsl(${hue},80%,${light}%)" title="${i}-${j}: ${(p*100).toFixed(1)}%">${p>0.02?(p*100).toFixed(0):''}</div>`;
+                hmHtml += `<div class="heatmap-cell" style="background:hsl(${hue},85%,${light}%)" title="${i}-${j}: ${(p*100).toFixed(1)}%">${p>0.02?(p*100).toFixed(0):''}</div>`;
             }
         }
-        // 修正热力图，行头需要错位
-        // 我们直接利用简单的网格排布
-        html += `
-    <div class="sect">
-      <div class="ttl">比分概率热力图</div>
-      <div style="display:grid;grid-template-columns:20px repeat(7,1fr);gap:2px;margin:0 auto;max-width:300px">
-        <div></div><div class="heatmap-axis">0</div><div class="heatmap-axis">1</div><div class="heatmap-axis">2</div><div class="heatmap-axis">3</div><div class="heatmap-axis">4</div><div class="heatmap-axis">5</div><div class="heatmap-axis">6</div>
-        ${Array.from({length:7}).map((_, i) => `
-          <div class="heatmap-axis">${i}</div>
-          ${Array.from({length:7}).map((_, j) => {
-            const p = pr.matrix ? pr.matrix[i][j] : 0;
-            const intensity = Math.min(1, p * 5);
-            const hue = 45 - intensity*40;
-            const light = 12 + intensity*50;
-            return `<div class="heatmap-cell" style="background:hsl(${hue},80%,${light}%)">${p>0.02?(p*100).toFixed(0):''}</div>`;
-        }).join('')}
-        `).join('')}
-      </div>
-    </div>`;
+        hmHtml += `</div>`;
+        html += `<div class="sect"><div class="ttl">比分概率热力图</div><div style="background:var(--surface-2);padding:20px;border-radius:12px">${hmHtml}</div></div>`;
 
-        // 4. 因素分解
+        // 因素分解
         const factorsHtml = pr.factors.map(f => {
             const pctv = clamp(f.delta * 100, -30, 30);
             const left = pctv >= 0 ? 50 : 50 + pctv;
@@ -641,43 +641,25 @@
           <span class="fr-delta ${pctv>=0?'pos':'neg'}">${pctv>=0?'+':''}${pctv.toFixed(1)}%</span>
         </div>`;
         }).join('');
-        html += `<div class="sect"><div class="ttl">因素分解</div><div style="background:var(--surface-2);padding:16px;border-radius:8px">${factorsHtml}</div></div>`;
+        html += `<div class="sect"><div class="ttl">因素分解</div><div class="whatif-panel" style="margin-bottom:0">${factorsHtml}</div></div>`;
 
-        // 5. What-If 模拟
+        // What-If
         html += `
     <div class="sect">
       <div class="ttl">What-If 模拟</div>
-      <div class="whatif-panel">
+      <div class="whatif-panel" style="margin-bottom:0">
         <div class="whatif-slider-row"><label>${pr.home.short} λ</label><input type="range" min="30" max="250" value="100" id="wfHome"><span class="whatif-val" id="wfHomeV">${pr.lh.toFixed(2)}</span></div>
         <div class="whatif-slider-row"><label>${pr.away.short} λ</label><input type="range" min="30" max="250" value="100" id="wfAway"><span class="whatif-val" id="wfAwayV">${pr.la.toFixed(2)}</span></div>
         <div class="whatif-result">
-          <div class="wf-prob home"><span class="wf-label">主胜</span><span class="wf-num" id="wfPh">${hw.toFixed(1)}%</span></div>
-          <div class="wf-prob draw"><span class="wf-label">平</span><span class="wf-num" id="wfPd">${dw.toFixed(1)}%</span></div>
-          <div class="wf-prob away"><span class="wf-label">客胜</span><span class="wf-num" id="wfPa">${aw.toFixed(1)}%</span></div>
+          <div class="wf-prob home"><span class="lbl2">主胜</span><span class="wf-num" id="wfPh" style="color:var(--amber)">${hw.toFixed(1)}%</span></div>
+          <div class="wf-prob draw"><span class="lbl2">平</span><span class="wf-num" id="wfPd" style="color:var(--text-2)">${dw.toFixed(1)}%</span></div>
+          <div class="wf-prob away"><span class="lbl2">客胜</span><span class="wf-num" id="wfPa" style="color:var(--cyan)">${aw.toFixed(1)}%</span></div>
         </div>
-      </div>
-    </div>`;
-
-        // 6. 模型健康度
-        html += `
-    <div class="sect">
-      <div class="ttl">模型健康度</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-        <div style="text-align:center;padding:12px;background:var(--surface-2);border-radius:8px"><div style="font-size:10px;color:var(--text-3)">主胜 (MC)</div><div style="font-size:20px;font-family:var(--font-serif);color:var(--amber)">${(pr.mc.h*100).toFixed(1)}%</div></div>
-        <div style="text-align:center;padding:12px;background:var(--surface-2);border-radius:8px"><div style="font-size:10px;color:var(--text-3)">平局 (MC)</div><div style="font-size:20px;font-family:var(--font-serif);color:var(--text-2)">${(pr.mc.d*100).toFixed(1)}%</div></div>
-        <div style="text-align:center;padding:12px;background:var(--surface-2);border-radius:8px"><div style="font-size:10px;color:var(--text-3)">客胜 (MC)</div><div style="font-size:20px;font-family:var(--font-serif);color:var(--cyan)">${(pr.mc.a*100).toFixed(1)}%</div></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);padding:8px 0">
-        <span>双方进球 (BTTS)</span><b style="color:var(--amber)">${(pr.btts*100).toFixed(1)}%</b>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);padding:8px 0">
-        <span>大于 2.5 球</span><b style="color:var(--amber)">${(pr.over25*100).toFixed(1)}%</b>
       </div>
     </div>`;
 
         $('#resultRoot').innerHTML = html;
 
-        // 绑定 What-If 事件
         const recalc = () => {
             const lh = pr.lh * (+$('#wfHome').value/100);
             const la = pr.la * (+$('#wfAway').value/100);
@@ -707,47 +689,35 @@
         $('#historyMask').style.display = 'flex';
         $('#historyList').innerHTML = state.history.length ? state.history.map(h => {
             const th = teamById(h.home), ta = teamById(h.away);
-            return `<div style="padding:12px;border-bottom:1px solid var(--border)">${th.name} ${h.ph}-${h.pa} ${ta.name}</div>`;
-        }).join('') : '暂无记录';
+            return `<div style="padding:16px;border-bottom:1px solid var(--border)">${th.name} <b style="color:var(--amber);font-size:16px;margin:0 8px">${h.ph}-${h.pa}</b> ${ta.name}</div>`;
+        }).join('') : '<div style="text-align:center;padding:40px;color:var(--text-4)">暂无记录</div>';
     }
 
     async function syncLatestSquad() {
         const btn = $('#syncBtn'), msg = $('#syncMsg');
         btn.textContent = '同步中...'; btn.disabled = true;
-        msg.innerHTML = '<span style="color:var(--amber)">正在通过代理连接 FPL 官方...</span>';
-
         try {
-            // 使用 allorigins 公共代理绕过 CORS 限制
             const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://fantasy.premierleague.com/api/bootstrap-static/');
             const res = await fetch(proxyUrl);
-            if (!res.ok) throw new Error('Proxy failed');
+            if(!res.ok) throw new Error();
             const data = await res.json();
 
-            if (!data || !data.teams) throw new Error('Invalid data');
-
-            // 更新球队徽章和攻防强度 (先验)
-            data.teams.forEach(t => {
-                // 通过简称或名字匹配
-                const team = state.teams.find(x =>
-                    x.name.toLowerCase().includes(t.name.toLowerCase()) ||
-                    t.name.toLowerCase().includes(x.name.toLowerCase()) ||
-                    x.short === t.short_name
-                );
-                if(team) {
-                    team.fplId = t.id;
-                    team.badge = `https://resources.premierleague.com/premierleague/badges/70/t${t.id}.png`;
-                    team.strAtt = (t.strength_attack_home + t.strength_attack_away) / 2;
-                    team.strDef = (t.strength_defence_home + t.strength_defence_away) / 2;
-                }
-            });
-
-            msg.innerHTML = `<span style="color:var(--emerald)">✅ 成功同步 ${data.elements.length} 名球员和 20 支球队</span>`;
-            renderFocus();
-            renderStandings();
-            renderDash();
+            // 只用来更新兜底数据的 logo，不破坏真实 data.json 的结构
+            if(!state.teams[0].badge) {
+                data.teams.forEach(t => {
+                    const team = state.teams.find(x => x.name === t.name || x.name.includes(t.name));
+                    if(team) {
+                        team.fplId = t.id;
+                        team.badge = `https://resources.premierleague.com/premierleague/badges/70/t${t.id}.png`;
+                    }
+                });
+                renderFocus(); renderStandings();
+                msg.innerHTML = `<span style="color:var(--emerald)">✅ 已更新球队队徽</span>`;
+            } else {
+                msg.innerHTML = `<span style="color:var(--emerald)">✅ 已使用 data.json 中的官方真实数据</span>`;
+            }
         } catch(e) {
-            console.error(e);
-            msg.innerHTML = `<span style="color:var(--rose)">代理同步失败，请确保已运行 node update.js 或等待 GitHub Actions</span>`;
+            msg.innerHTML = `<span style="color:var(--rose)">同步失败，请确保运行了 update.bat</span>`;
         } finally {
             btn.textContent = '🔄 同步最新阵容'; btn.disabled = false;
         }
@@ -761,13 +731,20 @@
         renderSelectors();
         renderStandings();
 
-        $('#pickerMode').addEventListener('click', e => {
-            if(e.target.tagName === 'BUTTON') {
-                $$('#pickerMode button').forEach(b => b.classList.remove('on'));
-                e.target.classList.add('on');
-                const mode = e.target.dataset.mode;
-                $('#roundWrap').style.display = mode === 'round' ? 'block' : 'none';
-                $('#teamWrap').style.display = mode === 'team' ? 'block' : 'none';
+        // 下拉列表展开与收起
+        $('#matchTrigger').onclick = () => {
+            const el = $('#matchList');
+            if(el.style.display === 'none' || !el.style.display) {
+                updateMatchList();
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+            }
+        };
+
+        document.addEventListener('click', e => {
+            if(!$('#matchTrigger').contains(e.target) && !$('#matchList').contains(e.target)) {
+                $('#matchList').style.display = 'none';
             }
         });
     }
